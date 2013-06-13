@@ -4,26 +4,18 @@ Daiquiri
 A framework for the publication of scientific databases
 -------------------------------------------------------
 
-                           ....    Today, the publication of research data plays 
-     .o:;;,,,''''''....,;;,'.      an important role in astronomy and astrophysics.
-      ,oll::;;;;;;;;;:ol'...       On the one hand, dedicated programs, such as
-       .:do''...   .;'.. ,'        surveys like SDSS and RAVE, data intensive
-         ;xd.     .:dc:;c.         instruments like LOFAR, or massive simulations 
-          .dO,       .l;           like Millennium and MultiDark are initially
-            ox;     ;l.            planned to release their data for the 
-             cl,.. l,              community. On the other hand, for more 
-             .;,:;:o               traditionally oriented research projects 
-               .;l.                data publication becomes a key requirement
-               .xx                 demanded by the funding agencies.
-               .kd                 
-                kd                 The common approach is to publish this data 
-                xx                 via dedicated web sites. This includes rather 
-                xx.                simple HTML forms as well as complex query 
-                lo.                systems such as SDSS-CAS or the RAVE database 
-                c,'                query interface. Most of these web sites are 
-           .. ....'.               tailor made for the particular case and are 
-           ','''''.....            therefore not easily transferrable to future 
-                                   projects.
+Today, the publication of research data plays an important role in astronomy and 
+astrophysics. On the one hand, dedicated programs, such as surveys like SDSS and 
+RAVE, data intensive instruments like LOFAR, or massive simulations like 
+Millennium and MultiDark are initially planned to release their data for the 
+community. On the other hand, for more traditionally oriented research projects 
+data publication becomes a key requirement demanded by the funding agencies.
+
+The common approach is to publish this data via dedicated web sites. This 
+includes rather simple HTML forms as well as complex query systems such as 
+SDSS-CAS or the RAVE database query interface. Most of these web sites are 
+tailor made for the particular case and are therefore not easily transferrable 
+to future projects.
 
 At Leibniz-Institute for Astrophysics Potsdam (AIP), we gained experience with both 
 the maintenance and the development of such applications. The RAVE and MultiDark 
