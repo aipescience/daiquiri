@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS `Contact_Messages` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `firstname` VARCHAR(64) NOT NULL,
+  `lastname` VARCHAR(64) NOT NULL,
+  `email` VARCHAR(64) NOT NULL,
+  `subject` VARCHAR(128) NOT NULL,
+  `message` VARCHAR(2048) NOT NULL,
+  `datetime` DATETIME NOT NULL,
+  `category_id` INTEGER NOT NULL,
+  `status_id` INTEGER NOT NULL,
+  `user_id` INTEGER
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Contact_Categories` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `category` VARCHAR(16)
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Contact_Status` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `status` VARCHAR(16) NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';

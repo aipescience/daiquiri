@@ -1,0 +1,60 @@
+CREATE TABLE IF NOT EXISTS `Auth_User` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(256) NOT NULL,
+  `email` VARCHAR(256) NOT NULL,
+  `password` VARCHAR(256) NOT NULL,
+  `role_id` INTEGER NOT NULL,
+  `status_id` INTEGER NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Details` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `user_id` INTEGER NOT NULL,
+  `key` VARCHAR(256) NOT NULL,
+  `value` VARCHAR(256) NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Roles` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `role` VARCHAR(16) NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Status` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `status` VARCHAR(16) NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Resources` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `resource` VARCHAR(256) NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Rules` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `role_id` INTEGER,
+  `resource_id` INTEGER,
+  `permissions` TEXT
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Registration` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(256) NOT NULL,
+  `email` VARCHAR(256) NOT NULL,
+  `password` VARCHAR(256) NOT NULL,
+  `code`  VARCHAR(256) NOT NULL,
+  `details` TEXT
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Apps` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `appname` VARCHAR(256) NOT NULL,
+  `password` VARCHAR(256) NOT NULL,
+  `active` BOOL NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Sessions` (
+  `session` char(32) PRIMARY KEY NOT NULL DEFAULT '',
+  `modified` int(11) DEFAULT NULL,
+  `lifetime` int(11) DEFAULT NULL,
+  `data` text
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';

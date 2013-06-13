@@ -1,0 +1,83 @@
+<?php
+
+/*
+ *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  See the NOTICE file distributed with this work for additional
+ *  information regarding copyright ownership. You may obtain a copy
+ *  of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+$items = array(
+    'index' => array(
+        'text' => 'Overview',
+        'href' => '/admin',
+        'resource' => 'Auth_Model_User',
+        'permission' => 'rows',
+    ),
+    'config' => array(
+        'text' => 'Configuration entries',
+        'href' => '/config/entries',
+        'resource' => 'Config_Model_Entries',
+        'permission' => 'index'),
+    'templates' => array(
+        'text' => 'Mail templates',
+        'href' => '/config/templates',
+        'resource' => 'Config_Model_Templates',
+        'permission' => 'index'),
+    'user' => array(
+        'text' => 'User management',
+        'href' => '/auth/user',
+        'resource' => 'Auth_Model_User',
+        'permission' => 'rows'),
+    'data' => array(
+        'text' => 'Database management',
+        'href' => '/data',
+        'resource' => 'Data_Model_Databases',
+        'permission' => 'show'),
+    'sessions' => array(
+        'text' => 'Sessions management',
+        'href' => '/auth/sessions',
+        'resource' => 'Auth_Model_Sessions',
+        'permission' => 'rows'),
+    'contact' => array(
+        'text' => 'Contact messages',
+        'href' => '/contact/messages',
+        'resource' => 'Contact_Model_Messages',
+        'permission' => 'rows'),
+    'query' => array(
+        'text' => 'Query jobs',
+        'href' => '/query/jobs',
+        'resource' => 'Query_Model_Jobs',
+        'permission' => 'rows')
+);
+if (Daiquiri_Config::getInstance()->cms->enabled) {
+    $items['wordpress'] = array(
+        'text' => 'CMS Admin Interface',
+        'href' => Daiquiri_Config::getInstance()->cms->url . 'wp-admin/',
+        'resource' => 'Cms_Model_Wordpress',
+        'permission' => 'admin');
+}
+
+foreach ($items as $key => $value) {
+    if ($this->current === $key) {
+        echo '<li class="nav-item active">';
+    } else {
+        echo '<li class="nav-item">';
+    }
+    echo $this->internalLink($value);
+    echo '</li>';
+}
+?>

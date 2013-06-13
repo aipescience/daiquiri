@@ -1,0 +1,108 @@
+/*  
+ *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  See the NOTICE file distributed with this work for additional
+ *  information regarding copyright ownership. You may obtain a copy
+ *  of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+*/
+
+.tab-content {
+    overflow:visible
+}
+#jobs .nav {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+#jobs .nav .nav-header {
+    border-bottom: 1px solid #ddd;
+}
+#jobs li.nav-item a {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 0;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: small;
+}
+#jobs a:hover {
+    border-radius: 0;
+}
+#jobs ul {
+    margin-bottom: 2px;
+}
+#browser {
+    width: 666px;
+    height: 200px;
+}
+#plot-container {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+#plot {
+    height: 438px;
+}
+.modal-body {
+    max-height: 500px;;
+}
+.CodeMirror {
+    line-height: 1.3em;
+    font-family: monospace;
+
+    /* Necessary so the scrollbar can be absolutely positioned within the wrapper on Lion. */
+    position: relative;
+    /* This prevents unwanted scrollbars from showing up on the body and wrapper in IE. */
+    overflow: hidden;
+    background-color: white;
+    width: 530px;
+
+    /* Copied from Bootstrap's textarea */
+    display: inline-block;
+    padding: 0px 6px;
+    margin-bottom: 9px;
+    color: #555555;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -ms-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+    transition: border linear 0.2s, box-shadow linear 0.2s;  
+}
+.CodeMirror-focused {
+    /* Copied from Bootstrap's textarea */
+    border-color: rgba(82, 168, 236, 0.8);
+    outline: 0;
+    outline: thin dotted \9;
+    /* IE6-9 */
+
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);  
+}
+.CodeMirror-gutters {
+    border-right-color: #ccc;
+    background-color: white;
+}
+.CodeMirror-linenumber {
+    color: #333;
+}

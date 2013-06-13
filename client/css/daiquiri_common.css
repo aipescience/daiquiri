@@ -1,0 +1,170 @@
+/*  
+ *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  See the NOTICE file distributed with this work for additional
+ *  information regarding copyright ownership. You may obtain a copy
+ *  of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+*/
+
+form {
+    /* margin-top matches the margin-bottom from bootstrap */
+    margin-top: 20px;
+}
+form .captcha img {
+    display: block;
+    border: 1px solid silver;
+    margin-bottom: 10px;
+}
+form fieldset {
+    margin-bottom: 20px;
+}
+form p textarea, 
+form p input[type="text"], 
+form p input[type="password"], 
+form p input[type="datetime"], 
+form p input[type="datetime-local"], 
+form p input[type="date"], 
+form p input[type="month"], 
+form p input[type="time"], 
+form p input[type="week"], 
+form p input[type="number"], 
+form p input[type="email"], 
+form p input[type="url"], 
+form p input[type="search"], 
+form p input[type="tel"], 
+form p input[type="color"], 
+form p .uneditable-input,
+form .inline textarea, 
+form .inline input[type="text"], 
+form .inline input[type="password"], 
+form .inline input[type="datetime"], 
+form .inline input[type="datetime-local"], 
+form .inline input[type="date"], 
+form .inline input[type="month"], 
+form .inline input[type="time"], 
+form .inline input[type="week"], 
+form .inline input[type="number"], 
+form .inline input[type="email"], 
+form .inline input[type="url"], 
+form .inline input[type="search"], 
+form .inline input[type="tel"], 
+form .inline input[type="color"], 
+form .inline .uneditable-input {
+    /* remove bottom margin, if the form element is inside a paragraph or inline */
+    margin-bottom: 0px;
+}
+form .inline {
+    margin-bottom: 10px;
+}
+.daiquiri-form-inline-group div,
+.daiquiri-form-inline-group label {
+    display: inline;
+}
+.daiquiri-form-inline-right-group { 
+    float: right;
+}
+pre {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+.align-form-horizontal,
+.margin-left {
+    /* align a block with a form-horizontal form from bootstrap */
+    margin-left: 180px;
+}
+.onehundredtwenty {
+    width: 120px;
+}
+.onehundredeighty {
+    width: 180px;
+}
+.onehundredfifty {
+    width: 150px;
+}
+/* 
+a button that looks like a link, see
+http://stackoverflow.com/questions/1367409/how-to-make-button-look-like-a-link
+*/
+.linkbutton, .linkbutton:focus, .linkbutton:active {
+    /* Remove all decorations */
+    border: none;
+    display: inline;
+    margin: 0em;
+    padding: 0em;
+    outline: none;
+    outline-offset: 0em;
+    /* Look like a link */
+    background: none;
+    cursor: pointer;
+    font: inherit;
+
+    color: #0088cc; /* bootstrap default, needs to be adjusted eventually */
+}
+.linkbutton:hover {
+    color: #005580; /* bootstrap default, needs to be adjusted eventually */
+    text-decoration: underline;
+}
+
+button::-moz-focus-inner {
+    /* Remove extra space inside buttons in Firefox */
+    border: none;
+    padding: 0em;
+}
+.expanded {
+    line-height: 30px;
+}
+.table .accordion:last-child {
+    margin-bottom: 0;
+}
+.table .table {
+    margin-bottom: 0;
+}
+.accordion-inner :last-child {
+    margin-bottom: 0;
+}
+/* overides the bold keys in the bootstrap horizontal dl */
+dl.dl-horizontal dt {
+    font-weight: normal;
+}
+dl.dl-horizontal dd {
+    /* one pixel more on the left to better aling with form fields */
+    padding-left: 1px
+}
+.daiquiri-nav .nav {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.daiquiri-nav .nav .nav-header {
+    border-bottom: 1px solid #ddd;
+}
+.daiquiri-nav li.nav-item > a {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 0;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: small;
+}
+.daiquiri-nav ul {
+    margin-bottom: 2px;
+}
+.no-transition {
+    -webkit-transition: height 0.001s;
+    -moz-transition: height 0.001s;
+    -ms-transition: height 0.001s;
+    -o-transition: height 0.001s;
+    transition: height 0.001s;
+}

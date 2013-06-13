@@ -1,0 +1,39 @@
+<?php
+/*
+ *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  See the NOTICE file distributed with this work for additional
+ *  information regarding copyright ownership. You may obtain a copy
+ *  of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+?>
+
+<?php if ($this->status === 'ok'): ?>
+    <p>Password changed.</p>
+    <?php if ($this->disable): ?>
+        <p>
+            For security, you account needs to be re-enabled by an administrator. 
+            This can take one or two days. If you do not receive a corresponding 
+            mail by then, please contact the administrators directly.
+        </p>
+    <?php endif; ?>
+<?php elseif ($this->status === 'form'): ?>
+    <h2>Change password</h2>
+    <p>Please give your username and a new password.</p>
+    <p>If you cannot remember your username, please contact the support directly.</p>
+    <?php echo $this->form; ?>
+<?php else: ?>
+    <p>The provided url is not valid.</p>
+<?php endif; ?>

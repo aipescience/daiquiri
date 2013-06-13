@@ -1,0 +1,122 @@
+<?php
+/*
+ *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  See the NOTICE file distributed with this work for additional
+ *  information regarding copyright ownership. You may obtain a copy
+ *  of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+?>
+
+<?php
+$id = $this->data['id'];
+unset($this->data['role_id']);
+unset($this->data['status_id']);
+?>
+
+<h2>Details of user "<?php echo $this->escape($this->data['username']); ?>"</h2>
+
+<h4>User information</h4>
+<div class="frame padding marginBottom">
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th class="span3">Key</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach (array('id', 'username', 'email', 'role', 'status') as $key): ?>
+                <tr>
+                    <td><?php echo ucfirst($this->escape($key)); ?></td>
+                    <td><?php echo $this->escape($this->data[$key]); ?></td>
+                </tr>
+                <?php unset($this->data[$key]); ?>
+            <?php endforeach; ?>
+            <?php foreach (Daiquiri_Config::getInstance()->auth->details as $key): ?>
+                <tr>
+                    <td><?php echo ucfirst($this->escape($key)); ?></td>
+                    <td><?php echo $this->escape($this->data[$key]); ?></td>
+                </tr>
+                <?php unset($this->data[$key]); ?>
+            <?php endforeach; ?>   
+        </tbody>
+    </table>
+</div>
+
+<h4>Additional information</h4> 
+<div class="frame padding marginBottom">
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th class="span3">Key</th>
+                <th>Value</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($this->data as $key => $value): ?>
+                <tr>
+                    <td><?php echo ucfirst($this->escape($key)); ?></td>
+                    <td><?php echo $this->escape($value); ?></td>
+                    <td>
+                        <?php
+                        echo $this->internalLink(array(
+                            'href' => '/auth/details/update/id/' . $id . '/key/' . $key,
+                            'text' => 'Update',
+                            'resource' => 'Auth_Model_User',
+                            'permission' => 'update'));
+                        ?>
+                        <?php
+                        echo $this->internalLink(array(
+                            'href' => '/auth/details/delete/id/' . $id . '/key/' . $key,
+                            'text' => 'Delete',
+                            'resource' => 'Auth_Model_User',
+                            'permission' => 'delete'));
+                        ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>  
+        </tbody>
+    </table>
+</div>
+
+<?php
+echo $this->internalLink(array(
+    'href' => '/auth/user/update/id/' . $id . '?redirect=/auth/user/show/id/' . $id,
+    'text' => 'Update User information',
+    'resource' => 'Auth_Model_User',
+    'permission' => 'update',
+    'prepend' => '<p>',
+    'append' => '<p>'));
+?>
+
+<?php
+echo $this->internalLink(array(
+    'href' => '/auth/details/create/id/' . $id,
+    'text' => 'Create additional entry',
+    'resource' => 'Auth_Model_Details',
+    'permission' => 'create',
+    'prepend' => '<p>',
+    'append' => '<p>'));
+?>
+
+<?php
+echo $this->internalLink(array(
+    'text' => 'Back',
+    'href' => $this->redirect,
+    'prepend' => '<p>',
+    'append' => '</p>'));
+?>

@@ -1,0 +1,92 @@
+<?php
+/*
+ *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  See the NOTICE file distributed with this work for additional
+ *  information regarding copyright ownership. You may obtain a copy
+ *  of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+?>
+
+<h2>Table management</h2>
+
+<pre>
+    <?php
+    echo PHP_EOL;
+    echo "'data' => array(" . PHP_EOL;
+    echo "    'databases' => array(" . PHP_EOL;
+    foreach ($this->data as $database) {
+        echo "        array(" . PHP_EOL;
+        foreach ($database as $key => $value) {
+            if (!in_array($key, array('id', 'tables'))) {
+                echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
+            }
+        }
+        echo "        )," . PHP_EOL;
+    }
+    echo "    )," . PHP_EOL;
+    echo "    'tables' => array(" . PHP_EOL;
+    foreach ($this->data as $database) {
+        foreach ($database['tables'] as $table) {
+            echo "        array(" . PHP_EOL;
+            echo "            'database_id' => '{$this->escape($database['id'])}', // {$this->escape($database['name'])}" . PHP_EOL;
+            foreach ($table as $key => $value) {
+                if (!in_array($key, array('id', 'columns'))) {
+                    echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
+                }
+            }
+            echo "        )," . PHP_EOL;
+        }
+    }
+    echo "    )," . PHP_EOL;
+    echo "    'columns' => array(" . PHP_EOL;
+    foreach ($this->data as $database) {
+        foreach ($database['tables'] as $table) {
+            foreach ($table['columns'] as $column) {
+                echo "        array(" . PHP_EOL;
+                echo "            'table_id' => '{$this->escape($table['id'])}', // {$this->escape($table['name'])}" . PHP_EOL;
+                foreach ($column as $key => $value) {
+                    if (!in_array($key, array('id', 'columns'))) {
+                        echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
+                    }
+                }
+                echo "        )," . PHP_EOL;
+            }
+        }
+    }
+    echo "    )," . PHP_EOL;
+    echo "    'functions' => array(";
+    foreach ($this->func as $function) {
+        echo PHP_EOL;
+        echo "        array(" . PHP_EOL;
+        foreach ($function as $key => $value) {
+            if ($key !== 'id') {
+                echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
+            }
+        }
+        echo "        )," . PHP_EOL;
+    }
+    echo "    )," . PHP_EOL;
+
+    echo ")" . PHP_EOL;
+    ?>
+</pre>
+<?php
+echo $this->internalLink(array(
+    'text' => 'Back to data management',
+    'href' => '/data/',
+    'prepend' => '<p>',
+    'append' => '</p>'));
+?>
