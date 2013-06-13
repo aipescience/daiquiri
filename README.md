@@ -70,7 +70,7 @@ Credits
 -------
 
 Daiquiri is developed and maintained by the E-Science group at the 
-[www.aip.de](Leibniz-Institute for Astrophysics Potsdam).
+[Leibniz-Institute for Astrophysics Potsdam](http://www.aip.de).
 
 Lead developers are [Jochen Klar](http://jochenklar.de) and 
 [Adrian Partl](https://www.adrian-partl.de/).
