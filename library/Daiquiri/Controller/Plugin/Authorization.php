@@ -49,37 +49,36 @@ class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Ab
     public function preDispatch(Zend_Controller_Request_Abstract $request) {
         parent::preDispatch($request);
 
-        // get the authorisation headers
-        $header = $request->getHeader('Authorization');
         $username = null;
         $password = null;
-        if (!empty($header)) {
-            $a = explode(' ', $header);
-            if ($a[0] === 'Basic' && isset($a[1])) {
-                $credentials = explode(':', base64_decode($a[1]));
-                if (count($credentials) == 2) {
-                    $username = $credentials[0];
-                    $password = $credentials[1];
 
-                    // try to authentikate as user
-                    $result = Daiquiri_Auth::getInstance()->authenticateUser($username, $password);
+        if(isset($_SERVER['PHP_AUTH_USER'])) {
+            $username = $_SERVER['PHP_AUTH_USER'];
+        }
 
-                    if (!$result) {
-                        // try to authenticate as app
-                        $result = Daiquiri_Auth::getInstance()->authenticateApp($username, $password);
+        if(isset($_SERVER['PHP_AUTH_PW'])) {
+            $password = $_SERVER['PHP_AUTH_PW'];
+        }
 
-                        if (!$result) {
-                            $this->getResponse()
-                                    ->clearHeaders()
-                                    ->setHttpResponseCode(401)
-                                    ->sendResponse();
-                            die(0);
-                        }
-                    }
+        // get the authorisation headers
+        if (!empty($username) && !empty($password)) {
+            // try to authenticate as user
+            $result = Daiquiri_Auth::getInstance()->authenticateUser($username, $password);
 
-                    $this->_active = true;
+            if (!$result) {
+                // try to authenticate as app
+                $result = Daiquiri_Auth::getInstance()->authenticateApp($username, $password);
+
+                if (!$result) {
+                    $this->getResponse()
+                            ->clearHeaders()
+                            ->setHttpResponseCode(401)
+                            ->sendResponse();
+                    die(0);
                 }
             }
+
+            $this->_active = true;
         }
     }
 

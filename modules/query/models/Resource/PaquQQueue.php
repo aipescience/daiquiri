@@ -55,6 +55,7 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
             'Query_Model_DbTable_JobsHistoryPaquQQueue',
             'Query_Model_DbTable_QueuesPaquQQueue',
             'Query_Model_DbTable_UserGroupsPaquQQueue',
+            'Daiquiri_Model_DbTable_Simple',
             'Auth_Model_DbTable_User'
         ));
 
@@ -65,6 +66,7 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
         $this->getTable('Query_Model_DbTable_JobsHistoryPaquQQueue')->setAdapter($userDBResource->getTable()->getAdapter());
         $this->getTable('Query_Model_DbTable_QueuesPaquQQueue')->setAdapter($userDBResource->getTable()->getAdapter());
         $this->getTable('Query_Model_DbTable_UserGroupsPaquQQueue')->setAdapter($userDBResource->getTable()->getAdapter());
+        $this->getTable('Daiquiri_Model_DbTable_Simple')->setAdapter($userDBResource->getTable()->getAdapter());
     }
 
     /**
@@ -481,6 +483,10 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
     public function fetchDefaultQueue() {
         $sqloptions = array();
         $sqloptions['from'] = array("id", "name", "priority", "timeout");
+
+        if(empty(Daiquiri_Config::getInstance()->query->queue->qqueue->defaultQueue)) {
+            throw new Exception("PaquQQueue: No default queue defined");
+        }
 
         $select = $this->getTable('Query_Model_DbTable_QueuesPaquQQueue')->select();
         $select->where("name = ?", Daiquiri_Config::getInstance()->query->queue->qqueue->defaultQueue);

@@ -40,8 +40,8 @@
                     <?php echo get_previous_posts_link(); ?>
                     <?php previous_post_link('Previous post: %link&nbsp&nbsp&nbsp'); ?>
                     <?php next_post_link('Next post: %link'); ?>
+                    <?php edit_post_link('Edit Page'); ?>
                 </div>
-
                 <?php if (comments_open(get_the_ID())): ?>
                     <?php comments_template() ?>
                 <?php endif ?>

@@ -81,7 +81,7 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
 
         //validate sql on server
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
-            if ($this->processing->validateSQLServerSide($combinedQuery, $errors) !== true) {
+            if ($this->processing->validateSQLServerSide($combinedQuery, $resultDB, $errors) !== true) {
                 return false;
             }
         }

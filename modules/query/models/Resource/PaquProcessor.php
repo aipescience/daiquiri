@@ -49,11 +49,16 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
         //set options in parallel query object
         $this->paraQuery->setEngine($config->query->userDb->engine);
-        $this->paraQuery->setDB($config->query->processor->paqu->scratchDB);
+        $this->paraQuery->setDB($config->query->scratchdb);
         $this->paraQuery->setConnectOnServerSite($config->query->processor->paqu->serverConnectStr);
         $this->paraQuery->setSpiderUsr($config->query->processor->paqu->spiderUsr);
         $this->paraQuery->setSpiderPwd($config->query->processor->paqu->spiderPwd);
-        $this->paraQuery->setFedEngine($config->query->processor->paqu->federated);
+
+        if(empty($config->query->processor->paqu->federated)) {
+            $this->paraQuery->setFedEngine("FEDERATED");
+        } else {
+            $this->paraQuery->setFedEngine($config->query->processor->paqu->federated);
+        }
     }
 
     /**
@@ -113,7 +118,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
         //validate sql on server
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
-            if ($this->processing->validateSQLServerSide($combinedQuery, $errors) !== true) {
+            if ($this->processing->validateSQLServerSide($combinedQuery, $resultDB, $errors) !== true) {
                 return false;
             }
         }
@@ -142,6 +147,8 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         if ($multiLines === false) {
             return false;
         }
+
+        $plan = $multiLines;
 
         $multiLineParseTrees = $this->processing->multilineParseTree($multiLines, $errors);
 
@@ -252,6 +259,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         }
 
         $this->paraQuery->setCheckOnDB(false);
+        $this->paraQuery->setAddRowNumbersToFinalTable(true);
 
         $adapter = $this->getUserDBResource()->getTable()->getAdapter();
 
@@ -406,7 +414,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                 $combinedSql = $combinedSql . $part . "; ";
             }
 
-            if ($this->processing->validateSQLServerSide($combinedSql, $errors) !== true) {
+            if ($this->processing->validateSQLServerSide($combinedSql, $resultDB, $errors) !== true) {
                 $scratchdb = Daiquiri_Config::getInstance()->query->scratchdb;
                 foreach ($errors as $error) {
                     if (strpos($error, "ERROR 1146") === false && strpos($error, $scratchdb) === false) {

@@ -26,12 +26,8 @@ for a in $(echo $1 | tr "&" " "); do
     eval ${b[0]}=${b[1]}
 done
 
-if [ ! -z "$toolBin" ]; then
-	toolBin+="/"
-fi
-
 if [ -z "$socket" ]; then
-    ${toolBin}mysqldump_vo --vo-bin2 -h$host -P$port -u$username -p$password $dbname $table
+    ${binPath}/mysqldump_vo --vo-bin2 -h$host -P$port -u$username -p$password $dbname $table
 else
-    ${toolBin}mysqldump_vo --vo-bin2 --socket=$socket -u$username -p$password $dbname $table
+    ${binPath}/mysqldump_vo --vo-bin2 --socket=$socket -u$username -p$password $dbname $table
 fi

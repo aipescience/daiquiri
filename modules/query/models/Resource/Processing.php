@@ -374,28 +374,35 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      * Validates the SQL syntax on the server. Proxy for different databases
      * (handles only MySQL at the moment...)
      * @param string $sql
+     * @param string $db
      * @param array &$errors  errors output
      * @return TRUE if ok, FALSE if not
      */
-    function validateSQLServerSide($sql, array &$errors) {
-        return $this->validateSQLServerSideMYSQL($sql, $errors);
+    function validateSQLServerSide($sql, $db, array &$errors) {
+        return $this->validateSQLServerSideMYSQL($sql, $db, $errors);
     }
 
     /**
      * Server sided SQL validation for MySQL using the PaQu Validate SQL functions.
      * Checks if it is installed and returns error if not.
      * @param string $sql
+     * @param string $db
      * @param array &$errors  errors output
      * @return TRUE if ok, FALSE if not
      * @throws Exception unavailable paqu_validateSQL plugin
      */
-    function validateSQLServerSideMYSQL($sql, array &$errors) {
+    function validateSQLServerSideMYSQL($sql, $db, array &$errors) {
         // get the resource
         $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
 
         //check if PaQu Validate plugin is installed.
         $resource->getTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_ASSOC);
-        $pluginAvail = $resource->plainQuery('select name from mysql.func where name="paqu_validateSQL";');
+
+        try {
+            $pluginAvail = $resource->plainQuery('select name from mysql.func where name="paqu_validateSQL";');
+        } catch (Exception $e) {
+            throw new Exception('PaQu Validate SQL plugin not installed.');
+        }
 
         if ($pluginAvail[0]['name'] !== "paqu_validateSQL") {
             throw new Exception('PaQu Validate SQL plugin not installed.');

@@ -150,7 +150,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // add options for paqu parallel query
         if (!empty($options['config']['query']) &&
                 strtolower($options['config']['query']['processor']['name'] === 'paqu')) {
-            $db = $options['config']['query']['processor']['paqu']['scratchDB'];
+            $db = $options['config']['query']['scratchdb'];
 
             if ($options['config']['query']['guest']) {
                 $rules['guest'][$db . '.*'] = array('select', 'set', 'create');

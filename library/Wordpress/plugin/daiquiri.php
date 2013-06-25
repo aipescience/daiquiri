@@ -1,13 +1,13 @@
 <?php
 /*
-  Plugin Name: Daiquiri framework integration
-  Description: Daiquiri framework integration
-  Author: author
+  Plugin Name: Daiquiri
+  Description: Daiquiri framework integration. After activation configure the database connection or you will not be able to log in again.  
+  Author: Jochen S. Klar, and AIP E-Science
   Version: 1.0
-  Text Domain: Daiquiri framework integration
+  Text Domain: Daiquiri framework integration. 
  */
 
-/*  
+/*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
@@ -35,9 +35,7 @@ $daiquiri_options = array(
     'daiquiri_url' => 'http://localhost/',
     'daiquiri_db_host' => 'localhost',
     'daiquiri_db_port' => '3306',
-    'daiquiri_db_user' => '',
-    'daiquiri_db_password' => '',
-    'daiquiri_db_dbname' => ''
+    'daiquiri_db_dbname' => 'daiquiri_web'
 );
 
 /*
@@ -81,7 +79,10 @@ function daiquiri_admin_display() {
     global $daiquiri_options;
     ?>
     <div class="wrap">
-        <h2>Daiquiri Administration</h2>        
+        <h2>Daiquiri Administration</h2>
+        <p style="color: #b94a48;">
+            <strong>Important:</strong> Adjust at least the daiquiri_db_dbname field.
+        </p>
         <form method="post" action="options.php">
             <table class="form-table">
                 <?php settings_fields('daiquiri'); ?>
@@ -102,6 +103,19 @@ function daiquiri_admin_display() {
                 <input type="submit" name="Submit" value="Save changes" />
             </p>
         </form>
+        <p style="color: #b94a48;">
+            Please ensure that the user configured in wp-config.php has SELECT permissions on
+            the database.
+            Otherwise you will not able to log in with the daiquiri credentials.
+        </p>   
+        <p>
+            You can archive this with SQL command: 
+            <code>GRANT SELECT ON `<?php echo get_option('daiquiri_db_dbname') ?>`.* to 'USER'@'localhost';</code>
+        </p>
+        <p>
+            On a different machine you need to create the user first: 
+            <code>CREATE USER 'USERNAME'@'localhost' IDENTIFIED BY 'PASSWORD';</code>
+        </p>
     </div>
     <?php
 }
@@ -121,7 +135,7 @@ function daiquiri_authenticate($username, $password) {
         $c .= 'port=' . get_option('daiquiri_db_port') . ';';
         $c .= 'dbname=' . get_option('daiquiri_db_dbname') . ';';
 
-        $adapter = new PDO($c, get_option('daiquiri_db_user'), get_option('daiquiri_db_password'));
+        $adapter = new PDO($c, DB_USER, DB_PASSWORD);
         $stmt = $adapter->prepare("SELECT `u`.`id`,`u`.`username`,`u`.`email`,`u`.`password`,`r`.`role` FROM `Auth_User` as `u`,`Auth_Status` as `s`,`Auth_Roles` as `r` WHERE `u`.`username` = ? AND `u`.`status_id` = `s`.`id` AND `u`.`role_id` = `r`.`id` AND `s`.`status` = 'active';");
         $stmt->execute(array($username));
         $row = $stmt->fetch();
@@ -203,6 +217,8 @@ function daiquiri_login_errors() {
         return "<strong>ERROR:</strong> You don't have permissions to log in.";
     else if ($ext_error == "wrongpw")
         return "<strong>ERROR:</strong> Invalid password.";
+    else if ($ext_error == "wrongpw")
+        return "<strong>ERROR:</strong> Wrong Configuration.";
     else
         return $error;
 }

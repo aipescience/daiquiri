@@ -369,7 +369,7 @@ class Daiquiri_Init {
         $links = array();
         $links[$this->_daiquiri_path . '/client'] = $this->_application_path . '/public/daiquiri';
         $links[$this->_options['config']['core']['captcha']['dir']] = $this->_application_path . '/public' . $this->_options['config']['core']['captcha']['url'];
-        if (!empty($this->_options['config']['cms'])) {
+        if (!empty($this->_options['config']['cms']) && $this->_options['config']['cms']['enabled']) {
             $links[$this->_options['config']['cms']['path']] = $this->_application_path . '/public' . $this->_options['config']['cms']['url'];
         }
 
@@ -568,7 +568,7 @@ EOT;
         }
 
         // set up guest user database
-        if (isset($this->_options['database']['user']) && $this->_options['config']['query']['guest'] === 1) {
+        if (isset($this->_options['database']['user'])) {
             $userDb = $this->_options['database']['user'];
             echo '    Syncing ' . $userDb['dbname'] . '.' . PHP_EOL;
 

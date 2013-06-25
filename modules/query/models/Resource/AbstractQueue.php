@@ -169,7 +169,8 @@ abstract class Query_Model_Resource_AbstractQueue extends Daiquiri_Model_Resourc
      * @return result set
      */
     public function plainQuery($query) {
-        return $this->getTable()->getAdapter()->fetchAll($query);
+        $resource = $this->getUserDBResource();
+        return $resource->getTable()->getAdapter()->fetchAll($query);
     }
 
     /**

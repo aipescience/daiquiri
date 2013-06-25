@@ -49,8 +49,13 @@ class Query_Model_Resource_SimpleQueue extends Query_Model_Resource_AbstractQueu
 
         $this->addTables(array(
             'Query_Model_DbTable_Jobs',
+            'Daiquiri_Model_DbTable_Simple',
             'Auth_Model_DbTable_User'
         ));
+
+        $userDBResource = $this->getUserDBResource();
+
+        $this->getTable('Daiquiri_Model_DbTable_Simple')->setAdapter($userDBResource->getTable()->getAdapter());
     }
 
     /**

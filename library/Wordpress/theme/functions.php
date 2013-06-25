@@ -25,7 +25,7 @@
  */
 global $daiquiri_theme_options;
 $daiquiri_theme_options = array(
-    'daiquiri_layout_url' => 'http://localhost/layout'
+    'daiquiri_url' => 'http://localhost/'
 );
 foreach ($daiquiri_theme_options as $option => $default) {
     add_option($option, $default);
@@ -107,18 +107,43 @@ class Daiquiri_Layout {
     }
 
     private function __construct() {
+        // sanity check
+        $siteUrl = get_option('siteurl');
+        $layoutUrl = get_option('daiquiri_url') . '/layout/';
+        if (strpos($layoutUrl, $siteUrl) !== false) {
+            echo '<h1>Error with theme</h1><p>Layout URL is below CMS URL.</p>';
+            die(0);
+        }
+
+        // construct request
         require_once('HTTP/Request2.php');
-        $req = new HTTP_Request2(get_option('daiquiri_layout_url'));
+        $req = new HTTP_Request2($layoutUrl);
+        $req->setConfig(array(
+            'connect_timeout' => 2,
+            'timeout' => 3
+        ));
         $req->setMethod('GET');
         $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
-        $response = $req->send();
+
+        try {
+            $response = $req->send();
+
+            if (200 != $response->getStatus()) {
+                echo '<h1>Error with theme</h1><p>HTTP request status != 200.</p>';
+                die(0);
+            }
+        } catch (HTTP_Request2_Exception $e) {
+            echo '<h1>Error with theme</h1><p>Error with HTTP request.</p>';
+            die(0);
+        }
+
         $body = explode('<!-- content -->', $response->getBody());
         if (count($body) == 2) {
             $this->_header = $body[0];
             $this->_footer = $body[1];
         } else {
-            $this->_header = '<h1>Error with theme</h1><div style="visibility:hidden;">';
-            $this->_footer = '</div>';
+            echo '<h1>Error with theme</h1><p>Malformatted layout.</p>';
+            die(0);
         }
     }
 

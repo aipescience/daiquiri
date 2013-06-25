@@ -209,7 +209,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 $plan = false;
             }
 
-            if ($values["plan_mail"] !== Null) {
+            if (isset($values["plan_mail"]) && $values["plan_mail"] !== Null) {
                 // store plan in session
                 if ($plan !== false) {
                     $ns->planString = $plan;
@@ -225,7 +225,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 );
             } else {
                 // submit query
-                $response = $model->query($ns->sql, $plan, $ns->tablename, $ns->queue);
+                $response = $model->query($ns->sql, $plan, $ns->tablename, array("queue" => $ns->queue));
 
                 if ($response['status'] === 'ok') {
                     return $response;

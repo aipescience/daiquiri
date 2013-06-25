@@ -121,7 +121,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
         }
 
         //if plan type direct, obtain query plan
-        if ($this->processor->supportsPlanType("QPROC_SIMPLE") === true) {
+        if ($this->processor->supportsPlanType("QPROC_SIMPLE") === true and $plan === false) {
             $plan = $this->processor->getPlan($sql, $errors);
 
             if (!empty($errors)) {
@@ -133,6 +133,12 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
                 $errors['planError'] = 'Query plan required. If you end up here, something went badly wrong';
                 return array('status' => 'error', 'errors' => $errors);
             }
+
+            //split plan into lines
+            $processing = new Query_Model_Resource_Processing();
+            $noMultilineCommentSQL = $processing->removeMultilineComments($plan);
+            $multiLines = $processing->splitQueryIntoMultiline($noMultilineCommentSQL, $errors);
+            $plan = $multiLines;
         }
 
         // process sql string

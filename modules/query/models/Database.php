@@ -68,7 +68,12 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                 'columns' => array()
             );
 
-            $resource->init($userdb['name'], $usertable);
+            try {
+                $resource->init($userdb['name'], $usertable);
+            } catch (Exception $e) {
+                continue;
+            }
+
             $usercolumns = $resource->fetchCols();
             foreach ($usercolumns as $usercolumn) {
                 $table['columns'][] = array(
@@ -148,6 +153,11 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                 if ((!file_exists($file) || file_exists($file . ".lock")) && $queueType === "gearman") {
                     //check if GearmanManager is up and running
                     if (!file_exists(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid)) {
+                        //check if we have write access to actually create this PID file
+                        if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid))) {
+                            return array('status' => 'error', 'error' => 'Cannot write to the gearman PID file location');
+                        }
+
                         $gearmanConf = Daiquiri_Config::getInstance()->query->download->queue->gearman;
 
                         //not there, start GearmanManager
@@ -228,6 +238,10 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         if (isset(Daiquiri_Config::getInstance()->query->download->adapter->config->$format)) {
             $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
+
+            //remove any additional stuff (like compression endings) from suffix
+            $parts = explode(".", $suffix);
+            $suffix = "." . $parts[1];
         } else {
             return array('status' => 'error', 'error' => 'Error: format not supported by stream');
         }

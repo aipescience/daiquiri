@@ -149,7 +149,7 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
      * Authenticates an API access with the given API key. This mechanism will become deprecated
      * in the near future.
      */
-    public function authenticateApp($apikey) {
+    public function authenticateApp($appname, $password) {
 
         // first check if username or password are missing
         if (!$appname) {
@@ -295,6 +295,14 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
                 return true;
             }
         }
+
+        //scratch database has read access
+        $scratchDB = Daiquiri_Config::getInstance()->query->scratchdb;
+
+        if (!empty($scratchDB) && $database === $scratchDB && ($permission === "select" ||
+                $permission === "set" )) {
+            return true;
+        }        
 
         return false;
     }
