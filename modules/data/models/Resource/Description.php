@@ -245,6 +245,9 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
             //assuming that create table statement always comes with \ns...
             $columnInfo = explode("\n", $createTable[1]);
 
+            //throw away the first column, since that one is always the CREATE TABLE statement
+            unset($columnInfo[0]);
+
             //find the column definition
             $definition = false;
             foreach ($columnInfo as $currColumn) {
