@@ -195,13 +195,15 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
     }
 
     //returns false if nothing found, otherwise the comment
-    public function getColumnComment($db, $table, $column) {
+    public function getColumnComment($db, $table, $column, $adapter = null) {
+        if ($adapter === null) {
+            $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
+        }
+
         $this->setTable('Daiquiri_Model_DbTable_Simple');
         $this->getTable()->setDb($db);
         $this->getTable()->setName($table);
-
-        //get adapter to ask database for comment information
-        $adapter = $this->getTable()->getAdapter();
 
         //this is DB specific, so handle differently
         if (get_class($adapter) === "Zend_Db_Adapter_Pdo_Mysql") {
@@ -219,13 +221,15 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
     }
 
     //returns false if nothing found, otherwise the comment
-    public function setColumnComment($db, $table, $column, $comment) {
+    public function setColumnComment($db, $table, $column, $comment, $adapter = null) {
+        if ($adapter === null) {
+            $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
+        }
+
         $this->setTable('Daiquiri_Model_DbTable_Simple');
         $this->getTable()->setDb($db);
         $this->getTable()->setName($table);
-
-        //get adapter to ask database for comment information
-        $adapter = $this->getTable()->getAdapter();
 
         //this is DB specific, so handle differently
         if (get_class($adapter) === "Zend_Db_Adapter_Pdo_Mysql") {
