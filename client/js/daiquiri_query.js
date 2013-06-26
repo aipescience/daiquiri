@@ -36,9 +36,15 @@ function Daiquiri_Query(baseUrl) {
             'rows': baseUrl + '/data/viewer/rows',
             'base': baseUrl
         },
-        'fileDownload': baseUrl + '/files/index/row'
+        'fileDownload': baseUrl + '/files/index/row',
+        'sampStream': baseUrl + '/query/index/stream',
+        'baseUrl': baseUrl
     }
     
+    this.sampStream = {
+        'https': false
+    };
+
     this.job = {};
     this.jobs = {};
     
@@ -550,6 +556,23 @@ function Daiquiri_Query(baseUrl) {
                 'baseurl': self.url.results.base,
                 'width': '700px',
                 'callback': function (daiquiriTable) {
+                    if($('#daiquiri-samp-connect').length < 1) {
+                        var div = $('<div />', {
+                            'id': 'daiquiri-samp-connect',
+                            'class': 'daiquiri-samp-connect',
+                        }).appendTo($('#results-tab'));
+
+                        $('#daiquiri-samp-connect').daiquiri_samp({
+                            baseStream: self.url.sampStream,
+                            streamHttps: self.sampStream.https,
+                            baseUrl: self.url.baseUrl
+                        });
+                    }
+
+                    //setting SAMP options
+                    $('#daiquiri-samp-connect').daiquiri_samp_setTable(self.job.table.value);
+                    $('#daiquiri-samp-connect').daiquiri_samp_setUser(self.job.username.value);
+
                     if (daiquiriTable.opt.select == true) {
                         var div = $('<div />', {
                             'class': 'daiquiri-query-file-download',
