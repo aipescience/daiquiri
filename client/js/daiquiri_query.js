@@ -198,7 +198,7 @@ function Daiquiri_Query(baseUrl) {
                             $('#plan_submit', dialog).click(function(){
                                 // get values from plan form
                                 _daiquiri_cm_plan.save();
-
+				$('.daiquiri-form-error').remove();
                                 var planValues = $('form', dialog).serialize();
 
                                 $.ajax({
@@ -235,7 +235,12 @@ function Daiquiri_Query(baseUrl) {
                                             dialog.appendTo($('#query'));
                                             dialog.modal();
                                         } else {
-                                            daiquiri_jsonError(json);
+					    var html = '<ul class="daiquiri-form-error unstyled text-error">';
+					    $.each(json.errors.form, function (key, value) {
+						html += '<li>' + value + '</li>';
+					    });
+					    html += '</ul>';
+					    $('form', '.daiquiri-modal-dialog').append(html);
                                         }   
                                     }
                                 });
