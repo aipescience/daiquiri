@@ -104,14 +104,6 @@ abstract class Query_Model_Resource_AbstractQueue extends Daiquiri_Model_Resourc
     abstract public function tableExists($table);
 
     /**
-     * Get job status of job with given id. Job status is given as 
-     * string (not the numerical value stored in the DB).
-     * @param array $param
-     * @return status string
-     */
-    //abstract public function getJobStatus($id);
-
-    /**
      * Returns an array with a configured DB query request . This function must 
      * ensure that a row with a job is returned as such: 0: id, 1: name/table name, 2: status
      * @param int $userId

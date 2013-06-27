@@ -691,6 +691,10 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
     }
 
     private function _createJobSelect($sqloptions) {
+        //build adapter
+        $userDBResource = $this->getUserDBResource();
+        $config = $userDBResource->getTable()->getAdapter()->getConfig();
+
         //do some reformulating of the query to adapt to PaQuQQueue
         $sqloptions = $this->_changeTableNames($sqloptions);
 
@@ -701,6 +705,9 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
 
         // get the primary sql select object
         $selectPending = $this->getTable('Query_Model_DbTable_JobsPaquQQueue')->getSelect($sqloptions);
+
+        $selectPending->where("mysqlUserName = ?", $config['username']);
+
         // add inner joins for the category and the status
         $selectPending->setIntegrityCheck(false);
         if (in_array('username', $sqloptions['from'])) {
@@ -711,6 +718,10 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
     }
 
     private function _createJobHistorySelect($sqloptions) {
+        //build adapter
+        $userDBResource = $this->getUserDBResource();
+        $config = $userDBResource->getTable()->getAdapter()->getConfig();
+
         //do some reformulating of the query to adapt to PaQuQQueue
         $sqloptions = $this->_changeTableNames($sqloptions);
 
@@ -722,6 +733,8 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
         }
 
         $selectHistory = $this->getTable('Query_Model_DbTable_JobsHistoryPaquQQueue')->getSelect($sqlHistOptions);
+
+        $selectHistory->where("mysqlUserName = ?", $config['username']);
 
         // add inner joins for the category and the status
         $selectHistory->setIntegrityCheck(false);
