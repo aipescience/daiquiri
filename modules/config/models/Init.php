@@ -190,6 +190,10 @@ class Config_Model_Init extends Daiquiri_Model_Init {
             'contact' => true,
             'data' => array(
                 'writeToDB' => 0,
+                'viewer' => array(
+                    'removeNewline' => false,
+                    'columnWidth' => '80em'
+                )
             ),
             'files' => array(),
         );
