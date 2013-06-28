@@ -71,6 +71,8 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         'daiquiri/js/daiquiri_plot.js',
         'daiquiri/js/daiquiri_poll.js',
         'daiquiri/js/daiquiri_query_buttons.js',
+        'daiquiri/lib/sampjs/samp.js',
+        'daiquiri/js/daiquiri_samp.js',
     );
     public $view;
 
