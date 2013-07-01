@@ -47,11 +47,9 @@ then
 fi
 
 if [ -z "$socket" ]; then
-    ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\` LIMIT 1" | head -1 | sed 's/\t/","/g;s/^/"/;s/$/"/;' > $path/$fileName.txt.head
-    ${toolBin}mysqldump --tab=$path --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' -h$host -P$port -u$username -p$password $dbname $table
+    ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $path/$fileName.txt.head
 else
-    ${toolBin}mysql --socket=$socket -u$username -p$password $dbname -e "SELECT * FROM \`$table\` LIMIT 1" | head -1 | sed 's/\t/","/g;s/^/"/;s/$/"/;' > $path/$fileName.txt.head
-    ${toolBin}mysqldump --tab=$path --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' --socket=$socket -u$username -p$password $dbname $table
+    ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $path/$fileName.txt.head
 fi
 
 cat $path/$fileName.txt.head $path/$fileName.txt > $path/$fileName.txt.new
