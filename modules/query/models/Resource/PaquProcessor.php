@@ -154,7 +154,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             $multiLineParseTrees = $this->processing->multilineParseTree($multiLines, $errors);
         } catch (Exception $e) {
             //check on an nonexisting temp table should be ignored here
-            if(strpos($e->getMessage(), "42S02" === false) {
+            if(strpos($e->getMessage(), "42S02") === false) {
                 throw $e;
             }
         }
