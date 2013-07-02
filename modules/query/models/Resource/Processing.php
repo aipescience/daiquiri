@@ -552,8 +552,25 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
                 if ($currNode['expr_type'] === "aggregate_function" ||
                         $currNode['expr_type'] === "function") {
 
+                    //we only need to escape, if this is not a function of a constant value.
+                    //therefore check for constants and break if only constants are found
+                    $foundOtherThanConst = true;
+                    if(!empty($currNode['sub_tree'])) {
+                        //setting it false, since we are actually checking - true value above is just a dummy
+                        //to continue processing
+                        $foundOtherThanConst = false;
+                        foreach($currNode['sub_tree'] as $node) {
+                            if($node['expr_type'] !== 'const' &&
+                                $node['expr_type'] !== 'operator') {
+
+                                $foundOtherThanConst = true;
+                                break;
+                            }
+                        }
+                    }
+
                     //check if an alias is already set
-                    if ($currNode['alias'] === false) {
+                    if ($foundOtherThanConst === true && $currNode['alias'] === false) {
                         //build escaped string
                         $escapedString = "_" . $this->buildEscapedString(array($currNode));
 
