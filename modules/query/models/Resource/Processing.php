@@ -570,7 +570,8 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
                     }
 
                     //check if an alias is already set
-                    if ($foundOtherThanConst === true && $currNode['alias'] === false) {
+                    if ($foundOtherThanConst === true && (!array_key_exists("alias", $currNode) ||
+                                                            $currNode['alias'] === false)) {
                         //build escaped string
                         $escapedString = "_" . $this->buildEscapedString(array($currNode));
 
