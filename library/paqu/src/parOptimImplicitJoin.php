@@ -1094,7 +1094,7 @@ function PHPSQLaddOuterQueryOrder(&$sqlTree, &$table, &$toThisNode, &$tableList,
    $node['base_expr'] = trim($node['base_expr']);
 
    #parse the group by (since the parser somehow messes up)
-   $phpParse = new PHPSQLParser();
+   $phpParse = new PHPSQLParserOld();
    $parsed = array();
    $parsed[0] = $phpParse->process_select_expr($node['base_expr']);
 
@@ -1193,7 +1193,7 @@ function PHPSQLaddOuterQueryGroup(&$sqlTree, &$table, &$toThisNode, &$tableList,
 
  foreach ($sqlTree['GROUP'] as $count => $node) {
 	#parse the group by (since the parser somehow messes up)
-   $phpParse = new PHPSQLParser();
+   $phpParse = new PHPSQLParserOld();
    $parsed = array();
    $parsed[0] = $phpParse->process_select_expr($node['base_expr']);
 
