@@ -150,17 +150,15 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
         $plan = $multiLines;
 
-        try {
-            $multiLineParseTrees = $this->processing->multilineParseTree($multiLines, $errors);
-        } catch (Exception $e) {
-            //check on an nonexisting temp table should be ignored here
-            if(strpos($e->getMessage(), "42S02") === false) {
-                throw $e;
-            }
-        }
+        $multiLineParseTrees = $this->processing->multilineParseTree($multiLines, $errors);
 
         if (!empty($errors)) {
-            return false;
+            foreach($errors as $error) {
+                //check on an nonexisting temp table should be ignored here
+                if(strpos($error, "42S02") === false) {
+                    return false;
+                }
+            }
         }
 
         $listCreateTmpTables = array();
