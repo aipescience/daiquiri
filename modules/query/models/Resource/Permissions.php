@@ -409,12 +409,6 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
             }
         }
 
-        $scratchDB = Daiquiri_Config::getInstance()->query->scratchdb;
-
-        if (!empty($scratchDB) && $currDB === $scratchDB) {
-            return true;
-        }
-
         //if we reach this place, name of user DB not found in the query and revoke access
         $error[] = "No permission to use " . $currTag . " on anything else than your user DB";
         return false;
@@ -450,6 +444,12 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
      */
     private function _checkTableDBACL($currTag, $db, $table, &$auth, array &$error) {
         if (isset($this->_tableACLCache[$db][$table]) && in_array($currTag, $this->_tableACLCache[$db][$table])) {
+            return true;
+        }
+
+        $scratchDB = Daiquiri_Config::getInstance()->query->scratchdb;
+
+        if (!empty($scratchDB) && $db === $scratchDB) {
             return true;
         }
 

@@ -106,25 +106,6 @@
  *	-# #Link the user defined subqueries from the FROM and WHERE statements to the new nested query tree.
  */
 function PHPSQLbuildShardQuery($sqlTree) {
-  #check for subqueries
-  #this handles nested subqueries that the user already provided. no idea how to handle these
-  #together with the automatic joins found below...
-  $subQueries = array();
-  foreach ($sqlTree['FROM'] as $subQuery) {
-    if ($subQuery['table'] == 'DEPENDENT-SUBQUERY') {
-      $subQuery['sub_tree'] = PHPSQLbuildShardQuery($subQuery['sub_tree']);
-      array_push($subQueries, $subQuery);
-    }
-  }
-  if (!empty($sqlTree['WHERE'])) {
-    foreach ($sqlTree['WHERE'] as $node) {
-      if ($node['expr_type'] == 'subquery') {
-        $node['sub_tree'] = PHPSQLbuildShardQuery($node['sub_tree']);
-        array_push($subQueries, $node);
-      }
-    }
-  }
-
   $newSqlTree = PHPSQLGroupWhereTerms($sqlTree);
 
   $listOfTables = array();
@@ -135,6 +116,25 @@ function PHPSQLbuildShardQuery($sqlTree) {
   PHPSQLCountWhereConditions($listOfTables);
   $listOfTables = PHPSQLdetStartTable($listOfTables);
   $nestedQuery = PHPSQLbuildNestedQuery($newSqlTree, $listOfTables, $dependantList, 0);
+
+  #check for subqueries
+  #this handles nested subqueries that the user already provided. no idea how to handle these
+  #together with the automatic joins found below...
+  $subQueries = array();
+  foreach ($nestedQuery['FROM'] as $subQuery) {
+    if ($subQuery['table'] == 'DEPENDENT-SUBQUERY') {
+      $subQuery['sub_tree'] = PHPSQLbuildShardQuery($subQuery['sub_tree']);
+      array_push($subQueries, $subQuery);
+    }
+  }
+  if (!empty($nestedQuery['WHERE'])) {
+    foreach ($nestedQuery['WHERE'] as $node) {
+      if ($node['expr_type'] == 'subquery') {
+        $node['sub_tree'] = PHPSQLbuildShardQuery($node['sub_tree']);
+        array_push($subQueries, $node);
+      }
+    }
+  }
 
   #link subqueries
   linkSubqueriesToTree($nestedQuery, $subQueries);
@@ -193,17 +193,17 @@ function linkNestedWheresToTree(&$nestedQuery, &$subQueries) {
  */
 function linkSubqueriesToTree(&$nestedQuery, &$subQueries) {
   foreach ($nestedQuery['FROM'] as &$subQuery) {
-   if ($subQuery['table'] == 'DEPENDENT-SUBQUERY') {
-	    #find subquery
-     foreach ($subQueries as $subNode) {
-      if (array_key_exists('alias', $subQuery) && $subQuery['alias'] == $subNode['alias']) {
-        $subQuery['sub_tree'] = $subNode['sub_tree'];
-        fixSelectsInAliasedSubquery($nestedQuery, $subQuery['sub_tree'], $subQuery['alias']);
-        break;
+    if ($subQuery['table'] == 'DEPENDENT-SUBQUERY') {
+      #find subquery
+      foreach ($subQueries as $subNode) {
+        if (array_key_exists('alias', $subQuery) && $subQuery['alias'] == $subNode['alias']) {
+          $subQuery['sub_tree'] = $subNode['sub_tree'];
+          fixSelectsInAliasedSubquery($nestedQuery, $subQuery['sub_tree'], $subQuery['alias']);
+          break;
+        }
       }
     }
   }
-}
 }
 
 /**
@@ -221,38 +221,46 @@ function linkSubqueriesToTree(&$nestedQuery, &$subQueries) {
  */
 function fixSelectsInAliasedSubquery(&$selectTree, &$subQuery, $tableAlias) {
   foreach ($selectTree['SELECT'] as &$selNode) {
-   preg_match("/`?([^`]*)`?\.?(.*)/", $selNode['base_expr'], $tmp);
-   if ($tmp[2] !== "") {
-     $table = $tmp[2];
-     $alias = $tmp[1];
-   } else {
-     $table = $tmp[1];
-     $alias = false;
-   }
-
-   if (trim($alias, "`") === trim($tableAlias, "`")) {
-	    //find column in subquery
-     $tmp2 = explode(".", trim($table, "`"));
-     if (count($tmp2) == 1) {
-      $subTable = $tmp2[0];
+    preg_match("/`?([^`]*)`?\.?(.*)/", $selNode['base_expr'], $tmp);
+    if ($tmp[2] !== "") {
+      $table = $tmp[2];
+      $alias = $tmp[1];
     } else {
-      $subTable = $tmp2[count($tmp2) - 1];
+      $table = $tmp[1];
+      $alias = false;
     }
 
-    foreach ($subQuery['SELECT'] as $node) {
-      preg_match("/`?([^`]*)`?\.?(.*)/", $node['base_expr'], $tmp3);
-      if ($tmp3[2] !== "") {
-        $nodeTable = $tmp3[2];
+    if (trim($alias, "`") === trim($tableAlias, "`")) {
+      //find column in subquery
+      $tmp2 = explode(".", trim($table, "`"));
+      if (count($tmp2) == 1) {
+        $subTable = $tmp2[0];
       } else {
-        $nodeTable = $tmp3[1];
+        $subTable = $tmp2[count($tmp2) - 1];
       }
 
-      if ($subTable === $nodeTable) {
-        $selNode['base_expr'] = "`" . $tableAlias . "`.`" . trim($node['alias'], "`") . "`";
+      foreach ($subQuery['SELECT'] as $node) {
+        preg_match("/`?([^`]*)`?\.?(.*)/", $node['base_expr'], $tmp3);
+        if ($tmp3[2] !== "") {
+          $nodeTable = $tmp3[2];
+        } else {
+          $nodeTable = $tmp3[1];
+        }
+
+        if ($subTable === $nodeTable) {
+          $selNode['base_expr'] = "`" . $tableAlias . "`.`" . trim($node['alias'], "`") . "`";
+        }
+      }
+    }
+
+    //check the table only (without alias) cases that they are sane
+    if($alias === false) {
+      $tmp2 = explode(".", trim($table, "`"));
+      if(count($tmp2) == 2 && $tmp2[0] === trim($tableAlias, "`")) {
+        $selNode['base_expr'] = "`" . $tableAlias . "`.`" . trim($selNode['base_expr'], "`") . "`";
       }
     }
   }
-}
 }
 
 /**

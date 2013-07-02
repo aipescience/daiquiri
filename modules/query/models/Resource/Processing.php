@@ -131,8 +131,12 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
                 $error['parseError'] = "Error parsing SQL: You have an syntax error near the position indicated by the following parser error: " . $e->getMessage();
                 return false;
             } catch (Exception $e) {
-                $error['parseError'] = $e->getMessage();
-                return false;
+                //continue if we could not find the table. this is not that bad and parse tree is still needed
+                //by paqu
+                if(strpos($e->getMessage(), "42S02") === false) {
+                    $error['parseError'] = $e->getMessage();
+                    return false;
+                }
             }
 
             $parseTrees[$key] = $tmpParseObj->parsed;
