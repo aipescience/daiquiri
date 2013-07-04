@@ -46,6 +46,8 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
                     'escape' => false)),
             'Form'
         ));
+
+        $this->addCsrfElement();
     }
 
     /**
@@ -316,14 +318,15 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * 
      * Adds a hidden tag with a salt for CSRF attack protection.
      */
-    public function createCsrfElement($salt = 'DaiquiriDaiquiriDaiquiri') {
+    public function addCsrfElement() {
         $field = new Zend_Form_Element_Hash('csrf_hash');
         $field->setOptions(array(
             'ignore' => true,
-            'salt' => $salt
+            'salt' => Daiquiri_Config::getInstance()->core->csrfSalt,
+            'decorators' => array('ViewHelper')
         ));
-
-        return $field;
+        $this->addElement($field);
+        return 'csrf_hash';
     }
 
     /**
