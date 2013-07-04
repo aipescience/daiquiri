@@ -21,14 +21,14 @@
  */
 
 /**
- * @class   Daiquiri_Model_Select Select.php
+ * @class   Daiquiri_Model_DbTable_Select Select.php
  * @brief   Class extending Zend_Db_Table_Select to alter the table names PROPERLY!
  * 
  * Class extending Zend_Db_Table_Select to alter the column names PROPERLY!
  * This is mainly used to set column names to values that include dots (i.e. if
  * using MySQL, the column names include the aliased table name they come from)
  */
-class Daiquiri_Model_Select extends Zend_Db_Table_Select {
+class Daiquiri_Model_DbTable_Select extends Zend_Db_Table_Select {
 
     public function setColumns($table, array $columnArray) {
         //this function sets the column names to what is provided
