@@ -104,6 +104,7 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
         }
 
         // assign to view
+        $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }

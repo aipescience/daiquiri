@@ -131,8 +131,12 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
                 $error['parseError'] = "Error parsing SQL: You have an syntax error near the position indicated by the following parser error: " . $e->getMessage();
                 return false;
             } catch (Exception $e) {
-                $error['parseError'] = $e->getMessage();
-                return false;
+                //continue if we could not find the table. this is not that bad and parse tree is still needed
+                //by paqu
+                if(strpos($e->getMessage(), "42S02") === false) {
+                    $error['parseError'] = $e->getMessage();
+                    return false;
+                }
             }
 
             $parseTrees[$key] = $tmpParseObj->parsed;
@@ -552,8 +556,26 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
                 if ($currNode['expr_type'] === "aggregate_function" ||
                         $currNode['expr_type'] === "function") {
 
+                    //we only need to escape, if this is not a function of a constant value.
+                    //therefore check for constants and break if only constants are found
+                    $foundOtherThanConst = true;
+                    if(!empty($currNode['sub_tree'])) {
+                        //setting it false, since we are actually checking - true value above is just a dummy
+                        //to continue processing
+                        $foundOtherThanConst = false;
+                        foreach($currNode['sub_tree'] as $node) {
+                            if($node['expr_type'] !== 'const' &&
+                                $node['expr_type'] !== 'operator') {
+
+                                $foundOtherThanConst = true;
+                                break;
+                            }
+                        }
+                    }
+
                     //check if an alias is already set
-                    if ($currNode['alias'] === false) {
+                    if ($foundOtherThanConst === true && (!array_key_exists("alias", $currNode) ||
+                                                            $currNode['alias'] === false)) {
                         //build escaped string
                         $escapedString = "_" . $this->buildEscapedString(array($currNode));
 
