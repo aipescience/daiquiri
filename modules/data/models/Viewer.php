@@ -160,11 +160,15 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
                     );
                 }
             } else {
-                $cols[] = array(
+                $col = array(
                     'name' => $name,
-                    'width' => '80em',
-                    'sortable' => true
+                    'width' => Daiquiri_Config::getInstance()->data->viewer->columnWidth,
+                    'sortable' => true,
                 );
+                if (Daiquiri_Config::getInstance()->data->viewer->removeNewline) {
+                    $col['formatter'] = 'removeNewline';
+                }
+                $cols[] = $col;
             }
         }
 
