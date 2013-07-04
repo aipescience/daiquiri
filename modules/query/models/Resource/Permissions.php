@@ -153,7 +153,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                     $db = "";
                     $usrDBName = "";
                     $table = "";
-                    $this->_parseDBTableName($currNode['base_expr'], $db, $table, $currDB);
+                    $this->_parseDBTableName($currNode['table'], $db, $table, $currDB);
 
                     if ($db === false) {
                         $error[] = "error in SQL: Did not specify DB for table " . $table;
@@ -299,7 +299,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 $table = "";
 
                 if ($object['expr_type'] == "table") {
-                    $this->_parseDBTableName($object['base_expr'], $db, $table, $currDB);
+                    $this->_parseDBTableName($object['table'], $db, $table, $currDB);
 
                     if ($this->_checkTableDBACL("drop", $db, $table, $auth, $error) !== true) {
                         return false;
@@ -310,7 +310,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                     return false;
 
                     //code that would allow check:
-                    /* $this->_parseDBTableName($object['base_expr'], $db, $table, $currDB);
+                    /* $this->_parseDBTableName($object['table'], $db, $table, $currDB);
 
                       $db = $table;
                       $table = false;
@@ -409,12 +409,6 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
             }
         }
 
-        $scratchDB = Daiquiri_Config::getInstance()->query->scratchdb;
-
-        if (!empty($scratchDB) && $currDB === $scratchDB) {
-            return true;
-        }
-
         //if we reach this place, name of user DB not found in the query and revoke access
         $error[] = "No permission to use " . $currTag . " on anything else than your user DB";
         return false;
@@ -450,6 +444,12 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
      */
     private function _checkTableDBACL($currTag, $db, $table, &$auth, array &$error) {
         if (isset($this->_tableACLCache[$db][$table]) && in_array($currTag, $this->_tableACLCache[$db][$table])) {
+            return true;
+        }
+
+        $scratchDB = Daiquiri_Config::getInstance()->query->scratchdb;
+
+        if (!empty($scratchDB) && $db === $scratchDB) {
             return true;
         }
 

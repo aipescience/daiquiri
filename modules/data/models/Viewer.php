@@ -46,7 +46,26 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
 
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
-        $rows = $this->getResource()->fetchRows($sqloptions);
+
+        // get the primary table
+        $tableObj = $this->getResource()->getTable();
+
+        // get select object
+        $select = $tableObj->getSelect($sqloptions);
+
+        $cols = $this->cols($db, $table, $params);
+
+        //build column array
+        $colNames = array();
+        foreach($cols['data'] as $col) {
+            $colNames[] = $col['name'];
+        }
+
+        $select->setColumns($tableObj->getName(), $colNames);
+
+        // get result convert to array and return
+        $rows =  $tableObj->fetchAll($select)->toArray();
+
         $response = $this->_response($rows, $sqloptions, $pk);
 
         return $response;
