@@ -139,7 +139,7 @@ abstract class Daiquiri_Model_DbTable_Abstract extends Zend_Db_Table_Abstract {
      */
     public function getSelect($sqloptions = array()) {
 
-        $select = $this->select();
+        $select = new Daiquiri_Model_Select($this);
 
         // set from
         $cols = $this->getCols();
