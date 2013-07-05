@@ -38,17 +38,8 @@ class Daiquiri_Model_DbTable_Select extends Zend_Db_Table_Select {
 
         $this->from($table);
 
-        //find the last table in the list
-        $selTable = false;
-        foreach($this->_parts['from'] as $key => $node) {
-            if($node['tableName'] === $table) {
-                $selTable = $key;
-            }
-        }
-
         foreach($columnArray as $column) {
             $column = trim($column, "`");
-            $table = $selTable;
 
             $newColumns[] = array($table, $column, NULL);
         }
