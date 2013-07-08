@@ -106,6 +106,25 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
+     * Fetches the colums as they are in the database.
+     * @param string $tableclass the name of the tableclass
+     * @return array
+     */
+    public function fetchDbCols($tableclass = null) {
+        $cols = $this->fetchCols($tableclass);
+        
+        // get the name of the database table
+        $t = $this->getTable()->getName();
+        
+        $dbCols = array();
+        foreach ($cols as $col) {
+            $dbCols[$col] = '`' . $t . '`.`' . $col . '`';
+        }
+        
+        return $dbCols;
+    }
+
+    /**
      * Fetches one row specified by its id from the the first 
      * (or a specified) database table.
      * @param int $id

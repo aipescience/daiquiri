@@ -96,6 +96,47 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
     }
 
     /**
+     * Returns the columns for the index.
+     * @return array 
+     */
+    public function cols(array $params = array()) {
+        // set default columns
+        if (empty($params['cols'])) {
+            $params['cols'] = $this->_cols;
+        }
+
+        $cols = array();
+        foreach ($params['cols'] as $name) {
+            $col = array('name' => $name);
+            if ($name === 'id') {
+                $col['width'] = '2em';
+                $col['align'] = 'center';
+            } else if ($name === 'username') {
+                $col['width'] = '8em';
+            } else if ($name === 'email') {
+                $col['width'] = '16em';
+            } else if ($name === 'role') {
+                $col['width'] = '6em';
+            } else if ($name === 'status') {
+                $col['width'] = '6em';
+            } else {
+                $col['width'] = '8em';
+            }
+            $cols[] = $col;
+        }
+
+        if (isset($params['options']) && $params['options'] === 'true') {
+            $cols[] = array(
+                'name' => 'options',
+                'width' => '30em',
+                'sortable' => 'false'
+            );
+        }
+
+        return array('cols' => $cols, 'status' => 'ok');
+    }
+
+    /**
      * Returns the main data of the user table.
      * @return array 
      */
@@ -107,24 +148,20 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
 
         // create csrf hash for clickjacking protection
         $csrf = md5(rand(0, 100000) + rand(0, 100000));
-        
+
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
         $rows = $this->getResource()->fetchRows($sqloptions);
-        $response = $this->_response($rows, $sqloptions);
-
-        // get the right columm for the status
-        $statusCol = array_search('status', $params['cols']);
-
+        
         // loop through the table and add options
         if (isset($params['options']) && $params['options'] === 'true') {
-            for ($i = 0; $i < sizeof($response->rows); $i++) {
-                $id = $response->rows[$i]['id'];
+            for ($i = 0; $i < count($rows); $i++) {
+                $id = $rows[$i]['id'];
                 $links = '';
 
                 $status = null;
-                if (!empty($statusCol)) {
-                    $status = $response->rows[$i]["cell"][$statusCol];
+                if (array_search('status', $params['cols'])) {
+                    $status = $rows[$i]['status'];
                 }
 
                 foreach ($this->_options as $key => $value) {
@@ -142,52 +179,11 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
                     }
                 }
 
-                $response->rows[$i]["cell"][] = $links;
+                $rows[$i]['options'] = $links;
             }
         }
 
-        return $response;
-    }
-
-    /**
-     * Returns the columns for the index.
-     * @return array 
-     */
-    public function cols(array $params = array()) {
-        // set default columns
-        if (empty($params['cols'])) {
-            $params['cols'] = $this->_cols;
-        }
-
-        $cols = array();
-        foreach ($params['cols'] as $name) {
-            $col = array('name' => $name);
-            if ($name === 'id') {
-                $col['width'] = '20em';
-                $col['align'] = 'center';
-            } else if ($name === 'username') {
-                $col['width'] = '80em';
-            } else if ($name === 'email') {
-                $col['width'] = '160em';
-            } else if ($name === 'role') {
-                $col['width'] = '60em';
-            } else if ($name === 'status') {
-                $col['width'] = '60em';
-            } else {
-                $col['width'] = '80em';
-            }
-            $cols[] = $col;
-        }
-
-        if (isset($params['options']) && $params['options'] === 'true') {
-            $cols[] = array(
-                'name' => 'options',
-                'width' => '300em',
-                'sortable' => 'false'
-            );
-        }
-
-        return $cols;
+        return $this->_response($rows, $sqloptions);
     }
 
     /**

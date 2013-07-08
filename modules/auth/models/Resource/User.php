@@ -44,7 +44,41 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * @return array 
      */
     public function fetchCols($tableclass = null) {
-        return array_merge(array('id', 'username', 'email', 'role', 'status'), Daiquiri_Config::getInstance()->auth->details);
+        $cols = array('id', 'username', 'email', 'role', 'status');
+        foreach (Daiquiri_Config::getInstance()->auth->details->toArray() as $detail) {
+            $cols[] = $detail;
+        }
+        return $cols;
+    }
+
+    /**
+     * Returns the colums as they are in the database.
+     * @param string $tableclass
+     * @return array 
+     */
+    public function fetchDbCols($tableclass = null) {
+        return $this->fetchCols($tableclass);
+
+        // get the names of the involved tables
+        $u = $this->getTable('Auth_Model_DbTable_User')->getName();
+        $r = $this->getTable('Auth_Model_DbTable_Roles')->getName();
+        $s = $this->getTable('Auth_Model_DbTable_Status')->getName();
+        $d = $this->getTable('Auth_Model_DbTable_Details')->getName();
+
+        $dbCols = array();
+        foreach ($cols as $col) {
+            if (in_array($col, array('id', 'username', 'email'))) {
+                $dbCols[$col] = '`' . $u . '`.`' . $col . '`';
+            } else if ($col === 'role') {
+                $dbCols[$col] = '`' . $r . '`.`' . 'role' . '`';
+            } else if ($col === 'status') {
+                $dbCols[$col] = '`' . $s . '`.`' . 'status' . '`';
+            } else {
+                $dbCols[$col] = '`' . $d . '`.`' . $col . '`';
+            }
+        }
+
+        return $dbCols;
     }
 
     /**

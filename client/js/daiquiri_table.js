@@ -1,285 +1,346 @@
-/*  
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
- *                           AIP E-Science (www.aip.de)
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
-/*
- * daiquiri_table - a plugin fo jquery and bootstap
- * 
- */
-
 var _daiquiri_table = {
     defaults: {
-        'params': {},
-        'rowNum': 20,
-        'rowList': [20,100,1000],
-        'colswidth': '100px',
-        'shrinkToFit': false,
-        'hoverrows': false,
-        'sortable': null,
-        'width': null,
-        'height': null,
-        'select': null,
-        'edit': false,
-        'del': false,
-        'add': false,
-        'editinline': null,
-        'callback': null
+        'header' : {},
+        'nrows': 20,
+        'nrowsList': [5,20,100],
+        'sort': null,
+        'colswidth': '100px'
     },
     items: {}
-}
+};
 
 function Daiquiri_Table(container, opt) {
-    // set state
     this.container = container;
+    this.id = container.attr('id');
     this.opt = opt;
+    this.params = null;
+    this.total = null;
 
-    this.tableId = this.container.attr('id') + '-table';
-    this.pagerId = this.container.attr('id') + '-pager';
-
-    // create table
-    this.table = $('<table/>',{
-        'id': this.tableId 
-    }).appendTo(this.container);
-
-    // create pager
-    this.pager = $('<div/>',{
-        'id': this.pagerId
-    }).appendTo(this.container);
-
-    // set the dimensions of the container
-    if (opt.width) {
-        this.container.width(opt.width);
-    }
-    if (opt.height) {
-        this.container.height(opt.height);
-    }
-
-    // set class
-    this.container.addClass('daiquiri-table');
-
-    /**
-     * Function to display the jqGrid table
-     */
-    this.displayGrid = function (json) {
+    this.init = function () {
         var self = this;
-        var colsmodel = json.data;
 
-        /* create cols model */
-        var cols = [];
-        $.each(colsmodel, function() {
-            cols.push(this.name);
-            if (this.formatter == 'singleFileLink' && self.opt.select !== false) {
-                self.opt.select = true;
-            }
-        });
-
-        var lastid;
-        this.table.jqGrid({
-            url: self.opt.rowsurl,
-            postData: self.opt.params,
-            datatype: "json",
-            colNames: cols,
-            colModel: colsmodel,
-            rowNum: self.opt.rowNum,
-            rowList: self.opt.rowList,
-            viewrecords: true,
-            pager: self.pagerId,
-            sortorder: "asc",
-            caption: self.opt.tablename,
-            shrinkToFit: self.opt.shrinkToFit,
-            hoverrows: self.opt.hoverrows,
-            multiselect: self.opt.select,
-            editurl: self.opt.editurl + '?table=' + self.opt.tablename,
-            jsonReader : {
-                root: "data.rows",
-                page: "data.page",
-                total: "data.total",
-                records: "data.records"
-            },
-            loadBeforeSend: function(jqXHR) {
-                jqXHR.setRequestHeader("Accept", 'application/json');
-            },
-            onSelectRow: function(id){
-                if (self.opt.editinline) {
-                    if(id && id!==lastid){
-                        $(this).jqGrid('restoreRow',lastid);
-                        $(this).jqGrid('editRow',id,{
-                            keys: true,
-                            extraparam: self.opt.params
-                        });
-                        lastid=id;
-                    }
-                }
-            },
-            gridComplete: function() {
-                // resize the the grid when it is fully loaded
-                self.resize();
-                if (self.opt.callback) {
-                    self.opt.callback(self);
-                }
-            },
-            resizeStop: function(width, index) { 
-                // resize the grid when a column is resized
-                self.resize();
-            }
-        }).navGrid('#'+this.pagerId,{
-            edit: self.opt.edit,
-            del: self.opt.del,
-            add: self.opt.add
-        },
-        {
-            // params for editing
-            editData: this.opt.params,
-            closeAfterEdit: true
-        },
-        {
-            // params for adding
-            editData: this.opt.params,
-            closeAfterAdd: true
-        },
-        {
-            // params for deleting
-            delData: this.opt.params
-        },{
-            // params for searching
-            closeAfterSearch: true,
-            closeOnEscape: true
-        },{});
-                                                                                    
-        // remove the collapse button
-        $('.ui-jqgrid-titlebar-close','#gview_'+ this.tableId).remove();
-    };
-        
-    /**
-     * Function to resize the table to fit into container
-     */
-    this.resize = function() {
-        // calculate width
-        var w;
-        var outerWidth = this.container.width() - 2; // - 2px for borders
-        var innerWidth = $('.ui-jqgrid-bdiv').get(0).scrollWidth;
-        if (this.opt.width !== null) {
-            // fixed width, subtract 2px for 2 vertical borders
-            w = outerWidth;
-            $('.ui-jqgrid-bdiv').css('overflow-x','auto');
-        } else {
-            // adjust width to match container
-            if (innerWidth <= 500) {
-                w = 500;
-                $('.ui-jqgrid-bdiv').css('overflow-x','hidden');
-            } else if (innerWidth < outerWidth) {
-                w = innerWidth;
-                $('.ui-jqgrid-bdiv').css('overflow-x','hidden');
-                $('th:last-child',this.container).css('borderRightWidth','0px');
-                $('td:last-child',this.container).css('borderRightWidth','0px');
-            } else {
-                w = outerWidth;
-                $('.ui-jqgrid-bdiv').css('overflow-x','auto');
-                $('th:last-child',this.container).css('borderRightWidth','0px');
-                $('td:last-child',this.container).css('borderRightWidth','0px');
-            }
-        }
-
-        // calculate height
-        var h;
-        if (this.opt.height !== null) {
-            // (4px for 4 horizontal borders)
-            h = this.container.height() 
-            - $('.ui-jqgrid-hdiv',this.container).height()
-            - this.pager.height() - 4;
-        } else {
-            if (this.table.height() > $('.ui-jqgrid-hdiv',this.container).height()) {
-                h = this.table.height();
-            } else {
-                // only one row
-                h = $('.ui-jqgrid-hdiv',this.container).height();
-            }
-            if (innerWidth > w) {
-                // 15px for the horizontal scrollbar
-                h += 15;
-            } else {
-                // 1px for the bottom border
-                h -= 1;
-            }
-            $('.ui-jqgrid-bdiv').css('overflow-y','hidden');
-        }
-
-        this.table.setGridWidth(w);
-        this.table.setGridHeight(h);
-    };
-        
-    /**
-     * Resets the container to the inital state
-     */
-    this.reset = function() {
-        this.table.GridUnload();
-            
-        this.container.children().remove();
-            
-        // create table
-        this.table = $('<table/>',{
-            'id': this.tableId 
+        // create pane for table
+        $('<div/>',{
+            'class': 'daiquiri-table-pane',
+            'html': '<table class="table"><thead></thead><tbody></tbody></table>'
         }).appendTo(this.container);
 
         // create pager
-        this.pager = $('<div/>',{
-            'id': this.pagerId
+        $('<div/>',{
+            'class': 'daiquiri-table-pager'
         }).appendTo(this.container);
-    };
-}
+        
+        // create pager
+        $('<div/>',{
+            'class': 'daiquiri-table-message'
+        }).appendTo(this.container);
 
-/* Extend jQuery formatters for links */
-jQuery.extend($.fn.fmatter, {
-    singleFileLink: function(cellvalue, options, rowdata) {
-        if(typeof options.colModel.formatoptions.baseLinkUrl != 'undefined') {
-            if(cellvalue != null) {
-                var re = /(?:\.([^.]+))?$/;
-                var ext = re.exec(cellvalue)[1];
-                ext = ext.toLowerCase();
+        // set class
+        this.container.addClass('daiquiri-table');
 
-                if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' || ext == 'bmp') {
-                    return '<a href="' + options.colModel.formatoptions.baseLinkUrl + '?name=' + cellvalue + '" target="_blank">' +
-                    cellvalue + '</a>';
-                } else {
-                    return '<a href="' + options.colModel.formatoptions.baseLinkUrl + '?name=' + cellvalue + '">' +
-                    cellvalue + '</a>';
-                }
-            } else {
-                return '';
-            }
-        } else {
-            return cellvalue;            
-        }
-    },
-    removeNewline: function(cellvalue, options, rowdata) {
-        if (cellvalue) {
-            cellvalue = cellvalue.replace(/(\r\n|\n|\r)/gm,"");
-        }
-        return cellvalue
+        // initial params
+        self.params = {
+            'nrows': self.opt.nrows,
+            'page': 1,
+            'sort': self.opt.sort,
+            'search': null
+        };
+
+        // display table
+        this.pager();
+        this.cols();
     }
-});
+
+    this.error = function(jqXHR, textStatus, errorThrown) {
+        
+        $('tbody', this.container).children().remove();
+        $('.daiquiri-table-message', this.container).children().remove();
+        $('.daiquiri-table-message', this.container).append('<p class="text-error">Table is empty</p>');
+    }
+
+    this.pager = function () {
+        var self = this;
+
+        var searchHtml = '<input placeholder="Search" type="text" class="span2" />';
+        searchHtml += '<button class="btn"><i class="icon-search"></i></button>';
+        var search = $('<form/>',{
+            'id': self.id + '-pager-search',
+            'class': 'daiquiri-table-pager-search-form input-append pull-left',
+            'html': searchHtml
+        }).submit(function () {
+            var id = $(this).attr('id').match(/(\w+)-pager-search/)[1];
+            var self = _daiquiri_table.items[id];
+            self.params.search = $('input',this).val()
+            self.rows();
+            return false;
+        }).appendTo($('.daiquiri-table-pager', self.container));
+
+        $('#' + self.id + '-pager-search').click(function () {
+            $(this).parent().submit();
+        });
+
+        $('<button/>',{
+            'id': self.id + '-pager-first',
+            'class': 'btn daiquiri-table-pager-button daiquiri-table-pager-button-small',
+            'html': '<i class="icon-fast-backward"></i>'
+        }).click(function () {
+            var id = $(this).attr('id').match(/(\w+)-pager-first/)[1];
+            var self = _daiquiri_table.items[id];
+            self.params.page = 1;
+            self.rows();
+        }).appendTo($('.daiquiri-table-pager', self.container));
+
+        $('<button/>',{
+            'id': self.id + '-pager-prev',
+            'class': 'btn daiquiri-table-pager-button daiquiri-table-pager-button-small',
+            'html': '<i class="icon-backward"></i>'
+        }).click(function () {
+            var id = $(this).attr('id').match(/(\w+)-pager-prev/)[1];
+            var self = _daiquiri_table.items[id];
+            self.params.page -= 1; 
+            if (self.params.page < 1) {
+                self.params.page = 1;
+            }
+            self.rows();
+        }).appendTo($('.daiquiri-table-pager', self.container));
+
+        $('<button/>',{
+            'id': self.id + '-pager-next',
+            'class': 'btn daiquiri-table-pager-button daiquiri-table-pager-button-small',
+            'html': '<i class="icon-forward"></i>'
+        }).click(function () {
+            var id = $(this).attr('id').match(/(\w+)-pager-next/)[1];
+            var self = _daiquiri_table.items[id];
+            self.params.page += 1;
+            if (self.params.page > self.total) {
+                self.params.page = self.total;
+            }
+            self.rows();
+        }).appendTo($('.daiquiri-table-pager', self.container));
+        
+        $('<button/>',{
+            'id': self.id + '-pager-last',
+            'class': 'btn daiquiri-table-pager-button daiquiri-table-pager-button-small',
+            'html': '<i class="icon-fast-forward"></i>'
+        }).click(function () {
+            var id = $(this).attr('id').match(/(\w+)-pager-last/)[1];
+            var self = _daiquiri_table.items[id];
+            self.params.page = self.total;
+            self.rows();
+        }).appendTo($('.daiquiri-table-pager', self.container));
+
+        $('<button/>',{
+            'id': self.id + '-pager-reset',
+            'class': 'btn daiquiri-table-pager-button',
+            'html': 'Reset'
+        }).click(function () {
+            var id = $(this).attr('id').match(/(\w+)-pager-reset/)[1];
+            var self = _daiquiri_table.items[id];
+            
+            $('input','.daiquiri-table-pager-search-form', self.container).val('');
+                
+            self.params.search = null
+            self.params.sort = null
+            self.params.page = 1
+            self.rows();
+        }).appendTo($('.daiquiri-table-pager', self.container));
+
+        var select = $('<select/>',{
+            'size': self.opt.nrowsList.length,
+            'class': 'daiquiri-table-pager-nrows pull-right',
+            'id': self.id + '-pager-nrows'
+        }).appendTo($('.daiquiri-table-pager', self.container));
+
+        $.each(self.opt.nrowsList, function (key, value) {
+            var option = {
+                'value': value,
+                'html': 'Show ' + value + ' rows'
+            };
+            if (self.opt.nrows == value) {
+                option.selected = 'selected';
+            }
+            $('<option/>', option).appendTo(select);
+        });
+
+        $('#' + self.id + '-pager-nrows').change( function() {
+            var id = $(this).attr('id').match(/(\w+)-pager-nrows/)[1];
+            var self = _daiquiri_table.items[id];
+            self.params.page = 1;
+            self.params.nrows = $(this).val();
+            self.rows();
+        });
+    }
+
+    this.cols = function () {
+        var self = this;
+
+        // get the cols via ajax
+        $.ajax({
+            url: opt.colsurl, 
+            type: 'GET',
+            data: $.extend({}, self.opt.params, self.params),
+            dataType: 'json',
+            headers: $.extend({}, self.opt.header, {
+                'Accept': 'application/json'
+            }),
+            error: self.error,
+            success: function (json) {
+                if (json.status == 'ok') {
+                    self.ncols = json.cols.length;
+                    self.colsmodel = json.cols;
+
+                    // contruct and append html elements for column headers
+                    var html = '<tr>';
+                    var width;
+                    for (var i = 0; i < self.colsmodel.length; i++) {
+                        if (self.colsmodel[i].width != undefined) {
+                            width = self.colsmodel[i].width;
+                        } else {
+                            width = self.opt.colswidth;
+                        }
+                        html += '<th id="' + self.id + '-thead-col-' + i + '" style="width:' + width + '" class="daiquiri-table-col-' + i + '">';
+                        html += self.colsmodel[i].name + '</th>';
+                    };
+                    html += '</tr>';
+                    $('thead',self.container).append(html);
+
+                    // add click event for column headers
+                    $('th', self.container).click(function () {
+                        var id = $(this).attr('id').match(/(\w+)-thead-col-\d+/)[1];
+                        var self = _daiquiri_table.items[id];
+
+                        // determine which column was clicked
+                        var element = $(this)
+                        var classes = element.attr('class');
+                        var colClass = classes.match(/daiquiri-table-col-\d+/)[0];
+
+                        // remove 'selected' class from other elements and add to this column
+                        $('.daiquiri-table-col-selected', 'table', self.container).removeClass('daiquiri-table-col-selected');
+
+                        // remove sorting arrow from other column header (for column selection)
+                        $('i','th','.daiquiri-table-col-selected', 'table', self.container).remove();
+
+                        if (classes.indexOf('daiquiri-table-col-selected') == -1) {
+                            // add 'selected' class to column header
+                            $('.' + colClass, self.container).addClass('daiquiri-table-col-selected');
+
+                            // add sorting arrow to column header
+                            $('<i/>',{
+                                'id': self.id + '-thead-sort',
+                                'class': 'icon-arrow-down pull-right'
+                            }).click( function () {
+                                var id = $(this).attr('id').match(/(\w+)-thead-sort/)[1];
+                                var self = _daiquiri_table.items[id];
+
+                                // determine which column was clicked
+                                var element = $(this);
+                                var colId = element.parent().attr('class').match(/daiquiri-table-col-(\d+)/)[1];
+                                var colName = self.colsmodel[colId].name;
+
+                                // exchange icons from 'icon-arrow-down' to 'icon-arrow-up' or vice versa
+                                if (element.attr('class').indexOf('icon-arrow-down') != -1) {
+                                    element.removeClass('icon-arrow-down').addClass('icon-arrow-up');
+                                    self.params.sort = colName + ' ASC';
+                                } else {
+                                    element.removeClass('icon-arrow-up').addClass('icon-arrow-down');
+                                    self.params.sort = colName + ' DESC';
+                                }
+
+                                // display new set of rows
+                                self.rows();
+
+                                // return but do not trigger click event in parent th
+                                return false;
+                            }).appendTo(element);
+                        }
+                    });
+
+                    // display new set of rows
+                    self.rows();
+                } else {
+                    self.error(null,null,json.error)
+                }
+            }
+        });
+    }
+
+    this.rows = function () {
+        var self = this;
+
+        // get the rows via ajax
+        $.ajax({
+            url: opt.rowsurl, 
+            type: 'GET',
+            data: $.extend({}, self.opt.params, self.params),
+            dataType: 'json',
+            headers: $.extend({}, self.opt.header, {
+                'Accept': 'application/json'
+            }),
+            error: self.error,
+            success: function (json) {
+                if (json.status == 'ok') {
+                    // store information from server in params
+                    self.total = json.total;
+
+                    // get the id of the selected column
+                    var selected = $('.daiquiri-table-col-selected');
+                    if (selected.length != 0) {
+                        var selectedId = selected.attr('class').match(/daiquiri-table-col-(\d+)/)[1];
+                    }
+
+                    // contrsuct html elements for the rows
+                    var html = '';
+                    var i,j;
+                    for (i = 0; i < json.nrows; i++) {
+                        html += '<tr>';
+                        for (j = 0; j < self.ncols; j++) {
+                            var classes = 'daiquiri-table-col-' + j + ' daiquiri-table-row-' + i;
+
+                            // add the selected class for cells in the selected column
+                            if (selectedId != undefined && j == selectedId) {
+                                classes += ' daiquiri-table-col-selected';
+                            }
+
+                            html += '<td class="' + classes + '">' + json.rows[i][j] + '</td>';
+                        }
+                        html += '</tr>';
+                    }
+   
+                    // get rid of the messages
+                    $('.daiquiri-table-message', this.container).children().remove();
+
+                    // get rid of the old rows
+                    var tbody = $('tbody',self.container)
+                    tbody.children().remove();
+
+                    // append the new rows to the body of the table
+                    tbody.append(html);
+
+                    // add click event for the rows (for row selection)
+                    $('td', self.container).click(function () {
+                        var element = $(this)
+                        var classes = element.attr('class');
+                        var rowClass = classes.match(/daiquiri-table-row-\d+/)[0];
+
+                        $('.daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
+
+                        if (classes.indexOf('daiquiri-table-row-selected') == -1) {
+                            $('.' + rowClass).addClass('daiquiri-table-row-selected');
+                        }
+                    });
+
+                } else {
+                    $('tbody',self.container).children().remove();
+                }
+            }
+        });
+    }
+}
 
 // main plugin
 (function($){
     $.fn.extend({ 
         daiquiri_table: function(opt) {
-            
             // apply default options
             opt = $.extend({},_daiquiri_table.defaults, opt);
 
@@ -289,62 +350,12 @@ jQuery.extend($.fn.fmatter, {
                 // check if table is already set
                 if (_daiquiri_table.items[id] == undefined) {
                     _daiquiri_table.items[id] = new Daiquiri_Table($(this),opt);
+                    _daiquiri_table.items[id].init()
                 } else {
                     _daiquiri_table.items[id].reset();
                     _daiquiri_table.items[id].opt = opt;
                 }
-                
-                // json ajax request for the table metadata
-                $.ajax({
-                    url: opt.colsurl, 
-                    data: opt.params,
-                    type: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        var message = 'Error with ajax request';
-                        console.log(message);
-                        console.log({
-                            'jqXHR': jqXHR,
-                            'textStatus': textStatus,
-                            'errorThrown': errorThrown
-                        });
-                        alert(message);
-                    },
-                    success: function(json) {
-                        if (json.status != 'ok') {
-                            var message = 'Error with ajax request';
-                            console.log(message);
-                            console.log(json);
-                            alert(message);
-                        }
-                        else {
-                            _daiquiri_table.items[id].displayGrid(json);
-                            $(window).bind('resize', function() {
-                                setTimeout("_daiquiri_table.items['"+id+"'].resize();",100);
-                            });
-                            setTimeout("_daiquiri_table.items['"+id+"'].resize();",100);
-                        }
-                    }
-                });
-            });  
-        },
-        daiquiri_table_resize: function(opt) {
-            
-            // apply default options
-            opt = $.extend(_daiquiri_table.defaults, opt);
-
-            return this.each(function() {
-                var id = $(this).attr('id');
-                
-                // resize table if it is there
-                if (_daiquiri_table.items[id] != undefined) {
-                    console.log(_daiquiri_table.items[id].resize);
-                    _daiquiri_table.items[id].resize();
-                }
-            });  
+            });
         }
     });
 })(jQuery);

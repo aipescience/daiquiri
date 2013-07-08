@@ -34,16 +34,24 @@ class Data_ViewerController extends Daiquiri_Controller_Abstract {
     }
 
     public function rowsAction() {
-        $params = $this->_getTableParams();
-        $this->view->data = $this->_model->rows($this->_db, $this->_table, $params);
+        // call model functions
+        $response = $this->_model->rows($this->_db, $this->_table, $this->_request->getQuery());
+
+        // assign to view
+        foreach ($response as $key => $value) {
+            $this->view->$key = $value;
+        }
+        $this->view->redirect = $this->_getParam('redirect', '/auth/user/');
         $this->view->status = 'ok';
     }
 
     public function colsAction() {
-        $params = $this->_getTableParams();
-        $response = $this->_model->cols($this->_db, $this->_table, $params);
+        // call model functions
+        $response = $this->_model->cols($this->_db, $this->_table, $this->_request->getQuery());
+        
+        // assign to view
         if ($response['status'] === "ok") {
-            $this->view->data = $response['data'];
+            $this->view->cols = $response['cols'];
             $this->view->status = 'ok';
         } else {
             $this->view->error = $response['error'];

@@ -170,7 +170,16 @@ abstract class Daiquiri_Model_DbTable_Abstract extends Zend_Db_Table_Abstract {
                 $select = $select->where($w);
             }
         }
+        
+        // set where statement
+        if (!empty($sqloptions['orWhere'])) {
+            foreach ($sqloptions['orWhere'] as $w) {
+                $select = $select->orWhere($w);
+            }
+        }
 
+        // Zend_Debug::dump($select->__toString()); // die(0);
+        
         return $select;
     }
 

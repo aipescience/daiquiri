@@ -42,80 +42,67 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
      * 'start', 'order', and 'where'. These map to the corresponding SQL
      * tags.
      */
-    protected function _sqloptions(array $tableParams = array()) {
+    protected function _sqloptions(array $queryParams = array()) {
         // parse options
         $sqloptions = array();
-        if (isset($tableParams['cols'])) {
-            $sqloptions['from'] = $tableParams['cols'];
+        if (isset($queryParams['cols'])) {
+            $sqloptions['from'] = $queryParams['cols'];
         } else {
             $sqloptions['from'] = null;
         }
-        if (isset($tableParams['rows'])) {
-            $sqloptions['limit'] = $tableParams['rows'];
+        if (isset($queryParams['nrows'])) {
+            $sqloptions['limit'] = $queryParams['nrows'];
         } else {
             $sqloptions['limit'] = null;
         }
-        if (isset($tableParams['rows']) && isset($tableParams['page'])) {
-            $sqloptions['start'] = ($tableParams['page'] - 1) * $tableParams['rows'];
+        if (($queryParams['nrows']) && isset($queryParams['page'])) {
+            $sqloptions['start'] = ($queryParams['page'] - 1) * $queryParams['nrows'];
         } else {
             $sqloptions['start'] = 0;
         }
-        if (isset($tableParams['sidx'])
-                && isset($tableParams['sord'])
-                && $tableParams['sidx'] != ''
-                && in_array(strtoupper($tableParams['sord']), array('ASC', 'DESC'))) {
-            $sqloptions['order'] = $tableParams['sidx'] . ' ' . strtoupper($tableParams['sord']);
+        if (isset($queryParams['sort'])) {
+            $s = explode(' ', $queryParams['sort']);
+
+            if (count($s) == 2) {
+                $sortField = $s[0];
+                $sortOrder = strtoupper($s[1]);
+
+                if (in_array($sortOrder, array('ASC', 'DESC'))) {
+                    $sqloptions['order'] = $sortField . ' ' . $sortOrder;
+                } else {
+                    $sqloptions['order'] = null;
+                }
+            } else {
+                $sqloptions['order'] = null;
+            }
         } else {
             $sqloptions['order'] = null;
         }
-        if (isset($tableParams['_search'])
-                && $tableParams['_search'] !== 'false'
-                && isset($tableParams['searchField'])
-                && isset($tableParams['searchOper'])
-                && isset($tableParams['searchString'])) {
 
-            // escape table and field
+        $sqloptions['orWhere'] = array();
+        if (isset($queryParams['search']) && ! empty($queryParams['search'])) {
             $adapter = Zend_Db_Table::getDefaultAdapter();
-            $table = $adapter->quoteIdentifier($this->getResource()->getTable()->getName());
-            $col = $adapter->quoteIdentifier($tableParams['searchField']);
-            $field = $table . '.' . $col;
+            
+            // get the full columns id
+            $resource = $this->getResource();
+            $dbCols = $resource->fetchDbCols(null);
 
-            $operations = array(
-                'eq' => ' = ?',
-                'ne' => ' != ?',
-                'bw' => ' LIKE "?%"',
-                'bn' => ' NOT LIKE "?%"',
-                'ew' => ' LIKE "%?"',
-                'en' => ' NOT LIKE "%?"',
-                'cn' => ' LIKE "%?%"',
-                'nc' => ' NOT LIKE "%?%"',
-                'nu' => ' IS NULL',
-                'nn' => ' IS NOT NULL',
-                'in' => ' IN (?)',
-                'ni' => ' NOT IN (?)'
-            );
-
-            if (array_key_exists($tableParams['searchOper'], $operations)) {
-
-                if (in_array($tableParams['searchOper'], array('in', 'ni'))) {
-                    $a = array();
-                    foreach (explode(',', $tableParams['searchString']) as $s) {
-                        $a[] = $adapter->quoteInto('?', $s);
-                    }
-                    $string = implode(',', $a);
-                } else {
-                    $string = $adapter->quoteInto('?', $tableParams['searchString']);
+            $cols = array();
+            if (isset($queryParams['cols']) && $queryParams['cols'] !== null) { 
+                foreach ($queryParams['cols'] as $col) {
+                    $cols[] = $dbCols[$col];
                 }
-
-                $oper = $operations[$tableParams['searchOper']];
-                $where = $field . preg_replace('/\?/', $string, $oper);
-
-                $sqloptions['where'] = array($where);
+            } else {
+                $cols = $dbCols;
             }
-        } else {
-            $sqloptions['where'] = array();
+            
+            foreach ($cols as $col) {
+                $quotedString = $adapter->quoteInto('?', $queryParams['search']);
+                $string = substr($quotedString, 1, strlen($quotedString)-2);
+                $sqloptions['orWhere'][] = $col . " LIKE '%". $string ."%'";
+            }
         }
-
+        
         return $sqloptions;
     }
 
@@ -123,7 +110,6 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
      * @brief   Returns the table in a paginated way. Compatible with jqGrid.
      * @param   array $rows         array of rows to return (comming from SQL query???)
      * @param   array $sqloptions   sql options array encoding SQL filters
-     * @param   string $pk          name of primary key column
      * @return  data class
      * 
      * This function returns the data queried from the database in a form that
@@ -133,71 +119,31 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
      *  - <b>total</b>      total number of pages
      *  - <b>records</b>    total number of rows
      */
-    protected function _response(array $rows, array $sqloptions, $pk = 'id') {
+    protected function _response(array $rows, array $sqloptions) {
         // fill data object
-        $data = new stdClass();
-        $data->rows = array();
-        foreach ($rows as $row) {
-            $data->rows[] = array('id' => $row[$pk], 'cell' => array_values($row));
+        $data = array();
+        
+        // rows from the database query
+        $data['rows'] = array();
+        foreach($rows as $row) {
+            $data['rows'][] = array_values($row);
         }
 
-        // get the number of rows
-        $nrows = $this->getResource()->countRows($sqloptions['where'], null);
+        // number of rows
+        $data['nrows'] = count($rows);
 
         // finish response
         if (isset($sqloptions['start']) && isset($sqloptions['limit'])) {
-            $data->page = $sqloptions['start'] / $sqloptions['limit'] + 1;
+            $data['page'] = $sqloptions['start'] / $sqloptions['limit'] + 1;
         } else {
-            $data->page = 1;
+            $data['page'] = 1;
         }
         if (isset($sqloptions['limit'])) {
-            $data->total = ceil($nrows / $sqloptions['limit']);
+            $data['total'] = ceil($data['nrows'] / $sqloptions['limit']);
         } else {
-            $data->total = 1;
+            $data['total'] = 1;
         }
-        $data->records = $nrows;
 
         return $data;
     }
-
-    /**
-     * @brief   Edits a field in the table. Compatible with jqGrid.
-     * @param   array $post     array with the edit command
-     * @param   array $columns  array with the names of the columns
-     * 
-     * Edits a field in the jqGrid table and saves changes in the data
-     * base.
-     * 
-     * The $post array should contain the fields:
-     *  - 'oper' encoding the edit operation: allowed values: 'add', 'edit', 'del'
-     *  - 'id'   id of current data row
-     *  - column data of the row with the columns defined in $columns as keys
-     */
-    protected function _edit(array $post, array $columns = array()) {
-        if ($post['oper'] == 'add') {
-            // obtain the values from the request params
-            foreach ($columns as $col) {
-                if ($post[$col]) {
-                    $data[$col] = $post[$col];
-                }
-            }
-
-            // add row to the table
-            $this->getResource()->insertRow($data);
-        } elseif ($post['oper'] == 'edit') {
-            // obtain the values from the request params
-            foreach ($columns as $col) {
-                if ($post[$col]) {
-                    $data[$col] = $post[$col];
-                }
-            }
-
-            // add row to the table
-            $this->getResource()->updateRow($post['id'], $data);
-        } elseif ($post['oper'] == 'del') {
-            // add row to the table
-            $this->getResource()->deleteRow($post['id']);
-        }
-    }
-
 }
