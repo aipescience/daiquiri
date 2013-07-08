@@ -105,6 +105,9 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
             $params['cols'] = $this->_cols;
         }
 
+        // create csrf hash for clickjacking protection
+        $csrf = md5(rand(0, 100000) + rand(0, 100000));
+        
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
         $rows = $this->getResource()->fetchRows($sqloptions);
@@ -132,7 +135,7 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
                     } else {
                         $links .= $this->internalLink(array(
                             'text' => $key,
-                            'href' => $value['url'] . '/id/' . $id,
+                            'href' => $value['url'] . '/id/' . $id . '/csrf/' . $csrf,
                             'resource' => $value['resource'],
                             'permission' => $value['permission'],
                             'append' => '&nbsp;'));
