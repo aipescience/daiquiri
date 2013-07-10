@@ -48,48 +48,18 @@ then
     exit
 fi
 
-# move away any .sql file we might already have here
-if [ -f $path/$fileName.sql ]
-then
-	mv $path/$fileName.sql $path/$fileName.sql.old
-fi
-
-# move away any .sql file we might already have here                                                                                                                       
-if [ -f $path/$fileName.sql ]
-then
-        mv $path/$fileName.sql $path/$fileName.sql.old
-fi
-
 if [ -z "$socket" ]; then
-    ${binPath}/mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\` LIMIT 1" | head -1 | sed 's/\t/","/g;s/^/"/;s/$/"/;' > $path/$fileName.txt.head 2>> $path/$fileName.err
-    ${binPath}/mysqldump --tab=$path --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' -h$host -P$port -u$username -p$password $dbname $table 2>> $path/$fileName.err
+    ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file
 else
-    ${binPath}/mysql --socket=$socket -u$username -p$password $dbname -e "SELECT * FROM \`$table\` LIMIT 1" | head -1 | sed 's/\t/","/g;s/^/"/;s/$/"/;' > $path/$fileName.txt.head 2>> $path/$fileName.err
-    ${binPath}/mysqldump --tab=$path --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' --socket=$socket -u$username -p$password $dbname $table 2>> $path/$fileName.err
+    ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file
 fi
-
-cat $path/$fileName.txt.head $path/$fileName.txt > $path/$fileName.txt.new 2>> $path/$fileName.err
-rm $path/$fileName.txt.head 2>> $path/$fileName.err
 
 #mysqldump writes \N for any NULL value, however we don't want this.                                                                                                      
 #therefore we are using this regex:                                                                                                                                       
-perl -pe 's/(^|,)\\N((?=,)|$)/\1/g' $path/$fileName.txt.new > $path/$fileName.txt 2>> $path/$fileName.err
-rm $path/$fileName.txt.new 2>> $path/$fileName.err
+#perl -pe 's/(^|,)\\N((?=,)|$)/\1/g' $path/$fileName.txt.new > $path/$fileName.txt 2>> $path/$fileName.err
+#rm $path/$fileName.txt.new 2>> $path/$fileName.err
 #plain text: replace all \N that are preceeded with a , or are at the beginning of the line                                                                               
 #and are either followed by a , (don't add the , to the match) or are at the end of the line                                                                              
-
-if [ -f $path/$fileName.txt ]
-then
-	mv $path/$fileName.txt $file
-fi
-
-rm $path/$fileName.sql
-
-#move old sql file back
-if [ -f $path/$fileName.sql.old ]
-then
-	mv $path/$fileName.sql.old $path/$fileName.sql
-fi
 
 #clean error file from MYSQL stupidity
 sed -i '/Warning:/d' $path/$fileName.err

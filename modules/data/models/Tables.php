@@ -85,7 +85,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
      * @param array $formParams
      * @return array
      */
-    public function create($databaseId = null, array $formParams = array()) {
+    public function create($databaseId = null, array $formParams = array(), array $tableDescription = array()) {
         // get databases model
         $databasesModel = new Data_Model_Databases();
 
@@ -131,7 +131,9 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                 $table = $values['name'];
 
                 try {
-                    $tableDescription = $descResource->describeTable($db, $table);
+                    if(empty($tableDescription)) {
+                        $tableDescription = $descResource->describeTable($db, $table);
+                    }
 
                     foreach ($tableDescription['columns'] as $c) {
                         $c['table_id'] = $table_id;

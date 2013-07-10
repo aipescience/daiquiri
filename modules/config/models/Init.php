@@ -138,7 +138,7 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                             'port' => '4730',
                             'host' => 'localhost',
                             'numThread' => '2',
-                            'pid' => $this->_application_path . '/GearmanManager.pid', #'/var/run/GearmanManager.pid',
+                            'pid' => '/var/lib/daiquiri/download/GearmanManager.pid',
                             'workerDir' => $this->_daiquiri_path . '/modules/query/scripts/download/worker',
                             'manager' => $this->_daiquiri_path . '/library/GearmanManager/pecl-manager.php'
                         )
@@ -190,6 +190,10 @@ class Config_Model_Init extends Daiquiri_Model_Init {
             'contact' => true,
             'data' => array(
                 'writeToDB' => 0,
+                'viewer' => array(
+                    'removeNewline' => false,
+                    'columnWidth' => '80em'
+                )
             ),
             'files' => array(),
         );

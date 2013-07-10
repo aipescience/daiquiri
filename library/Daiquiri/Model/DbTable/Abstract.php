@@ -135,11 +135,11 @@ abstract class Daiquiri_Model_DbTable_Abstract extends Zend_Db_Table_Abstract {
      * Constructs a Zend select object from a given array with sql options,
      * using the first (or a specified) database table.
      * @param Array $sqloptions array of sqloptions (start,limit,order,where,from)
-     * @return Zend_Db_Select
+     * @return Daiquiri_Model_DbTable_Select
      */
     public function getSelect($sqloptions = array()) {
 
-        $select = $this->select();
+        $select = new Daiquiri_Model_DbTable_Select($this);
 
         // set from
         $cols = $this->getCols();

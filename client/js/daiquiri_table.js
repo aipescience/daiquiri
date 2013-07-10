@@ -34,7 +34,7 @@ var _daiquiri_table = {
         'sortable': null,
         'width': null,
         'height': null,
-        'select': false,
+        'select': null,
         'edit': false,
         'del': false,
         'add': false,
@@ -81,11 +81,10 @@ function Daiquiri_Table(container, opt) {
         var colsmodel = json.data;
 
         /* create cols model */
-        self.opt.select = false;
         var cols = [];
         $.each(colsmodel, function() {
             cols.push(this.name);
-            if (this.formatter == 'singleFileLink') {
+            if (this.formatter == 'singleFileLink' && self.opt.select !== false) {
                 self.opt.select = true;
             }
         });
@@ -247,7 +246,7 @@ function Daiquiri_Table(container, opt) {
 
 /* Extend jQuery formatters for links */
 jQuery.extend($.fn.fmatter, {
-    singleFileLink : function(cellvalue, options, rowdata) {
+    singleFileLink: function(cellvalue, options, rowdata) {
         if(typeof options.colModel.formatoptions.baseLinkUrl != 'undefined') {
             if(cellvalue != null) {
                 var re = /(?:\.([^.]+))?$/;
@@ -267,6 +266,12 @@ jQuery.extend($.fn.fmatter, {
         } else {
             return cellvalue;            
         }
+    },
+    removeNewline: function(cellvalue, options, rowdata) {
+        if (cellvalue) {
+            cellvalue = cellvalue.replace(/(\r\n|\n|\r)/gm,"");
+        }
+        return cellvalue
     }
 });
 
@@ -276,7 +281,7 @@ jQuery.extend($.fn.fmatter, {
         daiquiri_table: function(opt) {
             
             // apply default options
-            opt = $.extend(_daiquiri_table.defaults, opt);
+            opt = $.extend({},_daiquiri_table.defaults, opt);
 
             return this.each(function() {
                 var id = $(this).attr('id');
