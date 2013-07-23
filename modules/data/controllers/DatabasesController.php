@@ -43,7 +43,10 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
                 // user clicked cancel
                 $this->_redirect('/data/');
             } else {
-                // validate form and create new user
+                //try to prolongue PHP execution limits
+                set_time_limit(600);
+
+                // validate form and create new database
                 $response = $this->_model->create($this->_request->getPost());
             }
         } else {

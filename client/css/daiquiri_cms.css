@@ -42,3 +42,25 @@
 #wp-content #commentform {
     margin-top: 0;
 }
+
+#wp-content #recent-news {
+    margin-top: 40px;
+}
+
+#wp-content .wp-caption {
+    padding: 10px 0 10px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+#wp-content .wp-caption-text {
+    font-size: small;
+    margin-top: 10px;
+}
+#wp-content .alignright {
+    margin-left: 20px;
+    float: right;
+}
+#wp-content .alignleft {
+    margin-right: 20px;
+    float: left;
+}
