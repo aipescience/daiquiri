@@ -191,6 +191,9 @@ class Daiquiri_Init {
         $front->setRequest($request);
 
         $this->_zend_application->bootstrap();
+        
+        // set the auth volatile so no csrf hashes are used
+        Daiquiri_Auth::getInstance()->setVolatile();
     }
 
     private function _initOptions($input_options) {

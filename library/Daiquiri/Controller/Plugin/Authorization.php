@@ -77,7 +77,8 @@ class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Ab
                     die(0);
                 }
             }
-
+            
+            Daiquiri_Auth::getInstance()->setVolatile();
             $this->_active = true;
         }
     }

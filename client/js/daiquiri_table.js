@@ -24,7 +24,7 @@ var _daiquiri_table = {
         'nrows': 10,
         'nrowsList': [10,100],
         'sort': null,
-        'colsWidth': '100px'
+        'columnWidth': '100px'
     },
     items: {},
     resizing: null
@@ -458,7 +458,7 @@ function Daiquiri_Table(container, opt) {
 
                     // append the new rows to the body of the table
                     tbody.append(html);
-                    /*
+                    
                     // add click event for the rows (for row selection)
                     $('td', self.container).click(function () {
                         var element = $(this)
@@ -470,7 +470,7 @@ function Daiquiri_Table(container, opt) {
                         if (classes.indexOf('daiquiri-table-row-selected') == -1) {
                             $('.' + rowClass).addClass('daiquiri-table-row-selected');
                         }
-                    });*/
+                    });
 
                 } else {
                     $('tbody',self.container).children().remove();

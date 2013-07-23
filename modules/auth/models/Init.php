@@ -276,7 +276,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         Daiquiri_Config::getInstance()->init(); // re-init Configuration object
         $authUserModel = new Auth_Model_User();
         $user = $authUserModel->rows();
-        if ($user->records == 0) {
+        if ($user['nrows'] == 0) {
             foreach ($options['auth']['user'] as $credentials) {
                 // pre-process password first
                 $credentials['newPassword'] = $credentials['password'];
@@ -285,7 +285,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
 
                 // fake request parametes to make 
                 Zend_Controller_Front::getInstance()->getRequest()->setParams($credentials);
-
+                
                 // create user
                 $r = $authUserModel->create($credentials);
 

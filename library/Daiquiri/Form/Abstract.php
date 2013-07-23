@@ -47,7 +47,9 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
             'Form'
         ));
 
-        $this->addCsrfElement();
+        if (Daiquiri_Auth::getInstance()->isVolatile()) {
+            $this->addCsrfElement();
+        }
     }
 
     /**
