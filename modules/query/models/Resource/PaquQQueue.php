@@ -437,13 +437,14 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
      * @param string $tableclass
      * @return int 
      */
-    public function countRows(array $where = null, $tableclass = null) {
-        $sqloptions = array();
-        $sqloptions['from'] = array("id");
-        $sqloptions['where'] = $where;
+    public function countRows(array $sqloptions = null, $tableclass = null) {
+        $sqloptions2 = array();
+        $sqloptions2['from'] = array("id");
+        $sqloptions2['where'] = $sqloptions['where'];
+        $sqloptions2['orWhere'] = $sqloptions['orWhere'];
 
-        $selectPending = $this->_createJobSelect($sqloptions);
-        $selectHistory = $this->_createJobHistorySelect($sqloptions);
+        $selectPending = $this->_createJobSelect($sqloptions2);
+        $selectHistory = $this->_createJobHistorySelect($sqloptions2);
 
         $selectPending->columns('COUNT(*) as count');
         $selectHistory->columns('COUNT(*) as count');
@@ -451,7 +452,7 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
         $count = $this->getTable('Query_Model_DbTable_JobsPaquQQueue')->fetchRow($selectPending)->count +
                 $this->getTable('Query_Model_DbTable_JobsHistoryPaquQQueue')->fetchRow($selectHistory)->count;
 
-        return $count;
+        return (int) $count;
     }
 
     public function fetchQueues() {

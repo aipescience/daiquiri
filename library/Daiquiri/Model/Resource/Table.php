@@ -112,15 +112,15 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Abstract {
      */
     public function fetchDbCols($tableclass = null) {
         $cols = $this->fetchCols($tableclass);
-        
+
         // get the name of the database table
         $t = $this->getTable()->getName();
-        
+
         $dbCols = array();
         foreach ($cols as $col) {
             $dbCols[$col] = '`' . $t . '`.`' . $col . '`';
         }
-        
+
         return $dbCols;
     }
 
@@ -168,7 +168,7 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Abstract {
      * @throws Exception
      * @return int
      */
-    public function countRows(array $where = null, $tableclass = null) {
+    public function countRows(array $sqloptions = null, $tableclass = null) {
         //get the table
         $table = $this->getTable($tableclass);
 
@@ -176,12 +176,21 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Abstract {
         $select = $table->select();
         $select->from($table, 'COUNT(*) as count');
 
-        foreach ($where as $w) {
-            $select = $select->where($w);
+        if ($sqloptions) {
+            if (isset($sqloptions['where'])) {
+                foreach ($sqloptions['where'] as $w) {
+                    $select = $select->where($w);
+                }
+            }
+            if (isset($sqloptions['orWhere'])) {
+                foreach ($sqloptions['orWhere'] as $w) {
+                    $select = $select->orWhere($w);
+                }
+            }
         }
 
         // query database and return
-        return $table->fetchRow($select)->count;
+        return (int) $table->fetchRow($select)->count;
     }
 
     /**

@@ -1,12 +1,33 @@
+/*  
+ *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  See the NOTICE file distributed with this work for additional
+ *  information regarding copyright ownership. You may obtain a copy
+ *  of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 var _daiquiri_table = {
     defaults: {
         'header' : {},
-        'nrows': 20,
-        'nrowsList': [5,20,100],
+        'nrows': 10,
+        'nrowsList': [10,100],
         'sort': null,
-        'colswidth': '100px'
+        'colsWidth': '100px'
     },
-    items: {}
+    items: {},
+    resizing: null
 };
 
 function Daiquiri_Table(container, opt) {
@@ -14,11 +35,11 @@ function Daiquiri_Table(container, opt) {
     this.id = container.attr('id');
     this.opt = opt;
     this.params = null;
-    this.total = null;
+    this.pages = null;
+    this.ncols = null;
+    this.colsmodel = null;
 
     this.init = function () {
-        var self = this;
-
         // create pane for table
         $('<div/>',{
             'class': 'daiquiri-table-pane',
@@ -30,7 +51,7 @@ function Daiquiri_Table(container, opt) {
             'class': 'daiquiri-table-pager'
         }).appendTo(this.container);
         
-        // create pager
+        // create message
         $('<div/>',{
             'class': 'daiquiri-table-message'
         }).appendTo(this.container);
@@ -39,10 +60,10 @@ function Daiquiri_Table(container, opt) {
         this.container.addClass('daiquiri-table');
 
         // initial params
-        self.params = {
-            'nrows': self.opt.nrows,
+        this.params = {
+            'nrows': this.opt.nrows,
             'page': 1,
-            'sort': self.opt.sort,
+            'sort': this.opt.sort,
             'search': null
         };
 
@@ -51,8 +72,26 @@ function Daiquiri_Table(container, opt) {
         this.cols();
     }
 
-    this.error = function(jqXHR, textStatus, errorThrown) {
+    this.reset = function () {
+        $('thead','.daiquiri-table-pane', this.container).children().remove();
+        $('tbody','.daiquiri-table-pane', this.container).children().remove();
+        $('.daiquiri-table-pager', this.container).children().remove();
+        $('.daiquiri-table-message', this.container).children().remove();
         
+        // initial params
+        this.params = {
+            'nrows': this.opt.nrows,
+            'page': 1,
+            'sort': this.opt.sort,
+            'search': null
+        };
+        
+        // display table
+        this.pager();
+        this.cols();
+    }
+
+    this.error = function(jqXHR, textStatus, errorThrown) {
         $('tbody', this.container).children().remove();
         $('.daiquiri-table-message', this.container).children().remove();
         $('.daiquiri-table-message', this.container).append('<p class="text-error">Table is empty</p>');
@@ -61,14 +100,14 @@ function Daiquiri_Table(container, opt) {
     this.pager = function () {
         var self = this;
 
-        var searchHtml = '<input placeholder="Search" type="text" class="span2" />';
+        var searchHtml = '<input placeholder="Search" type="text" class="input-mini" />';
         searchHtml += '<button class="btn"><i class="icon-search"></i></button>';
         var search = $('<form/>',{
             'id': self.id + '-pager-search',
             'class': 'daiquiri-table-pager-search-form input-append pull-left',
             'html': searchHtml
         }).submit(function () {
-            var id = $(this).attr('id').match(/(\w+)-pager-search/)[1];
+            var id = $(this).attr('id').match(/(.+)-pager-search/)[1];
             var self = _daiquiri_table.items[id];
             self.params.search = $('input',this).val()
             self.rows();
@@ -79,62 +118,65 @@ function Daiquiri_Table(container, opt) {
             $(this).parent().submit();
         });
 
-        $('<button/>',{
-            'id': self.id + '-pager-first',
-            'class': 'btn daiquiri-table-pager-button daiquiri-table-pager-button-small',
-            'html': '<i class="icon-fast-backward"></i>'
-        }).click(function () {
-            var id = $(this).attr('id').match(/(\w+)-pager-first/)[1];
+        var html = '<ul>';
+        html += '<li><a id="' + self.id + '-pager-first" href="#">First</a></li>';
+        html += '<li><a id="' + self.id + '-pager-prev" href="#">Previous</a></li>';
+        html += '<li><a id="' + self.id + '-pager-next" href="#">Next</a></li>';
+        html += '<li><a id="' + self.id + '-pager-last" href="#">Last</a></li>';
+        html += '</ul>';
+
+        $('<div />', {
+            'id': self.id + '-pager-pagination',
+            'class': 'pagination pull-left',
+            'html': html
+        }).appendTo($('.daiquiri-table-pager', self.container));
+        
+        $('<div />', {
+            'id': self.id + '-pager-reset',
+            'class': 'pagination pull-left',
+            'html': '<ul><li><a href="#">Reset</a></li></ul>'
+        }).appendTo($('.daiquiri-table-pager', self.container));
+
+        $('#' + self.id + '-pager-first').click(function () {
+            var id = $(this).attr('id').match(/(.+)-pager-first/)[1];
             var self = _daiquiri_table.items[id];
             self.params.page = 1;
             self.rows();
-        }).appendTo($('.daiquiri-table-pager', self.container));
-
-        $('<button/>',{
-            'id': self.id + '-pager-prev',
-            'class': 'btn daiquiri-table-pager-button daiquiri-table-pager-button-small',
-            'html': '<i class="icon-backward"></i>'
-        }).click(function () {
-            var id = $(this).attr('id').match(/(\w+)-pager-prev/)[1];
+            return false;
+        });
+        
+        $('#' + self.id + '-pager-prev').click(function () {
+            var id = $(this).attr('id').match(/(.+)-pager-prev/)[1];
             var self = _daiquiri_table.items[id];
             self.params.page -= 1; 
             if (self.params.page < 1) {
                 self.params.page = 1;
             }
             self.rows();
-        }).appendTo($('.daiquiri-table-pager', self.container));
+            return false;
+        });
 
-        $('<button/>',{
-            'id': self.id + '-pager-next',
-            'class': 'btn daiquiri-table-pager-button daiquiri-table-pager-button-small',
-            'html': '<i class="icon-forward"></i>'
-        }).click(function () {
-            var id = $(this).attr('id').match(/(\w+)-pager-next/)[1];
+        $('#' + self.id + '-pager-next').click(function () {
+            var id = $(this).attr('id').match(/(.+)-pager-next/)[1];
             var self = _daiquiri_table.items[id];
             self.params.page += 1;
-            if (self.params.page > self.total) {
-                self.params.page = self.total;
+            if (self.params.page > self.pages) {
+                self.params.page = self.pages;
             }
             self.rows();
-        }).appendTo($('.daiquiri-table-pager', self.container));
+            return false;
+        });
         
-        $('<button/>',{
-            'id': self.id + '-pager-last',
-            'class': 'btn daiquiri-table-pager-button daiquiri-table-pager-button-small',
-            'html': '<i class="icon-fast-forward"></i>'
-        }).click(function () {
-            var id = $(this).attr('id').match(/(\w+)-pager-last/)[1];
+        $('#' + self.id + '-pager-last').click(function () {
+            var id = $(this).attr('id').match(/(.+)-pager-last/)[1];
             var self = _daiquiri_table.items[id];
-            self.params.page = self.total;
+            self.params.page = self.pages;
             self.rows();
-        }).appendTo($('.daiquiri-table-pager', self.container));
+            return false;
+        });
 
-        $('<button/>',{
-            'id': self.id + '-pager-reset',
-            'class': 'btn daiquiri-table-pager-button',
-            'html': 'Reset'
-        }).click(function () {
-            var id = $(this).attr('id').match(/(\w+)-pager-reset/)[1];
+        $('#' + self.id + '-pager-reset').click(function () {
+            var id = $(this).attr('id').match(/(.+)-pager-reset/)[1];
             var self = _daiquiri_table.items[id];
             
             $('input','.daiquiri-table-pager-search-form', self.container).val('');
@@ -143,6 +185,12 @@ function Daiquiri_Table(container, opt) {
             self.params.sort = null
             self.params.page = 1
             self.rows();
+            return false;
+        });
+
+        $('<div/>',{
+            'class': 'daiquiri-table-pager-paging pull-left',
+            'id': self.id + '-pager-paging'
         }).appendTo($('.daiquiri-table-pager', self.container));
 
         var select = $('<select/>',{
@@ -163,7 +211,7 @@ function Daiquiri_Table(container, opt) {
         });
 
         $('#' + self.id + '-pager-nrows').change( function() {
-            var id = $(this).attr('id').match(/(\w+)-pager-nrows/)[1];
+            var id = $(this).attr('id').match(/(.+)-pager-nrows/)[1];
             var self = _daiquiri_table.items[id];
             self.params.page = 1;
             self.params.nrows = $(this).val();
@@ -187,74 +235,146 @@ function Daiquiri_Table(container, opt) {
             success: function (json) {
                 if (json.status == 'ok') {
                     self.ncols = json.cols.length;
-                    self.colsmodel = json.cols;
+                    self.colsmodel  = json.cols;
 
                     // contruct and append html elements for column headers
                     var html = '<tr>';
                     var width;
-                    for (var i = 0; i < self.colsmodel.length; i++) {
-                        if (self.colsmodel[i].width != undefined) {
-                            width = self.colsmodel[i].width;
-                        } else {
-                            width = self.opt.colswidth;
+                    for (var i = 0; i < self.ncols; i++) {
+                        if (self.colsmodel[i].hidden != true) {
+                            if (self.colsmodel[i].width != undefined) {
+                                width = self.colsmodel[i].width;
+                            } else {
+                                width = self.opt.colsWidth;
+                            }
+                            classes = 'daiquiri-table-col-' + i;
+                            if (self.colsmodel[i].sortable != 'false') {
+                                classes += ' sortable';
+                            }
+                            html += '<th id="' + self.id + '-thead-col-' + i + '" style="width:' + width + '" class="' + classes + '">';
+                            if (i != 0) {
+                                html += '<div class="handle-left pull-left"></div>';
+                            }
+                            html += '<span>' + self.colsmodel[i].name + '</span>';
+                            html += '<div class="handle-right pull-right"></div>';
+                            if (self.colsmodel[i].sortable != 'false') {
+                                html += '<i id="' + self.id + '-thead-sort" class="icon-chevron-down pull-right"></i>';
+                            }
+                            html += '</th>';
                         }
-                        html += '<th id="' + self.id + '-thead-col-' + i + '" style="width:' + width + '" class="daiquiri-table-col-' + i + '">';
-                        html += self.colsmodel[i].name + '</th>';
-                    };
+                    }
                     html += '</tr>';
                     $('thead',self.container).append(html);
 
-                    // add click event for column headers
                     $('th', self.container).click(function () {
-                        var id = $(this).attr('id').match(/(\w+)-thead-col-\d+/)[1];
+                        var id = $(this).attr('id').match(/(.+)-thead-col-\d+/)[1];
                         var self = _daiquiri_table.items[id];
-
+                        
                         // determine which column was clicked
                         var element = $(this)
                         var classes = element.attr('class');
                         var colClass = classes.match(/daiquiri-table-col-\d+/)[0];
-
+                        
                         // remove 'selected' class from other elements and add to this column
                         $('.daiquiri-table-col-selected', 'table', self.container).removeClass('daiquiri-table-col-selected');
-
-                        // remove sorting arrow from other column header (for column selection)
-                        $('i','th','.daiquiri-table-col-selected', 'table', self.container).remove();
 
                         if (classes.indexOf('daiquiri-table-col-selected') == -1) {
                             // add 'selected' class to column header
                             $('.' + colClass, self.container).addClass('daiquiri-table-col-selected');
-
-                            // add sorting arrow to column header
-                            $('<i/>',{
-                                'id': self.id + '-thead-sort',
-                                'class': 'icon-arrow-down pull-right'
-                            }).click( function () {
-                                var id = $(this).attr('id').match(/(\w+)-thead-sort/)[1];
-                                var self = _daiquiri_table.items[id];
-
-                                // determine which column was clicked
-                                var element = $(this);
-                                var colId = element.parent().attr('class').match(/daiquiri-table-col-(\d+)/)[1];
-                                var colName = self.colsmodel[colId].name;
-
-                                // exchange icons from 'icon-arrow-down' to 'icon-arrow-up' or vice versa
-                                if (element.attr('class').indexOf('icon-arrow-down') != -1) {
-                                    element.removeClass('icon-arrow-down').addClass('icon-arrow-up');
-                                    self.params.sort = colName + ' ASC';
-                                } else {
-                                    element.removeClass('icon-arrow-up').addClass('icon-arrow-down');
-                                    self.params.sort = colName + ' DESC';
-                                }
-
-                                // display new set of rows
-                                self.rows();
-
-                                // return but do not trigger click event in parent th
-                                return false;
-                            }).appendTo(element);
                         }
                     });
+                    
+                    // add sorting function to click on header
+                    $('i', 'th', self.container).click( function () {
+                        var id = $(this).attr('id').match(/(.+)-thead-sort/)[1];
+                        var self = _daiquiri_table.items[id];
 
+                        // determine which column was clicked
+                        var element = $(this);
+                        var classes = element.attr('class');
+                        var colName = $('span', element.parent()).text();
+                                
+                        // manipulate arrow and change sort options
+                        if (classes.indexOf('sorted') == -1) {
+                            $('i.sorted', self.container).removeClass('sorted').removeClass('icon-chevron-up').addClass('icon-chevron-down');
+                            element.addClass('sorted');
+                            element.addClass('icon-chevron-down');
+                            self.params.sort = colName + ' ASC';
+                        } else {
+                            if (element.attr('class').indexOf('icon-chevron-down') != -1) {
+                                element.removeClass('icon-chevron-down').addClass('icon-chevron-up');
+                                self.params.sort = colName + ' DESC';
+                            } else {
+                                element.removeClass('icon-chevron-up').addClass('icon-chevron-down');
+                                self.params.sort = colName + ' ASC';
+                            }
+                        }
+                                
+                        // display new set of rows
+                        self.rows();
+
+                        // return but do not trigger click event in parent th
+                        return false;
+                    });
+                    
+                    // make columns resizsable
+                    // disable click events on handle divs left an right of the header
+                    $('.handle-right').click(function () {
+                        return false;
+                    });
+                    $('.handle-left').click(function () {
+                        return false;
+                    });
+                    
+                    // on mousedown, init global resizing object
+                    $('.handle-right').on('mousedown', function (e) {
+                        var match = $(this).parent().attr('id').match(/(.+)-thead-col-(\d+)/);
+                        var id = match[1];
+                        var colId = match[2];
+                        var self = _daiquiri_table.items[id];
+                        var cols = $('th.daiquiri-table-col-' + colId, self.container);
+                        
+                        _daiquiri_table.resizing = {
+                            'cols': cols,
+                            'zero': e.pageX,
+                            'width': $('th.daiquiri-table-col-' + colId, self.container).width()
+                        }
+                    });
+                    $('.handle-left').on('mousedown', function (e) {
+                        var match = $(this).parent().attr('id').match(/(.+)-thead-col-(\d+)/);
+                        var id = match[1];
+                        var colId = match[2];
+                        var self = _daiquiri_table.items[id];
+                        var cols = $('th.daiquiri-table-col-' + (colId - 1), self.container);
+
+                        _daiquiri_table.resizing = {
+                            'cols': cols,
+                            'zero': e.pageX,
+                            'width': $('th.daiquiri-table-col-' + (colId - 1), self.container).width()
+                        }
+                        return false;
+                    });
+                    
+                    // on mouse up remove resizing object
+                    $(document).on('mouseup', function () {
+                        if (_daiquiri_table.resizing != null) {
+                            _daiquiri_table.resizing = null;
+                        }
+                    });
+                    
+                    // on mousemove perform resizing if resizing object is not null
+                    $(document).on("mousemove", function(e) {
+                        if (_daiquiri_table.resizing != null) {
+                            var delta = e.pageX - _daiquiri_table.resizing.zero;
+
+                            var width = _daiquiri_table.resizing.width + delta;
+                            if (width < 50) {
+                                width = 50;
+                            }
+                            _daiquiri_table.resizing.cols.width(width);
+                        }
+                    });
+                    
                     // display new set of rows
                     self.rows();
                 } else {
@@ -280,7 +400,19 @@ function Daiquiri_Table(container, opt) {
             success: function (json) {
                 if (json.status == 'ok') {
                     // store information from server in params
-                    self.total = json.total;
+                    self.pages = json.pages;
+
+                    // update pager
+                    var html = '<p>Page ' + json.page + ' of ' + json.pages + ' (' + json.total + ' ';
+                    if (json.total == 1) {
+                        html += 'row';
+                    } else {
+                        html += 'rows';
+                    }
+                    html += ' total)</p>';
+                    var paging = $('#' + self.id + '-pager-paging');
+                    paging.children().remove();
+                    paging.append(html);
 
                     // get the id of the selected column
                     var selected = $('.daiquiri-table-col-selected');
@@ -288,20 +420,31 @@ function Daiquiri_Table(container, opt) {
                         var selectedId = selected.attr('class').match(/daiquiri-table-col-(\d+)/)[1];
                     }
 
-                    // contrsuct html elements for the rows
-                    var html = '';
-                    var i,j;
-                    for (i = 0; i < json.nrows; i++) {
+                    // construct html elements for the rows
+                    html = '';
+                    var i,j,classes,text,format;
+                    for (j = 0; j < json.nrows; j++) {
                         html += '<tr>';
-                        for (j = 0; j < self.ncols; j++) {
-                            var classes = 'daiquiri-table-col-' + j + ' daiquiri-table-row-' + i;
+                        for (i = 0; i < self.ncols; i++) {
+                            if (self.colsmodel[i].hidden != true) {
+                                // format cell according to colsmodel
+                                text = json.rows[j][i];
+                                
+                                format = self.colsmodel[i].format;
+                                if (format != undefined) {
+                                    if (format.type == 'link') {
+                                        text = '<a href="' + format.base + '/' + text + '">' + text + '</a>';
+                                    }
+                                }
 
-                            // add the selected class for cells in the selected column
-                            if (selectedId != undefined && j == selectedId) {
-                                classes += ' daiquiri-table-col-selected';
+                                // add the selected class for cells in the selected column
+                                classes = 'daiquiri-table-col-' + i + ' daiquiri-table-row-' + j;
+                                if (selectedId != undefined && i == selectedId) {
+                                    classes += ' daiquiri-table-col-selected';
+                                }
+                            
+                                html += '<td class="' + classes + '">' + text + '</td>';
                             }
-
-                            html += '<td class="' + classes + '">' + json.rows[i][j] + '</td>';
                         }
                         html += '</tr>';
                     }
@@ -315,7 +458,7 @@ function Daiquiri_Table(container, opt) {
 
                     // append the new rows to the body of the table
                     tbody.append(html);
-
+                    /*
                     // add click event for the rows (for row selection)
                     $('td', self.container).click(function () {
                         var element = $(this)
@@ -327,7 +470,7 @@ function Daiquiri_Table(container, opt) {
                         if (classes.indexOf('daiquiri-table-row-selected') == -1) {
                             $('.' + rowClass).addClass('daiquiri-table-row-selected');
                         }
-                    });
+                    });*/
 
                 } else {
                     $('tbody',self.container).children().remove();
@@ -352,8 +495,8 @@ function Daiquiri_Table(container, opt) {
                     _daiquiri_table.items[id] = new Daiquiri_Table($(this),opt);
                     _daiquiri_table.items[id].init()
                 } else {
-                    _daiquiri_table.items[id].reset();
                     _daiquiri_table.items[id].opt = opt;
+                    _daiquiri_table.items[id].reset();
                 }
             });
         }

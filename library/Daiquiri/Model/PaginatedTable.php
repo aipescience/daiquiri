@@ -50,16 +50,20 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
         } else {
             $sqloptions['from'] = null;
         }
+        
         if (isset($queryParams['nrows'])) {
             $sqloptions['limit'] = $queryParams['nrows'];
-        } else {
-            $sqloptions['limit'] = null;
-        }
-        if (($queryParams['nrows']) && isset($queryParams['page'])) {
-            $sqloptions['start'] = ($queryParams['page'] - 1) * $queryParams['nrows'];
+
+            if (isset($queryParams['page'])) {
+                $sqloptions['start'] = ($queryParams['page'] - 1) * $queryParams['nrows'];
+            } else {
+                $sqloptions['start'] = 0;
+            }
         } else {
             $sqloptions['start'] = 0;
+            $sqloptions['limit'] = null;
         }
+
         if (isset($queryParams['sort'])) {
             $s = explode(' ', $queryParams['sort']);
 
@@ -80,29 +84,29 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
         }
 
         $sqloptions['orWhere'] = array();
-        if (isset($queryParams['search']) && ! empty($queryParams['search'])) {
+        if (isset($queryParams['search']) && !empty($queryParams['search'])) {
             $adapter = Zend_Db_Table::getDefaultAdapter();
-            
+
             // get the full columns id
             $resource = $this->getResource();
-            $dbCols = $resource->fetchDbCols(null);
-
+            $dbCols = $resource->fetchDbCols();
+            
             $cols = array();
-            if (isset($queryParams['cols']) && $queryParams['cols'] !== null) { 
+            if (isset($queryParams['cols']) && $queryParams['cols'] !== null) {
                 foreach ($queryParams['cols'] as $col) {
                     $cols[] = $dbCols[$col];
                 }
             } else {
                 $cols = $dbCols;
             }
-            
+
             foreach ($cols as $col) {
                 $quotedString = $adapter->quoteInto('?', $queryParams['search']);
-                $string = substr($quotedString, 1, strlen($quotedString)-2);
-                $sqloptions['orWhere'][] = $col . " LIKE '%". $string ."%'";
+                $string = substr($quotedString, 1, strlen($quotedString) - 2);
+                $sqloptions['orWhere'][] = $col . " LIKE '%" . $string . "%'";
             }
         }
-        
+
         return $sqloptions;
     }
 
@@ -122,15 +126,16 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
     protected function _response(array $rows, array $sqloptions) {
         // fill data object
         $data = array();
-        
+
         // rows from the database query
         $data['rows'] = array();
-        foreach($rows as $row) {
+        foreach ($rows as $row) {
             $data['rows'][] = array_values($row);
         }
 
         // number of rows
         $data['nrows'] = count($rows);
+        $data['total'] = $this->getResource()->countRows($sqloptions);
 
         // finish response
         if (isset($sqloptions['start']) && isset($sqloptions['limit'])) {
@@ -138,12 +143,14 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
         } else {
             $data['page'] = 1;
         }
+
         if (isset($sqloptions['limit'])) {
-            $data['total'] = ceil($data['nrows'] / $sqloptions['limit']);
+            $data['pages'] = ceil($data['total'] / $sqloptions['limit']);
         } else {
-            $data['total'] = 1;
+            $data['pages'] = 1;
         }
 
         return $data;
     }
+
 }

@@ -103,6 +103,8 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->_cols;
+        } else {
+            $params['cols'] = explode(',', $params['cols']);
         }
 
         $cols = array();
@@ -144,6 +146,8 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->_cols;
+        } else {
+            $params['cols'] = explode(',', $params['cols']);
         }
 
         // create csrf hash for clickjacking protection

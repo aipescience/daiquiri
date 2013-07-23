@@ -29,8 +29,13 @@ class Data_ViewerController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $this->view->db = $this->_db;
-        $this->view->table = $this->_table;
+        if (empty($this->_db) || empty($this->_table)) {
+            $this->view->status = 'error';           
+        } else {
+            $this->view->status = 'ok';
+            $this->view->db = $this->_db;
+            $this->view->table = $this->_table;
+        }
     }
 
     public function rowsAction() {

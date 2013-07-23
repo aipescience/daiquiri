@@ -40,23 +40,25 @@ class Contact_MessagesController extends Daiquiri_Controller_Abstract {
     }
 
     public function colsAction() {
-        // get parameters from request
-        $redirect = $this->_getParam('redirect', '/contact/messages/');
-        $params = $this->_getTableParams();
-
-        $this->view->redirect = $redirect;
-        $this->view->data = $this->_model->cols($params);
+        // call model functions
+        $response = $this->_model->cols($this->_request->getQuery());
+        
+        // assign to view
+        $this->view->cols = $response['cols'];
+        $this->view->redirect = $this->_getParam('redirect', '/contact/messages/');
         $this->view->status = 'ok';
     }
 
     public function rowsAction() {
-        // get parameters from request
-        $redirect = $this->_getParam('redirect', '/contact/messages/');
-        $params = $this->_getTableParams();
+        // call model functions
+        $response = $this->_model->rows($this->_request->getQuery());
 
-        $this->view->redirect = $redirect;
-        $this->view->data = $this->_model->rows($params);
-        $this->status = 'ok';
+        // assign to view
+        foreach ($response as $key => $value) {
+            $this->view->$key = $value;
+        }
+        $this->view->redirect = $this->_getParam('redirect', '/contact/messages/');
+        $this->view->status = 'ok';
     }
 
     public function respondAction() {

@@ -30,48 +30,6 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
     }
 
     /**
-     * Returns the rows of the given table and database.
-     * @param string $database
-     * @param string $table
-     * @param array $params
-     * @return array 
-     */
-    public function rows($db, $table, array $params = array()) {
-        // set init table
-        $this->getResource()->init($db, $table);
-
-        // get the primary key
-        $pks = $this->getResource()->getTable()->getPrimary();
-        $pk = $pks[0];
-
-        // get the table from the resource
-        $sqloptions = $this->_sqloptions($params);
-
-        // get the primary table
-        $tableObj = $this->getResource()->getTable();
-
-        // get select object
-        $select = $tableObj->getSelect($sqloptions);
-
-        $cols = $this->cols($db, $table, $params);
-
-        //build column array
-        $colNames = array();
-        foreach($cols['data'] as $col) {
-            $colNames[] = $col['name'];
-        }
-
-        $select->setColumns($tableObj->getName(), $colNames);
-
-        // get result convert to array and return
-        $rows =  $tableObj->fetchAll($select)->toArray();
-
-        $response = $this->_response($rows, $sqloptions, $pk);
-
-        return $response;
-    }
-
-    /**
      * Returns the columns of a given table and database. 
      * @param string $database
      * @param string $table
@@ -88,6 +46,8 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->getResource()->fetchCols();
+        } else {
+            $params['cols'] = explode(',', $params['cols']);
         }
 
         // obtain column metadata (if this exists)
@@ -99,8 +59,8 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
             $tableId = $tableModel->fetchIdWithName($dbId, $table);
             $tableData = $tableModel->getResource()->fetchRow($tableId);
         } else {
-            //this table is not in the metadata table - let's see if we can get
-            //further information from the table itself
+            // this table is not in the metadata table - let's see if we can get
+            // further information from the table itself
             $describeResource = new Data_Model_Resource_Description();
             $tableData = $describeResource->describeTable($db, $table);
         }
@@ -116,45 +76,46 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
             if ($name === 'row_id') {
                 $cols[] = array(
                     'name' => $name,
-                    'width' => '40em',
+                    'width' => '4em',
                     'sortable' => true,
                     'hidden' => true
                 );
             } else if (strpos($params['colUcd'][$key], "meta.ref") !== false) {
-                //is this a file daiquiri hosts or just a link?
+                // is this a file daiquiri hosts or just a link?
                 if (strpos($params['colUcd'][$key], "meta.file") !== false ||
                         strpos($params['colUcd'][$key], "meta.fits") !== false) {
-                    //this is a file we host and can be downloaded
+                    // this is a file we host and can be downloaded
                     $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
                     $cols[] = array(
                         'name' => $name,
-                        'width' => '200em',
+                        'width' => '20em',
                         'sortable' => true,
-                        'formatter' => 'singleFileLink',
-                        'formatoptions' => array(
-                            'baseLinkUrl' => $baseurl . '/files/index/single',
+                        'format' => array(
+                            'type' => 'link',
+                            'base' => $baseurl . '/files/index/single',
                         )
                     );
                 } else if (strpos($params['colUcd'][$key], "meta.ref.uri") !== false) {
+                    // this is just a link
                     $cols[] = array(
                         'name' => $name,
-                        'width' => '200em',
+                        'width' => '20em',
                         'sortable' => true,
-                        'formatter' => 'link',
-                        'formatoptions' => array(
+                        'format' => array(
+                            'type' => 'link',
                             'target' => 'blank',
                         )
                     );
                 } else if (strpos($params['colUcd'][$key], "meta.ref.ivorn") !== false) {
                     
                 } else {
-                    //we just show this as a link - meta.ref.url also ends up here
+                    // we just show this as a link - meta.ref.url also ends up here
                     $cols[] = array(
                         'name' => $name,
-                        'width' => '200em',
+                        'width' => '20em',
                         'sortable' => true,
-                        'formatter' => 'link',
-                        'formatoptions' => array(
+                        'format' => array(
+                            'type' => 'link',
                             'target' => 'blank',
                         )
                     );
@@ -166,13 +127,59 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
                     'sortable' => true,
                 );
                 if (Daiquiri_Config::getInstance()->data->viewer->removeNewline) {
-                    $col['formatter'] = 'removeNewline';
+                    $col['format'] = array('removeNewline' => true);
                 }
                 $cols[] = $col;
             }
         }
 
-        return array('status' => 'ok', 'data' => $cols);
+        return array('status' => 'ok', 'cols' => $cols);
+    }
+
+    /**
+     * Returns the rows of the given table and database.
+     * @param string $database
+     * @param string $table
+     * @param array $params
+     * @return array 
+     */
+    public function rows($db, $table, array $params = array()) {
+        // set init table
+        $this->getResource()->init($db, $table);
+        
+        // set default columns
+        if (empty($params['cols'])) {
+            $params['cols'] = $this->getResource()->fetchCols();
+        } else {
+            $params['cols'] = explode(',', $params['cols']);
+        }
+        
+        // get the table from the resource
+        $sqloptions = $this->_sqloptions($params);
+        
+        /*
+        // get the primary table
+        $tableObj = $this->getResource()->getTable();
+
+        // get select object
+        $select = $tableObj->getSelect($sqloptions);
+
+        $cols = $this->cols($db, $table, $params);
+
+        //build column array
+        $colNames = array();
+        foreach ($cols['data'] as $col) {
+            $colNames[] = $col['name'];
+        }
+
+        $select->setColumns($tableObj->getName(), $colNames);
+
+        // get result convert to array and return
+        $rows = $tableObj->fetchAll($select)->toArray();
+        */
+        
+        $rows = $this->getResource()->fetchRows($sqloptions);
+        return $this->_response($rows, $sqloptions);;
     }
 
 }

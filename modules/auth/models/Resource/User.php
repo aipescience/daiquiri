@@ -57,7 +57,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * @return array 
      */
     public function fetchDbCols($tableclass = null) {
-        return $this->fetchCols($tableclass);
+        $cols = $this->fetchCols($tableclass);
 
         // get the names of the involved tables
         $u = $this->getTable('Auth_Model_DbTable_User')->getName();
@@ -158,7 +158,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * @param string $tableclass
      * @return int 
      */
-    public function countRows(array $where = null, $tableclass = null) {
+    public function countRows(array $sqloptions = null, $tableclass = null) {
         //get the table
         $table = $this->getTable('Auth_Model_DbTable_User');
 
@@ -168,13 +168,25 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         $select->from($table, 'COUNT(*) as count');
 
         $join = array('status' => false, 'role' => false);
-        if ($where) {
-            foreach ($where as $w) {
-                $select = $select->where($w);
-                if (strrpos($w, '`status`') !== False) {
-                    $join['status'] = True;
-                } else if (strrpos($w, '`role`') !== False) {
-                    $join['role'] = True;
+        if ($sqloptions) {
+            if (isset($sqloptions['where'])) {
+                foreach ($sqloptions['where'] as $w) {
+                    $select = $select->where($w);
+                    if (strrpos($w, '`status`') !== False) {
+                        $join['status'] = True;
+                    } else if (strrpos($w, '`role`') !== False) {
+                        $join['role'] = True;
+                    }
+                }
+            }
+            if (isset($sqloptions['orWhere'])) {
+                foreach ($sqloptions['orWhere'] as $w) {
+                    $select = $select->orWhere($w);
+                    if (strrpos($w, '`status`') !== False) {
+                        $join['status'] = True;
+                    } else if (strrpos($w, '`role`') !== False) {
+                        $join['role'] = True;
+                    }
                 }
             }
         }
@@ -188,7 +200,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         }
 
         // query database and return
-        return $table->fetchRow($select)->count;
+        return (int) $table->fetchRow($select)->count;
     }
 
     /**

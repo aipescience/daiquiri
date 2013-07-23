@@ -1,5 +1,6 @@
 <?php
-/*  
+
+/*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
@@ -45,17 +46,14 @@ class Query_Model_Jobs extends Daiquiri_Model_PaginatedTable {
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
         $rows = $this->getResource()->fetchRows($sqloptions);
-        $response = $this->_response($rows, $sqloptions);
-
-        $statusIndex = array_search('status', $params['cols']);
 
         // loop through the table and add options
         if (isset($params['options']) && $params['options'] === 'true') {
-            for ($i = 0; $i < sizeof($response->rows); $i++) {
-                $id = $response->rows[$i]['id'];
+            for ($i = 0; $i < sizeof($rows); $i++) {
+                $id = $rows[$i]['id'];
 
-                if($statusIndex !== false) {
-                    $status = $response->rows[$i]['cell'][$statusIndex-1];
+                if (! empty($rows[$i]['status'])) {
+                    $status = $rows[$i]['status'];
                 } else {
                     $status = "";
                 }
@@ -67,7 +65,7 @@ class Query_Model_Jobs extends Daiquiri_Model_PaginatedTable {
                         'resource' => 'Query_Model_Jobs',
                         'permission' => 'show')));
 
-                if($this->getResource()->isStatusKillable($status)) {
+                if ($this->getResource()->isStatusKillable($status)) {
 
                     $links[] = $this->internalLink(array(
                         'text' => 'Kill',
@@ -77,16 +75,17 @@ class Query_Model_Jobs extends Daiquiri_Model_PaginatedTable {
                 }
 
                 $links[] = $this->internalLink(array(
-                        'text' => 'Remove',
-                        'href' => '/query/jobs/remove/id/' . $id,
-                        'resource' => 'Query_Model_Jobs',
-                        'permission' => 'remove'));
+                    'text' => 'Remove',
+                    'href' => '/query/jobs/remove/id/' . $id,
+                    'resource' => 'Query_Model_Jobs',
+                    'permission' => 'remove'));
 
-                $response->rows[$i]["cell"][] = implode('&nbsp;', $links);
+                $rows[$i]['options'] = implode('&nbsp;', $links);
             }
         }
 
-        return $response;
+        return $this->_response($rows, $sqloptions);
+        ;
     }
 
     /**
@@ -106,14 +105,14 @@ class Query_Model_Jobs extends Daiquiri_Model_PaginatedTable {
                 'sortable' => 'true'
             );
             if ($name === 'id') {
-                $col['width'] = '20px';
+                $col['width'] = '2em';
                 $col['align'] = 'center';
             } else if (in_array($name, array('database', 'table'))) {
-                $col['width'] = '160px';
+                $col['width'] = '16em';
             } else if ($name === 'time') {
-                $col['width'] = '120px';
+                $col['width'] = '12em';
             } else {
-                $col['width'] = '80px';
+                $col['width'] = '8em';
             }
             $cols[] = $col;
         }
@@ -121,13 +120,14 @@ class Query_Model_Jobs extends Daiquiri_Model_PaginatedTable {
         if (isset($params['options']) && $params['options'] === 'true') {
             $cols[] = array(
                 'name' => 'Options',
-                'width' => '120px',
+                'width' => '12em',
                 'sortable' => 'false',
                 'search' => 'false'
             );
         }
 
-        return $cols;
+        return array('cols' => $cols, 'status' => 'ok');
+        ;
     }
 
     /**
