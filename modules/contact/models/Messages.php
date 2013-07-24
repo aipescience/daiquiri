@@ -45,27 +45,28 @@ class Contact_Model_Messages extends Daiquiri_Model_PaginatedTable {
         // get the table from the resource using _showTable
         if (empty($params['cols'])) {
             $params['cols'] = $this->_cols;
+        } else {
+            $params['cols'] = explode(',', $params['cols']);
         }
 
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
         $rows = $this->getResource()->fetchRows($sqloptions);
-        $response = $this->_response($rows, $sqloptions);
 
         // loop through the table and add an options to show the message
         if (isset($params['options']) && $params['options'] === 'true') {
-            for ($i = 0; $i < sizeof($response->rows); $i++) {
-                $id = $response->rows[$i]['id'];
+            for ($i = 0; $i < sizeof($rows); $i++) {
+                $id = $rows[$i]['id'];
                 $link = $this->internalLink(array(
                     'text' => 'Respond',
                     'href' => '/contact/messages/respond/id/' . $id,
                     'resource' => 'Contact_Model_Messages',
                     'permission' => 'respond'));
-                $response->rows[$i]["cell"][] = $link;
+                $rows[$i]["options"] = $link;
             }
         }
 
-        return $response;
+        return $this->_response($rows, $sqloptions);;
     }
 
     /**
@@ -76,6 +77,8 @@ class Contact_Model_Messages extends Daiquiri_Model_PaginatedTable {
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->_cols;
+        } else {
+            $params['cols'] = explode(',', $params['cols']);
         }
 
         foreach ($this->_cols as $name) {
@@ -84,30 +87,30 @@ class Contact_Model_Messages extends Daiquiri_Model_PaginatedTable {
                 'sortable' => 'true'
             );
             if ($name === 'id') {
-                $col['width'] = '20px';
+                $col['width'] = '2em';
                 $col['align'] = 'center';
             } else if ($name === 'email') {
-                $col['width'] = '150px';
+                $col['width'] = '15em';
             } else if ($name === 'subject') {
-                $col['width'] = '180px';
+                $col['width'] = '18em';
             } else if ($name === 'category') {
-                $col['width'] = '60px';
+                $col['width'] = '6em';
             } else if ($name === 'status') {
-                $col['width'] = '60px';
+                $col['width'] = '6em';
             } else {
-                $col['width'] = '80px';
+                $col['width'] = '8em';
             }
             $cols[] = $col;
         }
         if (isset($params['options']) && $params['options'] === 'true') {
             $cols[] = array(
                 'name' => 'options',
-                'width' => '120px',
+                'width' => '12em',
                 'sortable' => 'false'
             );
         }
 
-        return $cols;
+        return array('cols' => $cols, 'status' => 'ok');
     }
 
     /**

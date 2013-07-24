@@ -44,7 +44,41 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * @return array 
      */
     public function fetchCols($tableclass = null) {
-        return array_merge(array('id', 'username', 'email', 'role', 'status'), Daiquiri_Config::getInstance()->auth->details);
+        $cols = array('id', 'username', 'email', 'role', 'status');
+        foreach (Daiquiri_Config::getInstance()->auth->details->toArray() as $detail) {
+            $cols[] = $detail;
+        }
+        return $cols;
+    }
+
+    /**
+     * Returns the colums as they are in the database.
+     * @param string $tableclass
+     * @return array 
+     */
+    public function fetchDbCols($tableclass = null) {
+        $cols = $this->fetchCols($tableclass);
+
+        // get the names of the involved tables
+        $u = $this->getTable('Auth_Model_DbTable_User')->getName();
+        $r = $this->getTable('Auth_Model_DbTable_Roles')->getName();
+        $s = $this->getTable('Auth_Model_DbTable_Status')->getName();
+        $d = $this->getTable('Auth_Model_DbTable_Details')->getName();
+
+        $dbCols = array();
+        foreach ($cols as $col) {
+            if (in_array($col, array('id', 'username', 'email'))) {
+                $dbCols[$col] = '`' . $u . '`.`' . $col . '`';
+            } else if ($col === 'role') {
+                $dbCols[$col] = '`' . $r . '`.`' . 'role' . '`';
+            } else if ($col === 'status') {
+                $dbCols[$col] = '`' . $s . '`.`' . 'status' . '`';
+            } else {
+                $dbCols[$col] = '`' . $d . '`.`' . $col . '`';
+            }
+        }
+
+        return $dbCols;
     }
 
     /**
@@ -124,7 +158,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * @param string $tableclass
      * @return int 
      */
-    public function countRows(array $where = null, $tableclass = null) {
+    public function countRows(array $sqloptions = null, $tableclass = null) {
         //get the table
         $table = $this->getTable('Auth_Model_DbTable_User');
 
@@ -134,13 +168,25 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         $select->from($table, 'COUNT(*) as count');
 
         $join = array('status' => false, 'role' => false);
-        if ($where) {
-            foreach ($where as $w) {
-                $select = $select->where($w);
-                if (strrpos($w, '`status`') !== False) {
-                    $join['status'] = True;
-                } else if (strrpos($w, '`role`') !== False) {
-                    $join['role'] = True;
+        if ($sqloptions) {
+            if (isset($sqloptions['where'])) {
+                foreach ($sqloptions['where'] as $w) {
+                    $select = $select->where($w);
+                    if (strrpos($w, '`status`') !== False) {
+                        $join['status'] = True;
+                    } else if (strrpos($w, '`role`') !== False) {
+                        $join['role'] = True;
+                    }
+                }
+            }
+            if (isset($sqloptions['orWhere'])) {
+                foreach ($sqloptions['orWhere'] as $w) {
+                    $select = $select->orWhere($w);
+                    if (strrpos($w, '`status`') !== False) {
+                        $join['status'] = True;
+                    } else if (strrpos($w, '`role`') !== False) {
+                        $join['role'] = True;
+                    }
                 }
             }
         }
@@ -154,7 +200,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         }
 
         // query database and return
-        return $table->fetchRow($select)->count;
+        return (int) $table->fetchRow($select)->count;
     }
 
     /**

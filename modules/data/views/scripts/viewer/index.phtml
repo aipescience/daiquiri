@@ -21,19 +21,23 @@
 ?>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        // create the table inside the div
-        $('#table').daiquiri_table({
-            'rowsurl': "<?php echo $this->baseUrl('/data/viewer/rows') ?>",
-            'colsurl': "<?php echo $this->baseUrl('/data/viewer/cols') ?>",
-            'baseurl': "<?php echo $this->baseUrl() ?>",
-            'params': {
-                'options': true,
-                'db': "<?php echo $this->db ?>",
-                'table': "<?php echo $this->table ?>"
-            }
+<?php if ($this->status === 'ok'): ?>
+        $(document).ready(function() {
+            // create the table inside the div
+            $('#table').daiquiri_table({
+                'rowsurl': "<?php echo $this->baseUrl('/data/viewer/rows') ?>",
+                'colsurl': "<?php echo $this->baseUrl('/data/viewer/cols') ?>",
+                'params': {
+                    'options': true,
+                    'db': "<?php echo $this->db ?>",
+                    'table': "<?php echo $this->table ?>"
+                }
+            });
         });
-    });
+<?php endif; ?>
 </script>
-
-<p id="table"></p>
+<?php if ($this->status === 'ok'): ?>
+<div id="table"></div>
+<?php else: ?>
+<p class="text-error">No Database or Table was given.</p>
+<?php endif; ?>

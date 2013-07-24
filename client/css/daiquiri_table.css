@@ -16,75 +16,89 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 
 .daiquiri-table {
+    font-size: 8pt;
     margin-bottom: 20px;
 }
-
-.ui-jqgrid table {
-    border-collapse: separate;
+.daiquiri-table th,
+.daiquiri-table td {
+    padding: 2px 0;
+    border-left: 1px solid #ddd;
+    overflow: hidden;
+    white-space: nowrap;
 }
-.ui-jqgrid input {
+.daiquiri-table th {
+    padding: 2px 0;
+}
+.daiquiri-table td {
+    padding: 2px 4px;
+}
+.daiquiri-table td:first-child,
+.daiquiri-table th:first-child {    
+    border-left: none;
+    padding-left: 4px;
+    
+}
+.daiquiri-table-pane {
+    overflow: auto;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.daiquiri-table table {
+    table-layout: fixed;
+    margin-bottom: 0 !important;
+}
+.daiquiri-table-pager {
+    height: 30px;
+}
+.daiquiri-table-pager-nrows {
+    width: 10em;
+    font-size: 11px;
+}
+.daiquiri-table-pager .pagination {
+    margin: 0 0 0 10px;
+}
+.daiquiri-table-pager-paging {
+    margin-left: 10px;
+    height: 30px;
+    line-height: 30px;
+}
+.daiquiri-table .daiquiri-table-col-selected,
+.daiquiri-table .daiquiri-table-row-selected {
+    background-color: #eee;
+}
+.daiquiri-table th i {
+    margin-top: 2px;
+}
+.daiquiri-table th i {
+    opacity: 0.2;
+}
+.daiquiri-table th i.sorted {
+    opacity: 1;
+}
+.daiquiri-table th .handle-left,
+.daiquiri-table th .handle-right {
+    display: inline-block;
+    width: 4px;
+    height: 20px;
+}
+.daiquiri-table th .handle-left:hover,
+.daiquiri-table th .handle-right:hover{
+    cursor: move;
+}
+.daiquiri-table-pager-search-form {
     margin: 0;
 }
-.ui-jqgrid .ui-pg-selbox {
-    padding: 0 !important;
-    width: auto;
+.daiquiri-table-pager-search-form button {
+    height: 30px;
 }
-.ui-jqgrid .ui-pg-input {
-    vertical-align: baseline !important;
-    font-size: 9px !important;
-    line-height: 9px !important;
-    padding: 0 !important;
-    padding-left: 0.5em !important;
-    width: auto;
+.daiquiri-table-pager-paging,
+.daiquiri-table-pager-paging p {
+    display: inline;
 }
-.ui-jqgrid .ui-searchFilter select {
-    font-size: 11px;
-    line-height: 14px;
-    height: 24px;
-    width: 120px;
-}
-.ui-jqgrid .ui-searchFilter input[type="text"]
-{
-    font-size: 11px;
-    line-height: 14px;
-    height: 14px;
-    width: 120px;
-}
-.ui-jqgrid .ui-searchFilter {
-    border-radius: 5px;
+.daiquiri-table-pager-paging p {
 
-    border: 1px solid silver;
-    -webkit-box-shadow: .2em .2em .3em rgba( 0, 0, 0, 0.45 );
-    -moz-box-shadow: .2em .2em .3em rgba( 0, 0, 0, 0.45 );
-    box-shadow: .2em .2em .3em rgba( 0, 0, 0, 0.45 );
-}
-.ui-jqgrid .ui-searchFilter thead td,
-.ui-jqgrid .ui-searchFilter tfoot td{
-    height: 20px;  
-}
-.ui-jqgrid .ui-searchFilter .ui-widget-content {
-    padding-left: 10px;
-    padding-right: 2px;
-    background-color: rgb(245, 245, 245);
-    border: 0px;
-}
-.ui-jqgrid .ui-searchFilter .ui-widget-header {
-    border-width: 0;
-    padding-left: 3px;
-    padding-right: 7px;
-    background-color: rgb(245, 245, 245);
-}
-.ui-jqgrid .ui-searchFilter .divider hr {
-    display: none;
-}
-.ui-jqgrid .ui-searchFilter .ui-closer,
-.ui-jqgrid .ui-searchFilter .ui-reset,
-.ui-jqgrid .ui-searchFilter .ui-search {
-    border-width: 0;
-}
-.ui-jqgrid-htable #jqgh_cb {
-    height: 13px !important;
 }

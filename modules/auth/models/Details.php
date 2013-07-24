@@ -56,6 +56,11 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function create($id, array $formParams = array()) {
+        // check for id
+        if ($id === null) {
+            throw new Exception('User id not given');
+        }
+
         // create the form object
         $form = new Auth_Form_Detail();
 
@@ -78,6 +83,12 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
                 $this->getResource()->storeValue($id, $values['key'], $values['value']);
                 return array('status' => 'ok');
             }
+        } else {
+            return array(
+                'status' => 'form',
+                'error' => 'form validation failed',
+                'form' => $form
+            );
         }
 
         return array('form' => $form, 'status' => 'form');
@@ -91,6 +102,11 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function update($id, $key, array $formParams = array()) {
+        // check for id
+        if ($id === null) {
+            throw new Exception('User id not given');
+        }
+
         // check if the key is there
         $value = $this->getResource()->fetchValue($id, $key);
         if ($value === null) {
@@ -131,7 +147,7 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
         }
 
         // create the form object
-        $form = new Daiquiri_Form_Delete();
+        $form = new Auth_Form_DeleteDetail();
 
         // valiadate the form if POST
         if (!empty($formParams) && $form->isValid($formParams)) {

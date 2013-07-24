@@ -34,15 +34,9 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
     private $_files = array(
         // jquery and jquery ui
         'daiquiri/lib/jquery-1.8.2.min.js',
-        'daiquiri/lib/jquery-ui-1.8.21/jquery-ui-1.8.21.min.js',
-        'daiquiri/lib/jquery-ui-1.8.21/jquery-ui-1.8.21.daiquiri.css',
         // bootstrap
         'daiquiri/lib/bootstrap/css/bootstrap.css',
         'daiquiri/lib/bootstrap/js/bootstrap.js',
-        // jqgrid
-        'daiquiri/lib/jqGrid-3.8.2/i18n/grid.locale-en.js',
-        'daiquiri/lib/jqGrid-3.8.2/jquery.jqGrid.min.js',
-        'daiquiri/lib/jqGrid-3.8.2/ui.jqgrid.css',
         // flot
         'daiquiri/lib/jquery.flot.js',
         // code mirror

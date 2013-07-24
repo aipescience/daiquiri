@@ -46,12 +46,12 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
      * Displays the cols of the user table.
      */
     public function colsAction() {
-        // get parameters from request
-        $redirect = $this->_getParam('redirect', '/auth/user/');
-        $params = $this->_getTableParams();
-
-        $this->view->redirect = $redirect;
-        $this->view->data = $this->_model->cols($params);
+        // call model functions
+        $response = $this->_model->cols($this->_request->getQuery());
+        
+        // assign to view
+        $this->view->cols = $response['cols'];
+        $this->view->redirect = $this->_getParam('redirect', '/auth/user/');
         $this->view->status = 'ok';
     }
 
@@ -59,13 +59,14 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
      * Displays the rows of the user table.
      */
     public function rowsAction() {
-        // get parameters from request
-        $redirect = $this->_getParam('redirect', '/auth/user/');
-        $params = $this->_getTableParams();
-
         // call model functions
-        $this->view->redirect = $redirect;
-        $this->view->data = $this->_model->rows($params);
+        $response = $this->_model->rows($this->_request->getQuery());
+
+        // assign to view
+        foreach ($response as $key => $value) {
+            $this->view->$key = $value;
+        }
+        $this->view->redirect = $this->_getParam('redirect', '/auth/user/');
         $this->view->status = 'ok';
     }
 
@@ -104,6 +105,7 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
         }
 
         // assign to view
+        $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }

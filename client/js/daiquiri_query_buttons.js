@@ -18,11 +18,6 @@
  *  limitations under the License.
  */
 
-/*
- * daiquiri_query_buttons - a plugin fo jquery and bootstap
- * 
- */
-
 (function($){
     $.fn.extend({ 
         daiquiri_query_buttons: function(opt) {

@@ -19,6 +19,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-?>
 
-<?php echo $this->cols($this->cols); ?>
+class Auth_Form_DeleteDetail extends Daiquiri_Form_Abstract {
+
+    public function init() {
+        // add fields
+        $this->addDangerButtonElement('submit', 'Delete detail');
+        $this->addButtonElement('cancel', 'Cancel');
+
+        // add groups
+        $this->addActionGroup(array('submit', 'cancel'));
+    }
+
+}

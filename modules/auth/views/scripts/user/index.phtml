@@ -26,7 +26,6 @@
         $('#table').daiquiri_table({
             'rowsurl': "<?php echo $this->baseUrl('/auth/user/rows') ?>",
             'colsurl': "<?php echo $this->baseUrl('/auth/user/cols') ?>",
-            'baseurl': "<?php echo $this->baseUrl() ?>",
             'params': {
                 'options': true
             }
@@ -44,9 +43,6 @@ echo $this->internalLink(array(
     'text' => 'Create user',
     'prepend' => '<p>',
     'append' => '</p>'));
-?>
-
-<?php
 echo $this->internalLink(array(
     'href' => '/admin',
     'text' => 'Back to Administration',

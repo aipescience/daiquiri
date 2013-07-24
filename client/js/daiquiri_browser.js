@@ -18,11 +18,6 @@
  *  limitations under the License.
  */
 
-/*
- * daiquiri_browser - a plugin fo jquery and bootstap
- * 
- */
-
 var _daiquiri_browser = {
     defaults: {
         'name': null,

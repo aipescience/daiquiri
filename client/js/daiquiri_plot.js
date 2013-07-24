@@ -53,7 +53,7 @@ function Daiquiri_Plot(container, opt) {
         // get colums by ajax call 
         $.ajax({
             url: self.opt.colsurl,
-            type: 'POST',
+            type: 'GET',
             dataType: 'json',
             headers: {
                 'Accept': 'application/json'
@@ -65,8 +65,8 @@ function Daiquiri_Plot(container, opt) {
             error: self.ajaxError,
             success: function (json) {
                 var selectOptions = '';
-                for (var i = 0; i < json.data.length; i++) {
-                    var col = json.data[i].name;
+                for (var i = 0; i < json.cols.length; i++) {
+                    var col = json.cols[i].name;
                     selectOptions += '<option label="' + col + '"value="'+ col +'">' + col + '</option>'
                 }
                 
@@ -90,11 +90,11 @@ function Daiquiri_Plot(container, opt) {
                     'html' : html
                 }).appendTo(self.opt.form);
                 
-                if (json.data.length > 2) {
-                    $("#xCol option[value='" + json.data[1].name + "']").attr('selected',true);
-                    $("#yCol option[value='" + json.data[2].name + "']").attr('selected',true);
-                } else if (json.data.length == 2) {
-                    $("#yCol option[value='" + json.data[1].name + "']").attr('selected',true);
+                if (json.cols.length > 2) {
+                    $("#xCol option[value='" + json.cols[1].name + "']").attr('selected',true);
+                    $("#yCol option[value='" + json.cols[2].name + "']").attr('selected',true);
+                } else if (json.cols.length == 2) {
+                    $("#yCol option[value='" + json.cols[1].name + "']").attr('selected',true);
                 }
                 
                 $('#submitplot').click(function(){
@@ -108,7 +108,7 @@ function Daiquiri_Plot(container, opt) {
         // get colums by ajax call 
         $.ajax({
             url: self.opt.rowsurl,
-            type: 'POST',
+            type: 'GET',
             dataType: 'json',
             headers: {
                 'Accept': 'application/json'
@@ -116,7 +116,7 @@ function Daiquiri_Plot(container, opt) {
             data: {
                 'db': self.opt.params.db,
                 'table': self.opt.params.table,
-                'rows': number,
+                'nrows': number,
                 'cols': xCol + ',' + yCol
             },
             error: self.ajaxError,
@@ -125,10 +125,10 @@ function Daiquiri_Plot(container, opt) {
                 var plotData = [];
 
                 // gather data for plot
-                for (var i = 0; i < json.data.rows.length; i++) {
-                    x = json.data.rows[i].cell[0];
-                    if (json.data.rows[i].cell.length > 1) {
-                        y = json.data.rows[i].cell[1];
+                for (var i = 0; i < json.rows.length; i++) {
+                    x = json.rows[i][0];
+                    if (json.rows[i].length > 1) {
+                        y = json.rows[i][1];
                     } else {
                         y = x;
                     }

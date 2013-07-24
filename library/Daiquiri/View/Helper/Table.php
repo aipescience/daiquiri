@@ -46,7 +46,7 @@ class Daiquiri_View_Helper_Table extends Zend_View_Helper_Abstract {
      * object that stores the data in the "rows" parameter (WHY?). This is usually produced by Daiquiri
      * modules using the model->rows method.
      */
-    public function table($cols, $data) {
+    public function table($cols, $rows) {
         $s = '<table class="table table-bordered">';
 
         // construct thead
@@ -60,10 +60,10 @@ class Daiquiri_View_Helper_Table extends Zend_View_Helper_Abstract {
 
         // construct tbody
         $s .= "<tbody>";
-        if (!empty($data)) {
-            foreach ($data->rows as $row) {
+        if (!empty($rows)) {
+            foreach ($rows as $row) {
                 $s .= "<tr>";
-                foreach ($row["cell"] as $value) {
+                foreach ($row as $value) {
                     $s .= "<td>" . $this->view->escape($value) . "</td>";
                 }
                 $s .= "</tr>";

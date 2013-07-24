@@ -40,27 +40,31 @@ class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->getResource()->fetchCols();
+        } else {
+            $params['cols'] = explode(',', $params['cols']);
         }
+
+        // create csrf hash for clickjacking protection
+        $csrf = md5(rand(0, 100000) + rand(0, 100000));
 
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
         $rows = $this->getResource()->fetchRows($sqloptions);
-        $response = $this->_response($rows, $sqloptions, 'session');
 
         // loop through the table and add an options to destroy the session
         if (isset($params['options']) && $params['options'] === 'true') {
-            for ($i = 0; $i < sizeof($response->rows); $i++) {
-                $session = $response->rows[$i]['id'];
+            for ($i = 0; $i < sizeof($rows); $i++) {
+                $session = $rows[$i]['id'];
                 $link = $this->internalLink(array(
                     'text' => 'Destroy',
-                    'href' => '/auth/sessions/destroy/session/' . $session,
+                    'href' => '/auth/sessions/destroy/session/' . $session . '/csrf/' . $csrf,
                     'resource' => 'Auth_Model_Sessions',
                     'permission' => 'destroy'));
-                $response->rows[$i]["cell"][] = $link;
+                $rows[$i]['options'] = $link;
             }
         }
 
-        return $response;
+        return $this->_response($rows, $sqloptions);
     }
 
     /**
@@ -71,6 +75,8 @@ class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->getResource()->fetchCols();
+        } else {
+            $params['cols'] = explode(',', $params['cols']);
         }
 
         foreach ($params['cols'] as $name) {
@@ -79,11 +85,11 @@ class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
                 'sortable' => 'true'
             );
             if ($name === 'email') {
-                $col['width'] = '180px';
+                $col['width'] = '18em';
             } else if ($name === 'modified') {
-                $col['width'] = '130px';
+                $col['width'] = '13em';
             } else {
-                $col['width'] = '80px';
+                $col['width'] = '8em';
             }
             $cols[] = $col;
         }
@@ -91,11 +97,11 @@ class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
         if (isset($params['options']) && $params['options'] === 'true') {
             $cols[] = array(
                 'name' => 'options',
-                'width' => '80px',
+                'width' => '8em',
                 'sortable' => 'false'
             );
         }
-        return $cols;
+        return array('cols' => $cols, 'status' => 'ok');
     }
 
     /**
