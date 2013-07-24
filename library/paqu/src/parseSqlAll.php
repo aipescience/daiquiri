@@ -263,7 +263,7 @@ function _parseSqlAll_SELECT(&$sqlTree, $mysqlConn = false, $zendAdapter = false
 					if($fromNode['expr_type'] == "table") {
 						$table[] = $fromNode['table'];
 						if($fromNode['alias'] === false) {
-							$alias[] = false;
+							$alias[] = $fromNode['table'];
 						} else {
 							$alias[] = $fromNode['alias']['name'];
 						}
@@ -423,9 +423,7 @@ function _parseSqlAll_getColsMysqlii(&$sqlTree, &$node, $mysqlConn, $table, $ali
 }
 
 function _parseSqlAll_getColsZend(&$sqlTree, &$node, $zendAdapter, $table, $alias) {
-	try {
-		$res = $zendAdapter->query("describe " . $table)->fetchAll();
-	}
+	$res = $zendAdapter->query("describe " . $table)->fetchAll();
 
     $count = 0;
 
