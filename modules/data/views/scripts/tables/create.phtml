@@ -29,6 +29,11 @@
         'prepend' => '<p>',
         'append' => '</p>'));
     ?>
+<?php elseif ($this->status === 'error'): ?>
+    <p>An error occurred when creating the table entry:</p>
+    <p><?php
+    echo $this->errors;
+    ?></p>
 <?php else: ?>
     <h2>Create table entry</h2>
     <?php echo $this->form; ?>

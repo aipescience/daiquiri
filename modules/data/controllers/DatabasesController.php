@@ -47,7 +47,11 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
                 set_time_limit(600);
 
                 // validate form and create new database
-                $response = $this->_model->create($this->_request->getPost());
+                try {
+                    $response = $this->_model->create($this->_request->getPost());
+                } catch (Exception $e) {
+                    $response = array('status' => 'error', 'errors' => $e->getMessage());                    
+                }
             }
         } else {
             // just display the form
