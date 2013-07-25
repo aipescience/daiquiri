@@ -46,7 +46,6 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         'daiquiri/lib/codemirror/mode/sql/sql.js',
         // other libs
         'daiquiri/lib/insert_at_caret.js',
-        'daiquiri/lib/var_dump.js',
         // daiquiri common
         'daiquiri/css/daiquiri_common.css',
         'daiquiri/js/daiquiri_common.js',
