@@ -133,10 +133,12 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
             } catch (Exception $e) {
                 //continue if we could not find the table. this is not that bad and parse tree is still needed
                 //by paqu
-                if(strpos($e->getMessage(), "42S02") === false) {
+                //WORKS WITHOUT IT?? Why did I introduce this?
+
+                //if(strpos($e->getMessage(), "42S02") === false) {
                     $error['parseError'] = $e->getMessage();
                     return false;
-                }
+                //}
             }
 
             $parseTrees[$key] = $tmpParseObj->parsed;

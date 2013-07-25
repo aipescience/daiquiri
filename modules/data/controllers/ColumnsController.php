@@ -47,7 +47,11 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
                 $this->_redirect('/data/');
             } else {
                 // validate form and create new user
-                $response = $this->_model->create($tableId, $this->_request->getPost());
+                try {
+                    $response = $this->_model->create($tableId, $this->_request->getPost());
+                } catch (Exception $e) {
+                    $response = array('status' => 'error', 'errors' => $e->getMessage());                    
+                }
             }
         } else {
             // just display the form
