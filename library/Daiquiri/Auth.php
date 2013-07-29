@@ -371,6 +371,9 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
 
         if (empty($parents)) {
             $parents[] = "guest";
+        } else {
+            //add self
+           $parents[] = $role;
         }
 
         return $parents;
