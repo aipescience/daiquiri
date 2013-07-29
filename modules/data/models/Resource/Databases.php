@@ -217,8 +217,10 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
 
         // delete tables and columns of this database
         $tablesResource = new Data_Model_Resource_Tables();
-        foreach ($entry['tables'] as $table) {
-            $tablesResource->deleteTable($table['id']);
+        if(!empty($entry['tables'])) {
+            foreach ($entry['tables'] as $table) {
+                $tablesResource->deleteTable($table['id']);
+            }
         }
 
         // delete database row
