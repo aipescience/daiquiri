@@ -128,7 +128,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         // get the primary sql select object
         $select = $this->getTable()->getSelect($sqloptions);
 
-        $select->where("`name` = ?", $name)
+        $select->where("`name` = ?", trim($name))
                 ->where("`database_id` = ?", $dbId);
 
         // get the rowset and return
