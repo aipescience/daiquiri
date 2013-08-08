@@ -49,6 +49,14 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
     public function __construct() {
         $this->permissions = new Query_Model_Resource_Permissions();
         $this->processing = new Query_Model_Resource_Processing();
+
+        // get current user
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        if ($username === null) {
+            $username = 'Guest';
+        }
+
+        $this->resultDB = Daiquiri_Config::getInstance()->getUserDBName($username);
     }
 
     /**

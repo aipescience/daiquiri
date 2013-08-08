@@ -50,15 +50,7 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             return false;
         }
 
-        // get current user
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        if ($username === null) {
-            $username = 'Guest';
-        }
-
-        $resultDB = Daiquiri_Config::getInstance()->getUserDBName($username);
-
-        $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $resultDB);
+        $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
 
         //check ACLs
         if ($this->permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
@@ -81,7 +73,7 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
 
         //validate sql on server
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
-            if ($this->processing->validateSQLServerSide($combinedQuery, $resultDB, $errors) !== true) {
+            if ($this->processing->validateSQLServerSide($combinedQuery, $this->resultDB, $errors) !== true) {
                 return false;
             }
         }
@@ -132,15 +124,7 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             return false;
         }
 
-        // get current user
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        if ($username === null) {
-            $username = 'Guest';
-        }
-
-        $resultDB = Daiquiri_Config::getInstance()->getUserDBName($username);
-
-        $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $resultDB);
+        $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
 
         //rewrite show statements
         $showRewrittenMultiLine = false;
@@ -161,7 +145,8 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             $resultTableName = date("Y-m-d\TH:i:s") . ":" . substr($micro[0], 2, 4);
         }
 
-        $querySQL = $this->processing->addCreateTableStatement($escapedMultiLine, $escapedMultiLineParseTrees, $resultDB, $resultTableName, $errors);
+        $querySQL = $this->processing->addCreateTableStatement($escapedMultiLine, $escapedMultiLineParseTrees, 
+                    $this->resultDB, $resultTableName, $errors);
         if (array_key_exists('addTableError', $errors)) {
             return false;
         }
@@ -180,7 +165,7 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
         //build job object
         $job = array(
             'table' => $resultTableName,
-            'database' => $resultDB,
+            'database' => $this->resultDB,
             'host' => false,
             'query' => $sql,
             'actualQuery' => $combinedQuery,

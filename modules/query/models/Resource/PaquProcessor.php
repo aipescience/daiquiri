@@ -54,6 +54,24 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         $this->paraQuery->setSpiderUsr($config->query->processor->paqu->spiderUsr);
         $this->paraQuery->setSpiderPwd($config->query->processor->paqu->spiderPwd);
 
+        //set the tables that only reside on the head node
+        $listOfHeadNodeTables = array();
+
+        //all tables in the user db are head node tables, therefore add the database name and a list
+        //of all tables in the database
+        $listOfHeadNodeTables[] = $this->resultDB;
+
+        //get list of tables in user database
+        $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
+
+        $sql = "SHOW TABLES;";
+        $stmt = $resource->getTable()->getAdapter()->query($sql);
+        $rows = $stmt->fetchAll();
+
+        $listOfHeadNodeTables = array_merge($listOfHeadNodeTables, $rows);
+
+        $this->paraQuery->setHeadNodeTables($listOfHeadNodeTables);
+
         if(empty($config->query->processor->paqu->federated)) {
             $this->paraQuery->setFedEngine("FEDERATED");
         } else {
@@ -87,15 +105,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             return false;
         }
 
-        // get current user
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        if ($username === null) {
-            $username = 'Guest';
-        }
-
-        $resultDB = Daiquiri_Config::getInstance()->getUserDBName($username);
-
-        $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $resultDB);
+        $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
 
         //check ACLs
         if ($this->permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
@@ -118,7 +128,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
         //validate sql on server
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
-            if ($this->processing->validateSQLServerSide($combinedQuery, $resultDB, $errors) !== true) {
+            if ($this->processing->validateSQLServerSide($combinedQuery, $this->resultDB, $errors) !== true) {
                 return false;
             }
         }
@@ -162,12 +172,14 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         }
 
         $listCreateTmpTables = array();
+        $listLinkTmpTables = array();
         $listDropTmpTables = array();
-        if (!$this->_checkPaquCallSyntax($multiLineParseTrees, $errors, $listCreateTmpTables, $listDropTmpTables)) {
+        if (!$this->_checkPaquCallSyntax($multiLineParseTrees, $errors, $listCreateTmpTables, 
+                    $listLinkTmpTables, $listDropTmpTables)) {
             return false;
         }
 
-        if (!$this->_checkPaquDropTmpBalancing($listCreateTmpTables, $listDropTmpTables, $errors)) {
+        if (!$this->_checkPaquDropTmpBalancing($listCreateTmpTables, $listLinkTmpTables, $listDropTmpTables, $errors)) {
             return false;
         }
 
@@ -201,12 +213,6 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             return false;
         } else {
             //replace result table tag with real result table
-            // get current user
-            $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-            if ($username === null) {
-                $username = 'Guest';
-            }
-            $resultDB = Daiquiri_Config::getInstance()->getUserDBName($username);
 
             //determine result table name
             if (empty($resultTableName)) {
@@ -231,7 +237,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         //build job object
         $job = array(
             'table' => $resultTableName,
-            'database' => $resultDB,
+            'database' => $this->resultDB,
             'host' => false,
             'query' => $sql,
             'actualQuery' => $plan,
@@ -305,7 +311,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         return $result;
     }
 
-    private function _checkPaquCallSyntax($parseTrees, array &$errors, array &$listCreateTmpTables, array &$listDropTmpTables) {
+    private function _checkPaquCallSyntax($parseTrees, array &$errors, array &$listCreateTmpTables, array &$listLinkTmpTables, array &$listDropTmpTables) {
         foreach ($parseTrees as $query) {
             foreach ($query as $key => $node) {
                 if ($key === "CALL") {
@@ -325,6 +331,20 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                                 $errors[] = "paquExec is a procedure and needs two parameters";
                                 return false;
                             }
+                        } else if ($node[0] === "paquLinkTmp") {
+                            //count parameters
+                            if (!empty($node[1])) {
+                                preg_match("/\(\s*\"(.+)\"\s*\)/", $node[1], $res);
+                                if (count($res) != 2 || strpos($res[1], '"') !== false) {
+                                    $errors[] = "paquLinkTmp needs one parameters.";
+                                    return false;
+                                }
+
+                                $listLinkTmpTables[] = $res[1];
+                            } else {
+                                $errors[] = "paquDropTmp is a procedure and needs one parameters";
+                                return false;
+                            }
                         } else if ($node[0] === "paquDropTmp") {
                             //count parameters
                             if (!empty($node[1])) {
@@ -340,7 +360,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                                 return false;
                             }
                         } else {
-                            $errors[] = "Paqu related call not paquExec or paquDropTmp.";
+                            $errors[] = "Paqu related call not paquExec, paquLinkTmp, or paquDropTmp.";
                             return false;
                         }
                     }
@@ -351,8 +371,8 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         return true;
     }
 
-    private function _checkPaquDropTmpBalancing(array &$listCreateTmpTables, array &$listDropTmpTables, array &$errors) {
-        if (count($listCreateTmpTables) !== count($listDropTmpTables)) {
+    private function _checkPaquDropTmpBalancing(array &$listCreateTmpTables, array &$listLinkTmpTables, array &$listDropTmpTables, array &$errors) {
+        if ((count($listCreateTmpTables) + count($listLinkTmpTables)) !== count($listDropTmpTables)) {
             $errors[] = "Paqu temporary tables are not balanced by paquDropTmp calls.";
             return false;
         }
@@ -365,18 +385,18 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             }
         }
 
+        foreach ($listLinkTmpTables as $value) {
+            $keys = array_keys($listDropTmpTables, $value);
+            if (count($keys) !== 1) {
+                $errors[] = "Paqu linked temporary tables are not exactly balanced by paquDropTmp calls.";
+                return false;
+            }
+        }
+
         return true;
     }
 
     private function _checkPaquPermissionsAndSyntax($parseTrees, $sql, array &$errors) {
-        // get current user
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        if ($username === null) {
-            $username = 'Guest';
-        }
-
-        $resultDB = Daiquiri_Config::getInstance()->getUserDBName($username);
-
         //build array for further processing. getting rid of all paqu commands to check
         //permissions and stuff
 
@@ -405,7 +425,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
         //do normal permission check
         $currNode = $query; //array($node);
-        $multiLineUsedDBs = $this->processing->multilineUsedDB($queryArray, $resultDB);
+        $multiLineUsedDBs = $this->processing->multilineUsedDB($queryArray, $this->resultDB);
 
         //check ACLs
         if ($this->permissions->check($queryArray, $multiLineUsedDBs, $errors) === false) {
@@ -419,7 +439,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                 $combinedSql = $combinedSql . $part . "; ";
             }
 
-            if ($this->processing->validateSQLServerSide($combinedSql, $resultDB, $errors) !== true) {
+            if ($this->processing->validateSQLServerSide($combinedSql, $this->resultDB, $errors) !== true) {
                 $scratchdb = Daiquiri_Config::getInstance()->query->scratchdb;
                 foreach ($errors as $error) {
                     if (strpos($error, "ERROR 1146") === false && strpos($error, $scratchdb) === false) {
