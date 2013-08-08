@@ -128,7 +128,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         // get the primary sql select object
         $select = $this->getTable()->getSelect($sqloptions);
 
-        $select->where("`name` = ?", $name)
+        $select->where("`name` = ?", trim($name))
                 ->where("`database_id` = ?", $dbId);
 
         // get the rowset and return
@@ -203,8 +203,10 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
 
         // delete columns of this table
         $resource = new Data_Model_Resource_Columns();
-        foreach ($entry['columns'] as $col) {
-            $resource->deleteRow($col['id']);
+        if(!empty($entry['columns'])) {
+            foreach ($entry['columns'] as $col) {
+                $resource->deleteRow($col['id']);
+            }
         }
 
         // delete table row

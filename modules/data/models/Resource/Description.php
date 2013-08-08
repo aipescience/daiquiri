@@ -59,10 +59,8 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
         $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
         $lockedTables = $adapter->query('SHOW OPEN TABLES IN `' . $db . '` WHERE In_use > 0')->fetchAll();
 
-        foreach ($lockedTables as $table) {
-            if ($table['Table'] == $table) {
-                return array();
-            } else {
+        foreach ($lockedTables as $tmpTable) {
+            if ($table['Table'] == $tmpTable) {
                 return array();
             }
         }

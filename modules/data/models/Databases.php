@@ -145,7 +145,6 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
                         $t['publication_select'] = $values['publication_select'];
                         $t['publication_update'] = $values['publication_update'];
                         $t['publication_insert'] = $values['publication_insert'];
-                        $columns = $t['columns'];
                         unset($t['columns']);
                         unset($t['database']);
 
