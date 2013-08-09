@@ -30,7 +30,8 @@ class Application_Model_Form_Register extends Daiquiri_Form_Abstract {
     protected $_days = array('', '<13', '13', '14', '15', '16', '17', '>17');
 
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
 
         $textVal = new Daiquiri_Form_Validator_Text();
 

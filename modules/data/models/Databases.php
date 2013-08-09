@@ -194,7 +194,7 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
             $this->getResource()->updateRow($id, $values);
             return array('status' => 'ok');
         }
-
+        Zend_Debug::dump($form->getMessages()); // die(0);
         return array('form' => $form, 'status' => 'form');
     }
 

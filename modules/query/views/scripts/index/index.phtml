@@ -22,10 +22,8 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        poll(15000);
-        
-        _daiquiri_query = new Daiquiri_Query('<?php echo $this->baseUrl(); ?>');
-        _daiquiri_query.init();
+        // daiquiri.common.poll(10000);
+        var query = new daiquiri.query.Query('<?php echo $this->baseUrl(); ?>');
     });
 </script>
 
@@ -43,7 +41,7 @@
                 <ul class="nav nav-tabs">
                     <?php foreach ($this->forms as $key => $form): ?>
                         <li id="<?php echo $this->escape($key); ?>-form-tab-header" 
-                            class="<?php if (!empty($form['default'])) echo 'active'; ?>" >
+                            class="<?php if (!empty($form['default'])) echo 'active default-tab'; ?>" >
                             <a href="#<?php echo $key ?>-form-tab" data-toggle="tab"><?php echo $this->escape($form['title']); ?></a>
                         </li>
                     <?php endforeach; ?>
@@ -62,9 +60,8 @@
                 </ul>
                 <div class="tab-content">
                     <?php foreach ($this->forms as $key => $form): ?>
-                        <div class="tab-pane <?php if (isset($form['default']) && $form['default'] == true) echo 'active'; ?>" 
-                             id="<?php echo $this->escape($key); ?>-form-tab">
-                                 <?php echo $this->action('form', 'index', 'query', array('form' => $key)); ?>
+                        <div class="tab-pane <?php if (isset($form['default']) && $form['default'] == true) echo 'active'; ?>" id="<?php echo $this->escape($key); ?>-form-tab">
+                            <?php echo $this->action('form', 'index', 'query', array('form' => $key)); ?>
                         </div>
                     <?php endforeach; ?>
                     <div class="tab-pane" id="details-tab"></div>

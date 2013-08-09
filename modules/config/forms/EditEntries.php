@@ -34,7 +34,8 @@ class Config_Form_EditEntries extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
 
         // add elements
         $this->addElement('textarea', 'value', array(

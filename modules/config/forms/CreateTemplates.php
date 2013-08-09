@@ -23,6 +23,9 @@
 class Config_Form_CreateTemplates extends Daiquiri_Form_Abstract {
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add elements
         $this->addElement('text', 'template', array(
             'label' => 'Template',

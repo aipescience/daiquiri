@@ -23,6 +23,9 @@
 class Auth_Form_DeleteDetail extends Daiquiri_Form_Abstract {
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add fields
         $this->addDangerButtonElement('submit', 'Delete detail');
         $this->addButtonElement('cancel', 'Cancel');

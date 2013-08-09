@@ -39,16 +39,16 @@
 .daiquiri-table th:first-child {    
     border-left: none;
     padding-left: 4px;
-    
 }
 .daiquiri-table-pane {
     overflow: auto;
+    width: auto;
     margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
 .daiquiri-table table {
-    table-layout: fixed;
+    table-layout: fixed !important;
     margin-bottom: 0 !important;
 }
 .daiquiri-table-pager {

@@ -18,14 +18,67 @@
  *  limitations under the License.
  */
 
+// daiquiri namespace
+var daiquiri = daiquiri || {};
+daiquiri.common = {};
+
+/**
+ * Emits the 'poll' signal periodically, specified by timeout.
+ */
+daiquiri.common.poll = function(timeout) {
+    setTimeout('daiquiri.common.poll('+ timeout +');', timeout);
+    $(window).trigger('poll');
+}
+
+/**
+ * Displays the form errors next to the corresponding fields
+ */
+daiquiri.common.showFormErrors = function(form, errors) {
+    // remove old errors
+    $('.daiquiri-form-error').remove();
+    
+    // loop over new errors and append after corresponding fields
+    $.each(errors, function(field, errors) {
+        var e;
+        var classes = 'daiquiri-form-error unstyled text-error';
+        if (field == 'form' || /^.*csrf$/.test(field)) {
+            e = $(form);
+        } else {
+            e = $('#' + field);
+            if (e.parents('fieldset').hasClass('daiquiri-form-horizontal-group')) {
+                classes += ' help-inline';
+            }
+        }
+
+        var html = '<ul class="' + classes +'">';
+        $.each(errors, function (key, value) {
+            html += '<li>' + value + '</li>';
+        });
+        html += '</ul>';
+        e.after(html);
+    });
+}
+
+/**
+ * Updated the csrf token of a given form
+ */
+daiquiri.common.updateCsrf = function(form, csrf) {
+    if (csrf != undefined) {
+        $('.daiquiri-csrf', $(form)).attr('value', csrf);
+    } else {
+        console.log('Error: No new csrf was provided!');
+    }
+}
+
 /** 
  * Displays errors with ajax calls.
  */
-function daiquiri_ajaxError(jqXHR, textStatus, errorThrown) {
+daiquiri.common.ajaxError = function(jqXHR, textStatus, errorThrown) {
     if (jqXHR.status == 403 || jqXHR.status == 503) {
         var location = window.location.href.split('#')[0]
         window.location.replace(location);
     } else {
+        //alert('Error with ajax request (Status: ' + jqXHR.status + ').');
         console.log({
             'status': jqXHR.status,
             'statusText': jqXHR.statusText,
@@ -35,10 +88,9 @@ function daiquiri_ajaxError(jqXHR, textStatus, errorThrown) {
 };
 
 /**
- * Displays other errors when json.status is not ok.
+ * Displays other ajax related errors (when json.status != 'ok').
  */
-function daiquiri_jsonError(json) {
-    var message = 'Error with json';
-    console.log(message);
+daiquiri.common.jsonError = function(json) {
+    //alert('Error with ajax request. (Status: ' + json.status + ').');
     console.log(json);
 };

@@ -36,24 +36,21 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * Sets the form decorator to what is defined in $_formDecorators.
      * 
      */
-    public function init() {
+    public function setFormDecorators() {
         $this->setDecorators(array(
             'FormElements',
             array('Description', array(
-                    'tag' => 'div',
-                    'placement' => 'append',
-                    'class' => 'text-error align-form-horizontal',
-                    'escape' => false)),
+                'tag' => 'div',
+                'placement' => 'append',
+                'class' => 'text-error align-form-horizontal',
+                'escape' => false)),
             'Form'
-        ));
-
-        if (Daiquiri_Auth::getInstance()->isVolatile()) {
-            $this->addCsrfElement();
-        }
+            )
+        );
     }
 
     /**
-     * @breif   Adds a form element for the captcha.
+     * @brief   Adds a form element for the captcha.
      * @return  string $element identifier for the element
      * 
      * Sets up the default Zend captcha for use with daiquiri and returns
@@ -320,15 +317,19 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * 
      * Adds a hidden tag with a salt for CSRF attack protection.
      */
-    public function addCsrfElement() {
-        $field = new Zend_Form_Element_Hash('csrf_hash');
-        $field->setOptions(array(
-            'ignore' => true,
-            'salt' => Daiquiri_Config::getInstance()->core->csrfSalt,
-            'decorators' => array('ViewHelper')
-        ));
-        $this->addElement($field);
-        return 'csrf_hash';
+    public function addCsrfElement($identifier = 'csrf') {
+        if (php_sapi_name() !== 'cli') {
+            $field = new Zend_Form_Element_Hash($identifier, array(
+                'class' => 'daiquiri-csrf',
+                'ignore' => true,
+                'salt' => str_replace('_','',get_called_class()),
+                'decorators' => array('ViewHelper')
+                ));
+            $this->addElement($field);
+            return $identifier;
+        } else {
+            return False;
+        }
     }
 
     /**

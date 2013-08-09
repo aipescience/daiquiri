@@ -22,46 +22,25 @@
 
 <?php if ($this->status === 'ok'): ?>
     <p>Query successfully submitted.</p>
-<?php elseif ($this->status === 'redirect'): ?>
-    <?php $this->redirector($this->redirect); ?>
+<?php elseif ($this->status === 'plan'): ?>
+    <p>Query submitted.</p>
+    <p>You need to view and approve the <a href="<?php echo $this->escape($this->redirect); ?>">query plan</a>.
 <?php elseif ($this->status === 'form'): ?>
-    <script type="text/javascript">
-        var _daiquiri_cm;
-                            
+    <script type="text/javascript">      
         $(document).ready(function() {
-            _daiquiri_cm = CodeMirror.fromTextArea($('#sql_query').get(0), {
-                mode: 'text/x-mysql',
-                indentWithTabs: false,
-                smartIndent: true,
-                matchBrackets : true,
-                lineNumbers: true,
-                lineWrapping: true,
-                autofocus: true
-            });
-                                            
-            // adjust with of input field, since span9 does not work with CodeMirror
-            _daiquiri_cm.setSize($('#sql_query').css('width'),null);
+            $('#sql_query').daiquiri_codemirror();
 
-            $("#<?php echo $this->escape($this->form->getAttrib('id')); ?>").daiquiri_query_buttons();
+            $('#daiquiry-form-query-sql').daiquiri_query_buttons();
                                 
-            $(".daiquiri-query-example").click(function() {
-                $('#sql_query').insertAtCaret($(this).attr('data-toggle'));
-
-                if(typeof _daiquiri_cm !== undefined) {
-                    var pos = _daiquiri_cm.getCursor();
-                    pos['ch'] += $(this).attr('data-toggle').length;
-                    _daiquiri_cm.replaceSelection($(this).attr('data-toggle'));
-                    _daiquiri_cm.setCursor(pos);
-                    _daiquiri_cm.focus();
-                }
+            $('.daiquiri-query-example').click(function() {
+                var string = $(this).attr('data-toggle');
+                $('#sql_query').insertAtCaret(string);
+                $('#sql_query').daiquiri_codemirror_insertAtCarret(string);
             });
 
             $('#sql_clear').click(function(){
                 $('#sql_query').val('');
-
-                if(typeof _daiquiri_cm !== "undefined") {
-                    _daiquiri_cm.setValue('');
-                }
+                $('#sql_query').daiquiri_codemirror_clear();
             });
         });
     </script>

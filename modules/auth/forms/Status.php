@@ -23,6 +23,9 @@
 class Auth_Form_Status extends Daiquiri_Form_Abstract {
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add elements
         $this->addElement('text', 'status', array(
             'label' => 'Status',

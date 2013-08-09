@@ -39,7 +39,8 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement('plan_csrf');
 
         $this->addElement('textarea', 'plan_query', array(
             'filters' => array('StringTrim'),

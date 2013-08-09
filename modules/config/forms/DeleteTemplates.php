@@ -23,6 +23,9 @@
 class Config_Form_DeleteTemplates extends Daiquiri_Form_Abstract {
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add fields
         $this->addDangerButtonElement('submit', 'Delete template');
         $this->addButtonElement('cancel', 'Cancel');

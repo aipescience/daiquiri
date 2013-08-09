@@ -49,6 +49,8 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
 
     abstract public function getQueue();
 
+    abstract public function getCsrf();
+    
     public function addQueueElements($prefix) {
         if (!empty($this->_queues)) {
             $buttons = array();

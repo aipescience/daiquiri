@@ -44,6 +44,9 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add elements
         $this->addElement('select', 'table_id', array(
             'label' => 'Table:',

@@ -61,6 +61,7 @@ class Auth_RegistrationController extends Daiquiri_Controller_Abstract {
      * Validates a registered user.
      */
     public function validateAction() {
+        // get params from request
         $id = $this->_getParam('id');
         $code = $this->_getParam('code');
 
@@ -76,8 +77,27 @@ class Auth_RegistrationController extends Daiquiri_Controller_Abstract {
      * Confirms a Validated user.
      */
     public function confirmAction() {
-        // run action on model
-        $response = $this->_model->confirm($this->_getParam('id'));
+        // get params from request
+        $id = $this->_getParam('id');
+
+        // check if POST or GET
+        if ($this->_request->isPost()) {
+            if ($this->_getParam('cancel')) {
+                $this->_redirect('/auth/user/');
+            } else {
+                // validate form and do stuff
+                $response = $this->_model->confirm($id, $this->_request->getPost());
+            }
+        }  else {
+            // just display the form
+            $response = $this->_model->confirm($id);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/registration/confirm/id/' . $id);
+        }
 
         // assign to view
         foreach ($response as $key => $value) {
@@ -89,8 +109,27 @@ class Auth_RegistrationController extends Daiquiri_Controller_Abstract {
      * Reject a registered user.
      */
     public function rejectAction() {
-        // run action on model
-        $response = $this->_model->reject($this->_getParam('id'));
+        // get params from request
+        $id = $this->_getParam('id');
+
+        // check if POST or GET
+        if ($this->_request->isPost()) {
+            if ($this->_getParam('cancel')) {
+                $this->_redirect('/auth/user/');
+            } else {
+                // validate form and do stuff
+                $response = $this->_model->reject($id, $this->_request->getPost());
+            }
+        }  else {
+            // just display the form
+            $response = $this->_model->reject($id);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/registration/reject/id/' . $id);
+        }
 
         // assign to view
         foreach ($response as $key => $value) {
@@ -102,8 +141,27 @@ class Auth_RegistrationController extends Daiquiri_Controller_Abstract {
      * Activates a confirmed user.
      */
     public function activateAction() {
-        // run action on model
-        $response = $this->_model->activate($this->_getParam('id'));
+        // get params from request
+        $id = $this->_getParam('id');
+
+        // check if POST or GET
+        if ($this->_request->isPost()) {
+            if ($this->_getParam('cancel')) {
+                $this->_redirect('/auth/user/');
+            } else {
+                // validate form and do stuff
+                $response = $this->_model->activate($id, $this->_request->getPost());
+            }
+        }  else {
+            // just display the form
+            $response = $this->_model->activate($id);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/registration/activate/id/' . $id);
+        }
 
         // assign to view
         foreach ($response as $key => $value) {
@@ -115,8 +173,27 @@ class Auth_RegistrationController extends Daiquiri_Controller_Abstract {
      * Disables a user.
      */
     public function disableAction() {
-        // run action on model
-        $response = $this->_model->disable($this->_getParam('id'));
+        // get params from request
+        $id = $this->_getParam('id');
+
+        // check if POST or GET
+        if ($this->_request->isPost()) {
+            if ($this->_getParam('cancel')) {
+                $this->_redirect('/auth/user/');
+            } else {
+                // validate form and do stuff
+                $response = $this->_model->disable($id, $this->_request->getPost());
+            }
+        }  else {
+            // just display the form
+            $response = $this->_model->disable($id);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/registration/disable/id/' . $id);
+        }
 
         // assign to view
         foreach ($response as $key => $value) {
@@ -128,8 +205,27 @@ class Auth_RegistrationController extends Daiquiri_Controller_Abstract {
      * Re-enables a disabled user.
      */
     public function reenableAction() {
-        // run action on model
-        $response = $this->_model->reenable($this->_getParam('id'));
+        // get params from request
+        $id = $this->_getParam('id');
+
+        // check if POST or GET
+        if ($this->_request->isPost()) {
+            if ($this->_getParam('cancel')) {
+                $this->_redirect('/auth/user/');
+            } else {
+                // validate form and do stuff
+                $response = $this->_model->reenable($id, $this->_request->getPost());
+            }
+        }  else {
+            // just display the form
+            $response = $this->_model->reenable($id);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/registration/reenable/id/' . $id);
+        }
 
         // assign to view
         foreach ($response as $key => $value) {

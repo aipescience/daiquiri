@@ -40,7 +40,8 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
      * @brief Initializes the contact form.
      */
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
 
         // add elements
         $this->addElement('text', 'subject', array(

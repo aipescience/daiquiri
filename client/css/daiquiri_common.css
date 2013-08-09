@@ -168,3 +168,7 @@ dl.dl-horizontal dd {
     -o-transition: height 0.001s;
     transition: height 0.001s;
 }
+.help-inline.text-error {
+    padding-left: 10px;
+    color: #b94a48;
+}

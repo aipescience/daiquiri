@@ -59,6 +59,12 @@ class Auth_PasswordController extends Daiquiri_Controller_Abstract {
             $response = $this->_model->change();
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/password/change/?redirect=' . $redirect);
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -134,6 +140,11 @@ class Auth_PasswordController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $model->set($id);
+        }
+
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/password/set/id/' . $id);
         }
 
         // assign to view        

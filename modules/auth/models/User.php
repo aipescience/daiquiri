@@ -32,54 +32,63 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
     private $_options = array(
         'Show' => array(
             'url' => '/auth/user/show',
+            'class' => 'daiquiri-user-show',
             'permission' => 'show',
             'resource' => 'Auth_Model_User'
         ),
         'Update' => array(
             'url' => '/auth/user/update',
+            'class' => 'daiquiri-user-update',
             'permission' => 'update',
             'resource' => 'Auth_Model_User'
         ),
         'Delete' => array(
             'url' => '/auth/user/delete',
+            'class' => 'daiquiri-user-delete',
             'permission' => 'delete',
             'resource' => 'Auth_Model_User'
         ),
         'Confirm' => array(
             'url' => '/auth/registration/confirm',
+            'class' => 'daiquiri-user-confirm',
             'permission' => 'confirm',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('registered')
         ),
         'Reject' => array(
             'url' => '/auth/registration/reject',
+            'class' => 'daiquiri-user-reject',
             'permission' => 'reject',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('registered')
         ),
         'Activate' => array(
             'url' => '/auth/registration/activate',
+            'class' => 'daiquiri-user-activate',
             'permission' => 'activate',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('registered', 'confirmed')
         ),
         'Disable' => array(
             'url' => '/auth/registration/disable',
+            'class' => 'daiquiri-user-disable',
             'permission' => 'disable',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('active')
         ),
         'Reenable' => array(
             'url' => '/auth/registration/reenable',
+            'class' => 'daiquiri-user-reenable',
             'permission' => 'reenable',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('disabled')
         ),
         'Password' => array(
             'url' => '/auth/password/set',
+            'class' => 'daiquiri-user-password',
             'permission' => 'set',
             'resource' => 'Auth_Model_Password'
-        )
+         )
     );
 
     /**
@@ -111,7 +120,7 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
         foreach ($params['cols'] as $name) {
             $col = array('name' => $name);
             if ($name === 'id') {
-                $col['width'] = '2em';
+                $col['width'] = '3em';
                 $col['align'] = 'center';
             } else if ($name === 'username') {
                 $col['width'] = '8em';
@@ -150,9 +159,6 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
             $params['cols'] = explode(',', $params['cols']);
         }
 
-        // create csrf hash for clickjacking protection
-        $csrf = md5(rand(0, 100000) + rand(0, 100000));
-
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
         $rows = $this->getResource()->fetchRows($sqloptions);
@@ -176,9 +182,10 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
                     } else {
                         $links .= $this->internalLink(array(
                             'text' => $key,
-                            'href' => $value['url'] . '/id/' . $id . '/csrf/' . $csrf,
+                            'href' => $value['url'] . '/id/' . $id,
                             'resource' => $value['resource'],
                             'permission' => $value['permission'],
+                            'class' => $value['class'],
                             'append' => '&nbsp;'));
                     }
                 }
@@ -272,6 +279,15 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
             $detailsResource->logEvent($id, 'update');
 
             return array('status' => 'ok');
+        } else {
+            $csrf = $form->getElement('csrf');
+            $csrf->initCsrfToken();
+            return array(
+                'form' => $form,
+                'csrf' => $csrf->getHash(),
+                'status' => 'error',
+                'errors' => $form->getMessages()
+                );
         }
 
         return array('form' => $form, 'status' => 'form');
@@ -322,13 +338,12 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
         $form = new Auth_Form_Delete();
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // get the form values
-            $values = $form->getValues();
-
-            // update the user and redirect
-            if ($values['submit']) {
+                // delete the user and redirect
                 $this->getResource()->deleteUser($id);
 
                 // invalidate the session of the user
@@ -336,9 +351,14 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
                 foreach ($resource->fetchAuthSessionsByUserId($id) as $session) {
                     $resource->deleteRow($session);
                 };
+                
+                return array('status' => 'ok');
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
             }
-
-            return array('status' => 'ok');
         }
 
         return array('form' => $form, 'status' => 'form');

@@ -49,6 +49,9 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add elements
         $this->addElement('select', 'database_id', array(
             'label' => 'Database:',

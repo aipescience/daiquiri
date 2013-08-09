@@ -158,19 +158,29 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
         $form = new Auth_Form_SetPassword();
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // get the form values
-            $values = $form->getValues();
+                // update the user and redirect
+                $this->getResource()->storePassword($id, $values['newPassword']);
 
-            // update the user and redirect
-            $this->getResource()->storePassword($id, $values['newPassword']);
+                // log the event
+                $resource = new Auth_Model_Resource_Details();
+                $resource->logEvent($id, 'setPassword');
 
-            // log the event
-            $resource = new Auth_Model_Resource_Details();
-            $resource->logEvent($id, 'setPassword');
-
-            return array('status' => 'ok');
+                return array('status' => 'ok');
+            } else {
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages(),
+                    'form' => $form,
+                    'csrf' => $csrf->getHash()
+                    );
+            }
         }
 
         return array('form' => $form, 'status' => 'form');

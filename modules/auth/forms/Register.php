@@ -29,7 +29,9 @@ class Auth_Form_Register extends Auth_Form_Abstract {
      * Initializes the form. 
      */
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         $u = array();
         $d = array();
 

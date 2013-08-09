@@ -29,7 +29,8 @@ class Auth_Form_Login extends Auth_Form_Abstract {
      * Initializes the form.
      */
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
 
         // add elements 
         $this->addUsernameElement(true);
