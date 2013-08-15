@@ -132,39 +132,69 @@ function _parseSqlAll_fixAliases(&$sqlTree) {
 			continue;
 
 		if(array_key_exists("WHERE", $sqlTree)) {
-		    foreach($sqlTree['WHERE'] as &$node) {
-				if($node['expr_type'] == "subquery") {
-					_parseSqlAll_fixAliases($node['sub_tree']);
-				}
+			_parseSqlAll_fixAliasesInNode($sqlTree['WHERE'], $fromList);
+		} 
 
-				//only process colrefs
-				if($node['expr_type'] !== "colref") {
-					continue;
-				}
+		if (array_key_exists("GROUP", $sqlTree)) {
+			_parseSqlAll_fixAliasesInNode($sqlTree['GROUP'], $fromList, $sqlTree['SELECT']);
+		} 
 
-				$tmp = _parseSqlAll_parseResourceName($node['base_expr']);
-
-				if(count($tmp) == 3) {
-					$table = $tmp[1];
-					$column = $tmp[2];
-				} else {
-					$table = false;
-					$column = $tmp[1];
-				}
-
-				//we only need to change this column if it was retrieved from a subquery
-				if($table !== false && array_key_exists($table, $fromList) && 
-					$fromList[$table]['expr_type'] == "subquery") {
-					//look this column up in the sub select
-					foreach($fromList[$table]['sub_tree']['SELECT'] as $selNode) {
-	                    if($selNode['alias'] !== false && strpos($selNode['alias']['name'], $column)) {
-	                            $node['base_expr'] = "`" . $table . "`.`" . trim($selNode['alias']['name'], "`") . "`";
-	                    }
-					}
-				}
-		    }
+		if (array_key_exists("ORDER", $sqlTree)) {
+			_parseSqlAll_fixAliasesInNode($sqlTree['ORDER'], $fromList, $sqlTree['SELECT']);
 		}
 	}
+}
+
+function _parseSqlAll_fixAliasesInNode(&$sqlTree, $fromList, &$selectTreeNode = FALSE) {
+    foreach($sqlTree as &$node) {
+		if(array_key_exists("expr_type", $node) && $node['expr_type'] == "subquery") {
+			_parseSqlAll_fixAliases($node['sub_tree']);
+		}
+
+		//only process colrefs
+		if((array_key_exists("expr_type", $node) && $node['expr_type'] !== "colref") || 
+			(array_key_exists("type", $node) && $node['type'] !== "expression")) {
+			continue;
+		}
+
+		$tmp = _parseSqlAll_parseResourceName($node['base_expr']);
+
+		if(count($tmp) == 3) {
+			$table = $tmp[1];
+			$column = $tmp[2];
+		} else {
+			$table = false;
+			$column = $tmp[1];
+		}
+
+		//we only need to change this column if it was retrieved from a subquery
+		if($table !== false && array_key_exists($table, $fromList) && 
+			$fromList[$table]['expr_type'] == "subquery") {
+			//look this column up in the sub select
+			foreach($fromList[$table]['sub_tree']['SELECT'] as $selNode) {
+                if($selNode['alias'] !== false && strpos($selNode['alias']['name'], $column)) {
+                        $node['base_expr'] = "`" . $table . "`.`" . trim($selNode['alias']['name'], "`") . "`";
+                }
+			}
+		} else if ($selectTreeNode !== FALSE) {
+			//go through the list of columns in the select tree part, and find the corresponding alias
+			//we are doing this the cheep way:
+			//take the column name in where/order/group and get rid of all ` and replace . with __
+			//this way we should end up with a name that should be contained in the SELECT column list
+			$currAlias = str_replace(".", "__", str_replace("`", "", $node['base_expr']));
+			$strLenCurrAlias = strlen($currAlias);
+
+			foreach($selectTreeNode as $selNode) {
+				$nodeAlias = trim($selNode['alias']['name'], "`");
+
+				$aliasStrPos = strpos($nodeAlias, $currAlias);
+
+				if($aliasStrPos !== FALSE && strlen($nodeAlias) == $aliasStrPos + $strLenCurrAlias) {
+					$node['base_expr'] = $selNode['alias']['name'];
+				}
+			}
+		}
+    }	
 }
 
 /**

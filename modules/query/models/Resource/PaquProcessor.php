@@ -68,7 +68,9 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         $stmt = $resource->getTable()->getAdapter()->query($sql);
         $rows = $stmt->fetchAll();
 
-        $listOfHeadNodeTables = array_merge($listOfHeadNodeTables, $rows);
+        foreach($rows as $row) {
+            $listOfHeadNodeTables[] = array_shift($row);
+        }
 
         $this->paraQuery->setHeadNodeTables($listOfHeadNodeTables);
 
