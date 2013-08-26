@@ -98,10 +98,9 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
         $rolesModel = new Auth_Model_Roles();
         $adapter = Daiquiri_Config::getInstance()->getDbAdapter();
 
-        $form = new Data_Form_Database(array(
+        $form = new Data_Form_CreateDatabase(array(
                     'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
                     'adapter' => $adapter,
-                    'submit' => 'Create database entry'
                 ));
 
         // valiadate the form if POST
@@ -175,7 +174,7 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
 
         $entry['adapter'] = array_search($entry['adapter'], $adapter);
 
-        $form = new Data_Form_Database(array(
+        $form = new Data_Form_UpdateDatabase(array(
                     'entry' => $entry,
                     'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
                     'adapter' => $adapter,
@@ -194,7 +193,7 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
             $this->getResource()->updateRow($id, $values);
             return array('status' => 'ok');
         }
-        Zend_Debug::dump($form->getMessages()); // die(0);
+
         return array('form' => $form, 'status' => 'form');
     }
 
