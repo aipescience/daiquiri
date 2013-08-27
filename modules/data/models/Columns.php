@@ -86,6 +86,9 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
         // get the entry
         $tablesModel = new Data_Model_Tables();
         $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Exception('$id ' . $id . ' not found.');
+        }
 
         $form = new Data_Form_Column(array(
                     'tableId' => $tablesModel->getId($entry['table']),

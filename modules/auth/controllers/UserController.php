@@ -177,7 +177,7 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
         // set action for form
         if (array_key_exists('form',$response)) {
             $form = $response['form'];
-            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/edit/id/' . $id);
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/edit');
         }
 
         // assign to view
