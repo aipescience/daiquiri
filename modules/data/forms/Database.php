@@ -20,10 +20,11 @@
  *  limitations under the License.
  */
 
-class Data_Form_CreateDatabase extends Daiquiri_Form_Abstract {
+class Data_Form_Database extends Daiquiri_Form_Abstract {
 
     protected $_roles = array();
     protected $_adapter = array();
+    protected $_entry = array();
 
     public function setRoles($roles) {
         $this->_roles = $roles;
@@ -31,6 +32,10 @@ class Data_Form_CreateDatabase extends Daiquiri_Form_Abstract {
 
     public function setAdapter($adapter) {
         $this->_adapter = $adapter;
+    }
+
+    public function setEntry($entry) {
+        $this->_entry = $entry;
     }
 
     public function init() {
@@ -95,7 +100,7 @@ class Data_Form_CreateDatabase extends Daiquiri_Form_Abstract {
             ));
         }
 
-        $this->addPrimaryButtonElement('submit', 'Create database entry');
+        $this->addPrimaryButtonElement('submit', 'Update database entry');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
@@ -106,6 +111,14 @@ class Data_Form_CreateDatabase extends Daiquiri_Form_Abstract {
         }
         $this->addHorizontalGroup($inputelements);
         $this->addActionGroup(array('submit', 'cancel'));
-    }
 
+        // set fields
+        foreach (array('name', 'description', 'adapter', 'publication_role_id', 'publication_select',
+    'publication_update', 'publication_insert', 'publication_show') as $element) {
+            if (isset($this->_entry[$element])) {
+                $this->setDefault($element, $this->_entry[$element]);
+            }
+        }
+
+    }
 }
