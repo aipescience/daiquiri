@@ -60,6 +60,7 @@
 /**
  * @brief Wrapper function for the whole implicit join finder and rewriter
  * @param sqlTree an SQL parser tree representation of the SQL query
+ * @param headNodeTables list of tables that are completely located on the head node and are not sharded
  * @return a reorganised SQL parser tree with the properly nested subqueries representation
  *	   of any aggregate or implicit join
  * 
@@ -105,7 +106,7 @@
  *		level.
  *	-# #Link the user defined subqueries from the FROM and WHERE statements to the new nested query tree.
  */
-function PHPSQLbuildShardQuery($sqlTree) {
+function PHPSQLbuildShardQuery($sqlTree, $headNodeTables = array()) {
   #check for subqueries
   #this handles nested subqueries that the user already provided. no idea how to handle these
   #together with the automatic joins found below...
@@ -133,7 +134,8 @@ function PHPSQLbuildShardQuery($sqlTree) {
   $dependantList = PHPSQLGroupWhereCond($newSqlTree, $listOfTables);
 
   PHPSQLCountWhereConditions($listOfTables);
-  $listOfTables = PHPSQLdetStartTable($listOfTables);
+  $listOfTables = PHPSQLdetStartTable($listOfTables, $headNodeTables);
+
   $nestedQuery = PHPSQLbuildNestedQuery($newSqlTree, $listOfTables, $dependantList, 0);
 
   #link subqueries
@@ -417,6 +419,7 @@ function PHPSQLbuildNestedQuery(&$sqlTree, &$tableList, &$dependantWheres, $recL
   PHPSQLresortCondTableList($tableList, $dependantWheres, $recLevel);
 
   #link to the tree
+
   if ($currInnerNode !== false) {
     linkInnerQueryToOuter($currOuterQuery, $currInnerNode, $tableList, $recLevel);
   }
@@ -1059,7 +1062,7 @@ function PHPSQLrewriteAliasWhere(&$node, $tableList, $recLevel, &$toThisNode) {
             }
           }
 
-          $subnode['base_expr'] = trim($tmp[0], "`");
+          $subnode['base_expr'] = trim(implode(".", $tmp), "`");
 
           break;
         }
@@ -1191,8 +1194,9 @@ function PHPSQLaddOuterQueryOrder(&$sqlTree, &$table, &$toThisNode, &$tableList,
 
 	    #check if this column already exists in the select tree
     $findNode = false;
-    foreach ($toThisNode['SELECT'] as &$selNode) {
-      if (trim($selNode['base_expr'], ' ') == trim($node['base_expr'], ' ')) {
+    foreach ($toThisNode['SELECT'] as $selNode) {
+      if (trim($selNode['base_expr'], ' ') == trim($node['base_expr'], ' ') ||
+          trim($selNode['alias']) == trim($node['base_expr'])) {
         $findNode = $selNode;
 		    #$selNode['order_clause'] = $node;
         break;
@@ -1280,7 +1284,8 @@ function PHPSQLaddOuterQueryGroup(&$sqlTree, &$table, &$toThisNode, &$tableList,
 	    #check if this column already exists in the select tree
      $findNode = false;
      foreach ($toThisNode['SELECT'] as &$selNode) {
-      if (trim($selNode['base_expr'], ' ') == trim($node['base_expr'], ' ')) {
+      if (trim($selNode['base_expr'], ' ') == trim($node['base_expr'], ' ') ||
+          trim($selNode['alias']) == trim($node['base_expr'])) {
         $findNode = $selNode;
 		    #$selNode['order_clause'] = $node;
         break;
@@ -1430,6 +1435,7 @@ function PHPSQLaddOuterQueryFrom(&$sqlTree, &$table, &$toThisNode, $tableList, $
  */
 function PHPSQLcollectColumns($sqlSelect, $tblDb, $tblName, $tblAlias, &$returnArray, &$tableList, $recLevel, $startBranch = true) {
   $countDiffTables = 0;
+  $tblAlias = str_replace($tblAlias, "`", "");
 
   $workload = array();
   if (array_key_exists('SELECT', $sqlSelect)) {
@@ -1450,13 +1456,20 @@ function PHPSQLcollectColumns($sqlSelect, $tblDb, $tblName, $tblAlias, &$returnA
       if (count($tmp) == 1) {
         $currCol = $tmp[0];
         $currTable = false;
-      } else {
+        $currDB = false;
+      } else if (count($tmp) == 2) {
         $currTable = trim($tmp[0], "`");
         $currCol = $tmp[1];
+        $currDB = false;
+      } else {
+        $currDB = trim($tmp[0], "`");
+        $currTable = trim($tmp[1], "`");
+        $currCol = $tmp[2];
       }
 
 //	    if ($currTable == $tblAlias || ($tblAlias == $tblDb . "." . $tblName && $currTable === false) || $currTable == $tblName) {
-      if ($currTable == $tblAlias || ($currTable === false) || $currTable == $tblName) {
+      if ($currTable == $tblAlias || ($currTable === false) || $currTable == $tblName || 
+             $tblAlias = $currDB . "." . $currTable) {
         if ($startBranch === true) {
           array_push($returnArray, $node);
         }
@@ -1602,13 +1615,14 @@ function PHPSQLgetAllColsFromWhere($whereTree, $table) {
 /**
  * @brief Determine the starting table for which to start with the recursive building of the nested tree
  * @param tableList list of table
+ * @param headNodeTables list of tables that are completely located on the head node and are not sharded
  * @return sorted table list according to the number of independant WHERE statements
  * 
  * This function sorts the table list according to the number of independant WHERE conditions in ascending
  * order (the outer query is assumend to be least selective). The recursive SQL generation algorithm will then
  * go through the list sequentially in the given order.
  */
-function PHPSQLdetStartTable($tableList) {
+function PHPSQLdetStartTable($tableList, $headNodeTables = array()) {
   $maxVal = -1;
   $currTable = NULL;
 
@@ -1617,8 +1631,19 @@ function PHPSQLdetStartTable($tableList) {
   foreach ($tableList as $key => $table) {
    if ($table['name'] != "DEPENDENT-SUBQUERY") {
      $condCount[$key] = $table['cond_count'];
+
+     //check if this is a table that is only on the head node
+     //TODO: make smarter check... (at the moment checking if table name is included in one or the other,
+     //this also allows definition of complete database and will consider this if database is given in table
+     //name)
+     foreach($headNodeTables as $headNodeTable) {
+      if(strpos($table['name'], $headNodeTable) !== false) {
+        $condCount[$key] = 99999999 + $table['cond_count'];
+        break;
+      }
+     }
    } else {
-     $condCount[$key] = 999999999999;
+     $condCount[$key] = 999999;
    }
  }
 
@@ -1858,7 +1883,6 @@ function PHPSQLGroupWhereTerms($sqlTree) {
 
   PHPSQLParseWhereTokens($whereTree, $newTree);
 
-  #var_dump($newTree);
   $sqlTree['WHERE'] = $newTree;
 
   return $sqlTree;
