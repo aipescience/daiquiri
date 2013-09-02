@@ -54,14 +54,14 @@ daiquiri.codemirror = {};
             });
         },
         /**
-         * Inserts the provides string at the position of the carret.
+         * Inserts the provides string at the position of the caret.
          */
-        daiquiri_codemirror_insertAtCarret: function(string) {
+        daiquiri_codemirror_insertAtCaret: function(string) {
             return this.each(function() {
                 var id = $(this).attr('id');
                 // check if table is already set
                 if (typeof daiquiri.codemirror.items[id] !== 'undefined') {
-                    daiquiri.codemirror.items[id].insertAtCarret(string);
+                    daiquiri.codemirror.items[id].insertAtCaret(string);
                 }
             });
         },
@@ -107,9 +107,9 @@ daiquiri.codemirror.CodeMirror = function(container, opt) {
 };
 
 /**
- * Inserts the provides string at the position of the carret. 
+ * Inserts the provides string at the position of the caret. 
  */
-daiquiri.codemirror.CodeMirror.prototype.insertAtCarret = function(string) {
+daiquiri.codemirror.CodeMirror.prototype.insertAtCaret = function(string) {
     var pos = this.cm.getCursor();
     pos['ch'] += string.length;
     this.cm.replaceSelection(string);
