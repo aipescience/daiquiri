@@ -432,7 +432,7 @@ daiquiri.query.Query.prototype.displayBrowser = function(){
         'url': self.url.browser,
         'action': function (string) {
             $('#sql_query').insertAtCaret(string);
-            $('$sql_query').daiquiri_codemirror_insertAtCaret(string);
+            $('#sql_query').daiquiri_codemirror_insertAtCaret(string);
         }
     });
 }
