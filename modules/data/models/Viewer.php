@@ -153,30 +153,14 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         } else {
             $params['cols'] = explode(',', $params['cols']);
         }
+
+        //properly escape the column names to handle any strange special character
+        foreach($params['cols'] as &$currCol) {
+            $currCol = "`" . trim($currCol, "`") . "`";
+        }
         
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
-        
-        /*
-        // get the primary table
-        $tableObj = $this->getResource()->getTable();
-
-        // get select object
-        $select = $tableObj->getSelect($sqloptions);
-
-        $cols = $this->cols($db, $table, $params);
-
-        //build column array
-        $colNames = array();
-        foreach ($cols['data'] as $col) {
-            $colNames[] = $col['name'];
-        }
-
-        $select->setColumns($tableObj->getName(), $colNames);
-
-        // get result convert to array and return
-        $rows = $tableObj->fetchAll($select)->toArray();
-        */
         
         $rows = $this->getResource()->fetchRows($sqloptions);
         return $this->_response($rows, $sqloptions);;
