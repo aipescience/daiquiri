@@ -199,7 +199,7 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
         $sqloptions['where'] = array();
 
         $selectPending = $this->_createJobSelect($sqloptions);
-        $selectPending->where($j . '.status = 0 OR ' . $j . '.status = 1');
+        $selectPending->where($j . '.status != 2');
         $selectPending->where($j . '.resultTableName = ?', $table);
         $selectPending->where($j . '.resultDBName = ?', $database);
 
