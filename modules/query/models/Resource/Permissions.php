@@ -461,7 +461,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
 
         if ($table !== false) {
             if (!($auth->checkDbTable($db, $table, strtolower($currTag)))) {
-                $error[] = "No permission to access db '" . $db . "' table '" . $table . "' with " . strtoupper($currTag);
+                $error[] = "Table does not exist or you have no permission to access db '" . $db . "' table '" . $table . "' with " . strtoupper($currTag);
                 return false;
             }
         } else {
