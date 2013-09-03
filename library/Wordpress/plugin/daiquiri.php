@@ -1,10 +1,10 @@
 <?php
 /*
-  Plugin Name: Daiquiri
-  Description: Daiquiri framework integration. After activation configure the database connection or you will not be able to log in again.  
-  Author: Jochen S. Klar, and AIP E-Science
+  Plugin Name: Daiquiri framework integration
+  Description: Daiquiri framework integration
+  Author: author
   Version: 1.0
-  Text Domain: Daiquiri framework integration. 
+  Text Domain: Daiquiri framework integration
  */
 
 /*
@@ -81,8 +81,19 @@ function daiquiri_admin_display() {
     <div class="wrap">
         <h2>Daiquiri Administration</h2>
         <p style="color: #b94a48;">
-            <strong>Important:</strong> Adjust at least the daiquiri_db_dbname field.
+            Please ensure that the user configured in wp-config.php has SELECT permissions on
+            the database. Otherwise you will not able to log in with the daiquiri credentials.
+        </p>   
+        <p>
+            You can archive this with SQL command: 
+            <code>GRANT SELECT ON `<?php echo get_option('daiquiri_db_dbname') ?>`.* to 'USER'@'localhost';</code>
         </p>
+        <p>
+            On a different machine you need to create the user first: 
+            <code>CREATE USER 'USERNAME'@'localhost' IDENTIFIED BY 'PASSWORD';</code>
+        </p>
+
+
         <form method="post" action="options.php">
             <table class="form-table">
                 <?php settings_fields('daiquiri'); ?>
@@ -103,19 +114,6 @@ function daiquiri_admin_display() {
                 <input type="submit" name="Submit" value="Save changes" />
             </p>
         </form>
-        <p style="color: #b94a48;">
-            Please ensure that the user configured in wp-config.php has SELECT permissions on
-            the database.
-            Otherwise you will not able to log in with the daiquiri credentials.
-        </p>   
-        <p>
-            You can archive this with SQL command: 
-            <code>GRANT SELECT ON `<?php echo get_option('daiquiri_db_dbname') ?>`.* to 'USER'@'localhost';</code>
-        </p>
-        <p>
-            On a different machine you need to create the user first: 
-            <code>CREATE USER 'USERNAME'@'localhost' IDENTIFIED BY 'PASSWORD';</code>
-        </p>
     </div>
     <?php
 }
