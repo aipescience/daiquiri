@@ -85,10 +85,10 @@ function Daiquiri_Samp(container, opt, id) {
         var div = $('#' + self.names.connectDiv);
 
         if(div.val() == null) {
-            var div = $('<div />', {
+            var div = $('<p />', {
                 'id': self.names.connectDiv,
                 'class': self.names.connectDiv,
-                'html': '<button id="' + self.names.connectButton + '" class="' + self.names.connectButton + '">Register with SAMP</button>'
+                'html': '<button id="' + self.names.connectButton + '" class="btn ' + self.names.connectButton + '">Register with SAMP</button>'
             }).appendTo($("#" + id));
 
             var sampButton = $('#' + self.names.connectButton);
@@ -101,7 +101,7 @@ function Daiquiri_Samp(container, opt, id) {
                 }
             });
 
-            var div = $('<div />', {
+            var div = $('<p />', {
                 'id': self.names.clientsList,
                 'class': self.names.clientsList,
             }).appendTo($("#" + id));
@@ -262,7 +262,12 @@ function Daiquiri_Samp(container, opt, id) {
                 'name': self.names.passwordInput
             }).appendTo(target);
 
-            target.append("<p>Clients:</p>");
+            var table = $("<table />", {
+                'class': 'table daiquiri-samp-clients',
+                'html': '<thead><tr><th></th><th>Client</th><th>Actions</th></tr></thead>'
+            }).appendTo(target);
+
+            var tbody = $("<tbody />").appendTo(table);
 
             var clientIDs = this.isSampConnected() ? this.sampClientTracker.ids : [];
             var node;
@@ -283,7 +288,7 @@ function Daiquiri_Samp(container, opt, id) {
 
                 if(clientNode == null)
                     continue;
-                target.append(clientNode);
+                tbody.append(clientNode);
                 gotClients = true;
             }
 
@@ -339,34 +344,33 @@ function Daiquiri_Samp(container, opt, id) {
         var clientSubs = self.sampClientTracker.subs[clientID];
         var clientIcon = clientMeta ? clientMeta["samp.icon.url"] : null;
 
-        var divClientNode = $('<div />', {
+        var trClientNode = $('<tr />', {
             'id': self.names.clientNode + "_" + clientID,
             'class': self.names.clientNode
         });
 
-        var spanIcon = $('<span />', {
+        var tdIcon = $('<td />', {
             'id': self.names.clientIcon + "_" + clientID,
             'class': self.names.clientIcon,
-        }).appendTo(divClientNode);
+        }).appendTo(trClientNode);
 
         var imgIcon = $('<img />', {
             'src': clientIcon,
-            'width': 24,
             'class': self.names.clientIcon,
-        }).appendTo(spanIcon);
+        }).appendTo(tdIcon);
 
         imgIcon.css("float", "left");
         
-        var nameSpan = $('<span />', {
+        var tdAction = $('<td />', {
             'id': self.names.clientName + "_" + clientID,
             'class': self.names.clientName,
             'html': document.createTextNode(clientName)
-        }).appendTo(divClientNode);
+        }).appendTo(trClientNode);
 
-        var actionSpan = $('<span />', {
+        var tdAction = $('<td />', {
             'id': self.names.clientAction + "_" + clientID,
             'class': self.names.clientAction,
-        }).appendTo(divClientNode);
+        }).appendTo(trClientNode);
 
         var pingMsg = self.createSampMessage("samp.app.ping", "{}");
         var sendMsg = self.createSampMessage("table.load.votable", '{}');
@@ -374,9 +378,9 @@ function Daiquiri_Samp(container, opt, id) {
         if(this.isClientSubscribed(clientID, pingMsg)) {
             var pingButton = $('<button />', {
                 'id': self.names.clientPingBtn + "_" + clientID,
-                'class': self.names.clientPingBtn,
+                'class': 'linkbutton ' + self.names.clientPingBtn,
                 'html': document.createTextNode("Ping " + clientName)
-            }).appendTo(actionSpan);
+            }).appendTo(tdAction);
 
             pingButton.off("click");
             pingButton.click(function() {
@@ -401,9 +405,9 @@ function Daiquiri_Samp(container, opt, id) {
         if(self.isClientSubscribed(clientID, sendMsg)) {
             var sendButton = $('<button />', {
                 'id': self.names.clientSendBtn + "_" + clientID,
-                'class': self.names.clientSendBtn,
+                'class': 'linkbutton ' + self.names.clientSendBtn,
                 'html': document.createTextNode("Send Table to " + clientName)
-            }).appendTo(actionSpan);
+            }).appendTo(tdAction);
 
             sendButton.off("click");
             sendButton.click(function() {
@@ -443,7 +447,7 @@ function Daiquiri_Samp(container, opt, id) {
             });
         };
 
-        return divClientNode;
+        return trClientNode;
     };
 };
 
