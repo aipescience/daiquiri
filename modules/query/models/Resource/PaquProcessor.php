@@ -120,13 +120,8 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             return false;
         }
 
-        //escape function column names
-        $escapedMultiLine = false;
-        $escapedMultiLineParseTrees = false;
-        $this->processing->escapeFunctions($multiLines, $multiLineParseTrees, $escapedMultiLine, $escapedMultiLineParseTrees);
-
         //combine multiline queries into one
-        $combinedQuery = $this->processing->combineMultiLine($escapedMultiLine);
+        $combinedQuery = $this->processing->combineMultiLine($multiLines);
 
         //validate sql on server
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
