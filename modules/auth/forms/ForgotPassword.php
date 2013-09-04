@@ -29,7 +29,8 @@ class Auth_Form_ForgotPassword extends Auth_Form_Abstract {
      * Initializes the form. 
      */
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
 
         // add form elements
         $this->addEmailElement(true);

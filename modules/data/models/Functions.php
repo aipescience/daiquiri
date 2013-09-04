@@ -111,6 +111,9 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
     public function update($id, array $formParams = array()) {
         // get the entry
         $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Exception('$id ' . $id . ' not found.');
+        }
 
         // create the form object
         $rolesModel = new Auth_Model_Roles();

@@ -29,7 +29,9 @@ class Auth_Form_Create extends Auth_Form_Abstract {
      * Initializes the form. 
      */
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         $d = array();
         $u = array();
 

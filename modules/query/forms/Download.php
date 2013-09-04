@@ -28,20 +28,25 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
         $this->_formats = $formats;
     }
 
-    public function init() {
-        parent::init();
+    public function getCsrf() {
+        return $this->getElement('download_csrf');
+    }
 
-        $this->addElement('select', 'format', array(
+    public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement('download_csrf');
+        
+        $this->addElement('select', 'download_format', array(
             'required' => true,
             'label' => 'Select format:',
             'multiOptions' => $this->_formats,
             'decorators' => array('ViewHelper'),
             'class' => 'span4'
         ));
-        $this->addPrimaryButtonElement('submit-download', 'Download');
+        $this->addPrimaryButtonElement('download_submit', 'Download');
 
-        $this->addHorizontalGroup(array('format'));
-        $this->addActionGroup(array('submit-download'));
+        $this->addHorizontalGroup(array('download_format'));
+        $this->addActionGroup(array('download_submit'));
     }
 
 }

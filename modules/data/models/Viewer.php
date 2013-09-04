@@ -155,9 +155,9 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         }
 
         //properly escape the column names to handle any strange special character
-        foreach($params['cols'] as &$currCol) {
-            $currCol = "`" . trim($currCol, "`") . "`";
-        }
+        //foreach($params['cols'] as &$currCol) {
+        //    $currCol = "`" . trim($currCol, "`") . "`";
+        //}
         
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);

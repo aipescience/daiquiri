@@ -100,32 +100,55 @@ class Query_Model_CurrentJobs extends Daiquiri_Model_Abstract {
     }
 
     public function rename($id, array $formParams = array()) {
+        // get the job
+        $row = $this->getResource()->fetchRow($id);
+
         // create the form object
-        $form = new Query_Form_RenameJob();
+        $form = new Query_Form_RenameJob(array(
+            'tablename' => $row['table']
+        ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $row = $this->getResource()->fetchRow($id);
-            if ($row['user_id'] !== $this->_userId) {
-                throw new Daiquiri_Exception_AuthError();
-            } else {
-                $data = $form->getValues();
-                $error = $this->getResource()->renameJob($id, $data['tablerename']);
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // reinit csrf
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
 
-                //adding error to form error stack
-                $form->getElement('tablerename')->addError($error);
-                if ($error !== 'ok') {
-                    return array('status' => 'error', 'error' => $form->getMessages(), 'val' => $data['tablerename'], 'form' => $form);
+                $row = $this->getResource()->fetchRow($id);
+                if ($row['user_id'] !== $this->_userId) {
+                    throw new Daiquiri_Exception_AuthError();
+                } else {
+                    $data = $form->getValues();
+                    $error = $this->getResource()->renameJob($id, $data['tablename']);
+
+                    //adding error to form error stack
+                    $form->getElement('tablename')->addError($error);
+                    if ($error !== 'ok') {
+                        return array(
+                            'status' => 'error',
+                            'errors' => $form->getMessages(),
+                            'form' => $form,
+                            'csrf' => $csrf->getHash()
+                            );
+                    }
+
+                    return array('status' => 'ok');
                 }
-
-                return array('status' => 'ok');
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages(),
+                    'form' => $form,
+                    'csrf' => $form->getElement('csrf')->getHash()
+                    );
             }
-        } else if (!empty($formParams)) {
-            $values = $form->getUnfilteredValues();
-            return array('status' => 'error', 'error' => $form->getMessages(), 'val' => $values['tablerename'], 'form' => $form);
         }
 
-        return array('form' => $form, 'status' => 'form');
+        return array(
+            'form' => $form,
+            'status' => 'form'
+            );
     }
 
 }

@@ -23,7 +23,6 @@
 class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
 
     protected $_queue;
-
     public function getQuery() {
         return $this->getValue('sql_query');
     }
@@ -41,11 +40,16 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         return $value;
     }
 
+    public function getCsrf() {
+        return $this->getElement('sql_csrf');
+    }
+
     public function init() {
-        parent::init();
+        $this->setAttrib('id', 'daiquiri-form-query-sql');
+        $this->setFormDecorators();
+        $this->addCsrfElement('sql_csrf');
 
-        $this->setAttrib('id', 'daiquiri-form-sql-query');
-
+        // add fields
         $this->addElement('textarea', 'sql_query', array(
             'filters' => array('StringTrim'),
             'validators' => array(

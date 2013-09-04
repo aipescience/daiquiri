@@ -1,4 +1,6 @@
-/*  
+<?php
+
+/*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
@@ -18,12 +20,18 @@
  *  limitations under the License.
  */
 
-/*
- * Very simple polling, emits the event 'poll'.
- */
+class Auth_Form_Confirm extends Daiquiri_Form_Abstract {
 
-function poll(timeout) {
-    setTimeout('poll('+ timeout +');', timeout);
-    $(window).trigger('poll');
+    public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
+        // add fields
+        $this->addDangerButtonElement('submit', 'Confirm user');
+        $this->addButtonElement('cancel', 'Cancel');
+
+        // add groups
+        $this->addActionGroup(array('submit', 'cancel'));
+    }
+
 }
-

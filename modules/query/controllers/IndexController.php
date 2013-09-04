@@ -37,6 +37,8 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
         // get the forms to display
         if (Daiquiri_Config::getInstance()->query->forms) {
             $this->view->forms = Daiquiri_Config::getInstance()->query->forms->toArray();
+        } else {
+            $this->view->forms = array();
         }
     }
 
@@ -242,11 +244,7 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     public function listJobsAction() {
         // get the model
         $model = Daiquiri_Proxy::factory('Query_Model_CurrentJobs');
-
-        // get parameters from request
-        $redirect = $this->_getParam('redirect', '/query/');
-
-        $this->view->redirect = $redirect;
+        
         $this->view->data = $model->index();
         $this->view->status = 'ok';
     }
@@ -286,6 +284,12 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
             $response = $model->rename($id);
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/query/index/rename-job?id=' . $id);
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -315,6 +319,12 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
             $response = $model->remove($id);
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/query/index/remove-job?id=' . $id);
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -342,6 +352,12 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $model->kill($id);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/query/index/kill-job?id=' . $id);
         }
 
         // assign to view

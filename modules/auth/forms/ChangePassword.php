@@ -29,7 +29,8 @@ class Auth_Form_ChangePassword extends Auth_Form_Abstract {
      * Initializes the form. 
      */
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
 
         // add elements
         $this->addOldPasswordElement(true);

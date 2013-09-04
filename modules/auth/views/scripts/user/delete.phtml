@@ -22,15 +22,7 @@
 
 <?php if ($this->status === 'ok'): ?>
     <p>User deleted.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
 <?php else: ?>
-    <h2>Delete User</h2>
     <p>Really delete user?</p>
     <?php echo $this->form; ?>
 <?php endif; ?>

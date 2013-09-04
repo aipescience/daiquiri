@@ -42,7 +42,8 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
      * @brief Initializes the contact form.
      */
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
 
         // add elements
         $this->addElement('textarea', 'sql', array(

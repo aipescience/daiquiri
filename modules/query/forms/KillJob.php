@@ -23,6 +23,9 @@
 class Query_Form_KillJob extends Daiquiri_Form_Abstract {
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+
         // add fields
         $this->addDangerButtonElement('submit', 'Kill job');
         $this->addButtonElement('cancel', 'Cancel');

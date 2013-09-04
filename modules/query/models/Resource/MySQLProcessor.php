@@ -63,13 +63,8 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             return false;
         }
 
-        //escape function column names
-        $escapedMultiLine = false;
-        $escapedMultiLineParseTrees = false;
-        $this->processing->escapeFunctions($multiLines, $multiLineParseTrees, $escapedMultiLine, $escapedMultiLineParseTrees);
-
         //combine multiline queries into one
-        $combinedQuery = $this->processing->combineMultiLine($escapedMultiLine);
+        $combinedQuery = $this->processing->combineMultiLine($multiLines);
 
         //validate sql on server
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
@@ -133,11 +128,6 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             return false;
         }
 
-        //escape function column names
-        $escapedMultiLine = false;
-        $escapedMultiLineParseTrees = false;
-        $this->processing->escapeFunctions($showRewrittenMultiLine, $showRewrittenMultiLineParseTrees, $escapedMultiLine, $escapedMultiLineParseTrees);
-
         //add create table statements
         //determine result table name
         if (empty($resultTableName)) {
@@ -145,7 +135,7 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             $resultTableName = date("Y-m-d\TH:i:s") . ":" . substr($micro[0], 2, 4);
         }
 
-        $querySQL = $this->processing->addCreateTableStatement($escapedMultiLine, $escapedMultiLineParseTrees, 
+        $querySQL = $this->processing->addCreateTableStatement($showRewrittenMultiLine, $showRewrittenMultiLineParseTrees, 
                     $this->resultDB, $resultTableName, $errors);
         if (array_key_exists('addTableError', $errors)) {
             return false;
@@ -203,12 +193,7 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             return false;
         }
 
-        //escape function column names
-        $escapedMultiLine = false;
-        $escapedMultiLineParseTrees = false;
-        $this->processing->escapeFunctions($multiLines, $multiLineParseTrees, $escapedMultiLine, $escapedMultiLineParseTrees);
-
-        $explainSQL = $this->_addExplain($escapedMultiLine);
+        $explainSQL = $this->_addExplain($multiLines);
 
         //loop through queries and obtain results
         $queryResult = array();

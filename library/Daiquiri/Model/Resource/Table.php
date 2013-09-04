@@ -254,6 +254,10 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Abstract {
             // get the row by its primary key
             $row = $this->getTable($tableclass)->find($id)->current();
 
+            if (empty($row)) {
+                throw new Exception('$id ' . $id . ' not found.');
+            }
+
             // delete the row
             $row->delete();
         } else {

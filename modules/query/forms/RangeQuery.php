@@ -46,10 +46,16 @@ class Query_Form_RangeQuery extends Query_Form_AbstractFormQuery {
         return $this->getValue('range_queue');
     }
 
+    public function getCsrf() {
+        return $this->getElement('range_csrf');
+    }
+
     public function init() {
+        $this->setAttrib('id', 'daiquiri-form-query-range');
+        $this->setFormDecorators();
+        $this->addCsrfElement('range_csrf');
 
-        $this->setAttrib('id', 'daiquiri-form-range-query');
-
+        // add fields
         $this->addElement('text', 'range_xmin', array(
             'filters' => array('StringTrim'),
             'required' => true,

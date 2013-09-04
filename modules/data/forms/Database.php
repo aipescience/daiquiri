@@ -25,7 +25,6 @@ class Data_Form_Database extends Daiquiri_Form_Abstract {
     protected $_roles = array();
     protected $_adapter = array();
     protected $_entry = array();
-    protected $_submit = null;
 
     public function setRoles($roles) {
         $this->_roles = $roles;
@@ -39,11 +38,10 @@ class Data_Form_Database extends Daiquiri_Form_Abstract {
         $this->_entry = $entry;
     }
 
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add elements
         $this->addElement('text', 'name', array(
             'label' => 'Database name',
@@ -102,7 +100,7 @@ class Data_Form_Database extends Daiquiri_Form_Abstract {
             ));
         }
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
+        $this->addPrimaryButtonElement('submit', 'Update database entry');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
@@ -121,6 +119,6 @@ class Data_Form_Database extends Daiquiri_Form_Abstract {
                 $this->setDefault($element, $this->_entry[$element]);
             }
         }
-    }
 
+    }
 }

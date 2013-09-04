@@ -22,14 +22,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        // create the user table inside the div
-        $('#table').daiquiri_table({
-            'rowsurl': "<?php echo $this->baseUrl('/auth/user/rows') ?>",
-            'colsurl': "<?php echo $this->baseUrl('/auth/user/cols') ?>",
-            'params': {
-                'options': true
-            }
-        });
+        daiquiri.userTable = new daiquiri.UserTable('<?php echo $this->baseUrl() ?>');
     });
 </script>
 

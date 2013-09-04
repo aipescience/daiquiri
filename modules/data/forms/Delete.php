@@ -29,6 +29,9 @@ class Data_Form_Delete extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add fields
         $this->addDangerButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');

@@ -104,6 +104,12 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
             $response = $this->_model->create();
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/create/');
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -131,6 +137,12 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $this->_model->update($id);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/update/id/' . $id);
         }
 
         // assign to view
@@ -162,6 +174,12 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
             $response = $this->_model->edit();
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/edit');
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -189,6 +207,12 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $this->_model->delete($id);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/delete/id/' . $id);
         }
 
         // assign to view

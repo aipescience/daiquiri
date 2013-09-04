@@ -108,172 +108,248 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
      * Sets the status of a registered user to 'confirmed'.
      * @param int $id
      */
-    public function confirm($id) {
-        // get the user credentials
-        $user = $this->getResource()->fetchRow($id);
+    public function confirm($id, array $formParams = array()) {
+        // create the form object
+        $form = new Auth_Form_Confirm();
 
-        // update the user
-        if ($user['status'] !== 'registered') {
-            return array(
-                'status' => 'error',
-                'error' => 'user status is not "registered"'
-            );
-        } else {
-            // get the new status id
-            $statusModel = new Auth_Model_Status();
-            $statusId = $statusModel->getId('confirmed');
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the user credentials
+                $user = $this->getResource()->fetchRow($id);
 
-            // confirm user in database
-            $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                // update the user
+                if ($user['status'] !== 'registered') {
+                    return array(
+                        'status' => 'error',
+                        'error' => 'user status is not "registered"'
+                    );
+                } else {
+                    // get the new status id
+                    $statusModel = new Auth_Model_Status();
+                    $statusId = $statusModel->getId('confirmed');
 
-            // log the event
-            $detailResource = new Auth_Model_Resource_Details();
-            $detailResource->logEvent($id, 'confirm');
+                    // confirm user in database
+                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
-            // send mail
-            $mailResource = new Auth_Model_Resource_Mail();
-            $mailResource->sendConfirmMail($user);
+                    // log the event
+                    $detailResource = new Auth_Model_Resource_Details();
+                    $detailResource->logEvent($id, 'confirm');
 
-            return array('status' => 'ok');
+                    // send mail
+                    $mailResource = new Auth_Model_Resource_Mail();
+                    $mailResource->sendConfirmMail($user);
+
+                    return array('status' => 'ok');
+                }        
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
         }
+
+        return array('form' => $form, 'status' => 'form');
     }
 
     /**
      * Sets the status of a registrered user to 'disabled'.
      * @param int $id
      */
-    public function reject($id) {
-        // get the user credentials
-        $user = $this->getResource()->fetchRow($id);
+    public function reject($id, array $formParams = array()) {
+        // create the form object
+        $form = new Auth_Form_Reject();
 
-        // update the user
-        if ($user['status'] !== 'registered') {
-            return array(
-                'status' => 'error',
-                'error' => 'user status is not "registered"'
-            );
-        } else {
-            // get the new status id
-            $statusModel = new Auth_Model_Status();
-            $statusId = $statusModel->getId('disabled');
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
 
-            // confirm user in database
-            $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                // get the user credentials
+                $user = $this->getResource()->fetchRow($id);
 
-            // log the event
-            $detailResource = new Auth_Model_Resource_Details();
-            $detailResource->logEvent($id, 'reject');
+                // update the user
+                if ($user['status'] !== 'registered') {
+                    return array(
+                        'status' => 'error',
+                        'error' => 'user status is not "registered"'
+                    );
+                } else {
+                    // get the new status id
+                    $statusModel = new Auth_Model_Status();
+                    $statusId = $statusModel->getId('disabled');
 
-            // send mail
-            $mailResource = new Auth_Model_Resource_Mail();
-            $mailResource->sendRejectMail($user);
+                    // confirm user in database
+                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
-            return array('status' => 'ok');
+                    // log the event
+                    $detailResource = new Auth_Model_Resource_Details();
+                    $detailResource->logEvent($id, 'reject');
+
+                    // send mail
+                    $mailResource = new Auth_Model_Resource_Mail();
+                    $mailResource->sendRejectMail($user);
+
+                    return array('status' => 'ok');
+                }
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
         }
+
+        return array('form' => $form, 'status' => 'form');
     }
 
     /**
      * Sets the status of a given user from 'confirmed' to 'active'.
      * @param int $id
      */
-    public function activate($id) {
-        // get the user credentials
-        $user = $this->getResource()->fetchRow($id);
+    public function activate($id, array $formParams = array()) {
+        // create the form object
+        $form = new Auth_Form_Activate();
 
-        // update the use
-        if ($user['status'] === 'active') {
-            return array(
-                'status' => 'error',
-                'error' => 'user status is already "active"'
-            );
-        } else {
-            // get the new status id
-            $statusModel = new Auth_Model_Status();
-            $statusId = $statusModel->getId('active');
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the user credentials
+                $user = $this->getResource()->fetchRow($id);
 
-            // confirm user in database
-            $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                // update the use
+                if ($user['status'] === 'active') {
+                    return array(
+                        'status' => 'error',
+                        'error' => 'user status is already "active"'
+                    );
+                } else {
+                    // get the new status id
+                    $statusModel = new Auth_Model_Status();
+                    $statusId = $statusModel->getId('active');
 
-            // log the event
-            $detailResource = new Auth_Model_Resource_Details();
-            $detailResource->logEvent($id, 'activate');
+                    // confirm user in database
+                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
-            // send mail
-            $mailResource = new Auth_Model_Resource_Mail();
-            $mailResource->sendActivateMail($user);
+                    // log the event
+                    $detailResource = new Auth_Model_Resource_Details();
+                    $detailResource->logEvent($id, 'activate');
 
-            return array('status' => 'ok');
+                    // send mail
+                    $mailResource = new Auth_Model_Resource_Mail();
+                    $mailResource->sendActivateMail($user);
+
+                    return array('status' => 'ok');
+                }
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
         }
+
+        return array('form' => $form, 'status' => 'form');
     }
 
     /**
      * Sets the status of a given user to 'disabled'.
      * @param int $id
      */
-    public function disable($id) {
-        // get the user credentials
-        $user = $this->getResource()->fetchRow($id);
+    public function disable($id, array $formParams = array()) {
+        // create the form object
+        $form = new Auth_Form_Disable();
 
-        // update the user
-        if ($user['status'] === 'disabled') {
-            return array(
-                'status' => 'error',
-                'error' => 'user status is already "disabled"'
-            );
-        } else {
-            // get the new status id
-            $statusModel = new Auth_Model_Status();
-            $statusId = $statusModel->getId('disabled');
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the user credentials
+                $user = $this->getResource()->fetchRow($id);
 
-            // confirm user in database
-            $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                // update the user
+                if ($user['status'] === 'disabled') {
+                    return array(
+                        'status' => 'error',
+                        'error' => 'user status is already "disabled"'
+                    );
+                } else {
+                    // get the new status id
+                    $statusModel = new Auth_Model_Status();
+                    $statusId = $statusModel->getId('disabled');
+                    Zend_Debug::dump($statusId); // die(0);
+                    // confirm user in database
+                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
-            // invalidate the session of the user
-            $sessionResource = new Auth_Model_Resource_Sessions();
-            foreach ($sessionResource->fetchAuthSessionsByUserId($id) as $session) {
-                $sessionResource->deleteRow($session);
-            };
+                    // invalidate the session of the user
+                    $sessionResource = new Auth_Model_Resource_Sessions();
+                    foreach ($sessionResource->fetchAuthSessionsByUserId($id) as $session) {
+                        $sessionResource->deleteRow($session);
+                    };
 
-            // log the event
-            $detailResource = new Auth_Model_Resource_Details();
-            $detailResource->logEvent($id, 'disable');
+                    // log the event
+                    $detailResource = new Auth_Model_Resource_Details();
+                    $detailResource->logEvent($id, 'disable');
 
-            return array('status' => 'ok');
+                    return array('status' => 'ok');
+                }
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
         }
+
+        return array('form' => $form, 'status' => 'form');
     }
 
     /**
      * Sets the status of a given user from 'disabled' to 'active'.
      * @param int $id
      */
-    public function reenable($id) {
-        // get the user credentials
-        $user = $this->getResource()->fetchRow($id);
+    public function reenable($id, array $formParams = array()) {
+        // create the form object
+        $form = new Auth_Form_Reenable();
 
-        // update the use
-        if ($user['status'] === 'active') {
-            return array(
-                'status' => 'error',
-                'error' => 'user status is already "active"'
-            );
-        } else {
-            // get the new status id
-            $statusModel = new Auth_Model_Status();
-            $statusId = $statusModel->getId('active');
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the user credentials
+                $user = $this->getResource()->fetchRow($id);
 
-            // confirm user in database
-            $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                // update the use
+                if ($user['status'] === 'active') {
+                    return array(
+                        'status' => 'error',
+                        'error' => 'user status is already "active"'
+                    );
+                } else {
+                    // get the new status id
+                    $statusModel = new Auth_Model_Status();
+                    $statusId = $statusModel->getId('active');
 
-            // log the event
-            $detailResource = new Auth_Model_Resource_Details();
-            $detailResource->logEvent($id, 'reenable');
+                    // confirm user in database
+                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
-            // send mail
-            $mailResource = new Auth_Model_Resource_Mail();
-            $mailResource->sendReenableMail($user);
+                    // log the event
+                    $detailResource = new Auth_Model_Resource_Details();
+                    $detailResource->logEvent($id, 'reenable');
 
-            return array('status' => 'ok');
+                    // send mail
+                    $mailResource = new Auth_Model_Resource_Mail();
+                    $mailResource->sendReenableMail($user);
+
+                    return array('status' => 'ok');
+                }
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
         }
+
+        return array('form' => $form, 'status' => 'form');
     }
 
 }

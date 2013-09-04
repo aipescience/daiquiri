@@ -60,18 +60,21 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
         // get the form
         $form = new $formConfig->class(array(
-                    'formOptions' => $formOptions,
-                    'queues' => $queues,
-                    'defaultQueue' => $defaultQueue
-                ));
+            'formOptions' => $formOptions,
+            'queues' => $queues,
+            'defaultQueue' => $defaultQueue
+            ));
 
         // init errors array
         $errors = array();
 
         // validate form
         if (!empty($formParams)) {
-            if ($form->isValid($formParams)) {
+            // reinit csrf
+            $csrf = $form->getCsrf();
+            $csrf->initCsrfToken();
 
+            if ($form->isValid($formParams)) {
                 // form is valid, get sql string from functions
                 $sql = $form->getQuery();
                 $tablename = $form->getTablename();
@@ -95,10 +98,11 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
                     return array(
                         'form' => $form,
+                        'csrf' => $csrf->getHash(),
                         'status' => 'form',
                         'errors' => $errors,
                         'formOptions' => $formOptions
-                    );
+                        );
                 }
 
                 // take a detour to the query plan
@@ -122,35 +126,52 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
                         return array(
                             'form' => $form,
+                            'csrf' => $csrf->getHash(),
                             'status' => 'form',
                             'errors' => $errors,
                             'formOptions' => $formOptions
-                        );
+                            );
                     }
 
                     $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
                     return array(
-                        'status' => 'redirect',
-                        'redirect' => $baseurl . '/query/index/plan?form=' . $formstring
-                    );
+                        'form' => $form,
+                        'csrf' => $csrf->getHash(),
+                        'status' => 'plan',
+                        'redirect' => $baseurl . '/query/index/plan?form=' . $formstring,
+                        'formOptions' => $formOptions
+                        );
                 } else {
                     // submit query
                     $response = $model->query($sql, false, $tablename, $options);
 
                     if ($response['status'] === 'ok') {
+                        $response['csrf'] = $csrf->getHash();
                         return $response;
                     } else {
-                        $errors = array('form' => $response['errors']);
+                        return array(
+                            'form' => $form,
+                            'csrf' => $csrf->getHash(),
+                            'status' => 'error',
+                            'errors' => array('form' => $response['errors']),
+                            'formOptions' => $formOptions
+                            );
                     }
                 }
             } else {
-                // extract errors from form and put directly into response
-                $errors = $form->getMessages();
+                return array(
+                    'form' => $form,
+                    'csrf' => $csrf->getHash(),
+                    'status' => 'error',
+                    'errors' => $form->getMessages(),
+                    'formOptions' => $formOptions
+                );
             }
         }
 
         return array(
             'form' => $form,
+            'csrf' => $form->getCsrf()->getHash(),
             'status' => 'form',
             'errors' => $errors,
             'formOptions' => $formOptions
@@ -176,72 +197,96 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
         // get the form for the plan
         $form = new Query_Form_Plan(array(
-                    'query' => $outString,
-                    'editable' => $model->canAlterPlan(),
-                    'mail' => Daiquiri_Config::getInstance()->query->processor->mail->enabled
-                ));
+            'query' => $outString,
+            'editable' => $model->canAlterPlan(),
+            'mail' => Daiquiri_Config::getInstance()->query->processor->mail->enabled
+            ));
 
         // init errors array
         $errors = array();
 
         // validate form
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get values 
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // reinit csrf
+                $csrf = $form->getElement('plan_csrf');
+                $csrf->initCsrfToken();
+                
+                // get values 
+                $values = $form->getValues();
 
-            if ($model->canAlterPlan()) {
-                // get new plan from form
-                $plan = $values['plan_query'];
+                if ($model->canAlterPlan()) {
+                    // get new plan from form
+                    $plan = $values['plan_query'];
 
-                // validate query plus plan
-                if ($model->validate($ns->sql, $plan, $ns->tablename, $errors) !== true) {
-                    if (!empty($errors)) {
-                        $errors = array('form' => $errors);
+                    // validate query plus plan
+                    if ($model->validate($ns->sql, $plan, $ns->tablename, $errors) !== true) {
+                        if (!empty($errors)) {
+                            $errors = array('form' => $errors);
+
+                            return array(
+                                'form' => $form,
+                                'csrf' => $csrf->getHash(),
+                                'status' => 'form',
+                                'errors' => $errors
+                                );
+                        }
+                    }
+                } else {
+                    $plan = false;
+                }
+
+                if (isset($values["plan_mail"]) && $values["plan_mail"] !== Null) {
+                    // store plan in session
+                    if ($plan !== false) {
+                        $ns->planString = $plan;
+                    } else {
+                        $ns->planString = implode('\n', $ns->plan);
+                    }
+
+                    // redirect to mail controller action
+                    $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
+                    return array(
+                        'form' => $form,
+                        'csrf' => $csrf->getHash(),
+                        'status' => 'redirect',
+                        'redirect' => $baseurl . '/query/index/mail'
+                        );
+                } else {
+                    // submit query
+                    $response = $model->query($ns->sql, $plan, $ns->tablename, array("queue" => $ns->queue));
+
+                    if ($response['status'] === 'ok') {
+                        $response['csrf'] = $csrf->getHash();
+                        return $response;
+
+                    } else {
+                        $errors = array('form' => $response['errors']);
 
                         return array(
                             'form' => $form,
-                            'status' => 'form',
+                            'csrf' => $csrf->getHash(),
+                            'status' => 'error',
                             'errors' => $errors
-                        );
+                            );
                     }
                 }
             } else {
-                $plan = false;
-            }
-
-            if (isset($values["plan_mail"]) && $values["plan_mail"] !== Null) {
-                // store plan in session
-                if ($plan !== false) {
-                    $ns->planString = $plan;
-                } else {
-                    $ns->planString = implode('\n', $ns->plan);
-                }
-
-                // redirect to mail controller action
-                $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
                 return array(
-                    'status' => 'redirect',
-                    'redirect' => $baseurl . '/query/index/mail'
+                    'form' => $form,
+                    'csrf' => $form->getElement('plan_csrf')->getHash(),
+                    'status' => 'form',
+                    'errors' => $form->getErrors(),
+                    'formOptions' => $formOptions
                 );
-            } else {
-                // submit query
-                $response = $model->query($ns->sql, $plan, $ns->tablename, array("queue" => $ns->queue));
-
-                if ($response['status'] === 'ok') {
-                    return $response;
-                } else {
-                    $errors = array('form' => $response['errors']);
-
-                    return array(
-                        'form' => $form,
-                        'status' => 'form',
-                        'errors' => $errors
-                    );
-                }
             }
         }
 
-        return array('form' => $form, 'status' => 'form');
+        return array(
+            'form' => $form,
+            'csrf' => $form->getElement('plan_csrf')->getHash(),
+            'status' => 'form'
+            );
     }
 
     public function mail(array $formParams = array()) {
@@ -264,10 +309,10 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
         // get the form for the plan
         $form = new Query_Form_Mail(array(
-                    'user' => $user,
-                    'sql' => $ns->sql,
-                    'plan' => $ns->planString
-                ));
+            'user' => $user,
+            'sql' => $ns->sql,
+            'plan' => $ns->planString
+            ));
 
         if (!empty($formParams) && $form->isValid($formParams)) {
             // form is valid, get values
@@ -290,7 +335,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             'status' => 'form',
             'sql' => $ns->sql,
             'plan' => $ns->planString
-        );
+            );
     }
 
 }

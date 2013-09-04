@@ -101,11 +101,19 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
             $formats[$key] = $adapter['config'][$key]['name'];
         }
         $form = new Query_Form_Download(array(
-                    'formats' => $formats
-                ));
+                'formats' => $formats
+            ));
+        
+        // init errors array
+        $errors = array();
 
         if (!empty($formParams)) {
+            // reinit csrf
+            $csrf = $form->getCsrf();
+            $csrf->initCsrfToken();
+
             if ($form->isValid($formParams)) {
+                $response = array();
 
                 // get the form values
                 $values = $form->getValues();
@@ -123,13 +131,20 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                 //get queue type and validate
                 $queueType = strtolower(Daiquiri_Config::getInstance()->query->download->queue->type);
                 if ($queueType !== "simple" and $queueType !== "gearman") {
-                    return array('form' => $form, 'status' => 'download queue type not valid');
+                    throw new Exception('Download queue type not valid');
                 }
 
                 // create dir if neccessary
                 if (!is_dir($dir)) {
                     if (mkdir($dir) === false) {
-                        return array('status' => 'error', 'error' => 'Error: configuration of download setup wrong');
+                        return array(
+                            'status' => 'error', 
+                            'errors' => array(
+                                'form' => 'Configuration of download setup wrong'
+                                ),
+                            'form' => $form,
+                            'csrf' => $csrf->getHash(), 
+                        );
                     }
 
                     chmod($dir, 0775);
@@ -146,7 +161,14 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                     try {
                         $resource->dumpTable($format, $file);
                     } catch (Exception $e) {
-                        return array('status' => 'error', 'error' => $e->getMessage());
+                        return array(
+                            'status' => 'error',
+                            'errors' => array(
+                                'form' => $e->getMessage()
+                                ),
+                            'form' => $form,
+                            'csrf' => $csrf->getHash(), 
+                        );
                     }
                 }
 
@@ -155,7 +177,14 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                     if (!file_exists(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid)) {
                         //check if we have write access to actually create this PID file
                         if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid))) {
-                            return array('status' => 'error', 'error' => 'Cannot write to the gearman PID file location');
+                            return array(
+                                'status' => 'error',
+                                'errors' => array(
+                                    'form' => 'Cannot write to the gearman PID file location'
+                                    ),
+                                'form' => $form,
+                                'csrf' => $csrf->getHash(), 
+                                );
                         }
 
                         $gearmanConf = Daiquiri_Config::getInstance()->query->download->queue->gearman;
@@ -187,7 +216,14 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                     //check if lockfile is present and if not, create
                     if (!file_exists($file . ".lock")) {
                         if (file_exists($file . ".err")) {
-                            return array('status' => 'error');
+                            return array(
+                                'status' => 'error',
+                                'errors' => array(
+                                    'form' => 'An error occured.'
+                                    ),
+                                'form' => $form,
+                                'csrf' => $csrf->getHash(), 
+                                );
                         }
 
                         //write lock file
@@ -205,24 +241,53 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                             $resource->dumpTableGearman($format, $file);
                         } catch (Exception $e) {
                             unlink($file . ".lock");
-                            return array('status' => 'error', 'error' => $e->getMessage());
+                            return array(
+                            'status' => 'error',
+                            'errors' => array(
+                                'form' => $e->getMessage()
+                                ),
+                            'form' => $form,
+                            'csrf' => $csrf->getHash(), 
+                            );
                         }
 
-                        return array('status' => 'pending');
+                        return array(
+                            'status' => 'pending',
+                            'form' => $form,
+                            'csrf' => $csrf->getHash(), 
+                        );
                     } else {
-                        return array('status' => 'pending');
+                        return array(
+                            'status' => 'pending',
+                            'form' => $form,
+                            'csrf' => $csrf->getHash(), 
+                        );
                     }
                 }
 
                 return array('status' => 'ok',
                     'link' => Daiquiri_Config::getInstance()->getSiteUrl() . $url,
-                    'regenLink' => Daiquiri_Config::getInstance()->getSiteUrl() . $regenUrl);
+                    'regenerateLink' => Daiquiri_Config::getInstance()->getSiteUrl() . $regenUrl,
+                    'form' => $form,
+                    'csrf' => $csrf->getHash(), 
+                    );
+
             } else {
-                return array('form' => $form, 'status' => 'validation failed');
+                return array(
+                    'form' => $form,
+                    'csrf' => $form->getCsrf()->getHash(), 
+                    'errors' => $form->getMessages(),
+                    'status' => 'error',
+                    );
             }
         }
 
-        return array('form' => $form, 'status' => 'form');
+        return array(
+            'form' => $form,
+            'csrf' => $form->getCsrf()->getHash(), 
+            'errors' => $errors,
+            'status' => 'form',
+        );
     }
 
     public function stream($table, $format) {

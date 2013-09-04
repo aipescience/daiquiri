@@ -29,93 +29,56 @@ unset($this->data['status_id']);
 <h2>Details of user "<?php echo $this->escape($this->data['username']); ?>"</h2>
 
 <h4>User information</h4>
-<div class="frame padding marginBottom">
-    <table class="table table-condensed">
-        <thead>
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th class="span3">Key</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach (array('id', 'username', 'email', 'role', 'status') as $key): ?>
             <tr>
-                <th class="span3">Key</th>
-                <th>Value</th>
+                <td><?php echo ucfirst($this->escape($key)); ?></td>
+                <td><?php echo $this->escape($this->data[$key]); ?></td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach (array('id', 'username', 'email', 'role', 'status') as $key): ?>
-                <tr>
-                    <td><?php echo ucfirst($this->escape($key)); ?></td>
-                    <td><?php echo $this->escape($this->data[$key]); ?></td>
-                </tr>
-                <?php unset($this->data[$key]); ?>
-            <?php endforeach; ?>
-            <?php foreach (Daiquiri_Config::getInstance()->auth->details as $key): ?>
-                <tr>
-                    <td><?php echo ucfirst($this->escape($key)); ?></td>
-                    <td><?php echo $this->escape($this->data[$key]); ?></td>
-                </tr>
-                <?php unset($this->data[$key]); ?>
-            <?php endforeach; ?>   
-        </tbody>
-    </table>
-</div>
+            <?php unset($this->data[$key]); ?>
+        <?php endforeach; ?>
+        <?php foreach (Daiquiri_Config::getInstance()->auth->details as $key): ?>
+            <tr>
+                <td><?php echo ucfirst($this->escape($key)); ?></td>
+                <td><?php echo $this->escape($this->data[$key]); ?></td>
+            </tr>
+            <?php unset($this->data[$key]); ?>
+        <?php endforeach; ?>   
+    </tbody>
+</table>
 
 <h4>Additional information</h4> 
-<div class="frame padding marginBottom">
-    <table class="table table-condensed">
-        <thead>
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th class="span3">Key</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->data as $key => $value): ?>
             <tr>
-                <th class="span3">Key</th>
-                <th>Value</th>
-                <th>Options</th>
+                <td><?php echo ucfirst($this->escape($key)); ?></td>
+                <td><?php echo $this->escape($value); ?></td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($this->data as $key => $value): ?>
-                <tr>
-                    <td><?php echo ucfirst($this->escape($key)); ?></td>
-                    <td><?php echo $this->escape($value); ?></td>
-                    <td>
-                        <?php
-                        echo $this->internalLink(array(
-                            'href' => '/auth/details/update/id/' . $id . '/key/' . $key,
-                            'text' => 'Update',
-                            'resource' => 'Auth_Model_User',
-                            'permission' => 'update'));
-                        ?>
-                        <?php
-                        echo $this->internalLink(array(
-                            'href' => '/auth/details/delete/id/' . $id . '/key/' . $key,
-                            'text' => 'Delete',
-                            'resource' => 'Auth_Model_User',
-                            'permission' => 'delete'));
-                        ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>  
-        </tbody>
-    </table>
-</div>
+        <?php endforeach; ?>  
+    </tbody>
+</table>
 
-<?php
-echo $this->internalLink(array(
-    'href' => '/auth/user/update/id/' . $id . '?redirect=/auth/user/show/id/' . $id,
-    'text' => 'Update User information',
-    'resource' => 'Auth_Model_User',
-    'permission' => 'update',
-    'prepend' => '<p>',
-    'append' => '<p>'));
-?>
-
-<?php
-echo $this->internalLink(array(
-    'href' => '/auth/details/create/id/' . $id,
-    'text' => 'Create additional entry',
-    'resource' => 'Auth_Model_Details',
-    'permission' => 'create',
-    'prepend' => '<p>',
-    'append' => '<p>'));
-?>
 
 <?php
 echo $this->internalLink(array(
     'text' => 'Back',
+    'class' => 'daiquiri-user-back',
     'href' => $this->redirect,
     'prepend' => '<p>',
     'append' => '</p>'));

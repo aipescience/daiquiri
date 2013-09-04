@@ -40,7 +40,8 @@ class Auth_Form_Detail extends Auth_Form_Abstract {
      * Initializes the form. 
      */
     public function init() {
-        parent::init();
+        $this->setFormDecorators();
+        $this->addCsrfElement();
 
         $this->addElement('text', 'key', array(
             'label' => 'Key:',

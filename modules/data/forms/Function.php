@@ -39,6 +39,9 @@ class Data_Form_Function extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add elements
         $this->addElement('text', 'name', array(
             'label' => 'Function name:',

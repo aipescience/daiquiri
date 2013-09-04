@@ -28,10 +28,10 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         }
 
         $sql = "SELECT * FROM {$this->_formOptions['table']}";
-        $sql .= $this->_quoteInto(" WHERE `ra` >= ?", $this->getValue('cone_ramin'));
-        $sql .= $this->_quoteInto(" AND `ra` <= ?", $this->getValue('cone_ramax'));
-        $sql .= $this->_quoteInto(" AND `de` >= ?", $this->getValue('cone_demin'));
-        $sql .= $this->_quoteInto(" AND `de` <= ?", $this->getValue('cone_demax'));
+        $sql .= $this->_quoteInto(" WHERE `raj2000_deg` >= ?", $this->getValue('cone_ramin'));
+        $sql .= $this->_quoteInto(" AND `raj2000_deg` <= ?", $this->getValue('cone_ramax'));
+        $sql .= $this->_quoteInto(" AND `dej2000_deg` >= ?", $this->getValue('cone_demin'));
+        $sql .= $this->_quoteInto(" AND `dej2000_deg` <= ?", $this->getValue('cone_demax'));
 
         return $sql;
     }
@@ -44,10 +44,16 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         return $this->getValue('cone_queue');
     }
 
+    public function getCsrf() {
+        return $this->getElement('cone_csrf');
+    }
+
     public function init() {
+        $this->setAttrib('id', 'daiquiri-form-query-cone');
+        $this->setFormDecorators();
+        $this->addCsrfElement('cone_csrf');
 
-        $this->setAttrib('id', 'daiquiri-form-cone-query');
-
+        // add fields
         $this->addElement('text', 'cone_ramin', array(
             'filters' => array('StringTrim'),
             'required' => true,

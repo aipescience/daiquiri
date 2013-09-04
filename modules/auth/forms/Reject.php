@@ -20,23 +20,17 @@
  *  limitations under the License.
  */
 
-class Auth_Form_Apps extends Auth_Form_Abstract {
+class Auth_Form_Reject extends Daiquiri_Form_Abstract {
 
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
         
-        // add elements
-        $u = array();
-        $u[] = $this->addAppnameElement(true);
-        $u[] = $this->addNewPasswordElement(true);
-        $u[] = $this->addConfirmPasswordElement(true);
-
-        $this->addPrimaryButtonElement('submit', 'Create user status');
+        // add fields
+        $this->addDangerButtonElement('submit', 'Reject user');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup($u);
         $this->addActionGroup(array('submit', 'cancel'));
     }
 

@@ -23,6 +23,9 @@
 class Config_Form_DeleteEntries extends Daiquiri_Form_Abstract {
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add fields
         $this->addDangerButtonElement('submit', 'Delete config entry');
         $this->addButtonElement('cancel', 'Cancel');

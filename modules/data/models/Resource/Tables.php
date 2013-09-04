@@ -200,6 +200,9 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
     public function deleteTable($id) {
         // get the entry
         $entry = $this->fetchRow($id);
+        if (empty($entry)) {
+            throw new Exception('$id ' . $id . ' not found.');
+        }
 
         // delete columns of this table
         $resource = new Data_Model_Resource_Columns();

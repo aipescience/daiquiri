@@ -23,6 +23,9 @@
 class Contact_Form_Categories extends Daiquiri_Form_Abstract {
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
         // add elements
         $this->addElement('text', 'category', array(
             'label' => 'Category',

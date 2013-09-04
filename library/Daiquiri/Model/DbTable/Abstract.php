@@ -142,14 +142,17 @@ abstract class Daiquiri_Model_DbTable_Abstract extends Zend_Db_Table_Abstract {
         $select = new Daiquiri_Model_DbTable_Select($this);
 
         // set from
-        $cols = $this->getCols();
-
-        if (empty($sqloptions['from'])) {
-            $select->from($this, $cols);
-        } else {
-            $from = array_intersect($sqloptions['from'], $cols);
-            $select->from($this, $from);
+        $cols = $this->getCols($sqloptions);
+        if (!empty($sqloptions['from'])) {
+            $cols = array_intersect($sqloptions['from'], $cols);
         }
+        // escape expressions with round brackets since Zend will not 
+        foreach($cols as &$currCol) {
+            if (strpos($currCol, '(') !== false && strpos($currCol, ')') !== false) {
+                $currCol = $this->getAdapter()->quoteIdentifier($currCol);
+            }
+        }
+        $select->from($this, $cols);
 
         // set limit
         if (!empty($sqloptions['limit'])) {
