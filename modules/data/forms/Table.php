@@ -27,6 +27,7 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
     protected $_roles = array();
     protected $_entry = array();
     protected $_submit = null;
+    protected $_csrfActive = true;
 
     public function setDatabases($databases) {
         $this->_databases = $databases;
@@ -48,9 +49,15 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
         $this->_submit = $submit;
     }
 
+    public function setCsrfActive($csrfActive) {
+        $this->_csrfActive = $csrfActive;
+    }
+
     public function init() {
         $this->setFormDecorators();
-        $this->addCsrfElement();
+
+        if($this->_csrfActive === true)
+            $this->addCsrfElement();
         
         // add elements
         $this->addElement('select', 'database_id', array(

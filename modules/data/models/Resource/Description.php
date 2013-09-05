@@ -93,7 +93,8 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
                 'type' => $info['metadata'][$col]['DATA_TYPE'],
                 'unit' => $metadata['unit'],
                 'ucd' => $metadata['ucd'],
-                'description' => $metadata['description']
+                'description' => $metadata['description'],
+                'comment' => $info['metadata'][$col]['COLUMN_COMMENT']
             );
         }
 

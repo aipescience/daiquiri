@@ -150,7 +150,7 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
 
                         $t['autofill'] = $autofill;
 
-                        $tableModel->create($databaseId, $t, $tableDescription);
+                        $tableModel->create($databaseId, $t, $tableDescription, false);
                     }
                 } catch (Exception $e) {
                     $this->getResource()->deleteDatabase($databaseId);
