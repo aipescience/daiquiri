@@ -54,6 +54,18 @@ daiquiri.codemirror = {};
             });
         },
         /**
+         * Calls the refresh method of the underlying code mirror object.
+         */
+        daiquiri_codemirror_refresh: function() {
+            return this.each(function() {
+                var id = $(this).attr('id');
+                // check if table is already set
+                if (typeof daiquiri.codemirror.items[id] !== 'undefined') {
+                    daiquiri.codemirror.items[id].cm.refresh();
+                }
+            });
+        },
+        /**
          * Inserts the provides string at the position of the caret.
          */
         daiquiri_codemirror_insertAtCaret: function(string) {

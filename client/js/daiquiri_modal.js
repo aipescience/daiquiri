@@ -116,6 +116,12 @@ daiquiri.Modal.prototype.display = function () {
     if (typeof this.opt.success!== 'undefined') {
         this.opt.success();
     }
+
+    // refresh a possible code mirror textarea
+    this.dialog.on('shown', function () {
+        $('textarea', this.dialog).daiquiri_codemirror_refresh();
+    });
+
     this.dialog.modal();
 };
 
