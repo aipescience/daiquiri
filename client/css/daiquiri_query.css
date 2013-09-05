@@ -111,7 +111,7 @@
 }
 
 .daiquiri-samp-clients button {
-    margin-right: 10px;
+    margin-right: 10px !important;
 }
 
 .daiquiri-samp-clients img {

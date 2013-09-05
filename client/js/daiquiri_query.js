@@ -30,12 +30,14 @@ daiquiri.table.item = null;
 /**
  * Constructor-like function for the Query class. 
  */
-daiquiri.query.Query = function (baseUrl) {
+daiquiri.query.Query = function (siteUrl) {
     var self = this;
 
     // store object globally, kind of a poor mans singleton.
     daiquiri.query.item = this;
 
+    // get the baseUrl and the other urls
+    var baseUrl = '/' + siteUrl.split( '/' ).slice(3).join('/')
     this.url = {
         'jobs': baseUrl + '/query/index/list-jobs',
         'browser':baseUrl + '/query/index/database',
@@ -52,13 +54,9 @@ daiquiri.query.Query = function (baseUrl) {
             'base': baseUrl
         },
         'fileDownload': baseUrl + '/files/index/row',
-        'sampStream': baseUrl + '/query/index/stream',
+        'sampStream': siteUrl + '/query/index/stream',
         'baseUrl': baseUrl
     }
-
-    this.sampStream = {
-        'https': false
-    };
 
     this.job = {};
     this.jobs = {};
@@ -538,17 +536,17 @@ daiquiri.query.Query.prototype.displayResults = function(){
                         'class': 'daiquiri-samp-connect',
                     }).appendTo($('#results-tab'));
 
-                    $('#daiquiri-samp-connect').daiquiri_samp({
+                    var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
                         baseStream: self.url.sampStream,
-                        streamHttps: self.sampStream.https,
+                        streamHttps: false,
                         baseUrl: self.url.baseUrl
                     });
                 }
 
-                //setting SAMP options
-                $('#daiquiri-samp-connect').daiquiri_samp_setTable(self.job.table.value);
-                //$('#daiquiri-samp-connect').daiquiri_samp_setUser(self.job.username.value);
-                console.log(self.job);
+                // setting SAMP options
+                daiquiri.samp.item.table = self.job.table.value;
+                daiquiri.samp.item.username = self.job.username.value;
+
                 if (table.opt.select == true) {
                     var div = $('<div />', {
                         'class': 'daiquiri-query-file-download',

@@ -29,6 +29,7 @@ class Query_Model_CurrentJobs extends Daiquiri_Model_Abstract {
      */
     public function __construct() {
         $this->_userId = Daiquiri_Auth::getInstance()->getCurrentId();
+        $this->_username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
         $this->setResource(get_class($resource));
     }
@@ -59,6 +60,14 @@ class Query_Model_CurrentJobs extends Daiquiri_Model_Abstract {
                 'value' => $value
             );
         }
+
+        // add username
+        $data['username'] = array(
+            'key' => 'username',
+            'name' => 'Username',
+            'value' => $this->_username
+        );
+
         return $data;
     }
 
