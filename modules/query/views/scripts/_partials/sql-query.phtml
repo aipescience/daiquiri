@@ -49,7 +49,7 @@
 
     <p><?php echo $this->escape($this->formOptions['help']); ?></p>
     <?php echo $this->form; ?>
-    <?php if ($this->status === 'error' && array_key_exists("from", $this->errors)): ?>
+    <?php if ($this->status === 'error' && array_key_exists("form", $this->errors)): ?>
         <p class="text-error">An error has occured.</p>
         <ul class="text-error">
             <?php foreach ($this->errors['form'] as $error): ?>
