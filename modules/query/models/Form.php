@@ -99,7 +99,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                     return array(
                         'form' => $form,
                         'csrf' => $csrf->getHash(),
-                        'status' => 'form',
+                        'status' => 'error',
                         'errors' => $errors,
                         'formOptions' => $formOptions
                         );
@@ -127,7 +127,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                         return array(
                             'form' => $form,
                             'csrf' => $csrf->getHash(),
-                            'status' => 'form',
+                            'status' => 'error',
                             'errors' => $errors,
                             'formOptions' => $formOptions
                             );
@@ -173,7 +173,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             'form' => $form,
             'csrf' => $form->getCsrf()->getHash(),
             'status' => 'form',
-            'errors' => $errors,
+            'errors' => array(),
             'formOptions' => $formOptions
         );
     }
@@ -227,7 +227,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                             return array(
                                 'form' => $form,
                                 'csrf' => $csrf->getHash(),
-                                'status' => 'form',
+                                'status' => 'error',
                                 'errors' => $errors
                                 );
                         }
@@ -275,7 +275,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 return array(
                     'form' => $form,
                     'csrf' => $form->getElement('plan_csrf')->getHash(),
-                    'status' => 'form',
+                    'status' => 'error',
                     'errors' => $form->getErrors(),
                     'formOptions' => $formOptions
                 );
