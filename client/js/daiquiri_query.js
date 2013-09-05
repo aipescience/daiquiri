@@ -537,9 +537,7 @@ daiquiri.query.Query.prototype.displayResults = function(){
                     }).appendTo($('#results-tab'));
 
                     var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
-                        baseStream: self.url.sampStream,
-                        streamHttps: false,
-                        baseUrl: self.url.baseUrl
+                        baseStream: self.url.sampStream
                     });
                 }
 
