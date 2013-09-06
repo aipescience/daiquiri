@@ -85,7 +85,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
      * @param array $formParams
      * @return array
      */
-    public function create($databaseId = null, array $formParams = array(), array $tableDescription = array(), $csrfActive = true) {
+    public function create($databaseId = null, array $formParams = array(), array $tableDescription = array(), $calledFromScript = false) {
         // get databases model
         $databasesModel = new Data_Model_Databases();
 
@@ -98,7 +98,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                     'databaseId' => $databaseId,
                     'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
                     'submit' => 'Create table entry',
-                    'csrfActive' => $csrfActive
+                    'csrfActive' => !$calledFromScript
                 ));
 
         // valiadate the form if POST
@@ -143,7 +143,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                         $c['table'] = $table;
                         $c['database'] = $db;
 
-                        $columnModel->create($table_id, $c, array('tables' => $tables), false);
+                        $columnModel->create($table_id, $c, array('tables' => $tables), true);
                     }
                 } catch (Exception $e) {
                     $this->getResource()->deleteTable($table_id);

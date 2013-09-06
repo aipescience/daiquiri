@@ -47,7 +47,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
      * @param array $formParams
      * @return array
      */
-    public function create($tableId = null, array $formParams = array(), $cachedInfo = array(), $csrfActive = true) {
+    public function create($tableId = null, array $formParams = array(), $cachedInfo = array(), $calledFromScript = false) {
         // create the form object
         $tablesModel = new Data_Model_Tables();
 
@@ -59,7 +59,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                     'tables' => $cachedInfo['tables'],
                     'tableId' => $tableId,
                     'submit' => 'Create column entry',
-                    'csrfActive' => $csrfActive
+                    'csrfActive' => !$calledFromScript
                 ));
 
         $oldFormParams = $formParams;
@@ -76,14 +76,19 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
         }
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-
+        if (!empty($formParams) && ($calledFromScript === true || $form->isValid($formParams))) {
             // get the form values
-            $values = $form->getValues();
-            unset($values['ucd_list']);
+            if($calledFromScript === true) {
+                $values = $formParams;
+            } else {
+                $values = $form->getValues();
+            }
+
+            if(array_key_exists("ucd_list", $values))
+                unset($values['ucd_list']);
 
             //check if entry is already there (and if we are running in a scripted setting)
-            if ($csrfActive === true && $this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
+            if ($calledFromScript === false && $this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
                 throw new Exception("Column entry already exists.");
             }
 
