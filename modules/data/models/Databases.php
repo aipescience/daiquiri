@@ -152,7 +152,8 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
 
                         $t['autofill'] = $autofill;
 
-                        $tableModel->create($databaseId, $t, $tableDescription, true);
+                        //$tableModel->create($databaseId, $t, $tableDescription, true);
+                        $tableModel->commitToDB($t, $tableDescription);
                     }
                 } catch (Exception $e) {
                     $this->getResource()->deleteDatabase($databaseId);
