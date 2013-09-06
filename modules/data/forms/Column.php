@@ -26,6 +26,7 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
     protected $_table_id = null;
     protected $_entry = array();
     protected $_submit = null;
+    protected $_csrfActive = true;
 
     public function setTables($tables) {
         $this->_tables = $tables;
@@ -43,9 +44,15 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
         $this->_submit = $submit;
     }
 
+    public function setCsrfActive($csrfActive) {
+        $this->_csrfActive = $csrfActive;
+    }
+
     public function init() {
         $this->setFormDecorators();
-        $this->addCsrfElement();
+
+        if($this->_csrfActive === true)
+            $this->addCsrfElement();
         
         // add elements
         $this->addElement('select', 'table_id', array(
@@ -98,14 +105,16 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             )
         ));
 
-        //obtain UCD data and provide a usable form
-        $ucdResource = new Data_Model_Resource_UCD;
-        $ucdData = $ucdResource->getTable()->fetchAll()->toArray();
-
+        //obtain UCD data and provide a usable form (but only if called from a non scriptable context)
         $ucdStrings = array();
 
-        foreach ($ucdData as $ucd) {
-            $ucdStrings[$ucd['word']] = $ucd['word'] . " | " . $ucd['type'] . " | " . $ucd['description'];
+        if($this->_csrfActive === true) {
+            $ucdResource = new Data_Model_Resource_UCD;
+            $ucdData = $ucdResource->getTable()->fetchAll()->toArray();
+
+            foreach ($ucdData as $ucd) {
+                $ucdStrings[$ucd['word']] = $ucd['word'] . " | " . $ucd['type'] . " | " . $ucd['description'];
+            }
         }
 
         $this->addElement('select', 'ucd_list', array(

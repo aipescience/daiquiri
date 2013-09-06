@@ -47,14 +47,33 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
      * @param array $formParams
      * @return array
      */
-    public function create($tableId = null, array $formParams = array()) {
+    public function create($tableId = null, array $formParams = array(), $cachedInfo = array(), $csrfActive = true) {
         // create the form object
         $tablesModel = new Data_Model_Tables();
+
+        if(empty($cachedInfo)) {
+            $cachedInfo['tables'] = $tablesModel->getValues();
+        }
+
         $form = new Data_Form_Column(array(
-                    'tables' => $tablesModel->getValues(),
+                    'tables' => $cachedInfo['tables'],
                     'tableId' => $tableId,
-                    'submit' => 'Create column entry'
+                    'submit' => 'Create column entry',
+                    'csrfActive' => $csrfActive
                 ));
+
+        $oldFormParams = $formParams;
+        if(array_key_exists("comment", $formParams)) {
+            unset($formParams['comment']);
+        }
+
+        if(array_key_exists("database", $formParams)) {
+            unset($formParams['database']);
+        }
+
+        if(array_key_exists("table", $formParams)) {
+            unset($formParams['table']);
+        }
 
         // valiadate the form if POST
         if (!empty($formParams) && $form->isValid($formParams)) {
@@ -63,8 +82,8 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
             $values = $form->getValues();
             unset($values['ucd_list']);
 
-            //check if entry is already there
-            if ($this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
+            //check if entry is already there (and if we are running in a scripted setting)
+            if ($csrfActive === true && $this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
                 throw new Exception("Column entry already exists.");
             }
 
@@ -72,8 +91,18 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
             $this->getResource()->insertRow($values);
 
             if (Daiquiri_Config::getInstance()->data->writeToDB) {
-                $entry = $tablesModel->show($values['table_id']);
-                $this->_writeColumnComment($entry['database'], $entry['name'], $values['name'], $values);
+                if(array_key_exists("database", $oldFormParams)) {
+                    $entry = array("database" => $oldFormParams['database'],
+                                    "name" => $oldFormParams['name']);
+                } else {
+                    $entry = $tablesModel->show($values['table_id']);
+                }
+
+                if(array_key_exists("comment", $oldFormParams)) {
+                    $this->_writeColumnComment($entry['database'], $entry['name'], $values['name'], $values, $oldFormParams['comment']);
+                } else {
+                    $this->_writeColumnComment($entry['database'], $entry['name'], $values['name'], $values);
+                }
             }
 
             return array('status' => 'ok');
