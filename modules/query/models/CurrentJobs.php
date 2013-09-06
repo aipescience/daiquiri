@@ -129,17 +129,21 @@ class Query_Model_CurrentJobs extends Daiquiri_Model_Abstract {
                     throw new Daiquiri_Exception_AuthError();
                 } else {
                     $data = $form->getValues();
-                    $error = $this->getResource()->renameJob($id, $data['tablename']);
 
-                    //adding error to form error stack
-                    $form->getElement('tablename')->addError($error);
-                    if ($error !== 'ok') {
-                        return array(
-                            'status' => 'error',
-                            'errors' => $form->getMessages(),
-                            'form' => $form,
-                            'csrf' => $csrf->getHash()
-                            );
+                    // check if table was not renamed at all
+                    if($row['table'] !== $data['tablename']) {
+                        $error = $this->getResource()->renameJob($id, $data['tablename']);
+
+                        //adding error to form error stack
+                        $form->getElement('tablename')->addError($error);
+                        if ($error !== 'ok') {
+                            return array(
+                                'status' => 'error',
+                                'errors' => $form->getMessages(),
+                                'form' => $form,
+                                'csrf' => $csrf->getHash()
+                                );
+                        }
                     }
 
                     return array('status' => 'ok');
