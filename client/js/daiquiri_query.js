@@ -646,6 +646,7 @@ daiquiri.query.Query.prototype.submitDownload = function(form) {
             data: values,
             error: daiquiri.common.ajaxError,
             success: function(json) {
+                daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
                 self.initDownload(json);
             }
         });
@@ -709,11 +710,9 @@ daiquiri.query.Query.prototype.pollDownload = function(){
 daiquiri.query.Query.prototype.initDownload = function(json) {
     var self = this;
 
-    daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
-
     if (json.status == 'ok') {
         self.pendingDownload = null;
-        self.displayDownloadLink(json.link);
+        self.displayDownloadLink(json);
     } else if (json.status == 'pending') {
         if(self.pendingDownload == null) {
             self.pendingDownload = {
@@ -751,7 +750,7 @@ daiquiri.query.Query.prototype.createDownloadLink = function (link) {
     return html;
 }
 
-daiquiri.query.Query.prototype.displayDownloadLink = function(link) {
+daiquiri.query.Query.prototype.displayDownloadLink = function(json) {
     var self = this;
 
     // remove old download messages and links
@@ -761,12 +760,12 @@ daiquiri.query.Query.prototype.displayDownloadLink = function(link) {
     // create new space for download messages
     $('<div/>',{
         'id': 'daiquiri-query-download-link',
-        'html' : self.downloadLink(link)
+        'html' : self.createDownloadLink(json.link)
     }).appendTo(self.tabs.download);
 
     // overide the click on the renerate link
     $('#regenerate-download').click(function(){
-        self.regenerateDownload();
+        self.regenerateDownload(json.regenerateLink);
         return false;
     });
 };

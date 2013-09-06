@@ -117,7 +117,12 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
 
                 // get the form values
                 $values = $form->getValues();
-                $format = $values['format'];
+                $format = $values['download_format'];
+
+                // sanity check for format
+                if (!in_array($format, Daiquiri_Config::getInstance()->query->download->adapter->enabled->toArray())) {
+                    throw new Exception('Error: format not valid.');
+                }
 
                 // create link and file sysytem path for table dump
                 $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
