@@ -102,10 +102,13 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-
+        if (!empty($formParams) && ($calledFromScript === true || $form->isValid($formParams))) {
             // get the form values
-            $values = $form->getValues();
+            if($calledFromScript === true) {
+                $values = $formParams;
+            } else {
+                $values = $form->getValues();
+            }
 
             // get autofill flag
             $autofill = null;
@@ -143,7 +146,8 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                         $c['table'] = $table;
                         $c['database'] = $db;
 
-                        $columnModel->create($table_id, $c, array('tables' => $tables), true);
+                        //$columnModel->create($table_id, $c, array('tables' => $tables), true);
+                        $columnMode->commitToDB($c)
                     }
                 } catch (Exception $e) {
                     $this->getResource()->deleteTable($table_id);

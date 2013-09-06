@@ -47,68 +47,29 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
      * @param array $formParams
      * @return array
      */
-    public function create($tableId = null, array $formParams = array(), $cachedInfo = array(), $calledFromScript = false) {
+    public function create($tableId = null, array $formParams = array()) {
         // create the form object
         $tablesModel = new Data_Model_Tables();
 
-        if(empty($cachedInfo)) {
-            $cachedInfo['tables'] = $tablesModel->getValues();
-        }
-
         $form = new Data_Form_Column(array(
-                    'tables' => $cachedInfo['tables'],
+                    'tables' => $tablesModel->getValues(),
                     'tableId' => $tableId,
-                    'submit' => 'Create column entry',
-                    'csrfActive' => !$calledFromScript
+                    'submit' => 'Create column entry'
                 ));
 
-        $oldFormParams = $formParams;
-        if(array_key_exists("comment", $formParams)) {
-            unset($formParams['comment']);
-        }
-
-        if(array_key_exists("database", $formParams)) {
-            unset($formParams['database']);
-        }
-
-        if(array_key_exists("table", $formParams)) {
-            unset($formParams['table']);
-        }
-
         // valiadate the form if POST
-        if (!empty($formParams) && ($calledFromScript === true || $form->isValid($formParams))) {
-            // get the form values
-            if($calledFromScript === true) {
-                $values = $formParams;
-            } else {
-                $values = $form->getValues();
+        if (!empty($formParams) && $form->isValid($formParams)) {
+            $values = $form->getValues();
+
+            if(array_key_exists("ucd_list", $values)) {
+                unset($values['ucd_list']);
             }
 
-            if(array_key_exists("ucd_list", $values))
-                unset($values['ucd_list']);
-
-            //check if entry is already there (and if we are running in a scripted setting)
-            if ($calledFromScript === false && $this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
+            if ($this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
                 throw new Exception("Column entry already exists.");
             }
 
-            // store the values in the database
-            $this->getResource()->insertRow($values);
-
-            if (Daiquiri_Config::getInstance()->data->writeToDB) {
-                if(array_key_exists("database", $oldFormParams)) {
-                    $entry = array("database" => $oldFormParams['database'],
-                                    "name" => $oldFormParams['name']);
-                } else {
-                    $entry = $tablesModel->show($values['table_id']);
-                }
-
-                if(array_key_exists("comment", $oldFormParams)) {
-                    $this->_writeColumnComment($entry['database'], $entry['name'], $values['name'], $values, $oldFormParams['comment']);
-                } else {
-                    $this->_writeColumnComment($entry['database'], $entry['name'], $values['name'], $values);
-                }
-            }
+            $this->commitToDB($values);
 
             return array('status' => 'ok');
         }
@@ -164,6 +125,41 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
         }
 
         return array('form' => $form, 'status' => 'form');
+    }
+
+    public function commitToDB(array $values = array()) {
+        $cache = $values;
+
+        if(array_key_exists("comment", $values)) {
+            unset($values['comment']);
+        }
+
+        if(array_key_exists("database", $values)) {
+            unset($values['database']);
+        }
+
+        if(array_key_exists("table", $values)) {
+            unset($values['table']);
+        }
+
+        // store the values in the database
+        $this->getResource()->insertRow($values);
+
+        if (Daiquiri_Config::getInstance()->data->writeToDB) {
+            if(array_key_exists("database", $cache)) {
+                $tableData = array("database" => $cache['database'],
+                                "name" => $cache['name']);
+            } else {
+                $tablesModel = new Data_Model_Tables();
+                $tableData = $tablesModel->show($values['table_id']);
+            }
+
+            if(array_key_exists("comment", $cache)) {
+                $this->_writeColumnComment($tableData['database'], $tableData['name'], $values['name'], $values, $cache['comment']);
+            } else {
+                $this->_writeColumnComment($tableData['database'], $tableData['name'], $values['name'], $values);
+            }
+        }
     }
 
     private function _writeColumnComment($db, $table, $column, $values, $oldComment = false) {
