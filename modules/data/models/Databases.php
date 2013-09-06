@@ -138,7 +138,9 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
                 // auto create entries for all tables
                 try {
                     foreach ($descResource->fetchTables($values['name']) as $table) {
+
                         $t = $descResource->describeTable($values['name'], $table);
+
                         $tableDescription = $t;
                         $t['database_id'] = $databaseId;
                         $t['publication_role_id'] = $values['publication_role_id'];
@@ -150,7 +152,7 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
 
                         $t['autofill'] = $autofill;
 
-                        $tableModel->create($databaseId, $t, $tableDescription, false);
+                        $tableModel->create($databaseId, $t, $tableDescription, true);
                     }
                 } catch (Exception $e) {
                     $this->getResource()->deleteDatabase($databaseId);
