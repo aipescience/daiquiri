@@ -148,7 +148,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
         if (Daiquiri_Config::getInstance()->data->writeToDB) {
             if(array_key_exists("database", $cache)) {
                 $tableData = array("database" => $cache['database'],
-                                "name" => $cache['name']);
+                                "name" => $cache['table']);
             } else {
                 $tablesModel = new Data_Model_Tables();
                 $tableData = $tablesModel->show($values['table_id']);

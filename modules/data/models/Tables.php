@@ -103,57 +103,14 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
 
         // valiadate the form if POST
         if (!empty($formParams) && ($calledFromScript === true || $form->isValid($formParams))) {
-            // get the form values
-            if($calledFromScript === true) {
-                $values = $formParams;
-            } else {
-                $values = $form->getValues();
-            }
-
-            // get autofill flag
-            $autofill = null;
-            if (array_key_exists('autofill', $values)) {
-                $autofill = $values['autofill'];
-                unset($values['autofill']);
-            }
-
             //check if entry is already there
             if ($this->getResource()->fetchIdWithName($values['database_id'], $values['name']) !== false) {
                 throw new Exception("Table entry already exists.");
             }
 
-            // store the values in the database
-            $table_id = $this->getResource()->insertRow($values);
+            $values = $form->getValues();
 
-            if ($autofill) {
-                // get the additional resources
-                $descResource = new Data_Model_Resource_Description();
-                $columnModel = new Data_Model_Columns();
-
-                // auto create entries for all columns
-                $db = $databasesModel->getValue($values['database_id']);
-                $table = $values['name'];
-
-                try {
-                    if(empty($tableDescription)) {
-                        $tableDescription = $descResource->describeTable($db, $table);
-                    }
-
-                    $tables = $this->getValues();
-
-                    foreach ($tableDescription['columns'] as $c) {
-                        $c['table_id'] = $table_id;
-                        $c['table'] = $table;
-                        $c['database'] = $db;
-
-                        //$columnModel->create($table_id, $c, array('tables' => $tables), true);
-                        $columnMode->commitToDB($c)
-                    }
-                } catch (Exception $e) {
-                    $this->getResource()->deleteTable($table_id);
-                    throw $e;
-                }
-            }
+            $this->commitToDB($values);
 
             return array('status' => 'ok');
         }
@@ -209,4 +166,42 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
         return array('form' => $form, 'status' => 'form');
     }
 
+    public function commitToDB(array $values = array(), array $tableDescription = array()) {
+        // get autofill flag
+        $autofill = null;
+        if (array_key_exists('autofill', $values)) {
+            $autofill = $values['autofill'];
+            unset($values['autofill']);
+        }
+
+        // store the values in the database
+        $table_id = $this->getResource()->insertRow($values);
+
+        if ($autofill) {
+            // get the additional resources
+            $descResource = new Data_Model_Resource_Description();
+            $columnModel = new Data_Model_Columns();
+
+            // auto create entries for all columns
+            $db = $databasesModel->getValue($values['database_id']);
+            $table = $values['name'];
+
+            try {
+                if(empty($tableDescription)) {
+                    $tableDescription = $descResource->describeTable($db, $table);
+                }
+
+                foreach ($tableDescription['columns'] as $c) {
+                    $c['table_id'] = $table_id;
+                    $c['table'] = $table;
+                    $c['database'] = $db;
+
+                    $columnModel->commitToDB($c);
+                }
+            } catch (Exception $e) {
+                $this->getResource()->deleteTable($table_id);
+                throw $e;
+            }
+        }        
+    }
 }
