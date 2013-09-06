@@ -127,6 +127,16 @@ add_action('wp_authenticate', 'daiquiri_authenticate', 1, 2);
 function daiquiri_authenticate($username, $password) {
     require_once('./wp-includes/registration.php');
 
+    var_dump(is_user_logged_in());
+
+    if (!is_user_logged_in()) {
+        if ($_GET["no_redirect"] !== 'true') {
+            $daiquiriLogin = get_option('daiquiri_url') . 'auth/login';
+            wp_redirect($daiquiriLogin);
+            exit;
+        }
+    }
+
     if (!empty($username) && !empty($password)) {
         $c = 'mysql:';
         $c .= 'host=' . get_option('daiquiri_db_host') . ';';

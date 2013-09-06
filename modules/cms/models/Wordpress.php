@@ -27,7 +27,7 @@ class Cms_Model_Wordpress extends Daiquiri_Model_Abstract {
 
     public function login($username, $password) {
         // make POST request to wordpress
-        $uri = Daiquiri_Config::getInstance()->getSiteUrl() . Daiquiri_Config::getInstance()->cms->url . '/wp-login.php';
+        $uri = Daiquiri_Config::getInstance()->getSiteUrl() . Daiquiri_Config::getInstance()->cms->url . '/wp-login.php?no_redirect=true';
         $client = new Zend_Http_Client($uri, array('maxredirects' => 0));
         $client->setMethod('POST');
         $client->setEncType('application/x-www-form-urlencoded');
