@@ -119,7 +119,7 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                 $values = $form->getValues();
                 $format = $values['download_format'];
 
-                $response = $this->_download($table, $format);
+                $response = $this->_createDownloadFile($table, $format);
                 $response['csrf'] = $csrf->getHash();
                 return $response;
             } else {
@@ -171,10 +171,10 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
         }
 
         // now resubmit the download request (without csrf)
-        return $this->_download($table, $format);
+        return $this->_createDownloadFile($table, $format);
     }
 
-    public function _download($table, $format) {
+    private function _createDownloadFile($table, $format) {
         // sanity check for format
         if (!in_array($format, Daiquiri_Config::getInstance()->query->download->adapter->enabled->toArray())) {
             throw new Exception('Error: format not valid.');
