@@ -117,7 +117,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             $rules['user']['Query_Model_Form'] = array('submit');
             $rules['user']['Query_Model_CurrentJobs'] =
                     array('index', 'show', 'kill', 'remove', 'rename');
-            $rules['user']['Query_Model_Database'] = array('show', 'download', 'file');
+            $rules['user']['Query_Model_Database'] = array('show', 'download', 'file', 'stream', 'regen');
 
             $rules['guest'][$options['database']['user']['dbname'] . '.*'] =
                     array('select', 'set', 'drop', 'create', 'alter', 'show tables');

@@ -322,6 +322,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
             $field = new Zend_Form_Element_Hash($identifier, array(
                 'class' => 'daiquiri-csrf',
                 'ignore' => true,
+                'timeout' => 1000000,
                 'salt' => str_replace('_','',get_called_class()),
                 'decorators' => array('ViewHelper')
                 ));

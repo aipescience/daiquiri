@@ -30,12 +30,14 @@ daiquiri.table.item = null;
 /**
  * Constructor-like function for the Query class. 
  */
-daiquiri.query.Query = function (baseUrl) {
+daiquiri.query.Query = function (siteUrl) {
     var self = this;
 
     // store object globally, kind of a poor mans singleton.
     daiquiri.query.item = this;
 
+    // get the baseUrl and the other urls
+    var baseUrl = '/' + siteUrl.split( '/' ).slice(3).join('/')
     this.url = {
         'jobs': baseUrl + '/query/index/list-jobs',
         'browser':baseUrl + '/query/index/database',
@@ -51,7 +53,9 @@ daiquiri.query.Query = function (baseUrl) {
             'rows': baseUrl + '/data/viewer/rows',
             'base': baseUrl
         },
-        'fileDownload': baseUrl + '/files/index/row'
+        'fileDownload': baseUrl + '/files/index/row',
+        'sampStream': siteUrl + '/query/index/stream',
+        'baseUrl': baseUrl
     }
 
     this.job = {};
@@ -365,6 +369,7 @@ daiquiri.query.Query.prototype.displayJobs = function(){
                 } else {
                     html += '<li class="nav-item">';
                 }
+
                 html += '<a href="#job-' + value.id + '">';
                 html += '<span>' + value.table + '</span>';
                 html += self.createStatusIcon(value.status);
@@ -524,6 +529,22 @@ daiquiri.query.Query.prototype.displayResults = function(){
             'baseurl': self.url.results.base,
             'width': '700px',
             'success': function (table) {
+
+                if ($('#daiquiri-samp-connect').length == 0) {
+                    var div = $('<div />', {
+                        'id': 'daiquiri-samp-connect',
+                        'class': 'daiquiri-samp-connect',
+                    }).appendTo($('#results-tab'));
+
+                    var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
+                        baseStream: self.url.sampStream
+                    });
+                }
+
+                // setting SAMP options
+                daiquiri.samp.item.table = self.job.table.value;
+                daiquiri.samp.item.username = self.job.username.value;
+
                 if (table.opt.select == true) {
                     var div = $('<div />', {
                         'class': 'daiquiri-query-file-download',
@@ -592,7 +613,7 @@ daiquiri.query.Query.prototype.displayDownload = function(){
             },
             error: daiquiri.common.ajaxError,
             success: function (html) {
-                console.log('new form');
+
                 var div = $('<div/>',{
                     'html' : html
                 }).appendTo(self.tabs.download);
@@ -625,6 +646,7 @@ daiquiri.query.Query.prototype.submitDownload = function(form) {
             data: values,
             error: daiquiri.common.ajaxError,
             success: function(json) {
+                daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
                 self.initDownload(json);
             }
         });
@@ -688,11 +710,9 @@ daiquiri.query.Query.prototype.pollDownload = function(){
 daiquiri.query.Query.prototype.initDownload = function(json) {
     var self = this;
 
-    daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
-
     if (json.status == 'ok') {
         self.pendingDownload = null;
-        self.displayDownloadLink(json.link);
+        self.displayDownloadLink(json);
     } else if (json.status == 'pending') {
         if(self.pendingDownload == null) {
             self.pendingDownload = {
@@ -730,7 +750,7 @@ daiquiri.query.Query.prototype.createDownloadLink = function (link) {
     return html;
 }
 
-daiquiri.query.Query.prototype.displayDownloadLink = function(link) {
+daiquiri.query.Query.prototype.displayDownloadLink = function(json) {
     var self = this;
 
     // remove old download messages and links
@@ -740,12 +760,12 @@ daiquiri.query.Query.prototype.displayDownloadLink = function(link) {
     // create new space for download messages
     $('<div/>',{
         'id': 'daiquiri-query-download-link',
-        'html' : self.downloadLink(link)
+        'html' : self.createDownloadLink(json.link)
     }).appendTo(self.tabs.download);
 
     // overide the click on the renerate link
     $('#regenerate-download').click(function(){
-        self.regenerateDownload();
+        self.regenerateDownload(json.regenerateLink);
         return false;
     });
 };

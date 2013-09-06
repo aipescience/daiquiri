@@ -106,3 +106,15 @@
 .CodeMirror-linenumber {
     color: #333;
 }
+.daiquiri-samp-clients td {
+    margin-right: 20px;
+}
+
+.daiquiri-samp-clients button {
+    margin-right: 10px !important;
+}
+
+.daiquiri-samp-clients img {
+    width: 20px;
+    height: 20px;
+}

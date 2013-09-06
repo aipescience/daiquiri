@@ -51,9 +51,10 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
     public function init() {
         $this->setFormDecorators();
 
-        if($this->_csrfActive === true)
+        if($this->_csrfActive === true) {
             $this->addCsrfElement();
-        
+        }
+
         // add elements
         $this->addElement('select', 'table_id', array(
             'label' => 'Table:',
