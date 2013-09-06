@@ -85,7 +85,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
      * @param array $formParams
      * @return array
      */
-    public function create($databaseId = null, array $formParams = array(), array $tableDescription = array(), $calledFromScript = false) {
+    public function create($databaseId = null, array $formParams = array(), array $tableDescription = array()) {
         // get databases model
         $databasesModel = new Data_Model_Databases();
 
@@ -97,12 +97,11 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                     'databases' => $databasesModel->getValues(),
                     'databaseId' => $databaseId,
                     'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
-                    'submit' => 'Create table entry',
-                    'csrfActive' => !$calledFromScript
+                    'submit' => 'Create table entry'
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && ($calledFromScript === true || $form->isValid($formParams))) {
+        if (!empty($formParams) && $form->isValid($formParams)) {
             //check if entry is already there
             if ($this->getResource()->fetchIdWithName($values['database_id'], $values['name']) !== false) {
                 throw new Exception("Table entry already exists.");
@@ -183,6 +182,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
             $columnModel = new Data_Model_Columns();
 
             // auto create entries for all columns
+            $databasesModel = new Data_Model_Databases();
             $db = $databasesModel->getValue($values['database_id']);
             $table = $values['name'];
 
