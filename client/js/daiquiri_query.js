@@ -802,7 +802,7 @@ daiquiri.query.Query.prototype.removeJob = function () {
     var modal = new daiquiri.Modal({
         'url': self.url.remove + '?id=' + self.job.id.value,
         'success': function () {
-            $('input[type=submit]','form','.daiquiri-modal').click(function () {
+            $('#submit','form','.daiquiri-modal').click(function () {
                 if ($(this).attr('name') == 'submit') {
                     var form = $('form','.daiquiri-modal');
                     var action = form.attr('action');
@@ -858,7 +858,7 @@ daiquiri.query.Query.prototype.killJob = function () {
     var modal = new daiquiri.Modal({
         'url': self.url.kill + '?id=' + self.job.id.value,
         'success': function () {
-            $('input[type=submit]','form','.daiquiri-modal').click(function () {
+            $('#submit','form','.daiquiri-modal').click(function () {
                 if ($(this).attr('name') == 'submit') {
                     var form = $('form','.daiquiri-modal');
                     var action = form.attr('action');
@@ -915,7 +915,7 @@ daiquiri.query.Query.prototype.renameJob = function () {
         'url': self.url.rename + '?id=' + self.job.id.value,
         'width': 700,
         'success': function () {
-            $('input[type=submit]','form','.daiquiri-modal').click(function () {
+            $('#submit','form','.daiquiri-modal').click(function () {
                 if ($(this).attr('name') == 'submit') {
                     var form = $('form','.daiquiri-modal');
                     var action = form.attr('action');
