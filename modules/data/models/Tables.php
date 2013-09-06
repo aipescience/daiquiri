@@ -102,12 +102,12 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
 
         // valiadate the form if POST
         if (!empty($formParams) && $form->isValid($formParams)) {
+            $values = $form->getValues();
+
             //check if entry is already there
             if ($this->getResource()->fetchIdWithName($values['database_id'], $values['name']) !== false) {
                 throw new Exception("Table entry already exists.");
             }
-
-            $values = $form->getValues();
 
             $this->commitToDB($values);
 
