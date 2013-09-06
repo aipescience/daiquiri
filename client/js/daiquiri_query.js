@@ -613,7 +613,7 @@ daiquiri.query.Query.prototype.displayDownload = function(){
             },
             error: daiquiri.common.ajaxError,
             success: function (html) {
-                console.log('new form');
+
                 var div = $('<div/>',{
                     'html' : html
                 }).appendTo(self.tabs.download);

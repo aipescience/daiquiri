@@ -119,164 +119,9 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
                 $values = $form->getValues();
                 $format = $values['download_format'];
 
-                // sanity check for format
-                if (!in_array($format, Daiquiri_Config::getInstance()->query->download->adapter->enabled->toArray())) {
-                    throw new Exception('Error: format not valid.');
-                }
-
-                // create link and file sysytem path for table dump
-                $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-                $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
-                $filename = $table . $suffix;
-                $url = '/query/index/file?table=' . $table . '&format=' . $format;
-                $regenUrl = '/query/index/regen?table=' . $table . '&format=' . $format;
-                $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
-                $file = $dir . DIRECTORY_SEPARATOR . $filename;
-
-                //get queue type and validate
-                $queueType = strtolower(Daiquiri_Config::getInstance()->query->download->queue->type);
-                if ($queueType !== "simple" and $queueType !== "gearman") {
-                    throw new Exception('Download queue type not valid');
-                }
-
-                // create dir if neccessary
-                if (!is_dir($dir)) {
-                    if (mkdir($dir) === false) {
-                        return array(
-                            'status' => 'error', 
-                            'errors' => array(
-                                'form' => 'Configuration of download setup wrong'
-                                ),
-                            'form' => $form,
-                            'csrf' => $csrf->getHash(), 
-                        );
-                    }
-
-                    chmod($dir, 0775);
-                }
-
-                if (!file_exists($file) && ($queueType === "simple" || empty($queueType))) {
-                    //get the user db name
-                    $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-                    $db = Daiquiri_Config::getInstance()->getUserDbName($username);
-
-                    // get the resource and create dump
-                    $resource = new Data_Model_Resource_Viewer();
-                    $resource->init($db, $table);
-                    try {
-                        $resource->dumpTable($format, $file);
-                    } catch (Exception $e) {
-                        return array(
-                            'status' => 'error',
-                            'errors' => array(
-                                'form' => $e->getMessage()
-                                ),
-                            'form' => $form,
-                            'csrf' => $csrf->getHash(), 
-                        );
-                    }
-                }
-
-                if ((!file_exists($file) || file_exists($file . ".lock")) && $queueType === "gearman") {
-                    //check if GearmanManager is up and running
-                    if (!file_exists(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid)) {
-                        //check if we have write access to actually create this PID file
-                        if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid))) {
-                            return array(
-                                'status' => 'error',
-                                'errors' => array(
-                                    'form' => 'Cannot write to the gearman PID file location'
-                                    ),
-                                'form' => $form,
-                                'csrf' => $csrf->getHash(), 
-                                );
-                        }
-
-                        $gearmanConf = Daiquiri_Config::getInstance()->query->download->queue->gearman;
-
-                        //not there, start GearmanManager
-                        $cmd = escapeshellcmd($gearmanConf->manager) .
-                                ' -d' .
-                                ' -D ' . escapeshellcmd($gearmanConf->numThread) .
-                                ' -h ' . escapeshellcmd($gearmanConf->host) . ':' . escapeshellcmd($gearmanConf->port) .
-                                ' -P ' . escapeshellcmd($gearmanConf->pid) .
-                                ' -w ' . escapeshellcmd($gearmanConf->workerDir) .
-                                ' -r 1 > /tmp/Daiquiri_GearmanManager.log &';
-
-                        shell_exec($cmd);
-                        // DOES NOT WORK IN NEWER PHP, NEED TO BE FIXED 
-                        // http://stackoverflow.com/questions/12322811/call-time-pass-by-reference-has-been-removed
-                        //check if pid exists, if not, an error occured - wait for 10 seconds to start gearman manager
-                        $count = 0;
-                        while (!file_exists($gearmanConf->pid)) {
-                            $count += 1;
-                            sleep(1);
-
-                            if ($count > 10) {
-                                throw new Exception('Error: Could not start GearmanManager.');
-                            }
-                        }
-                    }
-
-                    //check if lockfile is present and if not, create
-                    if (!file_exists($file . ".lock")) {
-                        if (file_exists($file . ".err")) {
-                            return array(
-                                'status' => 'error',
-                                'errors' => array(
-                                    'form' => 'An error occured.'
-                                    ),
-                                'form' => $form,
-                                'csrf' => $csrf->getHash(), 
-                                );
-                        }
-
-                        //write lock file
-                        touch($file . ".lock");
-
-                        //get the user db name
-                        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-                        $db = Daiquiri_Config::getInstance()->getUserDbName($username);
-
-                        // get the resource and create dump
-                        $resource = new Data_Model_Resource_Viewer();
-                        $resource->init($db, $table);
-
-                        try {
-                            $resource->dumpTableGearman($format, $file);
-                        } catch (Exception $e) {
-                            unlink($file . ".lock");
-                            return array(
-                            'status' => 'error',
-                            'errors' => array(
-                                'form' => $e->getMessage()
-                                ),
-                            'form' => $form,
-                            'csrf' => $csrf->getHash(), 
-                            );
-                        }
-
-                        return array(
-                            'status' => 'pending',
-                            'form' => $form,
-                            'csrf' => $csrf->getHash(), 
-                        );
-                    } else {
-                        return array(
-                            'status' => 'pending',
-                            'form' => $form,
-                            'csrf' => $csrf->getHash(), 
-                        );
-                    }
-                }
-
-                return array('status' => 'ok',
-                    'link' => Daiquiri_Config::getInstance()->getSiteUrl() . $url,
-                    'regenerateLink' => Daiquiri_Config::getInstance()->getSiteUrl() . $regenUrl,
-                    'form' => $form,
-                    'csrf' => $csrf->getHash(), 
-                    );
-
+                $response = $this->_download($table, $format);
+                $response['csrf'] = $csrf->getHash();
+                return $response;
             } else {
                 return array(
                     'form' => $form,
@@ -293,6 +138,173 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
             'errors' => $errors,
             'status' => 'form',
         );
+    }
+
+    public function regen($table, $format) {
+        if (empty($format) || empty($table)) {
+            throw new Daiquiri_Exception_AuthError();
+        }
+
+        // create link and file sysytem path for table dump
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
+        $compress = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->compress;
+        $filename = $table . $suffix;
+        $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
+        $file = $dir . DIRECTORY_SEPARATOR . $filename;
+
+        //security
+        if (!is_dir($dir)) {
+            throw new Daiquiri_Exception_AuthError();
+        }
+        if (file_exists($file . ".lock")) {
+            throw new Daiquiri_Exception_AuthError();
+        }
+
+        //delete the files...
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        if (file_exists($file . ".err")) {
+            unlink($file . ".err");
+        }
+
+        // now resubmit the download request (without csrf)
+        return $this->_download($table, $format);
+    }
+
+    public function _download($table, $format) {
+        // sanity check for format
+        if (!in_array($format, Daiquiri_Config::getInstance()->query->download->adapter->enabled->toArray())) {
+            throw new Exception('Error: format not valid.');
+        }
+
+        // create link and file sysytem path for table dump
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
+        $filename = $table . $suffix;
+        $url = '/query/index/file?table=' . $table . '&format=' . $format;
+        $regenUrl = '/query/index/regen?table=' . $table . '&format=' . $format;
+        $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
+        $file = $dir . DIRECTORY_SEPARATOR . $filename;
+
+        //get queue type and validate
+        $queueType = strtolower(Daiquiri_Config::getInstance()->query->download->queue->type);
+        if ($queueType !== "simple" and $queueType !== "gearman") {
+            throw new Exception('Download queue type not valid');
+        }
+
+        // create dir if neccessary
+        if (!is_dir($dir)) {
+            if (mkdir($dir) === false) {
+                return array(
+                    'status' => 'error', 
+                    'errors' => array(
+                        'form' => 'Configuration of download setup wrong'
+                        ));
+            }
+
+            chmod($dir, 0775);
+        }
+
+        if (!file_exists($file) && ($queueType === "simple" || empty($queueType))) {
+            //get the user db name
+            $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+            $db = Daiquiri_Config::getInstance()->getUserDbName($username);
+
+            // get the resource and create dump
+            $resource = new Data_Model_Resource_Viewer();
+            $resource->init($db, $table);
+            try {
+                $resource->dumpTable($format, $file);
+            } catch (Exception $e) {
+                return array(
+                    'status' => 'error',
+                    'errors' => array('form' => $e->getMessage()));
+            }
+        }
+
+        if ((!file_exists($file) || file_exists($file . ".lock")) && $queueType === "gearman") {
+            //check if GearmanManager is up and running
+            if (!file_exists(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid)) {
+                //check if we have write access to actually create this PID file
+                if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid))) {
+                    return array(
+                        'status' => 'error',
+                        'errors' => array(
+                            'form' => 'Cannot write to the gearman PID file location'
+                            ));
+                }
+
+                $gearmanConf = Daiquiri_Config::getInstance()->query->download->queue->gearman;
+
+                //not there, start GearmanManager
+                $cmd = escapeshellcmd($gearmanConf->manager) .
+                        ' -d' .
+                        ' -D ' . escapeshellcmd($gearmanConf->numThread) .
+                        ' -h ' . escapeshellcmd($gearmanConf->host) . ':' . escapeshellcmd($gearmanConf->port) .
+                        ' -P ' . escapeshellcmd($gearmanConf->pid) .
+                        ' -w ' . escapeshellcmd($gearmanConf->workerDir) .
+                        ' -r 1 > /tmp/Daiquiri_GearmanManager.log &';
+
+                shell_exec($cmd);
+                // DOES NOT WORK IN NEWER PHP, NEED TO BE FIXED 
+                // http://stackoverflow.com/questions/12322811/call-time-pass-by-reference-has-been-removed
+                //check if pid exists, if not, an error occured - wait for 10 seconds to start gearman manager
+                $count = 0;
+                while (!file_exists($gearmanConf->pid)) {
+                    $count += 1;
+                    sleep(1);
+
+                    if ($count > 10) {
+                        throw new Exception('Error: Could not start GearmanManager.');
+                    }
+                }
+            }
+
+            //check if lockfile is present and if not, create
+            if (!file_exists($file . ".lock")) {
+                if (file_exists($file . ".err")) {
+                    return array(
+                        'status' => 'error',
+                        'errors' => array(
+                            'form' => 'An error occured.'
+                            ));
+                }
+
+                //write lock file
+                touch($file . ".lock");
+
+                //get the user db name
+                $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+                $db = Daiquiri_Config::getInstance()->getUserDbName($username);
+
+                // get the resource and create dump
+                $resource = new Data_Model_Resource_Viewer();
+                $resource->init($db, $table);
+
+                try {
+                    $resource->dumpTableGearman($format, $file);
+                } catch (Exception $e) {
+                    unlink($file . ".lock");
+                    return array(
+                    'status' => 'error',
+                    'errors' => array(
+                        'form' => $e->getMessage()
+                        ));
+                }
+
+                return array('status' => 'pending');
+            } else {
+                return array('status' => 'pending',);
+            }
+        }
+
+        return array('status' => 'ok',
+            'link' => Daiquiri_Config::getInstance()->getSiteUrl() . $url,
+            'regenerateLink' => Daiquiri_Config::getInstance()->getSiteUrl() . $regenUrl
+            );
     }
 
     public function stream($table, $format) {
@@ -423,40 +435,6 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
         $mime = $finfo->file($file, FILEINFO_MIME);
 
         return array('file' => $file, 'filename' => $filename, 'mime' => $mime, 'compress' => $compress, 'status' => 'ok');
-    }
-
-    public function regen($table, $format) {
-        if (empty($format) || empty($table)) {
-            throw new Daiquiri_Exception_AuthError();
-        }
-
-        // create link and file sysytem path for table dump
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
-        $compress = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->compress;
-        $filename = $table . $suffix;
-        $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
-        $file = $dir . DIRECTORY_SEPARATOR . $filename;
-
-        //security
-        if (!is_dir($dir)) {
-            throw new Daiquiri_Exception_AuthError();
-        }
-        if (file_exists($file . ".lock")) {
-            throw new Daiquiri_Exception_AuthError();
-        }
-
-        //delete the files...
-        if (file_exists($file)) {
-            unlink($file);
-        }
-
-        if (file_exists($file . ".err")) {
-            unlink($file . ".err");
-        }
-
-        //now resubmit the download request
-        return $this->download($table, array("format" => $format, "table" => $table));
     }
 
 }

@@ -23,6 +23,7 @@
 class Query_Form_Download extends Daiquiri_Form_Abstract {
 
     protected $_formats;
+    protected $_csrfActive = true;
 
     public function setFormats(array $formats) {
         $this->_formats = $formats;
@@ -35,7 +36,7 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement('download_csrf');
-        
+
         $this->addElement('select', 'download_format', array(
             'required' => true,
             'label' => 'Select format:',
@@ -48,5 +49,4 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
         $this->addHorizontalGroup(array('download_format'));
         $this->addActionGroup(array('download_submit'));
     }
-
 }
