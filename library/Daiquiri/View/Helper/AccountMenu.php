@@ -28,30 +28,35 @@ class Daiquiri_View_Helper_AccountMenu extends Zend_View_Helper_Abstract {
         $this->view = $view;
     }
 
-    public function accountMenu() {
+    public function accountMenu($listOnly = true) {
+        $html = '';
         if (Daiquiri_Auth::getInstance()->checkAcl('Auth_Model_User', 'edit')
                 || Daiquiri_Auth::getInstance()->checkAcl('Auth_Model_Password', 'change')) {
-            echo '<li class="dropdown">';
-            echo '<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Account</a>';
-            echo '<ul class = "dropdown-menu">';
-            echo $this->view->internalLink(array(
+            if ($listOnly === true) {
+                $html .= '<li class="dropdown">';
+                $html .= '<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Account</a>';
+                $html .= '<ul class = "dropdown-menu">';
+            }
+            $html .= $this->view->internalLink(array(
                 'href' => '/auth/user/edit',
                 'text' => 'Edit User',
                 'resource' => 'Auth_Model_User',
                 'permission' => 'edit',
-                'prepend' => '<li>',
+                'prepend' => '<li class="nav-item">',
                 'append' => '</li>'));
-            echo $this->view->internalLink(array(
+            $html .= $this->view->internalLink(array(
                 'href' => '/auth/password/change',
                 'text' => 'Change Password',
                 'resource' => 'Auth_Model_Password',
                 'permission' => 'change',
-                'prepend' => '<li>',
+                'prepend' => '<li class="nav-item">',
                 'append' => '</li>'));
-            echo '</ul></li>';
-        } else {
-            return '';
+            if ($listOnly === true) {
+                $html .= '</ul></li>';
+            }
         }
+            
+        return $html;
     }
 
 }

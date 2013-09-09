@@ -266,14 +266,14 @@ function daiquiri_hide_end() {
 }
 
 /*
- * 
+ * Log out of daiquiri when logging out of wordpress.
  */
 
 add_action('wp_logout', 'daiquiri_logout');
 
 function daiquiri_logout() {
     require_once('HTTP/Request2.php');
-    $req = new HTTP_Request2(get_option('daiquiri_url') . '/auth/login/logout/cms/false');
+    $req = new HTTP_Request2(get_option('daiquiri_url') . '/auth/login/logout?cms_logout=false');
     $req->setMethod('GET');
     $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
     $response = $req->send();

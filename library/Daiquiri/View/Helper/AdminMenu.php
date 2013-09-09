@@ -28,16 +28,21 @@ class Daiquiri_View_Helper_AdminMenu extends Zend_View_Helper_Abstract {
         $this->view = $view;
     }
 
-    public function adminMenu() {
-        if (!Daiquiri_Auth::getInstance()->checkAcl('Auth_Model_User', 'rows')) {
-            return '';
-        } else {
-            echo '<li class="dropdown">';
-            echo '<a class="dropdown-toggle" data-toggle="dropdown" href="#">Admin</a>';
-            echo '<ul class = "dropdown-menu">';
-            echo $this->view->partial('index/_admin_menu.phtml', 'admin');
-            echo '</ul></li>';
+    public function adminMenu($listOnly = true) {
+        $html = '';
+        if (Daiquiri_Auth::getInstance()->checkAcl('Auth_Model_User', 'rows')) {
+            if ($listOnly === true) {
+                $html .= '<li class="dropdown">';
+                $html .= '<a class="dropdown-toggle" data-toggle="dropdown" href="#">Admin</a>';
+                $html .= '<ul class = "dropdown-menu">';
+            }
+            $html .= $this->view->partial('index/_admin_menu.phtml', 'admin');
+            if ($listOnly === true) {
+                $html .= '</ul></li>';
+            }
         }
+
+        return $html;
     }
 
 }

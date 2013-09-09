@@ -36,33 +36,40 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
         $form = new Auth_Form_Login();
 
         // check if request is POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // form is valid, get values
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // form is valid, get values
+                $values = $form->getValues();
 
-            // create DbAuth model and authenticate
-            $result = Daiquiri_Auth::getInstance()->authenticateUser($values['username'], $values['password']);
+                // create DbAuth model and authenticate
+                $result = Daiquiri_Auth::getInstance()->authenticateUser($values['username'], $values['password']);
 
-            // redirect depending on result of authentication
-            if ($result) {
-                $cookies = array();
+                // redirect depending on result of authentication
+                if ($result) {
+                    $cookies = array();
 
-                if (Daiquiri_Config::getInstance()->cms->enabled) {
-                    $model = new Cms_Model_Wordpress();
-                    $cookies = $model->login($values['username'], $values['password']);
+                    if (Daiquiri_Config::getInstance()->cms->enabled) {
+                        $model = new Cms_Model_Wordpress();
+                        $cookies = $model->login($values['username'], $values['password']);
+                    }
+
+                    return array(
+                        'status' => 'redirect',
+                        'cookies' => $cookies
+                    );
+                } else {
+                    $form->setDescription('Wrong credentials provided');
                 }
-
-                return array(
-                    'status' => 'redirect',
-                    'cookies' => $cookies
-                );
-            } else {
-                $form->setDescription('Wrong credentials provided');
-                return array('form' => $form, 'status' => 'wrong credentials');
             }
         }
 
-        return array('form' => $form, 'status' => 'form');
+        // log me out of wordpress for sanity
+        if (Daiquiri_Config::getInstance()->cms->enabled) {
+            $model = new Cms_Model_Wordpress();
+            $cookies = $model->logout();
+        }
+
+        return array('form' => $form, 'status' => 'form', 'cookies' => $cookies);
     }
 
     /**

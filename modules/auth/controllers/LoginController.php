@@ -70,7 +70,7 @@ class Auth_LoginController extends Daiquiri_Controller_Abstract {
         $redirect = $this->_getParam('redirect', '/');
 
         // get optional parameter for NOT logging out of the cms
-        $cms = $this->_getParam('cms', true);
+        $cms = $this->_getParam('cms_logout', true);
 
         // get model NOT poxied since acl are not necessarily there
         $model = new Auth_Model_Login();
