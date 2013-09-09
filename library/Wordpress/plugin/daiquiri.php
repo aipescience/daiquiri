@@ -33,9 +33,6 @@
 global $daiquiri_options;
 $daiquiri_options = array(
     'daiquiri_url' => 'http://localhost/',
-    'daiquiri_db_host' => 'localhost',
-    'daiquiri_db_port' => '3306',
-    'daiquiri_db_dbname' => 'daiquiri_web'
 );
 
 /*
@@ -79,21 +76,6 @@ function daiquiri_admin_display() {
     global $daiquiri_options;
     ?>
     <div class="wrap">
-        <h2>Daiquiri Administration</h2>
-        <p style="color: #b94a48;">
-            Please ensure that the user configured in wp-config.php has SELECT permissions on
-            the database. Otherwise you will not able to log in with the daiquiri credentials.
-        </p>   
-        <p>
-            You can archive this with SQL command: 
-            <code>GRANT SELECT ON `<?php echo get_option('daiquiri_db_dbname') ?>`.* to 'USER'@'localhost';</code>
-        </p>
-        <p>
-            On a different machine you need to create the user first: 
-            <code>CREATE USER 'USERNAME'@'localhost' IDENTIFIED BY 'PASSWORD';</code>
-        </p>
-
-
         <form method="post" action="options.php">
             <table class="form-table">
                 <?php settings_fields('daiquiri'); ?>
@@ -127,89 +109,118 @@ add_action('init', 'daiquiri_auto_login');
 function daiquiri_auto_login() 
 {
     // check which user is logged in into daiquiri right now
-    $daiquiriUser = array(
-        'id' => "2",
-        'username' => 'jochen',
-        'firstname' => 'Jochen',
-        'lastname' => 'Klar',
-        'email' => 'jochenklar@gmail.com',
-        'website' => 'jochenklar.de',
-        'role' => 'admin'
-    );
-    $daiquiriUser = array(
-        'id' => "1",
-        'username' => 'admin',
-        'firstname' => 'Admin',
-        'lastname' => 'Admin',
-        'email' => 'admin@example.com',
-        'website' => 'jochenklar.de',
-        'role' => 'admin'
-    );
-    if (is_user_logged_in()) {
-        // check if the RIGHT user is logged in
-        $currentUser = wp_get_current_user();;
-        if (strcmp($currentUser->user_login, $daiquiriUser['id']) != 0) {
+    $siteUrl = get_option('siteurl');
+    $layoutUrl = get_option('daiquiri_url') . '/auth/account/show/';
+    if (strpos($layoutUrl, $siteUrl) !== false) {
+        echo '<h1>Error with theme</h1><p>Layout URL is below CMS URL.</p>';
+        die(0);
+    }
+
+    // construct request
+    require_once('HTTP/Request2.php');
+    $req = new HTTP_Request2($layoutUrl);
+    $req->setConfig(array(
+        'connect_timeout' => 2,
+        'timeout' => 3
+    ));
+    $req->setMethod('GET');
+    $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
+    $req->setHeader('Accept: application/json');
+
+    try {
+        $response = $req->send();
+        $status = $response->getStatus();
+        $body = $response->getBody();
+    } catch (HTTP_Request2_Exception $e) {
+        echo '<h1>Error with daiquiri auth</h1><p>Error with HTTP request.</p>';
+        die(0);
+    }
+
+    if ($status == 403) {
+        if (is_user_logged_in()) {
             wp_logout();
-            // redirect to current page
             wp_redirect($_SERVER['REQUEST_URI']);
             exit();
         }
+    } else if ($status == 200) {
+        // decode the non empty json to the remote user array
+        $remoteUser = json_decode($response->getBody());
+
+        $daiquiriUser = array();
+        foreach(array('id','username','firstname','lastname','email','website','role') as $key) {
+            if (isset($remoteUser->data->$key)) {
+                $daiquiriUser[$key] = $remoteUser->data->$key;
+            }
+        }
+
+        if (is_user_logged_in()) {
+            // check if the RIGHT user is logged in
+            $currentUser = wp_get_current_user();;
+            if (strcmp($currentUser->user_login, $daiquiriUser['id']) != 0) {
+                wp_logout();
+                wp_redirect($_SERVER['REQUEST_URI']);
+                exit();
+            }
+        } else {
+            // create/update the wordpress user to match the daiquiri user
+            // the id in daiquiri maps to the user_login in wp
+            // the username in daiquiri maps to the user_nicename in wp
+
+            $wpUser = array(
+                'user_login' => $daiquiriUser['id'],
+                'user_nicename' => $daiquiriUser['username'],
+                'user_pass' => 'foo',
+                'user_email' => $daiquiriUser['email']
+            );
+
+            // get the role of the user
+            if ($daiquiriUser['role'] === 'admin') {
+                $wpUser['role'] = 'administrator';
+            } else if ($daiquiriUser['role'] === 'manager') {
+                $wpUser['role'] = 'editor';
+            } else {
+                $wpUser['role'] = 'subscriber';
+            }
+
+            if (isset($daiquiriUser['firstname'])) {
+                $wpUser['first_name'] = $daiquiriUser['firstname'];
+            }
+            if (isset($daiquiriUser['lastname'])) {
+                $wpUser['last_name'] = $daiquiriUser['lastname'];
+            }
+            if (isset($daiquiriUser['website'])) {
+                $wpUser['user_url'] = $daiquiriUser['website'];
+            }
+            if (isset($wpUser['first_name']) && isset($wpUser['last_name'])) {
+                $wpUser['display_name'] = $wpUser['first_name'] . ' ' . $wpUser['last_name'];
+            }
+
+            // update or create the user in the wordpress db
+            $storedUser = get_user_by('login', $wpUser['user_login']);
+            if ($storedUser === false) {
+                // create a new user in the wordpress db
+                $status = wp_insert_user($wpUser);
+            } else {
+                // update the user in the wordpress database
+                $wpUser['ID'] = $storedUser->ID;
+                $status = wp_update_user($wpUser);
+            }
+
+            if (is_int($status)) {
+                $userId = $status;
+            } else {
+                var_dump($status);
+            }
+            
+            // log in the newly created or updated user
+            $user = get_userdata($userId);
+            wp_set_current_user($user->ID, $user->user_login);
+            wp_set_auth_cookie($user->ID);
+            do_action('wp_login', $user->user_login);
+        }
     } else {
-        // create/update the wordpress user to match the daiquiri user
-        // the id in daiquiri maps to the user_login in wp
-        // the username in daiquiri maps to the user_nicename in wp
-
-        $wpUser = array(
-            'user_login' => $daiquiriUser['id'],
-            'user_nicename' => $daiquiriUser['username'],
-            'user_pass' => 'foo',
-            'user_email' => $daiquiriUser['email']
-        );
-
-        // get the role of the user
-        if ($daiquiriUser['role'] === 'admin') {
-            $wpUser['role'] = 'administrator';
-        } else if ($daiquiriUser['role'] === 'manager') {
-            $wpUser['role'] = 'editor';
-        } else {
-            $wpUser['role'] = 'subscriber';
-        }
-
-        if (isset($daiquiriUser['firstname'])) {
-            $wpUser['first_name'] = $daiquiriUser['firstname'];
-        }
-        if (isset($daiquiriUser['lastname'])) {
-            $wpUser['last_name'] = $daiquiriUser['lastname'];
-        }
-        if (isset($daiquiriUser['website'])) {
-            $wpUser['user_url'] = $daiquiriUser['website'];
-        }
-        if (isset($wpUser['first_name']) && isset($wpUser['last_name'])) {
-            $wpUser['display_name'] = $wpUser['first_name'] . ' ' . $wpUser['last_name'];
-        }
-
-        // update or create the user in the wordpress db
-        $storedUser = get_user_by('login', $wpUser['user_login']);
-        if ($storedUser === false) {
-            // create a new user in the wordpress db
-            $status = wp_insert_user($wpUser);
-        } else {
-            // update the user in the wordpress database
-            $wpUser['ID'] = $storedUser->ID;
-            $status = wp_update_user($wpUser);
-        }
-
-        if (is_int($status)) {
-            $userId = $status;
-        } else {
-            var_dump($status);
-        }
-        
-        // log in the newly created or updated user
-        $user = get_userdata($userId);
-        wp_set_current_user($user->ID, $user->user_login);
-        wp_set_auth_cookie($user->ID);
-        do_action('wp_login', $user->user_login);
+        echo '<h1>Error with auth</h1><p>HTTP request status != 200.</p>';
+        die(0); 
     }
 }
 

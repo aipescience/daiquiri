@@ -188,6 +188,19 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
     }
 
     /**
+     * Shows the credentials of the user who is currently logged in
+     */
+    public function infoAction() {
+        // get params from request
+        $redirect = $this->_getParam('redirect', '/auth/user/');
+
+        // call model method
+        $this->view->redirect = $redirect;
+        $this->view->data = $this->_model->show(Daiquiri_Auth::getInstance()->getCurrentId());
+        $this->view->status = 'ok';
+    }
+
+    /**
      * Deletes a user.
      */
     public function deleteAction() {
