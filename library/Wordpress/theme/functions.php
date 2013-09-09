@@ -20,28 +20,13 @@
  */
 
 /*
- * A global array to hold the options and their default values.
- * Add the options when the theme is activated.
- */
-global $daiquiri_theme_options;
-$daiquiri_theme_options = array(
-    'daiquiri_url' => 'http://localhost/'
-);
-foreach ($daiquiri_theme_options as $option => $default) {
-    add_option($option, $default);
-}
-
-/*
  * Register the settings when the admin interface is loaded.
  */
 
 add_action('admin_init', 'daiquiri_theme_init');
 
 function daiquiri_theme_init() {
-    global $daiquiri_theme_options;
-    foreach (array_keys($daiquiri_theme_options) as $option) {
-        register_setting('daiquiri_theme', $option);
-    }
+    add_option('daiquiri_url', 'http://localhost/');
 }
 
 /*
@@ -55,25 +40,19 @@ function daiquiri_theme_menu() {
 }
 
 function daiquiri_theme_options() {
-    global $daiquiri_theme_options;
     ?>
     <div class="wrap">
-        <h2>Daiquiri Administration</h2>        
         <form method="post" action="options.php">
             <table class="form-table">
-                <?php settings_fields('daiquiri_theme'); ?>
-                <?php
-                foreach (array_keys($daiquiri_theme_options) as $option) :
-                    ?>
-                    <tr valign="top">
-                        <th scope="row">
-                            <label><?php echo $option ?></label>
-                        </th>
-                        <td>
-                            <input type="text" class="regular-text" name="<?php echo $option ?>" value="<?php echo get_option($option); ?>" />
-                        </td>
-                    </tr>
-                <?php endforeach ?>
+                <?php settings_fields('daiquiri'); ?>
+                <tr valign="top">
+                    <th scope="row">
+                        <label>daiquiri_url</label>
+                    </th>
+                    <td>
+                        <input type="text" class="regular-text" name="daiquiri_url" value="<?php echo get_option('daiquiri_url'); ?>" />
+                    </td>
+                </tr>
             </table>
             <p class="submit">
                 <input type="submit" name="Submit" value="Save changes" />
