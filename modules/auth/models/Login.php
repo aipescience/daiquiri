@@ -48,11 +48,6 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
                 if ($result) {
                     $cookies = array();
 
-                    if (Daiquiri_Config::getInstance()->cms->enabled) {
-                        $model = new Cms_Model_Wordpress();
-                        $cookies = $model->login($values['username'], $values['password']);
-                    }
-
                     return array(
                         'status' => 'redirect',
                         'cookies' => $cookies
@@ -79,12 +74,6 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
      */
     public function logout($cms = true) {
         $cookies = array();
-
-        if ($cms === true && Daiquiri_Config::getInstance()->cms->enabled) {
-            // logout from wordpress
-            $model = new Cms_Model_Wordpress();
-            $cookies = $model->logout();
-        }
 
         // get the auth singleton, clear the identity and redirect.
         Zend_Auth::getInstance()->clearIdentity();
