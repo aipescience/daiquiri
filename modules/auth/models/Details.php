@@ -62,7 +62,7 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
         }
 
         // create the form object
-        $form = new Auth_Form_Detail();
+        $form = new Auth_Form_CreateDetail();
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -116,7 +116,7 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
         }
 
         // create the form object
-        $form = new Auth_Form_Detail(array(
+        $form = new Auth_Form_UpdateDetail(array(
                     'key' => $key,
                     'value' => $value
                 ));

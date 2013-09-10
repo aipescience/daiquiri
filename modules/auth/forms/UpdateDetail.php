@@ -21,9 +21,9 @@
  */
 
 /**
- * Class for the form which is used to create a new user. 
+ * Class for the form which is used to update a user detail. 
  */
-class Auth_Form_Detail extends Auth_Form_Abstract {
+class Auth_Form_UpdateDetail extends Auth_Form_Abstract {
 
     protected $_key;
     protected $_value;
