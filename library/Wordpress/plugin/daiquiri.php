@@ -289,25 +289,6 @@ function daiquiri_authenticate($username, $password) {
 }
 
 /*
- * Disable the user registration and password retrieval functions
- */
-
-/*
-add_action('lost_password', 'disable_function');
-add_action('user_register', 'disable_function');
-add_action('password_reset', 'disable_function');
-
-function disable_function() {
-    $errors = new WP_Error();
-    $errors->add('registerdisabled', __('User registration is not available from this site, so you can\'t create an account or retrieve your password from here.'));
-    login_header(__('Log In'), '', $errors);
-    ?>
-    <p id="backtoblog"><a href="<?php bloginfo('url'); ?>/" title="<?php _e('Are you lost?') ?>"><?php printf(__('&larr; Back to %s'), get_bloginfo('title', 'display')); ?></a></p>
-    <?php
-    exit();
-}
-*/
-/*
  * Hide the personal profile options.
  */
 
