@@ -119,7 +119,7 @@ function daiquiri_auto_login()
 
     if ($status == 403) {
         if (is_user_logged_in()) {
-            wp_logout();
+            wp_clear_auth_cookie();
             wp_redirect($_SERVER['REQUEST_URI']);
             exit();
         }
@@ -138,7 +138,60 @@ function daiquiri_auto_login()
             // check if the RIGHT user is logged in
             $currentUser = wp_get_current_user();;
             if (strcmp($currentUser->user_login, $daiquiriUser['id']) != 0) {
-                wp_logout();
+                wp_clear_auth_cookie();
+                wp_redirect($_SERVER['REQUEST_URI']);
+                exit();
+            }
+
+            // check if the user was updated
+            $updated = false;
+
+            // check main credentials
+            foreach(array(
+                    'username' => 'user_nicename',
+                    'email' => 'user_email',
+                    'firstname' => 'first_name',
+                    'lastname' => 'last_name'
+                ) as $key => $value) {
+
+                if (isset($daiquiriUser[$key])) {
+                    if (strcmp($currentUser->$value, $daiquiriUser[$key]) != 0) {
+                        $updated = true;
+                    }
+                }
+
+            }
+
+            // check url
+            $currentUrl  = str_replace(array('http://','https://'),'', $currentUser->user_url);
+            $daiquiriUrl = str_replace(array('http://','https://'),'', $daiquiriUser['website']);
+            if (strcmp($currentUrl,$daiquiriUrl) != 0) {
+                $updated = true;
+            }
+
+            // check role
+            if (count($currentUser->roles) != 1) {
+                $updated = true;
+            } else {
+                if ($daiquiriUser['role'] === 'admin') {
+                    if ($currentUser->roles[0] !== 'administrator') {
+                        $updated = true;
+                    }
+                } else if ($daiquiriUser['role'] === 'manager') {
+                    if ($currentUser->roles[0] !== 'editor') {
+                        $updated = true;
+                    }
+                } else {
+                    if ($currentUser->roles[0] !== 'subscriber') {
+                        $updated = true;
+                    }
+                }
+            }
+            
+            // update the user if things were changed
+            if ($updated === true) {
+                // logout and redirect
+                wp_clear_auth_cookie();
                 wp_redirect($_SERVER['REQUEST_URI']);
                 exit();
             }
@@ -192,7 +245,7 @@ function daiquiri_auto_login()
             } else {
                 var_dump($status);
             }
-            
+
             // log in the newly created or updated user
             $user = get_userdata($userId);
             wp_set_current_user($user->ID, $user->user_login);
@@ -221,9 +274,17 @@ function daiquiri_authenticate($username, $password) {
             exit;
         }
     } else {
-        // just do the redirect
-        wp_redirect($_GET['redirect_to']);
-        exit();
+        // check if there is a redirect
+        if (empty($_GET['redirect_to'])) {
+            // redirect to the daiquiri login page
+            $daiquiriLogin = get_option('daiquiri_url') . 'auth/login';
+            wp_redirect($daiquiriLogin);
+            exit;
+        } else {
+            // just do the redirect
+            wp_redirect($_GET['redirect_to']);
+            exit();
+        }
     }
 }
 
@@ -231,6 +292,7 @@ function daiquiri_authenticate($username, $password) {
  * Disable the user registration and password retrieval functions
  */
 
+/*
 add_action('lost_password', 'disable_function');
 add_action('user_register', 'disable_function');
 add_action('password_reset', 'disable_function');
@@ -244,7 +306,7 @@ function disable_function() {
     <?php
     exit();
 }
-
+*/
 /*
  * Hide the personal profile options.
  */
