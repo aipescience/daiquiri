@@ -117,13 +117,36 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
     function multilineParseTree($multilineSql, array &$error) {
         $parseTrees = array();
 
+        foreach ($multilineSql as $key => $currSql) {
+            try {
+                $tmpTree = envokeParseSqlAllParser($currSql);
+            } catch (Exception $e) {
+                $error['parseError'] = $e->getMessage();
+                return false;
+            }
+
+            $parseTrees[$key] = $tmpTree->parsed;
+        }
+
+        return $parseTrees;
+    }
+
+    /**
+     * Builds the SQL parse tree for every element in the multiline SQL
+     * array.
+     * @param array $multilineSqlTree array holding an SQL query string for each 
+     *                            multiline query
+     * @param array &$error       return array for error output
+     * @return array multiline parse tree 
+     */
+    function multilineProcessQueryWildcard($multilineSqlTree, array &$error) {
         // get the resource
         $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
         $adapter = $resource->getTable()->getAdapter();
 
-        foreach ($multilineSql as $key => $currSql) {
+        foreach ($multilineSqlTree as $key => $currSqlTree) {
             try {
-                $tmpParseObj = processQueryWildcard($currSql, false, $adapter);
+                $tmpParseObj = processQueryWildcard($currSqlTree, false, $adapter);
             } catch (UnsupportedFeatureException $e) {
                 $error['parseError'] = $e->getMessage();
                 return false;
@@ -133,12 +156,9 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
             } catch (Exception $e) {
                 //continue if we could not find the table. this is not that bad and parse tree is still needed
                 //by paqu
-                //WORKS WITHOUT IT?? Why did I introduce this?
 
-                //if(strpos($e->getMessage(), "42S02") === false) {
-                    $error['parseError'] = $e->getMessage();
-                    return false;
-                //}
+                $error['parseError'] = $e->getMessage();
+                return false;
             }
 
             $parseTrees[$key] = $tmpParseObj->parsed;
@@ -146,7 +166,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
         return $parseTrees;
     }
-
+    
     /**
      * Using the parse tree, determines for each multiline the currently used
      * database.
@@ -417,8 +437,14 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         $sql = trim($sql);
 
         $resource->getTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_ASSOC);
-        $sqlStr = $resource->getTable()->getAdapter()->quoteInto('use ' + $db + '; ' + 'select paqu_validateSQL(?) as a;', $sql);
-        $validate = $resource->plainQuery($sqlStr);
+        $sqlStr = $resource->getTable()->getAdapter()->quoteInto('use ' . $db . '; ' . 'select paqu_validateSQL(?) as a;', $sql);
+
+        try {
+            $validate = $resource->plainQuery($sqlStr);
+        } catch (Exception $e) {
+            $errors['validateError'] = $e->getMessage();
+            return false;
+        }
 
         $errorString = $validate[0]['a'];
 

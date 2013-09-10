@@ -287,6 +287,10 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         $dbId = $metaDb->fetchIdWithName($database);
 
         if ($dbId !== false && $metaDb->checkACL($dbId, $permission)) {
+            if($table === false) {
+                return true;
+            }
+
             //access to database granted, so let's check for table access
             $metaTable = new Data_Model_Tables();
 

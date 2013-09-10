@@ -69,7 +69,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 throw new Exception("Column entry already exists.");
             }
 
-            $this->commitToDB($values);
+            $this->store($values);
 
             return array('status' => 'ok');
         }
@@ -127,7 +127,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function commitToDB(array $values = array()) {
+    public function store(array $values = array()) {
         $cache = $values;
 
         if(array_key_exists("comment", $values)) {

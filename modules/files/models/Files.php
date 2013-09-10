@@ -314,7 +314,9 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
 
         $file = array();
         foreach ($directories as $dir) {
-            $file = array_merge($file, glob($dir . DIRECTORY_SEPARATOR . $name, GLOB_NOSORT));
+            if(file_exists($dir . DIRECTORY_SEPARATOR . $name)) {
+                $file[] = $dir . DIRECTORY_SEPARATOR . $name;
+            }
         }
 
         return $file;
