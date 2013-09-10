@@ -44,9 +44,6 @@ class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
             $params['cols'] = explode(',', $params['cols']);
         }
 
-        // create csrf hash for clickjacking protection
-        $csrf = md5(rand(0, 100000) + rand(0, 100000));
-
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
         $rows = $this->getResource()->fetchRows($sqloptions);
@@ -54,10 +51,10 @@ class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
         // loop through the table and add an options to destroy the session
         if (isset($params['options']) && $params['options'] === 'true') {
             for ($i = 0; $i < sizeof($rows); $i++) {
-                $session = $rows[$i]['id'];
+                $session = $rows[$i]['session'];
                 $link = $this->internalLink(array(
                     'text' => 'Destroy',
-                    'href' => '/auth/sessions/destroy/session/' . $session . '/csrf/' . $csrf,
+                    'href' => '/auth/sessions/destroy/session/' . $session,
                     'resource' => 'Auth_Model_Sessions',
                     'permission' => 'destroy'));
                 $rows[$i]['options'] = $link;
@@ -109,9 +106,25 @@ class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
      * @param string $session
      * @return array
      */
-    public function destroy($session) {
-        $this->getResource()->deleteRow($session);
-        return array('status' => 'ok');
-    }
+    public function destroy($session, array $formParams = array()) {
+        // create the form object
+        $form = new Auth_Form_DestroySession();
 
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $this->getResource()->deleteRow($session);
+
+                return array('status' => 'ok');
+            } else {
+                return array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
 }

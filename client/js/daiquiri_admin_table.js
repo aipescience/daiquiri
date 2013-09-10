@@ -24,11 +24,12 @@ var daiquiri = daiquiri || {};
 /**
  * Displays the main table of the user management and ajaxifies the option links.
  */ 
-daiquiri.UserTable = function (baseurl) {
+daiquiri.AdminTable = function (opt) {
+
     // create the user table inside the div
     $('#table').daiquiri_table({
-        'rowsurl': baseurl + '/auth/user/rows',
-        'colsurl': baseurl + '/auth/user/cols',
+        'rowsurl': opt.rowsurl,
+        'colsurl': opt.colsurl,
         'params': {
             'options': true
         },

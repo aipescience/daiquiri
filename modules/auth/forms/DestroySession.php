@@ -1,4 +1,5 @@
 <?php
+
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -18,15 +19,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Session destroyed.</p>
-<?php elseif ($this->status === 'error'): ?>
-    <p><?php $this->errors ?></p>
-<?php else: ?>
-    <p>Really destroy session?</p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+class Auth_Form_DestroySession extends Daiquiri_Form_Abstract {
 
+    public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
+        // add fields
+        $this->addDangerButtonElement('submit', 'Destroy Session');
+        $this->addButtonElement('cancel', 'Cancel');
 
+        // add groups
+        $this->addActionGroup(array('submit', 'cancel'));
+    }
+
+}

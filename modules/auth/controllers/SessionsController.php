@@ -75,14 +75,32 @@ class Auth_SessionsController extends Daiquiri_Controller_Abstract {
      */
     public function destroyAction() {
         // get the id of the session to be destroyed
-        $id = $this->_getParam('session');
+        $session = $this->_getParam('session');
 
-        $response = $this->_model->destroy($id);
+        // check if POST or GET
+        if ($this->_request->isPost()) {
+            if ($this->_getParam('cancel')) {
+                $this->_redirect('/auth/sessions/');
+            } else {
+                // validate form and do stuff
+                $response = $this->_model->destroy($session, $this->_request->getPost());
+            }
+        }  else {
+            // just display the form
+            $response = $this->_model->destroy($session);
+        }
 
-        // assign to view        
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/sessions/destroy/session/' . $session);
+        }
+
+        // assign to view
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
+
     }
 
 }

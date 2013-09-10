@@ -59,7 +59,7 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         'daiquiri/css/daiquiri_query.css',
         'daiquiri/js/daiquiri_query.js',
         // daiquiri user table
-        'daiquiri/js/daiquiri_user_table.js',
+        'daiquiri/js/daiquiri_admin_table.js',
         // daiquiri cms
         'daiquiri/css/daiquiri_cms.css',
         // daiquiri misc

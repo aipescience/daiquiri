@@ -22,14 +22,9 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        // create the table inside the div
-        $('#table').daiquiri_table({
-            'rowsurl': "<?php echo $this->baseUrl('/auth/sessions/rows') ?>",
-            'colsurl': "<?php echo $this->baseUrl('/auth/sessions/cols') ?>",
-            'baseurl': "<?php echo $this->baseUrl() ?>",
-            'params': {
-                'options': true
-            }
+        daiquiri.adminTable = new daiquiri.AdminTable({
+            "rowsurl": "<?php echo $this->baseUrl('/auth/sessions/rows') ?>",
+            "colsurl": "<?php echo $this->baseUrl('/auth/sessions/cols') ?>"
         });
     });  
 </script>
