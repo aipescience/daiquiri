@@ -109,6 +109,24 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
         $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
 
+        //we are not permitting "USE"!
+        foreach ($multiLineParseTrees as $key => $currTree) {
+            // check if this command was a use command and register in array
+            if (is_array($currTree) && array_key_exists('USE', $currTree)) {
+                $errors['illegalSQL'] = "'USE' SQL command currently not supported.";
+                return false;
+            } else if (is_array($currTree) && !empty($currTree[0]) && $currTree[0] === "USE") {
+                $errors['illegalSQL'] = "'USE' SQL command currently not supported.";
+                return false;
+            }
+        }
+
+        $multiLineParseTrees = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+
+        if (!empty($errors)) {
+            return false;
+        }
+
         //check ACLs
         if ($this->permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
             return false;

@@ -52,6 +52,12 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
 
         $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
 
+        $multiLineParseTrees = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+
+        if (!empty($errors)) {
+            return false;
+        }
+
         //check ACLs
         if ($this->permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
             return false;
@@ -121,6 +127,12 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
 
         $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
 
+        $multiLineParseTrees = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+
+        if (!empty($errors)) {
+            return false;
+        }
+
         //rewrite show statements
         $showRewrittenMultiLine = false;
         $showRewrittenMultiLineParseTrees = false;
@@ -188,6 +200,12 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
         }
 
         $multiLineParseTrees = $this->processing->multilineParseTree($multiLines, $errors);
+
+        if (!empty($errors)) {
+            return false;
+        }
+
+        $multiLineParseTrees = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
 
         if (!empty($errors)) {
             return false;
