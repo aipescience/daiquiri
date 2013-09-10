@@ -65,30 +65,32 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
         $form = new Auth_Form_Detail();
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // get the form values
-            $values = $form->getValues();
-
-            // check if the entry is already there
-            if ($this->getResource()->fetchValue($id, $values['key']) !== null) {
-                $form->setDescription('User detail already stored');
+                // check if the entry is already there
+                if ($this->getResource()->fetchValue($id, $values['key']) !== null) {
+                    $form->setDescription('User detail already stored');
+                    return array(
+                        'status' => 'error',
+                        'error' => 'user detail already stored',
+                        'form' => $form
+                    );
+                } else {
+                    // store the details
+                    $this->getResource()->storeValue($id, $values['key'], $values['value']);
+                    return array('status' => 'ok');
+                }
+            } else {
                 return array(
+                    'form' => $form,
                     'status' => 'error',
-                    'error' => 'user detail already stored',
+                    'error' => $form->getMessages(),
                     'form' => $form
                 );
-            } else {
-                // store the details
-                $this->getResource()->storeValue($id, $values['key'], $values['value']);
-                return array('status' => 'ok');
             }
-        } else {
-            return array(
-                'status' => 'form',
-                'error' => 'form validation failed',
-                'form' => $form
-            );
         }
 
         return array('form' => $form, 'status' => 'form');
