@@ -28,27 +28,13 @@
  */
 
 /*
- * A global array to hold the options and their default values.
- */
-global $daiquiri_options;
-$daiquiri_options = array(
-    'daiquiri_url' => 'http://localhost/',
-    'daiquiri_db_host' => 'localhost',
-    'daiquiri_db_port' => '3306',
-    'daiquiri_db_dbname' => 'daiquiri_web'
-);
-
-/*
  * Add the options when the plugin is activated.
  */
 
 register_activation_hook(WP_PLUGIN_DIR . '/daiquiri/daiquiri.php', 'daiquiri_activate');
 
 function daiquiri_activate() {
-    global $daiquiri_options;
-    foreach ($daiquiri_options as $option => $default) {
-        add_option($option, $default);
-    }
+    add_option('daiquiri_url', 'http://localhost/');
 }
 
 /*
@@ -58,10 +44,7 @@ function daiquiri_activate() {
 add_action('admin_init', 'daiquiri_admin_init');
 
 function daiquiri_admin_init() {
-    global $daiquiri_options;
-    foreach (array_keys($daiquiri_options) as $option) {
-        register_setting('daiquiri', $option);
-    }
+    register_setting('daiquiri', 'daiquiri_url');
 }
 
 /*
@@ -76,39 +59,19 @@ function daiquiri_admin_menu() {
 }
 
 function daiquiri_admin_display() {
-    global $daiquiri_options;
     ?>
     <div class="wrap">
-        <h2>Daiquiri Administration</h2>
-        <p style="color: #b94a48;">
-            Please ensure that the user configured in wp-config.php has SELECT permissions on
-            the database. Otherwise you will not able to log in with the daiquiri credentials.
-        </p>   
-        <p>
-            You can archive this with SQL command: 
-            <code>GRANT SELECT ON `<?php echo get_option('daiquiri_db_dbname') ?>`.* to 'USER'@'localhost';</code>
-        </p>
-        <p>
-            On a different machine you need to create the user first: 
-            <code>CREATE USER 'USERNAME'@'localhost' IDENTIFIED BY 'PASSWORD';</code>
-        </p>
-
-
         <form method="post" action="options.php">
             <table class="form-table">
                 <?php settings_fields('daiquiri'); ?>
-                <?php
-                foreach (array_keys($daiquiri_options) as $option) :
-                    ?>
-                    <tr valign="top">
-                        <th scope="row">
-                            <label><?php echo $option ?></label>
-                        </th>
-                        <td>
-                            <input type="text" class="regular-text" name="<?php echo $option ?>" value="<?php echo get_option($option); ?>" />
-                        </td>
-                    </tr>
-                <?php endforeach ?>
+                <tr valign="top">
+                    <th scope="row">
+                        <label>daiquiri_url</label>
+                    </th>
+                    <td>
+                        <input type="text" class="regular-text" name="daiquiri_url" value="<?php echo get_option('daiquiri_url'); ?>" />
+                    </td>
+                </tr>
             </table>
             <p class="submit">
                 <input type="submit" name="Submit" value="Save changes" />
@@ -116,6 +79,183 @@ function daiquiri_admin_display() {
         </form>
     </div>
     <?php
+}
+
+/*
+ * Automatiacally login the user which is logged in into daiquiri right now.
+ */ 
+
+add_action('init', 'daiquiri_auto_login');
+
+function daiquiri_auto_login() 
+{
+    // check which user is logged in into daiquiri right now
+    $siteUrl = get_option('siteurl');
+    $layoutUrl = get_option('daiquiri_url') . '/auth/account/show/';
+    if (strpos($layoutUrl, $siteUrl) !== false) {
+        echo '<h1>Error with theme</h1><p>Layout URL is below CMS URL.</p>';
+        die(0);
+    }
+
+    // construct request
+    require_once('HTTP/Request2.php');
+    $req = new HTTP_Request2($layoutUrl);
+    $req->setConfig(array(
+        'connect_timeout' => 2,
+        'timeout' => 3
+    ));
+    $req->setMethod('GET');
+    $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
+    $req->setHeader('Accept: application/json');
+
+    try {
+        $response = $req->send();
+        $status = $response->getStatus();
+        $body = $response->getBody();
+    } catch (HTTP_Request2_Exception $e) {
+        echo '<h1>Error with daiquiri auth</h1><p>Error with HTTP request.</p>';
+        die(0);
+    }
+
+    if ($status == 403) {
+        if (is_user_logged_in()) {
+            wp_clear_auth_cookie();
+            wp_redirect($_SERVER['REQUEST_URI']);
+            exit();
+        }
+    } else if ($status == 200) {
+        // decode the non empty json to the remote user array
+        $remoteUser = json_decode($response->getBody());
+
+        $daiquiriUser = array();
+        foreach(array('id','username','firstname','lastname','email','website','role') as $key) {
+            if (isset($remoteUser->data->$key)) {
+                $daiquiriUser[$key] = $remoteUser->data->$key;
+            }
+        }
+
+        if (is_user_logged_in()) {
+            // check if the RIGHT user is logged in
+            $currentUser = wp_get_current_user();;
+            if (strcmp($currentUser->user_login, $daiquiriUser['id']) != 0) {
+                wp_clear_auth_cookie();
+                wp_redirect($_SERVER['REQUEST_URI']);
+                exit();
+            }
+
+            // check if the user was updated
+            $updated = false;
+
+            // check main credentials
+            foreach(array(
+                    'username' => 'user_nicename',
+                    'email' => 'user_email',
+                    'firstname' => 'first_name',
+                    'lastname' => 'last_name'
+                ) as $key => $value) {
+
+                if (isset($daiquiriUser[$key])) {
+                    if (strcmp($currentUser->$value, $daiquiriUser[$key]) != 0) {
+                        $updated = true;
+                    }
+                }
+
+            }
+
+            // check url
+            $currentUrl  = str_replace(array('http://','https://'),'', $currentUser->user_url);
+            $daiquiriUrl = str_replace(array('http://','https://'),'', $daiquiriUser['website']);
+            if (strcmp($currentUrl,$daiquiriUrl) != 0) {
+                $updated = true;
+            }
+
+            // check role
+            if (count($currentUser->roles) != 1) {
+                $updated = true;
+            } else {
+                if ($daiquiriUser['role'] === 'admin') {
+                    if ($currentUser->roles[0] !== 'administrator') {
+                        $updated = true;
+                    }
+                } else if ($daiquiriUser['role'] === 'manager') {
+                    if ($currentUser->roles[0] !== 'editor') {
+                        $updated = true;
+                    }
+                } else {
+                    if ($currentUser->roles[0] !== 'subscriber') {
+                        $updated = true;
+                    }
+                }
+            }
+            
+            // update the user if things were changed
+            if ($updated === true) {
+                // logout and redirect
+                wp_clear_auth_cookie();
+                wp_redirect($_SERVER['REQUEST_URI']);
+                exit();
+            }
+        } else {
+            // create/update the wordpress user to match the daiquiri user
+            // the id in daiquiri maps to the user_login in wp
+            // the username in daiquiri maps to the user_nicename in wp
+
+            $wpUser = array(
+                'user_login' => $daiquiriUser['id'],
+                'user_nicename' => $daiquiriUser['username'],
+                'user_pass' => 'foo',
+                'user_email' => $daiquiriUser['email']
+            );
+
+            // get the role of the user
+            if ($daiquiriUser['role'] === 'admin') {
+                $wpUser['role'] = 'administrator';
+            } else if ($daiquiriUser['role'] === 'manager') {
+                $wpUser['role'] = 'editor';
+            } else {
+                $wpUser['role'] = 'subscriber';
+            }
+
+            if (isset($daiquiriUser['firstname'])) {
+                $wpUser['first_name'] = $daiquiriUser['firstname'];
+            }
+            if (isset($daiquiriUser['lastname'])) {
+                $wpUser['last_name'] = $daiquiriUser['lastname'];
+            }
+            if (isset($daiquiriUser['website'])) {
+                $wpUser['user_url'] = $daiquiriUser['website'];
+            }
+            if (isset($wpUser['first_name']) && isset($wpUser['last_name'])) {
+                $wpUser['display_name'] = $wpUser['first_name'] . ' ' . $wpUser['last_name'];
+            }
+
+            // update or create the user in the wordpress db
+            $storedUser = get_user_by('login', $wpUser['user_login']);
+            if ($storedUser === false) {
+                // create a new user in the wordpress db
+                $status = wp_insert_user($wpUser);
+            } else {
+                // update the user in the wordpress database
+                $wpUser['ID'] = $storedUser->ID;
+                $status = wp_update_user($wpUser);
+            }
+
+            if (is_int($status)) {
+                $userId = $status;
+            } else {
+                var_dump($status);
+            }
+
+            // log in the newly created or updated user
+            $user = get_userdata($userId);
+            wp_set_current_user($user->ID, $user->user_login);
+            wp_set_auth_cookie($user->ID);
+            do_action('wp_login', $user->user_login);
+        }
+    } else {
+        echo '<h1>Error with auth</h1><p>HTTP request status != 200.</p>';
+        die(0); 
+    }
 }
 
 /*
@@ -127,126 +267,25 @@ add_action('wp_authenticate', 'daiquiri_authenticate', 1, 2);
 function daiquiri_authenticate($username, $password) {
     require_once('./wp-includes/registration.php');
 
-    var_dump(is_user_logged_in());
-
     if (!is_user_logged_in()) {
         if ($_GET["no_redirect"] !== 'true') {
             $daiquiriLogin = get_option('daiquiri_url') . 'auth/login';
             wp_redirect($daiquiriLogin);
             exit;
         }
-    }
-
-    if (!empty($username) && !empty($password)) {
-        $c = 'mysql:';
-        $c .= 'host=' . get_option('daiquiri_db_host') . ';';
-        $c .= 'port=' . get_option('daiquiri_db_port') . ';';
-        $c .= 'dbname=' . get_option('daiquiri_db_dbname') . ';';
-
-        $adapter = new PDO($c, DB_USER, DB_PASSWORD);
-        $stmt = $adapter->prepare("SELECT `u`.`id`,`u`.`username`,`u`.`email`,`u`.`password`,`r`.`role` FROM `Auth_User` as `u`,`Auth_Status` as `s`,`Auth_Roles` as `r` WHERE `u`.`username` = ? AND `u`.`status_id` = `s`.`id` AND `u`.`role_id` = `r`.`id` AND `s`.`status` = 'active';");
-        $stmt->execute(array($username));
-        $row = $stmt->fetch();
-
-        if ($row) {
-            $ex = explode('$', $row['password']);
-            $algo = $ex[1];
-            $salt = $ex[2];
-
-            $hash = crypt($password, '$' . $algo . '$' . $salt . '$');
-
-            if ($hash === $row['password']) {
-                $user = array(
-                    'display_name' => $username,
-                    'user_login' => $username,
-                    'user_pass' => $password,
-                    'user_email' => $row['email']
-                );
-
-                // get the role of the user
-                if ($row['role'] === 'admin') {
-                    $user['role'] = 'administrator';
-                } else if ($row['role'] === 'manager') {
-                    $user['role'] = 'editor';
-                } else {
-                    $user['role'] = 'subscriber';
-                }
-
-                // get the users details
-                $details = array(
-                    'firstname' => 'first_name',
-                    'lastname' => 'last_name',
-                    'website' => 'user_url'
-                );
-                $stmt = $adapter->prepare("SELECT `key`,`value` FROM `Auth_Details` WHERE `user_id` = ?;");
-                $stmt->execute(array($row['id']));
-                while ($row = $stmt->fetch()) {
-                    if (array_key_exists($row['key'], $details)) {
-                        $user[$details[$row['key']]] = $row['value'];
-                    }
-                }
-                if (isset($user['first_name']) && isset($user['last_name'])) {
-                    $user['display_name'] = $user['first_name'] . ' ' . $user['last_name'];
-                }
-
-                // update or create the user in the wordpress db
-                if ($id = username_exists($username)) {
-                    // update the user in the wordpress database
-                    $user['ID'] = $id;
-                    wp_update_user($user);
-                } else {
-                    wp_insert_user($user);
-                }
-            } else {
-                global $ext_error;
-                $ext_error = "wrongpw";
-                $username = NULL;
-            }
+    } else {
+        // check if there is a redirect
+        if (empty($_GET['redirect_to'])) {
+            // redirect to the daiquiri login page
+            $daiquiriLogin = get_option('daiquiri_url') . 'auth/login';
+            wp_redirect($daiquiriLogin);
+            exit;
         } else {
-            global $ext_error;
-            $ext_error = "notindb";
-            $username = NULL;
+            // just do the redirect
+            wp_redirect($_GET['redirect_to']);
+            exit();
         }
     }
-}
-
-/*
- * Override the message for the login window.
- */
-
-add_filter('login_errors', 'daiquiri_login_errors');
-
-function daiquiri_login_errors() {
-    global $error;
-    global $ext_error;
-    if ($ext_error == "notindb")
-        return "<strong>ERROR:</strong> Username not found.";
-    else if ($ext_error == "wrongrole")
-        return "<strong>ERROR:</strong> You don't have permissions to log in.";
-    else if ($ext_error == "wrongpw")
-        return "<strong>ERROR:</strong> Invalid password.";
-    else if ($ext_error == "wrongpw")
-        return "<strong>ERROR:</strong> Wrong Configuration.";
-    else
-        return $error;
-}
-
-/*
- * Disable the user registration and password retrieval functions
- */
-
-add_action('lost_password', 'disable_function');
-add_action('user_register', 'disable_function');
-add_action('password_reset', 'disable_function');
-
-function disable_function() {
-    $errors = new WP_Error();
-    $errors->add('registerdisabled', __('User registration is not available from this site, so you can\'t create an account or retrieve your password from here.'));
-    login_header(__('Log In'), '', $errors);
-    ?>
-    <p id="backtoblog"><a href="<?php bloginfo('url'); ?>/" title="<?php _e('Are you lost?') ?>"><?php printf(__('&larr; Back to %s'), get_bloginfo('title', 'display')); ?></a></p>
-    <?php
-    exit();
 }
 
 /*

@@ -78,7 +78,7 @@ class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Ab
                 }
             }
             
-            Daiquiri_Auth::getInstance()->setVolatile();
+            Daiquiri_Auth::getInstance()->unsetCsrf();
             $this->_active = true;
         }
     }

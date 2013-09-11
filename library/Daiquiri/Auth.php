@@ -34,7 +34,7 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
     private $_acl;
     private $_userAdapter = null;
     private $_appAdapter = null;
-    private $_volatile = true;
+    private $_csrf = true;
 
     /**
      * @brief   constructor - initialises password cryptography and all required database tables
@@ -432,23 +432,23 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
 
     
     /**
-     * @brief   setVolatile method - sets the volatile flag of the auth singleton
+     * @brief   unsetCsrf method - unsets the csrf flag of the auth singleton
      * 
-     * Sets the volatile flag of the auth singleton.
+     * Unsets the csrf flag of the auth singleton.
      */
-    public function setVolatile() {
-        $this->_volatile = false;
+    public function unsetCsrf() {
+        $this->_csrf = false;
     }
     
     /**
-     * @brief   isVolatile method - returns the volatile flag of the auth singleton
+     * @brief   useCsrf method - returns the csrf flag of the auth singleton
      * @return  bool
      * 
-     * Returns whether the volatile flag of the auth singleton is set or not. 
+     * Returns whether the csrf flag of the auth singleton is set or not. 
      * In this case no CSRF Hashes will be used for forms.
      */
-    public function isVolatile() {
-        return ($this->_volatile === true);
+    public function useCsrf() {
+        return ($this->_csrf === true);
     }
     
 }

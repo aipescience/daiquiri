@@ -20,6 +20,18 @@
  *  limitations under the License.
  */
 
-class Cms_Bootstrap extends Zend_Application_Module_Bootstrap {
-    
+class Auth_Form_DestroySession extends Daiquiri_Form_Abstract {
+
+    public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
+        // add fields
+        $this->addDangerButtonElement('submit', 'Destroy Session');
+        $this->addButtonElement('cancel', 'Cancel');
+
+        // add groups
+        $this->addActionGroup(array('submit', 'cancel'));
+    }
+
 }

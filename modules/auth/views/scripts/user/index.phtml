@@ -22,7 +22,10 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        daiquiri.userTable = new daiquiri.UserTable('<?php echo $this->baseUrl() ?>');
+        daiquiri.adminTable = new daiquiri.AdminTable({
+            "rowsurl": "<?php echo $this->baseUrl('/auth/user/rows') ?>",
+            "colsurl": "<?php echo $this->baseUrl('/auth/user/cols') ?>"
+        });
     });
 </script>
 

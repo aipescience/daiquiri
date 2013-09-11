@@ -318,7 +318,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * Adds a hidden tag with a salt for CSRF attack protection.
      */
     public function addCsrfElement($identifier = 'csrf') {
-        if (php_sapi_name() !== 'cli') {
+        if (php_sapi_name() !== 'cli' && Daiquiri_Auth::getInstance()->useCsrf()) {
             $field = new Zend_Form_Element_Hash($identifier, array(
                 'class' => 'daiquiri-csrf',
                 'ignore' => true,

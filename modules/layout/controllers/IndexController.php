@@ -31,4 +31,3 @@ class Layout_IndexController extends Daiquiri_Controller_Abstract {
     }
 
 }
-

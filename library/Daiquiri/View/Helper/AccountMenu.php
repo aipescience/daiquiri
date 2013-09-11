@@ -38,10 +38,10 @@ class Daiquiri_View_Helper_AccountMenu extends Zend_View_Helper_Abstract {
                 $html .= '<ul class = "dropdown-menu">';
             }
             $html .= $this->view->internalLink(array(
-                'href' => '/auth/user/edit',
-                'text' => 'Edit User',
-                'resource' => 'Auth_Model_User',
-                'permission' => 'edit',
+                'href' => '/auth/account/update',
+                'text' => 'Update User',
+                'resource' => 'Auth_Model_Account',
+                'permission' => 'update',
                 'prepend' => '<li class="nav-item">',
                 'append' => '</li>'));
             $html .= $this->view->internalLink(array(

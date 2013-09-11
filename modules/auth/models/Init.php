@@ -113,6 +113,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $rules['user'] = array();
         $rules['user']['Auth_Model_User'] = array('edit');
         $rules['user']['Auth_Model_Password'] = array('change');
+        $rules['user']['Auth_Model_Account'] = array('show','update');
         if (!empty($options['config']['query'])) {
             $rules['user']['Query_Model_Form'] = array('submit');
             $rules['user']['Query_Model_CurrentJobs'] =
