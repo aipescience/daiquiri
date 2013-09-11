@@ -23,10 +23,17 @@ var daiquiri = daiquiri || {};
 daiquiri.common = {};
 
 /**
+ * Starts the polling by calling the emit poll function for the first time.
+ */
+daiquiri.common.startPoll = function(timeout) {
+    daiquiri.common.poll = daiquiri.common.emitPoll(timeout);
+}
+
+/**
  * Emits the 'poll' signal periodically, specified by timeout.
  */
-daiquiri.common.poll = function(timeout) {
-    daiquiri.common.pollId = setTimeout('daiquiri.common.poll('+ timeout +');', timeout);
+daiquiri.common.emitPoll = function(timeout) {
+    daiquiri.common.poll = setTimeout('daiquiri.common.emitPoll('+ timeout +');', timeout);
     $(window).trigger('poll');
 }
 
@@ -74,8 +81,8 @@ daiquiri.common.updateCsrf = function(form, csrf) {
  * Displays errors with ajax calls.
  */
 daiquiri.common.ajaxError = function(jqXHR, textStatus, errorThrown) {
-    clearTimeout(daiquiri.common.pollId);
-    var modal = new daiquiri.Modal({
+    clearTimeout(daiquiri.common.poll);
+    daiquiri.common.modal = new daiquiri.Modal({
         'label': 'Ajax Error',
         'body': '<p>An error occured while connectiong to the server.</p><p>The corresponding HTTP status is "' + jqXHR.statusText + '" (' + jqXHR.status + ').</p>',
         'primary': 'Reload page',
@@ -86,7 +93,7 @@ daiquiri.common.ajaxError = function(jqXHR, textStatus, errorThrown) {
             })
         }
     });
-    modal.show();
+    setTimeout('daiquiri.common.modal.show();', 1000);
 };
 
 /**
