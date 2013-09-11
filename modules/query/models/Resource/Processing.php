@@ -161,12 +161,12 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
                 return false;
             }
 
-            $parseTrees[$key] = $tmpParseObj->parsed;
+            $parseTrees[$key] = $tmpParseObj;
         }
 
         return $parseTrees;
     }
-    
+
     /**
      * Using the parse tree, determines for each multiline the currently used
      * database.
