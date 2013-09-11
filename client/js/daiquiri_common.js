@@ -81,19 +81,33 @@ daiquiri.common.updateCsrf = function(form, csrf) {
  * Displays errors with ajax calls.
  */
 daiquiri.common.ajaxError = function(jqXHR, textStatus, errorThrown) {
-    clearTimeout(daiquiri.common.poll);
-    daiquiri.common.modal = new daiquiri.Modal({
-        'label': 'Ajax Error',
-        'body': '<p>An error occured while connectiong to the server.</p><p>The corresponding HTTP status is "' + jqXHR.statusText + '" (' + jqXHR.status + ').</p>',
-        'primary': 'Reload page',
-        'success': function () {
-            $('#daiquiri-modal-primary').click(function () {
-                var location = window.location.href.split('#')[0]
-                window.location.replace(location);
-            })
+    if (typeof daiquiri.common.poll == 'undefined') {
+        console.log('Ajax error: ' + jqXHR.statusText + '" (' + jqXHR.status + ')');
+    } else {
+        clearTimeout(daiquiri.common.poll);
+
+        if (jqXHR.status == 403) {
+            var label = 'Session expired';
+            var body = '<p>Your session is expired. Please log in again.</p>';
+            var primary = 'Login';
+        } else {
+            var label = 'Ajax Error';
+            var body = '<p>An error occured while connecting to the server.</p><p>The corresponding HTTP status is "' + jqXHR.statusText + '" (' + jqXHR.status + ').</p>';
+            var primary = 'Reload page';
         }
-    });
-    setTimeout('daiquiri.common.modal.show();', 1000);
+
+        var modal = new daiquiri.Modal({
+            'label': label,
+            'body': body,
+            'primary': primary,
+            'success': function () {
+                $('#daiquiri-modal-primary').click(function () {
+                    window.location.replace(window.location.pathname);
+                })
+            }
+        });
+        modal.show();
+    }
 };
 
 /**
