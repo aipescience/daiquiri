@@ -39,7 +39,7 @@ class Daiquiri_View_Helper_AccountMenu extends Zend_View_Helper_Abstract {
             }
             $html .= $this->view->internalLink(array(
                 'href' => '/auth/account/update',
-                'text' => 'Update User',
+                'text' => 'Update Profile',
                 'resource' => 'Auth_Model_Account',
                 'permission' => 'update',
                 'prepend' => '<li class="nav-item">',
