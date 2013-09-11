@@ -105,9 +105,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
 
             $rules['guest'][$options['database']['user']['dbname'] . '.*'] = array('select', 'set');
         }
-        if (!empty($options['config']['cms'])) {
-            $rules['guest']['Cms_Model_Wordpress'] = array('get', 'post');
-        }
+
 
         // construct rules for the user
         $rules['user'] = array();
@@ -206,9 +204,6 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                     array('create', 'show', 'update', 'delete');
             $rules['admin']['Data_Model_Functions'] =
                     array('create', 'show', 'update', 'delete');
-        }
-        if (!empty($options['config']['cms'])) {
-            $rules['admin']['Cms_Model_Wordpress'] = array('get', 'put', 'admin');
         }
 
         $this->_buildRules_r($input['rules'], $output['rules'], $rules);

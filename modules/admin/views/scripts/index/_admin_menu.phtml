@@ -66,9 +66,7 @@ $items = array(
 if (Daiquiri_Config::getInstance()->cms->enabled) {
     $items['wordpress'] = array(
         'text' => 'CMS Admin Interface',
-        'href' => Daiquiri_Config::getInstance()->cms->url . 'wp-admin/',
-        'resource' => 'Cms_Model_Wordpress',
-        'permission' => 'admin');
+        'href' => Daiquiri_Config::getInstance()->cms->url . 'wp-admin/');
 }
 
 foreach ($items as $key => $value) {

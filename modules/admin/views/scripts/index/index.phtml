@@ -23,55 +23,5 @@
 <h2>Administration</h2>
 
 <ul class="nav nav-tabs nav-stacked span9">
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Configuration overview (view and update configuration parameters)',
-        'href' => '/config/entries',
-        'resource' => 'Config_Model_Entries',
-        'permission' => 'index',
-        'prepend' => '<li>',
-        'append' => '</li>'));
-    echo $this->internalLink(array(
-        'text' => 'Mail templates configuration (view and update mail templates)',
-        'href' => '/config/templates',
-        'resource' => 'Config_Model_Templates',
-        'permission' => 'index',
-        'prepend' => '<li>',
-        'append' => '</li>'));
-    echo $this->internalLink(array(
-        'text' => 'User management (view and manage user registred with the system)',
-        'href' => '/auth/user',
-        'resource' => 'Auth_Model_User',
-        'permission' => 'rows',
-        'prepend' => '<li>',
-        'append' => '</li>'));
-    echo $this->internalLink(array(
-        'text' => 'Database management (view and manage tables)',
-        'href' => '/data',
-        'resource' => 'Data_Model_Databases',
-        'permission' => 'show',
-        'prepend' => '<li>',
-        'append' => '</li>'));
-    echo $this->internalLink(array(
-        'text' => 'Sessions management (view and destroy current user sessions)',
-        'href' => '/auth/sessions',
-        'resource' => 'Auth_Model_Sessions',
-        'permission' => 'rows',
-        'prepend' => '<li>',
-        'append' => '</li>'));
-    echo $this->internalLink(array(
-        'text' => 'Contact messages (view and respond to contact messages)',
-        'href' => '/contact/messages',
-        'resource' => 'Contact_Model_Messages',
-        'permission' => 'rows',
-        'prepend' => '<li>',
-        'append' => '</li>'));
-    echo $this->internalLink(array(
-        'text' => 'Query jobs (view and manage database query jobs)',
-        'href' => '/query/jobs',
-        'resource' => 'Query_Model_Jobs',
-        'permission' => 'rows',
-        'prepend' => '<li>',
-        'append' => '</li>'));
-    ?>
+    <?php echo $this->partial('index/_admin_menu.phtml', 'admin'); ?>
 </ul>
