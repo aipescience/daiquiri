@@ -138,6 +138,12 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             return false;
         }
 
+        //paqu does not yet support multiline queries, so raise an error
+        if(count($multiLineUsedDBs) > 1) {
+            $errors['submitError'] = "Multiple queries are not supported with PaQu.";
+            return false;
+        }
+
         //combine multiline queries into one
         $combinedQuery = $this->processing->combineMultiLine($multiLines);
 

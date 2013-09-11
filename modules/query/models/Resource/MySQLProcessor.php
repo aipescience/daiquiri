@@ -216,11 +216,18 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
         //loop through queries and obtain results
         $queryResult = array();
 
-        foreach ($explainSQL as $query) {
-            $stmt = $this->getUserDBResource()->getTable()->getAdapter()->query($query);
+        $conn = $this->getUserDBResource()->getTable()->getAdapter()->getConnection();
 
+        foreach ($explainSQL as $query) {
             try {
-                $queryResult[] = $stmt->fetchAll();
+                $usePos = strpos(strtoupper(trim($query)), "USE");
+                if($usePos !== false && $usePos < 2) {
+                    //exec this only if this is a USE database switch query...
+                    $conn->exec($query);
+                } else {
+                    $stmt = $conn->query($query);
+                    $queryResult[] = $stmt->fetchAll();
+                }
             } catch (Exception $e) {
                 $errors[] = $e->getMessage();
                 return array();
@@ -242,12 +249,20 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
     private function _addExplain(&$multiLines) {
         $explainSQL = array();
 
+        $useStatement = "";
+
         foreach ($multiLines as $key => $query) {
             $selectPos = strpos(strtoupper(trim($query)), "SELECT");
             if ($selectPos !== false) {
                 //check if SELECT is at the beginning
                 if ($selectPos < 2) {
-                    $explainSQL[] = "EXPLAIN EXTENDED " . $query;
+                    $explainSQL[] = $useStatement . "EXPLAIN EXTENDED " . $query;
+                }
+            } else {
+                //check if this is a USE statement
+                $usePos = strpos(strtoupper(trim($query)), "USE");
+                if($usePos !== false && $usePos < 2) {
+                    $useStatement = $query . "; ";
                 }
             }
         }
