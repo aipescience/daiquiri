@@ -100,6 +100,13 @@ daiquiri.samp.SAMP = function (container, opt) {
         });
 
         parent.updateSampClientList();
+
+        // bind unload function to window
+        window.onbeforeunload = function() {
+            if(daiquiri.samp.item.sampConnector.connection) {
+                 daiquiri.samp.item.sampConnector.unregister();
+            }
+        }
     };
     this.sampConnector.onunreg = function() {
         var parent = this.parent;
@@ -181,14 +188,6 @@ daiquiri.samp.SAMP.prototype.displayForm = function()  {
             'id': self.names.clientsList,
             'class': self.names.clientsList,
         }).appendTo($("#" + this.id));
-
-        //bind unload function to window
-        $(window).off('beforeunload');
-        $(window).on('beforeunload', function() {
-            if(daiquiri.samp.item.sampConnector.connection) {
-                daiquiri.samp.item.sampConnector.unregister();
-            }
-        });
     }
     this.updateSampClientList();
 };
