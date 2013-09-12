@@ -70,6 +70,8 @@
     background-color: white;
     width: 530px;
 
+    height: 200px;
+
     /* Copied from Bootstrap's textarea */
     display: inline-block;
     padding: 0px 6px;
