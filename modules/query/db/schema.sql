@@ -10,3 +10,9 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
   `time` DATETIME,
   `comment` TEXT
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Query_Examples` (
+  `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(256) NOT NULL,
+  `query` TEXT NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';

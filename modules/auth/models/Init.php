@@ -120,6 +120,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
 
             $rules['guest'][$options['database']['user']['dbname'] . '.*'] =
                     array('select', 'set', 'drop', 'create', 'alter', 'show tables');
+            $rules['user']['Query_Model_Examples'] =
+                    array('index', 'show');
         }
         if ($options['config']['data']) {
             $rules['user']['Data_Model_Databases'] = array('index', 'show');
@@ -194,6 +196,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         if (!empty($options['config']['query'])) {
             $rules['admin']['Query_Model_Jobs'] =
                     array('rows', 'cols', 'show', 'kill', 'remove', 'rename');
+            $rules['admin']['Query_Model_Examples'] =
+                    array('index', 'show', 'create', 'update', 'delete');
         }
         if ($options['config']['data']) {
             $rules['admin']['Data_Model_Databases'] =

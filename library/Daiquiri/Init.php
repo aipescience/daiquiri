@@ -84,6 +84,7 @@ class Daiquiri_Init {
             $this->_init_models['auth'] = new Auth_Model_Init($application_path, $daiquiri_path, $input_options);
             $this->_init_models['contact'] = new Contact_Model_Init($application_path, $daiquiri_path, $input_options);
             $this->_init_models['data'] = new Data_Model_Init($application_path, $daiquiri_path, $input_options);
+            $this->_init_models['query'] = new Query_Model_Init($application_path, $daiquiri_path, $input_options);
 
             // parse options in an incremental way, order is important
             foreach ($this->_init_models as $key => $value) {

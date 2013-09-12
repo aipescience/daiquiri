@@ -383,9 +383,9 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     }
 
     public function exampleQueriesAction() {
-        if (!empty(Daiquiri_Config::getInstance()->query->examples)) {
-            $this->view->examples = Daiquiri_Config::getInstance()->query->examples->toArray();
-        }
+        $model = Daiquiri_Proxy::factory('Query_Model_Examples');
+        $examples = $model->index();
+        $this->view->examples = $model->index();
     }
 
     public function databaseBrowserAction() {

@@ -81,7 +81,6 @@ class Config_Model_Init extends Daiquiri_Model_Init {
             ),
             'cms' => array(
                 'enabled' => false,
-                'type' => 'wordpress',
                 'url' => '/cms/',
                 'path' => '/var/lib/daiquiri/wordpress'
             ),
@@ -192,7 +191,7 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                 'writeToDB' => 0,
                 'viewer' => array(
                     'removeNewline' => false,
-                    'columnWidth' => '80em'
+                    'columnWidth' => '12em'
                 )
             ),
             'files' => array(),
