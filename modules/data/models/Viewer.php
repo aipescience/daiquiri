@@ -91,7 +91,7 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
                         'width' => '20em',
                         'sortable' => true,
                         'format' => array(
-                            'type' => 'link',
+                            'type' => 'filelink',
                             'base' => $baseurl . '/files/index/single',
                         )
                     );
