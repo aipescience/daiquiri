@@ -34,6 +34,7 @@ class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
         $this->addElement('textarea', 'value', array(
@@ -44,6 +45,7 @@ class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
         $this->addPrimaryButtonElement('submit', 'Create config entry');
