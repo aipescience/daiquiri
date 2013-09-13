@@ -84,6 +84,12 @@ pre {
     /* align a block with a form-horizontal form from bootstrap */
     margin-left: 180px;
 }
+.eighty {
+    width: 80px;
+}
+.onehundred {
+    width: 100px;
+}
 .onehundredtwenty {
     width: 120px;
 }

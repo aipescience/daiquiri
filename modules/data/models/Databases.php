@@ -81,10 +81,20 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
     /**
      * Returns a database entry.
      * @param int $id
+     * @param bool $idIsName = true, if $id is actually a string containing the name of the database
+     *             or $idIsName = false, if $id is the row id as saved in the database
+     * @param bool $fullData if tables and columns should be retrieved as well...
      * @return array
      */
-    public function show($id) {
-        return $this->getResource()->fetchRow($id);
+    public function show($id, $idIsName = false, $fullData = true) {
+        if($idIsName === true) {
+            $id = $this->getResource()->fetchIdWithName($id);
+
+            if($id === false) {
+                return false;
+            }
+        }
+        return $this->getResource()->fetchRow($id, $fullData);
     }
 
     /**

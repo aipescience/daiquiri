@@ -20,13 +20,63 @@
  */
 ?>
 
-<h2>Column details</h2>
+<?php if ($this->status === 'ok'): ?>
+    <h4>Table details</h4>
 
-<table class='table table-bordered'>
-    <?php foreach ($this->data as $key => $value): ?>
+    <table class='table table-bordered'>
         <tr>
-            <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
-            <td><?php echo $this->escape($value); ?></td>
+            <td class="onehundredtwenty">Database name</td>
+            <td>
+                <?php echo $this->escape($this->data['database']); ?>
+            </td>
         </tr>   
-    <?php endforeach; ?>
-</table>
+        <tr>
+            <td class="onehundredtwenty">Table name</td>
+            <td>
+                <?php echo $this->escape($this->data['name']); ?>
+            </td>
+        </tr>   
+        <tr>
+            <td class="onehundredtwenty">Description</td>
+            <td>
+                <?php echo $this->escape($this->data['description']); ?>
+            </td>
+        </tr>   
+    </table>
+
+    <?php if(array_key_exists("columns", $this->data) && !empty($this->data['columns'])): ?>
+        <h5>Column details</h5>
+
+        <table class='table table-bordered'>
+            <tr>
+                <td class="onehundredtwenty">Column</td>
+                <td class="eighty">Type</td>
+                <td class="onehundredtwenty">UCD</td>
+                <td class="onehundred">Unit</td>
+                <td>Description</td>
+            </tr>   
+
+            <?php foreach ($this->data['columns'] as $cols): ?>
+                <tr>
+                    <td class="onehundredtwenty">
+                        <?php echo $this->escape($cols['name']); ?>
+                    </td>
+                    <td class="eighty">
+                        <?php echo $this->escape($cols['type']); ?>
+                    </td>
+                    <td class="onehundredtwenty">
+                        <?php echo $this->escape($cols['ucd']); ?>
+                    </td>
+                    <td class="onehundred">
+                        <?php echo $this->escape($cols['unit']); ?>
+                    </td>
+                    <td>
+                        <?php echo $this->escape($cols['description']); ?>
+                    </td>
+                </tr>   
+            <?php endforeach; ?>
+        </table>
+    <?php endif; ?>
+<?php else: ?>
+<h5>Error retrieving table information</h5>
+<?php endif; ?>

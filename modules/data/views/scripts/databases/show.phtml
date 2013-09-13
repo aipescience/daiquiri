@@ -20,44 +20,84 @@
  */
 ?>
 
-<h2>Database details</h2>
+<?php if ($this->status === 'ok'): ?>
+    <h4>Database details</h4>
 
-<table class='table table-bordered'>
-    <?php foreach ($this->data as $dbKey => $dbValue): ?>
+    <table class='table table-bordered'>
         <tr>
-            <td class="onehundredtwenty"><?php echo $this->escape($dbKey); ?></td>
+            <td class="onehundredtwenty">Database name</td>
             <td>
-                <?php if (is_array($dbValue)): ?>
-                    <?php foreach ($dbValue as $tables): ?>
-                        <table class='table table-bordered'>
-                            <?php foreach ($tables as $tableKey => $tableValue): ?>
-                                <tr>
-                                    <td class="onehundredtwenty"><?php echo $this->escape($tableKey); ?></td>
-                                    <td>
-                                        <?php if (is_array($tableValue)): ?>
-                                            <?php foreach ($tableValue as $cols): ?>
-                                                <table class='table table-bordered'>
-                                                    <?php foreach ($cols as $colKey => $colValue): ?>
-                                                        <tr>
-                                                            <td class="onehundredtwenty"><?php echo $this->escape($colKey); ?></td>
-                                                            <td><?php echo $this->escape($colValue); ?></td>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                </table>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <?php echo $this->escape($tableValue); ?>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>   
-                            <?php endforeach; ?>
-                        </table>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <?php echo $this->escape($dbValue); ?>
-                <?php endif; ?>
+                <?php echo $this->escape($this->data['name']); ?>
             </td>
         </tr>   
-    <?php endforeach; ?>
-</table>
+        <tr>
+            <td class="onehundredtwenty">Description</td>
+            <td>
+                <?php echo $this->escape($this->data['description']); ?>
+            </td>
+        </tr>   
+    </table>
 
+    <?php if(array_key_exists("tables", $this->data) && !empty($this->data['tables'])): ?>
+        <?php foreach ($this->data['tables'] as $table): ?>
+            <h5>Table details</h5>
+
+            <table class='table table-bordered'>
+                <tr>
+                    <td class="onehundredtwenty">Database name</td>
+                    <td>
+                        <?php echo $this->escape($this->data['name']); ?>
+                    </td>
+                </tr>   
+                <tr>
+                    <td class="onehundredtwenty">Table name</td>
+                    <td>
+                        <?php echo $this->escape($table['name']); ?>
+                    </td>
+                </tr>   
+                <tr>
+                    <td class="onehundredtwenty">Description</td>
+                    <td>
+                        <?php echo $this->escape($table['description']); ?>
+                    </td>
+                </tr>   
+            </table>
+
+            <?php if(array_key_exists("columns", $table) && !empty($table['columns'])): ?>
+                <h6>Column details</h6>
+
+                <table class='table table-bordered'>
+                    <tr>
+                        <td class="onehundredtwenty">Column</td>
+                        <td class="eighty">Type</td>
+                        <td class="onehundredtwenty">UCD</td>
+                        <td class="onehundred">Unit</td>
+                        <td>Description</td>
+                    </tr>   
+
+                    <?php foreach ($table['columns'] as $cols): ?>
+                        <tr>
+                            <td class="onehundredtwenty">
+                                <?php echo $this->escape($cols['name']); ?>
+                            </td>
+                            <td class="eighty">
+                                <?php echo $this->escape($cols['type']); ?>
+                            </td>
+                            <td class="onehundredtwenty">
+                                <?php echo $this->escape($cols['ucd']); ?>
+                            </td>
+                            <td class="onehundred">
+                                <?php echo $this->escape($cols['unit']); ?>
+                            </td>
+                            <td>
+                                <?php echo $this->escape($cols['description']); ?>
+                            </td>
+                        </tr>   
+                    <?php endforeach; ?>
+                </table>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>    
+<?php else: ?>
+<h5>Error retrieving database information</h5>
+<?php endif; ?>
