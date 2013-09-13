@@ -27,6 +27,9 @@
  *  limitations under the License.
  */
 
+// Include daiquiri shortcodes
+require_once('daiquiri_shortcodes.php');
+
 /*
  * Add the options when the plugin is activated.
  */

@@ -314,9 +314,22 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
 
         $file = array();
         foreach ($directories as $dir) {
-            if(file_exists($dir . DIRECTORY_SEPARATOR . $name)) {
+            $file = array_merge($file, $this->_findFileRec($name, $dir));
+        }
+
+        return $file;
+    }
+
+    private function _findFileRec($name, $currDir) {
+        $subdirs = glob($currDir . '/*', GLOB_ONLYDIR|GLOB_NOSORT);
+
+        $file = array();
+        foreach($subdirs as $subdir) {
+            $file = array_merge($file, $this->_findFileRec($name, $subdir));
+        }
+
+        if(file_exists($dir . DIRECTORY_SEPARATOR . $name)) {
                 $file[] = $dir . DIRECTORY_SEPARATOR . $name;
-            }
         }
 
         return $file;

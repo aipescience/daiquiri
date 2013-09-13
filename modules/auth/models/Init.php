@@ -103,7 +103,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             $rules['guest']['Data_Model_Databases'] = array('index', 'show');
             $rules['guest']['Data_Model_Viewer'] = array('rows', 'cols');
 
-            $rules['guest'][$options['database']['user']['dbname'] . '.*'] = array('select', 'set');
+            $rules['guest']['Query_Model_Examples'] =
+                    array('index', 'show');
         }
 
 
@@ -118,8 +119,6 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                     array('index', 'show', 'kill', 'remove', 'rename');
             $rules['user']['Query_Model_Database'] = array('show', 'download', 'file', 'stream', 'regen');
 
-            $rules['guest'][$options['database']['user']['dbname'] . '.*'] =
-                    array('select', 'set', 'drop', 'create', 'alter', 'show tables');
             $rules['user']['Query_Model_Examples'] =
                     array('index', 'show');
         }
@@ -152,12 +151,6 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         if (!empty($options['config']['query']) &&
                 strtolower($options['config']['query']['processor']['name'] === 'paqu')) {
             $db = $options['config']['query']['scratchdb'];
-
-            if ($options['config']['query']['guest']) {
-                $rules['guest'][$db . '.*'] = array('select', 'set', 'create');
-            } else {
-                $rules['user'][$db . '.*'] = array('select', 'set', 'create');
-            }
         }
 
         // construct rules for support role

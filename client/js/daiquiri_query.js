@@ -37,7 +37,13 @@ daiquiri.query.Query = function (siteUrl) {
     daiquiri.query.item = this;
 
     // get the baseUrl and the other urls
-    var baseUrl = '/' + siteUrl.split( '/' ).slice(3).join('/')
+    var s = siteUrl.split( '/' );
+    if (s.length == 3) {
+        var baseUrl = '';
+    } else {
+        var baseUrl = '/' + siteUrl.split( '/' ).slice(3).join('/')
+    }
+
     this.url = {
         'jobs': baseUrl + '/query/index/list-jobs',
         'browser':baseUrl + '/query/index/database',

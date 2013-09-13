@@ -31,9 +31,31 @@ class Data_TablesController extends Daiquiri_Controller_Abstract {
     }
 
     public function showAction() {
-        $id = $this->_getParam('id');
-        $this->view->data = $this->_model->show($id);
-        $this->view->status = 'ok';
+        $db = false;
+        if($this->_hasParam('id')) {
+            $id = $this->_getParam('id');  
+        } else {
+            $db = $this->_getParam('db');
+            $id = $this->_getParam('table');
+        }
+        
+        //dive down recusively?
+        $all = true;
+        if($this->_hasParam('all')) {
+            $a = $this->_getParam('all');
+
+            if($a == 0) {
+                $all = false;
+            }
+        }
+
+        $this->view->data = $this->_model->show($id, $db, $all);
+
+        if($this->view->data === false) {
+            $this->view->status = 'error';
+        } else {
+            $this->view->status = 'ok';
+        }
     }
 
     public function createAction() {

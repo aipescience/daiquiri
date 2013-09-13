@@ -437,10 +437,13 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         $sql = trim($sql);
 
         $resource->getTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_ASSOC);
-        $sqlStr = $resource->getTable()->getAdapter()->quoteInto('use ' . $db . '; ' . 'select paqu_validateSQL(?) as a;', $sql);
+        $conn = $resource->getTable()->getAdapter()->getConnection();
+
+        $sqlStr = $resource->getTable()->getAdapter()->quoteInto('select paqu_validateSQL(?) as a;', $sql);
 
         try {
-            $validate = $resource->plainQuery($sqlStr);
+            $conn->exec("use " . $db);
+            $validate = $conn->query($sqlStr)->fetchAll();
         } catch (Exception $e) {
             $errors['validateError'] = $e->getMessage();
             return false;
