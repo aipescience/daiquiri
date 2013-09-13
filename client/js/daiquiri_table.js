@@ -75,17 +75,17 @@ daiquiri.table.Table = function(container, opt) {
     ncols = null;
     colsmodel = null;
 
+    // create pager
+    $('<div/>',{
+        'class': 'daiquiri-table-pager'
+    }).appendTo(this.container);
+    
     // create pane for table
     $('<div/>',{
         'class': 'daiquiri-table-pane',
         'html': '<table class="table"><thead></thead><tbody></tbody></table>'
     }).appendTo(this.container);
 
-    // create pager
-    $('<div/>',{
-        'class': 'daiquiri-table-pager'
-    }).appendTo(this.container);
-    
     // create message
     $('<div/>',{
         'class': 'daiquiri-table-message'
