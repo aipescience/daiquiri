@@ -351,7 +351,6 @@ daiquiri.query.Query.prototype.displayJobs = function(){
     var self = this;
 
     // make ajax request for the list of jobs
-    console.log(self.url.jobs);
     $.ajax({
         url: self.url.jobs,
         dataType: 'json',
