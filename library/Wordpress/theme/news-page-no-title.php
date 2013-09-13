@@ -28,10 +28,9 @@ Template Name: News
 <?php Daiquiri_Layout::getInstance()->get_header(); ?>
 
 <div class="row">
-    <div id="wp-content" class="span9">
+    <div id="wp-content" class="span12">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
                 <div class="post">
-		    <h2><?php the_title(); ?></h2>
                     <?php the_content(); ?>
 
                     <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>

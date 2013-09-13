@@ -940,6 +940,8 @@ daiquiri.query.Query.prototype.renameJob = function () {
                             self.displayDetails();
                             self.displayJobs();
 
+                            // reload the current job
+                            self.loadJob(self.job.id.value)
                         } else if (json.status == 'error') {
                             console.log(json.errors);
                             daiquiri.common.updateCsrf(form, json.csrf);

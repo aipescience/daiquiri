@@ -46,8 +46,11 @@ class Config_Form_EditEntries extends Daiquiri_Form_Abstract {
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
+
+
         $this->addPrimaryButtonElement('submit', 'Edit config entry');
         $this->addButtonElement('cancel', 'Cancel');
 
