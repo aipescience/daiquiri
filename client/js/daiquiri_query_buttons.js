@@ -36,7 +36,7 @@
                     });
                 });
 
-                //activate the default queue button
+                // activate the default queue button
                 if(typeof($('button[name$=_def]', group)).attr('name') == "undefined") {
                     $('button:first-child', group).click();
                 } else {
