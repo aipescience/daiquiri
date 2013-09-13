@@ -328,8 +328,8 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
             $file = array_merge($file, $this->_findFileRec($name, $subdir));
         }
 
-        if(file_exists($dir . DIRECTORY_SEPARATOR . $name)) {
-                $file[] = $dir . DIRECTORY_SEPARATOR . $name;
+        if(file_exists($currDir . DIRECTORY_SEPARATOR . $name)) {
+                $file[] = $currDir . DIRECTORY_SEPARATOR . $name;
         }
 
         return $file;

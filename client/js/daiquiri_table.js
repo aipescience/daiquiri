@@ -475,15 +475,15 @@ daiquiri.table.Table.prototype.rows = function () {
                             
                             format = self.colsmodel[i].format;
                             if (format != undefined) {
-                                if (format.type == 'filelink') {
+                                if (format.type == 'filelink' && text != null) {
                                     var re = /(?:\.([^.]+))?$/;
                                     var ext = re.exec(text)[1];
                                     ext = ext.toLowerCase();
 
                                     if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' || ext == 'bmp') {
-                                        text = '<a href="' + format.base + '/?name=' + text + '" target="_blank">' + text + '</a>';
+                                        text = '<a href="' + format.base + '?name=' + text + '" target="_blank">' + text + '</a>';
                                     } else {
-                                        text = '<a href="' + format.base + '/?name=' + text + '">' + text + '</a>';
+                                        text = '<a href="' + format.base + '?name=' + text + '">' + text + '</a>';
                                     }
                                 } else if (format.type == 'link') {
                                     text = '<a href="' + text + '">' + text + '</a>';
