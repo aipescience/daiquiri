@@ -53,8 +53,10 @@
 }
 .daiquiri-table-pager {
     height: 30px;
+    margin-bottom: 10px;
 }
 .daiquiri-table-pager-nrows {
+    margin: 0;
     width: 10em;
     font-size: 11px;
 }

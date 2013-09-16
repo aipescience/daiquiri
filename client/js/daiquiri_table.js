@@ -75,17 +75,17 @@ daiquiri.table.Table = function(container, opt) {
     ncols = null;
     colsmodel = null;
 
+    // create pager
+    $('<div/>',{
+        'class': 'daiquiri-table-pager'
+    }).appendTo(this.container);
+    
     // create pane for table
     $('<div/>',{
         'class': 'daiquiri-table-pane',
         'html': '<table class="table"><thead></thead><tbody></tbody></table>'
     }).appendTo(this.container);
 
-    // create pager
-    $('<div/>',{
-        'class': 'daiquiri-table-pager'
-    }).appendTo(this.container);
-    
     // create message
     $('<div/>',{
         'class': 'daiquiri-table-message'
@@ -475,8 +475,18 @@ daiquiri.table.Table.prototype.rows = function () {
                             
                             format = self.colsmodel[i].format;
                             if (format != undefined) {
-                                if (format.type == 'link') {
-                                    text = '<a href="' + format.base + '/' + text + '">' + text + '</a>';
+                                if (format.type == 'filelink' && text != null) {
+                                    var re = /(?:\.([^.]+))?$/;
+                                    var ext = re.exec(text)[1];
+                                    ext = ext.toLowerCase();
+
+                                    if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' || ext == 'bmp') {
+                                        text = '<a href="' + format.base + '?name=' + text + '" target="_blank">' + text + '</a>';
+                                    } else {
+                                        text = '<a href="' + format.base + '?name=' + text + '">' + text + '</a>';
+                                    }
+                                } else if (format.type == 'link') {
+                                    text = '<a href="' + text + '">' + text + '</a>';
                                 }
                             }
 
