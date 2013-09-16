@@ -1,13 +1,5 @@
 <?php
 /*
-  Plugin Name: Daiquiri framework integration
-  Description: Daiquiri framework integration
-  Author: author
-  Version: 1.0
-  Text Domain: Daiquiri framework integration
- */
-
-/*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)

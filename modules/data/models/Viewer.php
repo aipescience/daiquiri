@@ -47,7 +47,8 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         if (empty($params['cols'])) {
             $params['cols'] = $this->getResource()->fetchCols();
         } else {
-            $params['cols'] = explode(',', $params['cols']);
+	    // intersect the input array with the cols in the database
+	    $params['cols'] = array_intersect($this->getResource()->fetchCols(), explode(',', $params['cols']));
         }
 
         // obtain column metadata (if this exists)

@@ -64,3 +64,10 @@
     margin-right: 20px;
     float: left;
 }
+#wp-content .news-entry {
+    margin-bottom: 10px;
+}
+#wp-content .news-entry-date {
+    width: 180px;
+    display: inline-block;
+}
