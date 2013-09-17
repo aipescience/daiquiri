@@ -46,9 +46,13 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->getResource()->fetchCols();
+	    $colsIds = array_combine(array_keys($params['cols']),array_keys($params['cols']));
         } else {
-	    // intersect the input array with the cols in the database
-	    $params['cols'] = array_intersect($this->getResource()->fetchCols(), explode(',', $params['cols']));
+	    // explode the input for the cols array
+	    $params['cols'] = explode(',', $params['cols']);
+
+	    // intersect the cols array with the cols in the database to get the ids of the cols
+	    $colsIds = array_keys(array_intersect($this->getResource()->fetchCols(), $params['cols']));
         }
 
         // obtain column metadata (if this exists)
@@ -67,8 +71,8 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         }
 
         $params['colUcd'] = array();
-        foreach ($params['cols'] as $key => $value) {
-            $params['colUcd'][$key] = $tableData['columns'][$key]['ucd'];
+        foreach ($colsIds as $id => $colsId) {
+            $params['colUcd'][$id] = $tableData['columns'][$colsId]['ucd'];
         }
 
         // return columns ot this table
