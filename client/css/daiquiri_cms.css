@@ -71,3 +71,15 @@
     width: 180px;
     display: inline-block;
 }
+#wp-sidebar ul {
+    margin-left: 0px;
+}
+#wp-sidebar .menu ul li {
+    margin-left: 20px;
+}
+#wp-sidebar li {
+    list-style: none;
+}
+#wp-sidebar .sidebar-container {
+    margin-bottom: 20px;
+}
