@@ -69,17 +69,14 @@ class Auth_LoginController extends Daiquiri_Controller_Abstract {
         // get redirect url
         $redirect = $this->_getParam('redirect', '/');
 
-        // get optional parameter for NOT logging out of the cms
-        $cms = $this->_getParam('cms_logout', true);
-
         // get model NOT poxied since acl are not necessarily there
         $model = new Auth_Model_Login();
-        $response = $model->logout($cms);
+        $response = $model->logout();
 
         // set cookies
-        if (!empty($response['cookies'])) {
-            foreach ($response['cookies'] as $cookie) {
-                $this->getResponse()->setHeader('Set-cookie', $cookie);
+        foreach ($this->_request->getCookie() as $cookie => $value) {
+            if (strpos($cookie, 'wordpress_') === 0) {
+                setcookie($cookie, '', 0, '/');
             }
         }
 

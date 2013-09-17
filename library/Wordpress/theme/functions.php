@@ -20,49 +20,6 @@
  */
 
 /*
- * Register the settings when the admin interface is loaded.
- */
-
-add_action('admin_init', 'daiquiri_theme_init');
-
-function daiquiri_theme_init() {
-    add_option('daiquiri_url', 'http://localhost/');
-}
-
-/*
- * Initialize the option page in the administration interface.
- */
-
-add_action('admin_menu', 'daiquiri_theme_menu');
-
-function daiquiri_theme_menu() {
-    add_theme_page('Daiquiri Theme Options', 'Options', 'edit_theme_options', 'daiquiri-theme-options', 'daiquiri_theme_options');
-}
-
-function daiquiri_theme_options() {
-    ?>
-    <div class="wrap">
-        <form method="post" action="options.php">
-            <table class="form-table">
-                <?php settings_fields('daiquiri'); ?>
-                <tr valign="top">
-                    <th scope="row">
-                        <label>daiquiri_url</label>
-                    </th>
-                    <td>
-                        <input type="text" class="regular-text" name="daiquiri_url" value="<?php echo get_option('daiquiri_url'); ?>" />
-                    </td>
-                </tr>
-            </table>
-            <p class="submit">
-                <input type="submit" name="Submit" value="Save changes" />
-            </p>
-        </form>
-    </div>
-    <?php
-}
-
-/*
  * Singleton to get and store the layout form daiquiri.
  * The layout is seperated in header and footer wordpress style.
  */

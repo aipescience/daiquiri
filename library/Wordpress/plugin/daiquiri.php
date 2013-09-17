@@ -29,60 +29,7 @@
 
 // Include daiquiri shortcodes
 require_once('daiquiri_shortcodes.php');
-
-/*
- * Add the options when the plugin is activated.
- */
-
-register_activation_hook(WP_PLUGIN_DIR . '/daiquiri/daiquiri.php', 'daiquiri_activate');
-
-function daiquiri_activate() {
-    add_option('daiquiri_url', 'http://localhost/');
-}
-
-/*
- * Register the settings when the admin interface is loaded.
- */
-
-add_action('admin_init', 'daiquiri_admin_init');
-
-function daiquiri_admin_init() {
-    register_setting('daiquiri', 'daiquiri_url');
-}
-
-/*
- * Initialize the option page in the administration interface.
- */
-
-add_action('admin_menu', 'daiquiri_admin_menu');
-
-function daiquiri_admin_menu() {
-    add_options_page('Daiquiri Administration', 'Daiquiri', 'activate_plugins', 'daiquiri', 'daiquiri_admin_display');
-    remove_menu_page('users.php');
-}
-
-function daiquiri_admin_display() {
-    ?>
-    <div class="wrap">
-        <form method="post" action="options.php">
-            <table class="form-table">
-                <?php settings_fields('daiquiri'); ?>
-                <tr valign="top">
-                    <th scope="row">
-                        <label>daiquiri_url</label>
-                    </th>
-                    <td>
-                        <input type="text" class="regular-text" name="daiquiri_url" value="<?php echo get_option('daiquiri_url'); ?>" />
-                    </td>
-                </tr>
-            </table>
-            <p class="submit">
-                <input type="submit" name="Submit" value="Save changes" />
-            </p>
-        </form>
-    </div>
-    <?php
-}
+require_once('daiquiri_options.php');
 
 /*
  * Automatiacally login the user which is logged in into daiquiri right now.
@@ -92,113 +39,52 @@ add_action('init', 'daiquiri_auto_login');
 
 function daiquiri_auto_login() 
 {
-    // check which user is logged in into daiquiri right now
-    $siteUrl = get_option('siteurl');
-    $layoutUrl = get_option('daiquiri_url') . '/auth/account/show/';
-    if (strpos($layoutUrl, $siteUrl) !== false) {
-        echo '<h1>Error with theme</h1><p>Layout URL is below CMS URL.</p>';
-        die(0);
-    }
-
-    // construct request
-    require_once('HTTP/Request2.php');
-    $req = new HTTP_Request2($layoutUrl);
-    $req->setConfig(array(
-        'connect_timeout' => 2,
-        'timeout' => 3
-    ));
-    $req->setMethod('GET');
-    $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
-    $req->setHeader('Accept: application/json');
-
-    try {
-        $response = $req->send();
-        $status = $response->getStatus();
-        $body = $response->getBody();
-    } catch (HTTP_Request2_Exception $e) {
-        echo '<h1>Error with daiquiri auth</h1><p>Error with HTTP request.</p>';
-        die(0);
-    }
-
-    if ($status == 403) {
-        if (is_user_logged_in()) {
-            wp_clear_auth_cookie();
-            wp_redirect($_SERVER['REQUEST_URI']);
-            exit();
-        }
-    } else if ($status == 200) {
-        // decode the non empty json to the remote user array
-        $remoteUser = json_decode($response->getBody());
-
-        $daiquiriUser = array();
-        foreach(array('id','username','firstname','lastname','email','website','role') as $key) {
-            if (isset($remoteUser->data->$key)) {
-                $daiquiriUser[$key] = $remoteUser->data->$key;
-            }
+    if (!is_user_logged_in()) {
+        // check which user is logged in into daiquiri right now
+        $siteUrl = get_option('siteurl');
+        $layoutUrl = get_option('daiquiri_url') . '/auth/account/show/';
+        if (strpos($layoutUrl, $siteUrl) !== false) {
+            echo '<h1>Error with theme</h1><p>Layout URL is below CMS URL.</p>';
+            die(0);
         }
 
-        if (is_user_logged_in()) {
-            // check if the RIGHT user is logged in
-            $currentUser = wp_get_current_user();;
-            if (strcmp($currentUser->user_login, $daiquiriUser['id']) != 0) {
+        // construct request
+        require_once('HTTP/Request2.php');
+        $req = new HTTP_Request2($layoutUrl);
+        $req->setConfig(array(
+            'connect_timeout' => 2,
+            'timeout' => 3
+        ));
+        $req->setMethod('GET');
+        $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
+        $req->setHeader('Accept: application/json');
+
+        try {
+            $response = $req->send();
+            $status = $response->getStatus();
+            $body = $response->getBody();
+        } catch (HTTP_Request2_Exception $e) {
+            echo '<h1>Error with daiquiri auth</h1><p>Error with HTTP request.</p>';
+            die(0);
+        }
+
+        if ($status == 403) {
+            if (is_user_logged_in()) {
                 wp_clear_auth_cookie();
                 wp_redirect($_SERVER['REQUEST_URI']);
                 exit();
             }
+        } else if ($status == 200) {
+            // decode the non empty json to the remote user array
+            $remoteUser = json_decode($response->getBody());
 
-            // check if the user was updated
-            $updated = false;
-
-            // check main credentials
-            foreach(array(
-                    'username' => 'user_nicename',
-                    'email' => 'user_email',
-                    'firstname' => 'first_name',
-                    'lastname' => 'last_name'
-                ) as $key => $value) {
-
-                if (isset($daiquiriUser[$key])) {
-                    if (strcmp($currentUser->$value, $daiquiriUser[$key]) != 0) {
-                        $updated = true;
-                    }
-                }
-
-            }
-
-            // check url
-            $currentUrl  = str_replace(array('http://','https://'),'', $currentUser->user_url);
-            $daiquiriUrl = str_replace(array('http://','https://'),'', $daiquiriUser['website']);
-            if (strcmp($currentUrl,$daiquiriUrl) != 0) {
-                $updated = true;
-            }
-
-            // check role
-            if (count($currentUser->roles) != 1) {
-                $updated = true;
-            } else {
-                if ($daiquiriUser['role'] === 'admin') {
-                    if ($currentUser->roles[0] !== 'administrator') {
-                        $updated = true;
-                    }
-                } else if ($daiquiriUser['role'] === 'manager') {
-                    if ($currentUser->roles[0] !== 'editor') {
-                        $updated = true;
-                    }
-                } else {
-                    if ($currentUser->roles[0] !== 'subscriber') {
-                        $updated = true;
-                    }
+            $daiquiriUser = array();
+            foreach(array('id','username','firstname','lastname','email','website','role') as $key) {
+                if (isset($remoteUser->data->$key)) {
+                    $daiquiriUser[$key] = $remoteUser->data->$key;
                 }
             }
-            
-            // update the user if things were changed
-            if ($updated === true) {
-                // logout and redirect
-                wp_clear_auth_cookie();
-                wp_redirect($_SERVER['REQUEST_URI']);
-                exit();
-            }
-        } else {
+
             // create/update the wordpress user to match the daiquiri user
             // the id in daiquiri maps to the user_login in wp
             // the username in daiquiri maps to the user_nicename in wp
@@ -254,10 +140,10 @@ function daiquiri_auto_login()
             wp_set_current_user($user->ID, $user->user_login);
             wp_set_auth_cookie($user->ID);
             do_action('wp_login', $user->user_login);
+        } else {
+            echo '<h1>Error with auth</h1><p>HTTP request status != 200.</p>';
+            die(0); 
         }
-    } else {
-        echo '<h1>Error with auth</h1><p>HTTP request status != 200.</p>';
-        die(0); 
     }
 }
 
