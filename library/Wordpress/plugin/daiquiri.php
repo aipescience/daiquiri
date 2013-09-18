@@ -41,16 +41,9 @@ function daiquiri_auto_login()
 {
     if (!is_user_logged_in()) {
         // check which user is logged in into daiquiri right now
-        $siteUrl = get_option('siteurl');
-        $layoutUrl = get_option('daiquiri_url') . '/auth/account/show/';
-        if (strpos($layoutUrl, $siteUrl) !== false) {
-            echo '<h1>Error with theme</h1><p>Layout URL is below CMS URL.</p>';
-            die(0);
-        }
-
-        // construct request
+        $userUrl = get_option('daiquiri_url') . '/auth/account/show/';
         require_once('HTTP/Request2.php');
-        $req = new HTTP_Request2($layoutUrl);
+        $req = new HTTP_Request2($userUrl);
         $req->setConfig(array(
             'connect_timeout' => 2,
             'timeout' => 3
@@ -77,7 +70,6 @@ function daiquiri_auto_login()
         } else if ($status == 200) {
             // decode the non empty json to the remote user array
             $remoteUser = json_decode($response->getBody());
-
             $daiquiriUser = array();
             foreach(array('id','username','firstname','lastname','email','website','role') as $key) {
                 if (isset($remoteUser->data->$key)) {
@@ -132,7 +124,9 @@ function daiquiri_auto_login()
             if (is_int($status)) {
                 $userId = $status;
             } else {
+	        echo '<h1>Error with auth</h1>';
                 var_dump($status);
+		exit();
             }
 
             // log in the newly created or updated user
@@ -158,7 +152,7 @@ function daiquiri_authenticate($username, $password) {
 
     if (!is_user_logged_in()) {
         if ($_GET["no_redirect"] !== 'true') {
-            $daiquiriLogin = get_option('daiquiri_url') . 'auth/login';
+            $daiquiriLogin = get_option('daiquiri_url') . '/auth/login';
             wp_redirect($daiquiriLogin);
             exit;
         }
@@ -166,7 +160,7 @@ function daiquiri_authenticate($username, $password) {
         // check if there is a redirect
         if (empty($_GET['redirect_to'])) {
             // redirect to the daiquiri login page
-            $daiquiriLogin = get_option('daiquiri_url') . 'auth/login';
+            $daiquiriLogin = get_option('daiquiri_url') . '/auth/login';
             wp_redirect($daiquiriLogin);
             exit;
         } else {
