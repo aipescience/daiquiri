@@ -34,6 +34,12 @@
                                 
             $('.daiquiri-query-example').click(function() {
                 var string = $(this).attr('data-toggle');
+
+                // clear textarea
+                $('#sql_query').val('');
+                $('#sql_query').daiquiri_codemirror_clear();
+
+                // insert query
                 $('#sql_query').insertAtCaret(string);
                 $('#sql_query').daiquiri_codemirror_insertAtCaret(string);
             });
