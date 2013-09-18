@@ -44,6 +44,17 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $jobs->addJob($job['table'], $href, array($status));
         }
 
+        $resUWSJobs = new Uws_Model_Resource_UWSJobs();
+
+        $pendingJobList = $resUWSJobs->fetchRows();
+
+        foreach ($pendingJobList as $job) {
+            $href = Daiquiri_Config::getInstance()->getSiteUrl() .
+                    "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
+            $status = $job['phase'];
+            $jobs->addJob($job['jobId'], $href, array($status));
+        }
+
         return $jobs;
     }
 
