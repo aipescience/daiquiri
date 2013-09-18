@@ -394,7 +394,7 @@ daiquiri.query.Query.prototype.displayJobs = function(){
             $.each($('a',jobDiv),function(){  
                 // load job on click
                 $(this).click(function() {
-                    self.pollingDownload = null;
+                    self.pendingDownload = null;
 
                     var jobId = $(this).attr('href').split("-")[1];
                     
@@ -680,19 +680,22 @@ daiquiri.query.Query.prototype.regenerateDownload = function(link) {
 };
 
 daiquiri.query.Query.prototype.pollDownload = function(){
-    var self = this;
+    var self = daiquiri.query.item;
 
     // check if polling was disabled already
-    if (self.pollingDownload == null) {
+    if (self.pendingDownload == null) {
         $(window).unbind('poll', daiquiri.query.item.pollDownload);
         return;
     }
 
     // check if the job is completed
     if (self.job.status.value != 'success') {
-        self.pollingDownload == null;
+        self.pendingDownload == null;
         return;
     }
+
+    // get the csrf from the form
+    self.pendingDownload.data.download_csrf = $('#download_csrf', 'form', self.tabs.download).val();
 
     // make an ajax call to get the updated status of the download
     if (self.idle) {
@@ -704,9 +707,10 @@ daiquiri.query.Query.prototype.pollDownload = function(){
             headers: {
                 'Accept': 'application/json'
             },
-            data: self.pollingDownload.data,
+            data: self.pendingDownload.data,
             error: daiquiri.common.ajaxError,
             success: function(json) {
+		daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
                 self.initDownload(json);
             }
         });
@@ -723,7 +727,8 @@ daiquiri.query.Query.prototype.initDownload = function(json) {
         if(self.pendingDownload == null) {
             self.pendingDownload = {
                 'data': {
-                    'format': $('#format', 'form', self.tabs.download).val(),
+                    'download_format': $('#download_format', 'form', self.tabs.download).val(),
+		    'download_csrf': $('#download_csrf', 'form', self.tabs.download).val(),
                     'table': self.job.table.value
                 }
             };
