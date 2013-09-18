@@ -60,10 +60,19 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
         $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
 
         // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current()->toArray();
-        unset($row['database_id']);
-        unset($row['table_id']);
-        return $row;
+        $row = $this->getTable()->fetchAll($select)->current();
+
+        $data = false;
+
+        if($row) {
+            $row = $row->toArray();
+            unset($row['database_id']);
+            unset($row['table_id']);
+
+            $data = $row;
+        }
+
+        return $data;
     }
 
     /**
