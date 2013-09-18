@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: News
+Template Name: News (no title)
 */
 ?>
 <?php
@@ -51,7 +51,12 @@ Template Name: News
 	<ul class="unstyled">
         <?php 
         foreach (wp_get_recent_posts() as $post) {
-	    echo '<li><a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"].'</a></li>';
+	    echo '<li class="news-entry">';
+	    echo '<span class="news-entry-date">';
+	    echo date('F jS, Y', strtotime($post["post_date"]));
+	    echo '</span>';
+	    echo '<a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"].'</a>';
+	    echo '</li>';
         }
         ?>
 	</ul>
