@@ -43,15 +43,39 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
     public function fetchRow($id) {
         $sqloptions = array();
 
-        // get the names of the involved tables
-        $j = $this->getTable('UWS_Jobs')->getName();
-
         // get the primary sql select object
         $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`$j`.`jobId` = ?", $id);
+        $select->where("`jobId` = ?", $id);
+        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
 
         // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current()->toArray();
+        $row = $this->getTable()->fetchAll($select)->current();
+
+        $data = false;
+
+        if($row) {
+            $data = $row->toArray();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Returns a specific row from the (pending) job table
+     * @param type $id
+     * @throws Exception
+     * @return type 
+     */
+    public function fetchRows() {
+        $sqloptions = array();
+
+        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
+        // get the primary sql select object
+        $select = $this->getTable()->getSelect($sqloptions);
+        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
+
+        // get the rowset and return
+        $row = $this->getTable()->fetchAll($select)->toArray();
         return $row;
     }
 
@@ -67,10 +91,10 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
         $select = $this->getTable()->getSelect($sqloptions);
 
         $select->where("`jobId` = ?", $id);
+        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->toArray();
-
 
         if ($row) {
             //map information to an object
