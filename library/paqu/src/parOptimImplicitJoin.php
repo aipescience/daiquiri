@@ -568,10 +568,9 @@ function linkInnerQueryToOuter(&$currOuterQuery, &$currInnerNode, &$tableList, $
       #check if this has already been aliased
       if ($alias == $tmp[0] && strpos($tmp[0], 'agr_')) {
         continue 1;
-      } //taking this out for the moment... 
-      /* else {
-      $node['base_expr'] = $alias . '.`' . trim($node['alias'], '`') . '`';
-      }*/
+      } else {
+        $node['base_expr'] = $alias . '.`' . trim($node['alias'], '`') . '`';
+      }
     }
 
     if (!array_key_exists('where_col', $node) && !array_key_exists('order_clause', $node) && !array_key_exists('group_clause', $node)) {
@@ -1067,7 +1066,7 @@ function PHPSQLrewriteAliasWhere(&$node, $tableList, $recLevel, &$toThisNode) {
               }
             }
 
-            $subnode['base_expr'] = '`' . $tableList[$tblKey]['alias'] . '`.`' . $subnode['base_expr'] . '`';
+            $subnode['base_expr'] = '`' . trim($tableList[$tblKey]['alias'], "`") . '`.`' . $subnode['base_expr'] . '`';
           }
         }
       }
@@ -1434,7 +1433,7 @@ function PHPSQLaddOuterQueryFrom(&$sqlTree, &$table, &$toThisNode, $tableList, $
  */
 function PHPSQLcollectColumns($sqlSelect, $tblDb, $tblName, $tblAlias, &$returnArray, &$tableList, $recLevel, $startBranch = true) {
   $countDiffTables = 0;
-  $tblAlias = str_replace($tblAlias, "`", "");
+  $tblAlias = str_replace("`", "", $tblAlias);
 
   $workload = array();
   if (array_key_exists('SELECT', $sqlSelect)) {
@@ -1468,7 +1467,7 @@ function PHPSQLcollectColumns($sqlSelect, $tblDb, $tblName, $tblAlias, &$returnA
 
 //	    if ($currTable == $tblAlias || ($tblAlias == $tblDb . "." . $tblName && $currTable === false) || $currTable == $tblName) {
       if ($currTable == $tblAlias || ($currTable === false) || $currTable == $tblName || 
-             $tblAlias = $currDB . "." . $currTable) {
+             $tblAlias == $currDB . "." . $currTable) {
         if ($startBranch === true) {
           array_push($returnArray, $node);
         }

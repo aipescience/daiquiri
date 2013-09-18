@@ -33,7 +33,12 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         $id = $this->_getParam('id');
         $this->view->data = $this->_model->show($id);
-        $this->view->status = 'ok';
+
+        if($this->view->data === false) {
+            $this->view->status = 'error';
+        } else {
+            $this->view->status = 'ok';
+        }
     }
 
     public function createAction() {

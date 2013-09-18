@@ -20,6 +20,7 @@
  */
 ?>
 
+<?php if ($this->status === 'ok'): ?>
 <h2>Column details</h2>
 
 <table class='table table-bordered'>
@@ -30,3 +31,6 @@
         </tr>   
     <?php endforeach; ?>
 </table>
+<?php else: ?>
+<h5>Error retrieving column information</h5>
+<?php endif; ?>
