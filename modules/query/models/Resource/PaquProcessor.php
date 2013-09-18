@@ -341,7 +341,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                         if ($node[0] === "paquExec") {
                             //count parameters
                             if (!empty($node[1])) {
-                                preg_match("/\(\s*\"(.+)\"\s*,\s*\"(.+)\"\s*\)/", $node[1], $res);
+                                preg_match("/\(\s*'(.+)'\s*,\s*'(.+)'\s*\)/", $node[1], $res);
                                 if (count($res) != 3 || strpos($res[1], '"') !== false) {
                                     $errors[] = "paquExec needs two parameters.";
                                     return false;
@@ -355,7 +355,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                         } else if ($node[0] === "paquLinkTmp") {
                             //count parameters
                             if (!empty($node[1])) {
-                                preg_match("/\(\s*\"(.+)\"\s*\)/", $node[1], $res);
+                                preg_match("/\(\s*'(.+)'\s*\)/", $node[1], $res);
                                 if (count($res) != 2 || strpos($res[1], '"') !== false) {
                                     $errors[] = "paquLinkTmp needs one parameters.";
                                     return false;
@@ -369,7 +369,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                         } else if ($node[0] === "paquDropTmp") {
                             //count parameters
                             if (!empty($node[1])) {
-                                preg_match("/\(\s*\"(.+)\"\s*\)/", $node[1], $res);
+                                preg_match("/\(\s*'(.+)'\s*\)/", $node[1], $res);
                                 if (count($res) != 2 || strpos($res[1], '"') !== false) {
                                     $errors[] = "paquDropTmp needs one parameters.";
                                     return false;
