@@ -69,8 +69,6 @@ class ParallelQuery {
     private $checkOnDB = true;                          //!< Run checks on DB or has query already been validated elsewhere 
     private $addRowNumbersToFinalTable = false;         //!< Adds row numbers to final result table
 
-    private $dataDB = false;                            //!< The database where most of the query is done for finding the spider nodes
-
     private $headNodeTables = array();                  //!< List of tables that are completely located on the head node and are not sharded
 
     function __construct() {
@@ -89,10 +87,6 @@ class ParallelQuery {
 
     function setDB($value) {
         $this->defDB = $value;
-    }
-
-    function setDataDB($value) {
-        $this->dataDB = $value;
     }
 
     function setEngine($value) {
@@ -285,7 +279,7 @@ class ParallelQuery {
         $query_id = "/* PaQu: QID " . mt_rand(1, 100000000) . " */ ";
         
         foreach($this->shardedQueries as $query) {
-            if(preg_match('/\s*call\s*paquExec\s*\(\s*\"(.{1,}?)\"\s*,\s*\"(.{1,}?)\"\s*\)\s*/i', $query, $matches)) {
+            if(preg_match('/\s*call\s*paquExec\s*\(\s*\'(.{1,}?)\'\s*,\s*\'(.{1,}?)\'\s*\)\s*/i', $query, $matches)) {
                 #remove any LIMIT clause, that might interfere
                 #if this limit is part of a subquery, there must be a closing parenthesis at pos > limit_pos
                 $tmpPos = strrpos($matches[1], "LIMIT");
@@ -324,7 +318,7 @@ class ParallelQuery {
                 array_push($this->actualQueries, $hostTableCreateQuery);
                 array_push($this->actualQueries, $shardCreateFedTable);
                 array_push($this->actualQueries, $shardActualQuery);
-            } else if(preg_match('/\s*call\s*paquLinkTmp\s*\(\s*\"(.{1,}?)\"\s*\)\s*/i', $query, $matches)) {
+            } else if(preg_match('/\s*call\s*paquLinkTmp\s*\(\s*\'(.{1,}?)\'\s*\)\s*/i', $query, $matches)) {
                 $shardCreateFedTable = "SET @a := (SELECT GROUP_CONCAT(CONCAT(column_name, ' ', column_type)) FROM information_schema.COLUMNS " .
                                         "WHERE TABLE_SCHEMA='" . $this->defDB . "' AND TABLE_NAME='" . $matches[1] . "');\n";
 
@@ -340,7 +334,7 @@ class ParallelQuery {
                 $shardCreateFedTable .= "')) from (select * from mysql.spider_tables group by host, port) as `__sp__`"; #where table_name like '" . $this->defTable ."#%'";
 
                 array_push($this->actualQueries, $shardCreateFedTable);
-            } else if(preg_match('/\s*call\s*paquDropTmp\s*\(\s*\"(.{1,}?)\"\s*\)\s*/i', $query, $matches)) {
+            } else if(preg_match('/\s*call\s*paquDropTmp\s*\(\s*\'(.{1,}?)\'\s*\)\s*/i', $query, $matches)) {
                 $dropTableShard = $query_id . " SELECT spider_bg_direct_sql('" . $query_id . " DROP TABLE ". $this->defDB . "." . $matches[1] . 
                                   "', '', concat('host \"', `__sp__`.host ,'\", port \"', `__sp__`.port ,'\", user \"". $this->defSpiderUsr ."\"";
 
