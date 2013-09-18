@@ -292,7 +292,7 @@ class ParallelQuery {
                 $hostTableCreateQuery = $query_id . " CREATE DATABASE IF NOT EXISTS ". $this->defDB .
                                         "; USE ". $this->defDB .
                                         "; " . $query_id . " CREATE TABLE ". $this->defDB ."." . $matches[2] .
-                                        " ENGINE=". $this->defEngine . " " . $limitFreeQuery . " LIMIT 0";
+                                        " ENGINE=". $this->defEngine . " " . str_replace("\'", "'", $limitFreeQuery) . " LIMIT 0";
                         
                 $shardCreateFedTable = $query_id . " SELECT spider_bg_direct_sql('CREATE DATABASE IF NOT EXISTS ". $this->defDB .
                                         "; " . $query_id . " CREATE TABLE ". $this->defDB ."." . $matches[2] . 

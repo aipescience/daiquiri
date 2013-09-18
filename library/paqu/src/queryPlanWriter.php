@@ -114,11 +114,10 @@ function PHPSQLqueryPlanWriter($shard_query, $resultTable, $addRowNumber = false
     $dropTables = array();
 
     foreach($shard_query->subqueries as $key => $query) {
-
-      $query[0] = str_replace("\'", "'", $query[0]);
-      $query[0] = str_replace("'", "\'", $query[0]);
-
     	if($query['parallel'] === true) {
+        $query[0] = str_replace("\'", "'", $query[0]);
+        $query[0] = str_replace("'", "\'", $query[0]);
+
   	    $paraQuery = "CALL paquExec('" . str_replace("\n", " ", $query[0]) . "', '" . $key . "')";
   	    
   	    $dropTableHead = "CALL paquDropTmp('" . $key . "')";
