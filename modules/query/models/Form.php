@@ -29,6 +29,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             throw new Exception('form options not found');
         } else {
             $formOptions = $formConfig->toArray();
+	    $formOptions['name'] = $formstring;
         }
 
         // get queues

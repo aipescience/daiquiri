@@ -50,6 +50,13 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
     abstract public function getQueue();
 
     abstract public function getCsrf();
+
+    public function getFieldId($string) {
+        if (!isset($this->_formOptions['name'])) {
+	    throw new Exception('no name was specified');
+        }
+        return $this->_formOptions['name'] . '_' . $string;
+    }
     
     public function addQueueElements($prefix) {
         if (!empty($this->_queues)) {
@@ -100,7 +107,7 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
     protected function _escape($string) {
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
-        return trim($adapter->quote($string, $value), "'");
+        return trim($adapter->quote($string), "'");
     }
 
 }
