@@ -26,71 +26,67 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         if (!isset($this->_formOptions['table'])) {
             throw new Exception('no table was specified');
         }
+	if (!isset($this->_formOptions['ra'])) {
+            throw new Exception('no ra field was specified');
+        }
+	if (!isset($this->_formOptions['dec'])) {
+            throw new Exception('no dec field was specified');
+        }
 
-        $sql = "SELECT * FROM {$this->_formOptions['table']}";
-        $sql .= $this->_quoteInto(" WHERE `raj2000_deg` >= ?", $this->getValue('cone_ramin'));
-        $sql .= $this->_quoteInto(" AND `raj2000_deg` <= ?", $this->getValue('cone_ramax'));
-        $sql .= $this->_quoteInto(" AND `dej2000_deg` >= ?", $this->getValue('cone_demin'));
-        $sql .= $this->_quoteInto(" AND `dej2000_deg` <= ?", $this->getValue('cone_demax'));
+	$ra     = $this->_escape($this->getValue($this->getFieldId('ra')));
+	$dec    = $this->_escape($this->getValue($this->getFieldId('dec')));
+	$radius = $this->_escape($this->getValue($this->getFieldId('radius')));
 
+	$sql = "SELECT angdist({$ra},{$dec},`{$this->_formOptions['ra']}`,`{$this->_formOptions['dec']}`)";
+	$sql .= " * 3600.0 AS distance_arcsec, s.* FROM {$this->_formOptions['table']} AS s";
+	$sql .= " WHERE angdist({$ra},{$dec},`{$this->_formOptions['ra']}`,`{$this->_formOptions['dec']}`)";
+	$sql .= " < {$radius} / 3600.0;";
         return $sql;
     }
 
     public function getTablename() {
-        return $this->getValue('cone_tablename');
+        return $this->getValue($this->getFieldId('tablename'));
     }
 
     public function getQueue() {
-        return $this->getValue('cone_queue');
+        return $this->getValue($this->getFieldId('queue'));
     }
 
     public function getCsrf() {
-        return $this->getElement('cone_csrf');
+        return $this->getElement($this->getFieldId('csrf'));
     }
 
     public function init() {
         $this->setAttrib('id', 'daiquiri-form-query-cone');
         $this->setFormDecorators();
-        $this->addCsrfElement('cone_csrf');
+        $this->addCsrfElement($this->getFieldId('csrf'));
 
         // add fields
-        $this->addElement('text', 'cone_ramin', array(
+        $this->addElement('text', $this->getFieldId('ra'), array(
             'filters' => array('StringTrim'),
             'required' => true,
             'validators' => array(
                 array('validator' => 'float')
             ),
-            'label' => 'RA<sub>min</sub>',
-            'class' => 'span2'
+            'label' => 'RA'
         ));
-        $this->addElement('text', 'cone_ramax', array(
+        $this->addElement('text', $this->getFieldId('dec'), array(
             'filters' => array('StringTrim'),
             'required' => true,
             'validators' => array(
                 array('validator' => 'float')
             ),
-            'label' => 'RA<sub>max</sub>',
-            'class' => 'span2'
+            'label' => 'DEC'
         ));
-        $this->addElement('text', 'cone_demin', array(
+        $this->addElement('text', $this->getFieldId('radius'), array(
             'filters' => array('StringTrim'),
             'required' => true,
             'validators' => array(
                 array('validator' => 'float')
             ),
-            'label' => 'DEC<sub>min</sub>',
-            'class' => 'span2'
+            'label' => 'Radius'
         ));
-        $this->addElement('text', 'cone_demax', array(
-            'filters' => array('StringTrim'),
-            'required' => true,
-            'validators' => array(
-                array('validator' => 'float')
-            ),
-            'label' => 'DEC<sub>max</sub>',
-            'class' => 'span2'
-        ));
-        $this->addElement('text', 'cone_tablename', array(
+        $this->addElement('text', $this->getFieldId('tablename'), array(
             'filters' => array(
                 'StringTrim',
                 array('PregReplace', array('match' => '/ /', 'replace' => '_'))
@@ -104,21 +100,20 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         ));
 
         // add fields
-        $this->addPrimaryButtonElement('cone_submit', 'Submit new cone search');
+        $this->addPrimaryButtonElement($this->getFieldId('submit'), 'Submit new cone search');
 
         // add groups
-        $this->addViewScriptGroup(array('cone_ramin', 'cone_ramax', 'cone_demin', 'cone_demax'), '_forms/cone.phtml');
-        $this->addParagraphGroup(array('cone_tablename'), 'table-group', false, true);
-        $this->addInlineGroup(array('cone_submit'), 'button-group');
+        $this->addHorizontalGroup(array($this->getFieldId('ra'), $this->getFieldId('dec'), $this->getFieldId('radius')));
+        $this->addParagraphGroup(array($this->getFieldId('tablename')), 'table-group', false, true);
+        $this->addInlineGroup(array($this->getFieldId('submit')), 'button-group');
 
         if (isset($this->_tablename)) {
-            $this->setDefault('cone_tablename', $this->_tablename);
+            $this->setDefault($this->getFieldId('tablename'), $this->_tablename);
         }
 
-        $this->setDefault('cone_ramin', '0');
-        $this->setDefault('cone_ramax', '360');
-        $this->setDefault('cone_demin', '-90');
-        $this->setDefault('cone_demax', '90');
+	$this->setDefault($this->getFieldId('ra'), '320.0');
+        $this->setDefault($this->getFieldId('dec'), '16.0');
+        $this->setDefault($this->getFieldId('radius'), '2.0');
     }
 
 }

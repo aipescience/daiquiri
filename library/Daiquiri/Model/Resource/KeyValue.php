@@ -61,6 +61,7 @@ class Daiquiri_Model_Resource_KeyValue extends Daiquiri_Model_Resource_Abstract 
 
     public function fetchRows() {
         $select = $this->getTable()->select();
+        $select->order('key asc');
         $rows = $this->getTable()->fetchAll($select);
 
         if ($rows) {
