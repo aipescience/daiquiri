@@ -126,6 +126,11 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
                     );
                 }
             } else {
+                $width = Daiquiri_Config::getInstance()->data->viewer->columnWidth;
+                if(!($width)) {
+                    $width = "12em";
+                }
+
                 $col = array(
                     'name' => $name,
                     'width' => Daiquiri_Config::getInstance()->data->viewer->columnWidth,
