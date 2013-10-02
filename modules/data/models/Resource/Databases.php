@@ -105,6 +105,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
                 // get the sql select object
                 $select = $tablesTable->select();
                 $select->where('database_id = ?', $data['id']);
+                $select->where("`publication_role_id` <= ?", count($usrRoles));
                 $tables = $tablesTable->fetchAll($select)->toArray();
 
                 // get columns table
