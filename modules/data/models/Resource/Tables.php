@@ -37,17 +37,21 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
     }
 
     public function fetchRows($sqloptions = array()) {
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
+
         // get the names of the involved tables
         $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
         $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
 
         // get the primary sql select object
         $select = $this->getTable()->getSelect($sqloptions);
+        $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
 
         // add inner joins for the category and the status
         $select->setIntegrityCheck(false);
         if (isset($sqloptions['from']) && in_array('database', $sqloptions['from'])) {
             $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
+            $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
         }
         // get the rowset and return
         $rows = $this->getTable()->fetchAll($select);
@@ -66,6 +70,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         //get the roles
         $rolesModel = new Auth_Model_Roles();
         $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the names of the involved tables
         $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
@@ -74,10 +79,12 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         // get the primary sql select object
         $select = $this->getTable()->getSelect($sqloptions);
         $select->where("`$t`.`id` = ?", $id);
+        $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
 
         // add inner joins for the category, the status and the user
         $select->setIntegrityCheck(false);
         $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
+        $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();
@@ -124,12 +131,14 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
      */
     public function fetchIdWithName($dbId, $name) {
         $sqloptions = array();
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the primary sql select object
         $select = $this->getTable()->getSelect($sqloptions);
 
         $select->where("`name` = ?", trim($name))
                 ->where("`database_id` = ?", $dbId);
+        $select->where('`publication_role_id` <= ?', count($usrRoles));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->toArray();
