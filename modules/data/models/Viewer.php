@@ -154,9 +154,9 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
      * @return array 
      */
     public function rows($db, $table, array $params = array()) {
-        // set init table
+         // set init table
         $this->getResource()->init($db, $table);
-        
+
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->getResource()->fetchCols();
@@ -165,15 +165,29 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         }
 
         //properly escape the column names to handle any strange special character
-        //foreach($params['cols'] as &$currCol) {
-        //    $currCol = "`" . trim($currCol, "`") . "`";
-        //}
-        
+        $colls = array()
+        foreach($params['cols'] as &$currCol) {
+            $currCol = "`" . trim($currCol, "`") . "`";
+            $colls[] = new Zend_Db_Expr($currCol);
+        }
+
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
+
+        // get the primary table
+        $table = $this->getResource()->getTable();
+
+        // get select object
+        $select = $table->getSelect($sqloptions);
         
-        $rows = $this->getResource()->fetchRows($sqloptions);
-        return $this->_response($rows, $sqloptions);;
+        //remove the join that is some times added by Zend, by getting rid of the FROM stuff#
+        //and adding it again...
+        $select->reset( Zend_Db_Select::FROM );
+        $select->from($table, $colls);
+
+        // get result convert to array and return
+        $rows = $table->fetchAll($select)->toArray();
+        return $this->_response($rows, $sqloptions);
     }
 
 }
