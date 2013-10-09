@@ -207,22 +207,9 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
 
         ob_end_clean();
 
-        //check if this needs to be sent compressed or not...
-        if ($response['compress'] == true) {
-            $zip = new ZipStream($response['filename'] . ".zip");
-            $comment = "Compressed result file " . $response['filename'] . " downloaded on " . date('l jS \of F Y h:i:s A');
-            $zip->setComment($comment);
-
-            $fhandle = fopen($response['file'], "rb");
-            $zip->addLargeFile($fhandle, $response['filename']);
-            fclose($fhandle);
-
-            $zip->finalize();
-        } else {
-            http_send_content_disposition($response['filename']);
-            http_send_content_type($response['mime']);
-            http_send_file($response['file']);
-        }
+        http_send_content_disposition($response['filename']);
+        http_send_content_type($response['mime']);
+        http_send_file($response['file']);
     }
 
     public function regenAction() {
