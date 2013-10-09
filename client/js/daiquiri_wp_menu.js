@@ -39,9 +39,8 @@
                         $('a',self).addClass('dropdown-toggle').attr('data-toggle','dropdown');
 
                         // thou shalt not put a div in you nav!
-                        var menu = html.match('<div class="menu">(.*)</div>')[1];
-                        console.log(menu);
-                        self.append(menu);
+                        var ul = html.match('<div.*?class="menu".*?>(.*?)</div>')[1];
+                        self.append(ul);
 
                         $('ul:not(.children)',self).addClass('dropdown-menu');
                         $('li',self).attr('class','nav-item');
