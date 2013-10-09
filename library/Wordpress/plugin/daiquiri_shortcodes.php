@@ -99,5 +99,5 @@ function menu_func($atts) {
     extract(shortcode_atts(array(
         'menu' => null,
     ), $atts ) );
-    return wp_nav_menu( array( 'menu' => $name, 'echo' => false ) );
+    return wp_nav_menu( array( 'menu' => $name, 'echo' => false ));
 }

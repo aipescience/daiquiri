@@ -178,3 +178,9 @@ dl.dl-horizontal dd {
     padding-left: 10px;
     color: #b94a48;
 }
+li.dropdown li {
+    list-style: none;
+}
+li.dropdown ul ul {
+    margin-left: 0;
+}
