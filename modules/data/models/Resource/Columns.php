@@ -44,6 +44,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
      */
     public function fetchRow($id) {
         $sqloptions = array();
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the names of the involved tables
         $c = $this->getTable('Data_Model_DbTable_Columns')->getName();
@@ -58,6 +59,8 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
         $select->setIntegrityCheck(false);
         $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name'));
         $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
+        $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
+        $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();

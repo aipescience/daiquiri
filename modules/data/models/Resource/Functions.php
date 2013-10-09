@@ -33,13 +33,38 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
     }
 
     /**
+     * Returns all functions that user has access permission
+     * @param type $id
+     * @throws Exception
+     * @return type 
+     */
+    public function fetchRows() {
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
+
+        //roles starting at 1, therefore check for <=
+        $select = $this->getTable()->select();
+        $select->where('`publication_role_id` <= ?', count($usrRoles));
+        $rows = $this->getTable()->fetchAll($select);
+
+        return $rows;
+    }    
+
+    /**
      * Returns a specific row from the (joined) Databases/Tables/Columns tables.
      * @param type $id
      * @throws Exception
      * @return type 
      */
     public function fetchRow($id) {
-        $data = parent::fetchRow($id);
+        $sqloptions = array();
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
+
+        // get the primary sql select object
+        $select = $this->getTable()->getSelect($sqloptions);
+        $select->where("`id` = ?", $id);
+        $select->where("`publication_role_id` <= ?", count($usrRoles));
+
+        $data = $this->getTable()->fetchAll($select)->current();
 
         //get the roles
         $rolesModel = new Auth_Model_Roles();
@@ -61,10 +86,12 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
      */
     public function fetchIdWithName($name) {
         $sqloptions = array();
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the primary sql select object
         $select = $this->getTable()->getSelect($sqloptions);
         $select->where("`name` = ?", trim($name));
+        $select->where("`publication_role_id` <= ?", count($usrRoles));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->toArray();
