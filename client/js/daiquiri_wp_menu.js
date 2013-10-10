@@ -38,11 +38,10 @@
                         $(self).addClass('dropdown');
                         $('a',self).addClass('dropdown-toggle').attr('data-toggle','dropdown');
 
-                        // thou shalt not put a div in you nav!
-                        var ul = html.match('<div.*?class="menu".*?>(.*?)</div>')[1];
+                        var ul = html.match('(<ul class="menu">.*</ul>)')[1];
                         self.append(ul);
 
-                        $('ul:not(.children)',self).addClass('dropdown-menu');
+                        $('ul:not(.children)',self).removeClass('menu').addClass('dropdown-menu');
                         $('li',self).attr('class','nav-item');
                     }
                 });

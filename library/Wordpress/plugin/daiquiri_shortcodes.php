@@ -99,5 +99,19 @@ function menu_func($atts) {
     extract(shortcode_atts(array(
         'menu' => null,
     ), $atts ) );
-    return wp_nav_menu( array( 'menu' => $name, 'echo' => false ));
+
+    if ( ($menu_object = wp_get_nav_menu_object( $menu ) ) && ( isset($menu_object) ) ) {
+        $menu_items = wp_get_nav_menu_items($menu_object->term_id);
+
+        $string = '<ul class="menu">';
+        foreach ( (array) $menu_items as $key => $menu_item ) {
+            $string .= '<li><a href="' . $menu_item->url . '">' . $menu_item->title . '</a></li>';
+        }
+        $string .= '</ul>';
+
+    } else {
+        $string = '<p class="text-error">Menu "' . $menu . '" not defined.</p>';
+    }
+
+    return $string;
 }
