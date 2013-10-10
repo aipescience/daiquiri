@@ -38,11 +38,21 @@
                         $(self).addClass('dropdown');
                         $('a',self).addClass('dropdown-toggle').attr('data-toggle','dropdown');
 
-                        var ul = html.match('(<ul class="menu">.*</ul>)')[1];
+                        // thou shalt not put a div in you nav!
+                        var begin = html.indexOf('<!-- begin -->') + '<!-- begin -->'.length;
+                        var end   = html.indexOf('<!-- end -->');
+                        ul = html.substring(begin,end);
+
+                        // workaround for wp page menu
+                        if (ul.indexOf('<div') == 0) {
+                            ul = ul.substring('<div class="menu">'.length, ul.length - '</div>'.length - 1);
+                        }
                         self.append(ul);
 
-                        $('ul:not(.children)',self).removeClass('menu').addClass('dropdown-menu');
-                        $('li',self).attr('class','nav-item');
+                        $('ul:not(.sub-menu):not(.children)',self).addClass('dropdown-menu');
+                        $('li',self).attr('class','nav-item').removeAttr('id');
+
+                        // i want to apologize for this code ...
                     }
                 });
             });
