@@ -446,6 +446,8 @@ daiquiri.table.Table.prototype.rows = function () {
                 self.pages = json.pages;
 
                 // update pager
+                var html = '<p>Page ' + json.page + ' of ' + json.pages;
+                /*
                 var html = '<p>Page ' + json.page + ' of ' + json.pages + ' (' + json.total + ' ';
                 if (json.total == 1) {
                     html += 'row';
@@ -453,6 +455,7 @@ daiquiri.table.Table.prototype.rows = function () {
                     html += 'rows';
                 }
                 html += ' total)</p>';
+                */
                 var paging = $('#' + self.id + '-pager-paging');
                 paging.children().remove();
                 paging.append(html);

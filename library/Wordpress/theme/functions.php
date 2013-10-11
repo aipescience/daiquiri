@@ -55,6 +55,7 @@ class Daiquiri_Layout {
         require_once('HTTP/Request2.php');
         $req = new HTTP_Request2($layoutUrl);
         $req->setConfig(array(
+            'ssl_verify_peer' => false, // we trust the certificate here
             'connect_timeout' => 2,
             'timeout' => 3
         ));

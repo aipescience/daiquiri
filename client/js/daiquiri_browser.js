@@ -257,7 +257,11 @@ daiquiri.browser.Browser.prototype.resize = function() {
     
     var currentWidth;
     var width = Math.ceil((self.width - 2) / 3);
-
+    // subtract more pixels if zoomed out
+    var zoom = window.outerWidth/window.innerWidth;
+    if (zoom < 0.99) width -= 1;
+    if (zoom < 0.51) width -= 1;
+    if (zoom < 0.26) width -= 1;
     var remainingWidth = self.width - 2; /* -2 for 2 borders, apearantly ? */
 
     $('div', self.container).each(function () {

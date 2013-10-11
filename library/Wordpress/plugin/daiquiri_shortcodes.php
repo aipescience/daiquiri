@@ -22,9 +22,6 @@
 // [tableinfo db="DBName" table="tableName"]
 add_shortcode('tableinfo', 'tableinfo_func' );
 
-// [tableinfo db="DBName"]
-add_shortcode('dbinfo', 'dbinfo_func' );
-
 function tableinfo_func($atts, $content = null) {
     extract(shortcode_atts(array(
         'db' => 'NON_EXISTING_DATABASE',
@@ -59,6 +56,9 @@ function tableinfo_func($atts, $content = null) {
     return $body;
 }
 
+// [tableinfo db="DBName"]
+add_shortcode('dbinfo', 'dbinfo_func' );
+
 function dbinfo_func($atts, $content = null) {
     extract(shortcode_atts(array(
         'db' => 'NON_EXISTING_DATABASE',
@@ -90,4 +90,21 @@ function dbinfo_func($atts, $content = null) {
     }
 
     return $body;
+}
+
+// [menu]
+add_shortcode('menu', 'menu_func' );
+
+function menu_func($atts) {
+    extract(shortcode_atts(array(
+        'menu' => null,
+    ), $atts ) );
+
+    $string = wp_nav_menu(array(
+        'menu' => $menu,
+        'echo' => false,
+        'container' => 'p'
+        ));
+
+    return '<!-- begin -->'.$string.'<!-- end -->';
 }
