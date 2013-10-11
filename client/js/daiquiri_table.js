@@ -60,7 +60,8 @@ daiquiri.table.opt = {
     'nrows': 10,
     'nrowsList': [10,100],
     'sort': null,
-    'columnWidth': '100px'
+    'columnWidth': '100px',
+    'multiselect': false
 };
 
 /**
@@ -468,33 +469,38 @@ daiquiri.table.Table.prototype.rows = function () {
 
                 // construct html elements for the rows
                 html = '';
-                var i,j,classes,text,format;
+                var i,j,classes,text,format,id,cell;
                 for (j = 0; j < json.nrows; j++) {
                     html += '<tr>';
                     for (i = 0; i < self.ncols; i++) {
+                        rowId = json.rows[j]["id"];
+                        cell = json.rows[j]["cell"];
                         if (self.colsmodel[i].hidden != true) {
                             // format cell according to colsmodel
-                            text = json.rows[j][i];
-                            
+                            classes = 'daiquiri-table-col-' + i + ' daiquiri-table-row-' + j;
+
                             format = self.colsmodel[i].format;
                             if (format != undefined) {
-                                if (format.type == 'filelink' && text != null) {
+                                if (format.type == 'filelink' && cell[i] != null) {
                                     var re = /(?:\.([^.]+))?$/;
-                                    var ext = re.exec(text)[1];
+                                    var ext = re.exec(cell[i])[1];
                                     ext = ext.toLowerCase();
 
                                     if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' || ext == 'bmp') {
-                                        text = '<a href="' + format.base + '?name=' + text + '" target="_blank">' + text + '</a>';
+                                        text = '<a href="' + format.base + '?name=' + cell[i] + '" target="_blank">' + cell[i] + '</a>';
                                     } else {
-                                        text = '<a href="' + format.base + '?name=' + text + '">' + text + '</a>';
+                                       text = '<a href="' + format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>';
                                     }
+
+                                    classes += ' daiquiri-table-downloadable';
                                 } else if (format.type == 'link') {
-                                    text = '<a href="' + text + '">' + text + '</a>';
+                                    text = '<a href="' + cell[i] + '">' + cell[i] + '</a>';
                                 }
+                            } else {
+                                text = cell[i];
                             }
 
                             // add the selected class for cells in the selected column
-                            classes = 'daiquiri-table-col-' + i + ' daiquiri-table-row-' + j;
                             if (selectedId != undefined && i == selectedId) {
                                 classes += ' daiquiri-table-col-selected';
                             }
@@ -521,7 +527,13 @@ daiquiri.table.Table.prototype.rows = function () {
                     var classes = element.attr('class');
                     var rowClass = classes.match(/daiquiri-table-row-\d+/)[0];
 
-                    $('.daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
+                    if (self.opt.multiselect) {
+                        // deselect only THIS row
+                        $('.' + rowClass).removeClass('daiquiri-table-row-selected');
+                    } else {
+                        // deselect all rows
+                        $('.daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
+                    }
 
                     if (classes.indexOf('daiquiri-table-row-selected') == -1) {
                         $('.' + rowClass).addClass('daiquiri-table-row-selected');

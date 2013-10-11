@@ -534,13 +534,26 @@ daiquiri.query.Query.prototype.displayResults = function(){
             'colsurl': self.url.results.cols,
             'baseurl': self.url.results.base,
             'width': '700px',
+            'multiselect': true,
             'success': function (table) {
+                if ($('.daiquiri-table-downloadable','#results-tab').length != 0) {
+                    $('#results-tab').append('<div><button id="daiquiri-file-download-button" class="linkbutton">Download files from selected cells</button></div>')
+
+                    $('#daiquiri-file-download-button').on('click', function () {
+                        var items = [];
+                        $('a','.daiquiri-table-downloadable.daiquiri-table-row-selected,.daiquiri-table-downloadable.daiquiri-table-col-selected','#results-tab').each(function () {
+                            items.push(this.href);
+                        })
+                        console.log(items);
+                        // $('<iframe />', {
+                        //     'style': 'visibility: hidden; height: 0; width: 0;',
+                        //     'src': url
+                        // }).appendTo(div);
+                    })
+                }
 
                 if ($('#daiquiri-samp-connect').length == 0) {
-                    var div = $('<div />', {
-                        'id': 'daiquiri-samp-connect',
-                        'class': 'daiquiri-samp-connect',
-                    }).appendTo($('#results-tab'));
+                    $('#results-tab').append('<div id="daiquiri-samp-connect" class="daiquiri-samp-connect"></div>');
 
                     var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
                         baseStream: self.url.sampStream
@@ -551,21 +564,21 @@ daiquiri.query.Query.prototype.displayResults = function(){
                 daiquiri.samp.item.table = self.job.table.value;
                 daiquiri.samp.item.username = self.job.username.value;
 
-                if (table.opt.select == true) {
-                    var div = $('<div />', {
-                        'class': 'daiquiri-query-file-download',
-                        'html': '<button class="btn daiquiri-query-file-download-button">Download files from selected rows</button>'
-                    }).appendTo($('#results-tab'));
-                    $('.daiquiri-query-file-download-button').click(function(){
-                        var ids = $('#results-table-table').getGridParam('selarrrow').join();
-                        var url = self.url.fileDownload + '?table=' + self.job.table.value + '&id=' + ids;
+                // if (table.opt.select == true) {
+                //     var div = $('<div />', {
+                //         'class': 'daiquiri-query-file-download',
+                //         'html': '<button class="btn daiquiri-query-file-download-button">Download files from selected rows</button>'
+                //     }).appendTo($('#results-tab'));
+                //     $('.daiquiri-query-file-download-button').click(function(){
+                //         var ids = $('#results-table-table').getGridParam('selarrrow').join();
+                //         var url = self.url.fileDownload + '?table=' + self.job.table.value + '&id=' + ids;
 
-                        $('<iframe />', {
-                            'style': 'visibility: hidden; height: 0; width: 0;',
-                            'src': url
-                        }).appendTo(div);
-                    })
-                }
+                //         $('<iframe />', {
+                //             'style': 'visibility: hidden; height: 0; width: 0;',
+                //             'src': url
+                //         }).appendTo(div);
+                //     })
+                // }
             }
         });
     }

@@ -171,7 +171,7 @@ daiquiri.samp.SAMP.prototype.displayForm = function()  {
         var div = $('<p />', {
             'id': self.names.connectDiv,
             'class': self.names.connectDiv,
-            'html': '<button id="' + self.names.connectButton + '" class="btn ' + self.names.connectButton + '">Register with SAMP</button>'
+            'html': '<button id="' + self.names.connectButton + '" class="linkbutton ' + self.names.connectButton + '">Register with SAMP</button>'
         }).appendTo($("#" + this.id));
 
         var sampButton = $('#' + self.names.connectButton);

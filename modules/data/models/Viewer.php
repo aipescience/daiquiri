@@ -166,20 +166,7 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
 
         // get the table from the resource
         $sqloptions = $this->_sqloptions($params);
-
-        // get the primary table
-        $table = $this->getResource()->getTable();
-
-        // get select object
-        $select = $table->getSelect($sqloptions);
-        
-        //remove the join that is some times added by Zend, by getting rid of the FROM stuff#
-        //and adding it again...
-        $select->reset( Zend_Db_Select::FROM );
-        $select->from($table, $colls);
-
-        // get result convert to array and return
-        $rows = $table->fetchAll($select)->toArray();
+        $rows = $this->getResource()->fetchRows($sqloptions);
         return $this->_response($rows, $sqloptions);
     }
 

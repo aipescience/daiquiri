@@ -130,7 +130,10 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
         // rows from the database query
         $data['rows'] = array();
         foreach ($rows as $row) {
-            $data['rows'][] = array_values($row);
+            //Zend_Debug::dump($row); die(0);
+            $data['rows'][] = array(
+                "cell" => array_values($row)
+                );
         }
 
         // number of rows

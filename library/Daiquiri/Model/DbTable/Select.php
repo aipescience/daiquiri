@@ -30,21 +30,21 @@
  */
 class Daiquiri_Model_DbTable_Select extends Zend_Db_Table_Select {
 
-    public function setColumns($table, array $columnArray) {
-        //this function sets the column names to what is provided
-        //nothing more - no parsing no nothing. 
+    // public function setColumns($table, array $columnArray) {
+    //     //this function sets the column names to what is provided
+    //     //nothing more - no parsing no nothing. 
 
-        $newColumns = array();
+    //     $newColumns = array();
 
-        $this->from($table);
+    //     $this->from($table);
 
-        foreach($columnArray as $column) {
-            $column = trim($column, "`");
+    //     foreach($columnArray as $column) {
+    //         $column = trim($column, "`");
 
-            $newColumns[] = array($table, $column, NULL);
-        }
+    //         $newColumns[] = array($table, $column, NULL);
+    //     }
 
-        $this->_parts['columns'] = $newColumns;
-    }
+    //     $this->_parts['columns'] = $newColumns;
+    // }
 
 }

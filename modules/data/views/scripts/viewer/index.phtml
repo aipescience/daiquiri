@@ -20,6 +20,7 @@
  */
 ?>
 
+<?php if ($this->status === 'ok'): ?>
 <script type="text/javascript">
 <?php if ($this->status === 'ok'): ?>
         $(document).ready(function() {
@@ -28,15 +29,31 @@
                 'rowsurl': "<?php echo $this->baseUrl('/data/viewer/rows') ?>",
                 'colsurl': "<?php echo $this->baseUrl('/data/viewer/cols') ?>",
                 'params': {
-                    'options': true,
                     'db': "<?php echo $this->db ?>",
                     'table': "<?php echo $this->table ?>"
-                }
+                },
+                'success': function () {
+                    if ($('.daiquiri-table-downloadable','#table').length != 0) {
+                        $('#content').append('<div><button id="daiquiri-file-download-button" class="linkbutton">Download files from selected cells</button></div>')
+
+                        $('#daiquiri-file-download-button').on('click', function () {
+                            var items = [];
+                            $('a','.daiquiri-table-downloadable.daiquiri-table-row-selected,.daiquiri-table-downloadable.daiquiri-table-col-selected','#table').each(function () {
+                                items.push(this.href);
+                            })
+                            console.log(items);
+                            // $('<iframe />', {
+                            //     'style': 'visibility: hidden; height: 0; width: 0;',
+                            //     'src': url
+                            // }).appendTo(div);
+                        })
+                    }
+                },
+                'multiselect': true
             });
         });
 <?php endif; ?>
 </script>
-<?php if ($this->status === 'ok'): ?>
 <div id="table"></div>
 <?php else: ?>
 <p class="text-error">No Database or Table was given.</p>
