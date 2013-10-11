@@ -150,9 +150,9 @@ abstract class Daiquiri_Model_DbTable_Abstract extends Zend_Db_Table_Abstract {
         // escape expressions with round brackets since Zend will not
         foreach($cols as &$currCol) {
             if (strpos($currCol, '(') !== false && strpos($currCol, ')') !== false) {
-                $currCol = $this->getAdapter()->quoteIdentifier($currCol);
+               $currCol = new Zend_Db_Expr($this->getAdapter()->quoteIdentifier($currCol));
             } else if (strpos($currCol, '.') !== false) {
-               $quote = $this->getAdapter()->quoteIdentifier();
+               $quote = $this->getAdapter()->quoteIdentifier("");
                $currCol = new Zend_Db_Expr($quote[0] . $currCol . $quote[0]);
             }
         }
