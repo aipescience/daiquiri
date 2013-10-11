@@ -46,13 +46,13 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         // set default columns
         if (empty($params['cols'])) {
             $params['cols'] = $this->getResource()->fetchCols();
-	    $colsIds = array_combine(array_keys($params['cols']),array_keys($params['cols']));
+            $colsIds = array_combine(array_keys($params['cols']),array_keys($params['cols']));
         } else {
-	    // explode the input for the cols array
-	    $params['cols'] = explode(',', $params['cols']);
+    	    // explode the input for the cols array
+    	    $params['cols'] = explode(',', $params['cols']);
 
-	    // intersect the cols array with the cols in the database to get the ids of the cols
-	    $colsIds = array_keys(array_intersect($this->getResource()->fetchCols(), $params['cols']));
+    	    // intersect the cols array with the cols in the database to get the ids of the cols
+    	    $colsIds = array_keys(array_intersect($this->getResource()->fetchCols(), $params['cols']));
         }
 
         // obtain column metadata (if this exists)
@@ -162,13 +162,6 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
             $params['cols'] = $this->getResource()->fetchCols();
         } else {
             $params['cols'] = explode(',', $params['cols']);
-        }
-
-        //properly escape the column names to handle any strange special character
-        $colls = array()
-        foreach($params['cols'] as &$currCol) {
-            $currCol = "`" . trim($currCol, "`") . "`";
-            $colls[] = new Zend_Db_Expr($currCol);
         }
 
         // get the table from the resource
