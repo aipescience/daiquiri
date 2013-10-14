@@ -469,31 +469,42 @@ daiquiri.table.Table.prototype.rows = function () {
 
                 // construct html elements for the rows
                 html = '';
-                var i,j,classes,text,format,id,cell;
+                var i,j,classes,text,format,rowId,colId,cell,ext;
                 for (j = 0; j < json.nrows; j++) {
                     html += '<tr>';
-                    for (i = 0; i < self.ncols; i++) {
-                        rowId = json.rows[j]["id"];
-                        cell = json.rows[j]["cell"];
-                        if (self.colsmodel[i].hidden != true) {
-                            // format cell according to colsmodel
-                            classes = 'daiquiri-table-col-' + i + ' daiquiri-table-row-' + j;
 
-                            format = self.colsmodel[i].format;
-                            if (format != undefined) {
-                                if (format.type == 'filelink' && cell[i] != null) {
-                                    var re = /(?:\.([^.]+))?$/;
-                                    var ext = re.exec(cell[i])[1];
-                                    ext = ext.toLowerCase();
+                    // get the id of the row
+                    rowId = json.rows[j]["id"];
+                    if (typeof rowId === 'undefined') rowId = j;
+
+                    // get the "cell" with the actual data
+                    cell = json.rows[j]["cell"];
+
+                    // loop over rows
+                    for (i = 0; i < self.ncols; i++) {
+                        // get the column
+                        col = self.colsmodel[i];
+
+                        if (col.hidden != true) {
+                            // get the id of the column
+                            colId = col["id"];
+                            if (typeof colId === 'undefined') colId = i;
+
+                            // format cell according to colsmodel
+                            classes = 'daiquiri-table-col-' + colId + ' daiquiri-table-row-' + rowId;
+
+                            if (typeof col.format !== 'undefined') {
+                                if (col.format.type == 'filelink' && cell[i] != null) {
+                                    ext = cell[i].match(/(?:\.([^.]+))?$/)[1].toLowerCase();
 
                                     if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' || ext == 'bmp') {
-                                        text = '<a href="' + format.base + '?name=' + cell[i] + '" target="_blank">' + cell[i] + '</a>';
+                                        text = '<a href="' + col.format.base + '?name=' + cell[i] + '" target="_blank">' + cell[i] + '</a>';
                                     } else {
-                                       text = '<a href="' + format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>';
+                                       text = '<a href="' + col.format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>';
                                     }
 
                                     classes += ' daiquiri-table-downloadable';
-                                } else if (format.type == 'link') {
+                                } else if (col.format.type == 'link') {
                                     text = '<a href="' + cell[i] + '">' + cell[i] + '</a>';
                                 }
                             } else {

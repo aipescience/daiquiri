@@ -74,23 +74,26 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
     /**
      * Returns a database entry.
      * @param int $id
-     * @param str $dbName if set, $id is assumed to be the table name
+     * @param str $tablename if set, $id is assumed to be the table name
      * @param bool $fullData if tables and columns should be retrieved as well...
      * @return array
      */
-    public function show($id, $dbName = false, $fullData = true) {
-        if($dbName !== false) {
+    public function show($id, $tablename = false, $fullData = true) {
+        if($tablename !== false) {
             // get databases model
             $databasesModel = new Data_Model_Databases();
-            $dbId = $databasesModel->getResource()->fetchIdWithName($dbName);
-            $id = $this->getResource()->fetchIdWithName($dbId, $id);
+            $tableId = $databasesModel->getResource()->fetchIdWithName($tablename);
+            $id = $this->getResource()->fetchIdWithName($tableId, $id);
 
-            if($id === false) {
-                return false;
+            if ($id === false) {
+                return array('status' => 'error');
             }
         }
 
-        return $this->getResource()->fetchRow($id, $fullData);
+        return array(
+            'status' => 'ok',
+            'data' => $this->getResource()->fetchRow($id, $fullData)
+        );
     }
 
     /**

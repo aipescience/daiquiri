@@ -34,19 +34,44 @@
                 },
                 'success': function () {
                     if ($('.daiquiri-table-downloadable','#table').length != 0) {
-                        $('#content').append('<div><button id="daiquiri-file-download-button" class="linkbutton">Download files from selected cells</button></div>')
 
-                        $('#daiquiri-file-download-button').on('click', function () {
-                            var items = [];
-                            $('a','.daiquiri-table-downloadable.daiquiri-table-row-selected,.daiquiri-table-downloadable.daiquiri-table-col-selected','#table').each(function () {
-                                items.push(this.href);
+                        if ($('#daiquiri-file-download-rows-button').length == 0) {
+                            $('#content').append('<div><button id="daiquiri-file-download-rows-button" class="linkbutton">Download files from selected rows</button></div>')
+
+                            $('#daiquiri-file-download-rows-button').on('click', function () {
+                                var rowIds = [];
+                                $('.daiquiri-table-downloadable.daiquiri-table-row-selected','#table').each(function () {
+
+                                    rowIds.push($(this).attr('class').match(/daiquiri-table-row-(\d+)/)[1]);
+                                })
+                                if (rowIds.length != 0) {
+                                    console.log(rowIds.join(','));
+                                    // $('<iframe />', {
+                                    //     'style': 'visibility: hidden; height: 0; width: 0;',
+                                    //     'src': url
+                                    // }).appendTo(div);
+                                }
                             })
-                            console.log(items);
-                            // $('<iframe />', {
-                            //     'style': 'visibility: hidden; height: 0; width: 0;',
-                            //     'src': url
-                            // }).appendTo(div);
-                        })
+                        }
+
+                        if ($('#daiquiri-file-download-cols-button').length == 0) {
+                            $('#content').append('<div><button id="daiquiri-file-download-cols-button" class="linkbutton">Download files from the selected column</button></div>')
+
+                            $('#daiquiri-file-download-cols-button').on('click', function () {
+                                var colId = false;
+                                var col = $('.daiquiri-table-downloadable.daiquiri-table-col-selected','#table').first();
+                                if (col.length != 0) {
+                                    colId = col.attr('class').match(/daiquiri-table-col-(\d+)/)[1];
+                                }
+                                if (colId != false) {
+                                    console.log(colId);
+                                    // $('<iframe />', {
+                                    //      'style': 'visibility: hidden; height: 0; width: 0;',
+                                    //      'src': '<?php echo $this->baseUrl('/files/index/row/id/'); ?>' + colId
+                                    // }).appendTo('body');
+                                }
+                            })
+                        }
                     }
                 },
                 'multiselect': true

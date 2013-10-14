@@ -123,17 +123,18 @@ abstract class Daiquiri_Model_PaginatedTable extends Daiquiri_Model_Abstract {
      *  - <b>total</b>      total number of pages
      *  - <b>records</b>    total number of rows
      */
-    protected function _response(array $rows, array $sqloptions) {
+    protected function _response(array $rows, array $sqloptions, $pk = False) {
         // fill data object
         $data = array();
 
         // rows from the database query
         $data['rows'] = array();
         foreach ($rows as $row) {
-            //Zend_Debug::dump($row); die(0);
-            $data['rows'][] = array(
-                "cell" => array_values($row)
-                );
+            $d = array("cell" => array_values($row));
+            if ($pk !== False) {
+                $d['id'] = $row[$pk];
+            } 
+            $data['rows'][] = $d;
         }
 
         // number of rows

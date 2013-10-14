@@ -537,19 +537,43 @@ daiquiri.query.Query.prototype.displayResults = function(){
             'multiselect': true,
             'success': function (table) {
                 if ($('.daiquiri-table-downloadable','#results-tab').length != 0) {
-                    $('#results-tab').append('<div><button id="daiquiri-file-download-button" class="linkbutton">Download files from selected cells</button></div>')
+                    if ($('#daiquiri-file-download-rows-button').length == 0) {
+                        $('#results-tab').append('<div><button id="daiquiri-file-download-rows-button" class="linkbutton">Download files from selected rows</button></div>')
 
-                    $('#daiquiri-file-download-button').on('click', function () {
-                        var items = [];
-                        $('a','.daiquiri-table-downloadable.daiquiri-table-row-selected,.daiquiri-table-downloadable.daiquiri-table-col-selected','#results-tab').each(function () {
-                            items.push(this.href);
+                        $('#daiquiri-file-download-rows-button').on('click', function () {
+                            var rowIds = [];
+                            $('.daiquiri-table-downloadable.daiquiri-table-row-selected','#results-tab').each(function () {
+
+                                rowIds.push($(this).attr('class').match(/daiquiri-table-row-(\d+)/)[1]);
+                            })
+                            if (rowIds.length != 0) {
+                                console.log(rowIds.join(','));
+                                // $('<iframe />', {
+                                //     'style': 'visibility: hidden; height: 0; width: 0;',
+                                //     'src': url
+                                // }).appendTo(div);
+                            }
                         })
-                        console.log(items);
-                        // $('<iframe />', {
-                        //     'style': 'visibility: hidden; height: 0; width: 0;',
-                        //     'src': url
-                        // }).appendTo(div);
-                    })
+                    }
+
+                    if ($('#daiquiri-file-download-cols-button').length == 0) {
+                        $('#results-tab').append('<div><button id="daiquiri-file-download-cols-button" class="linkbutton">Download files from the selected column</button></div>')
+
+                        $('#daiquiri-file-download-cols-button').on('click', function () {
+                            var colId = false;
+                            var col = $('.daiquiri-table-downloadable.daiquiri-table-col-selected','#results-tab').first();
+                            if (col.length != 0) {
+                                colId = col.attr('class').match(/daiquiri-table-col-(\d+)/)[1];
+                            }
+                            if (colId != false) {
+                                console.log(colId);
+                                // $('<iframe />', {
+                                //      'style': 'visibility: hidden; height: 0; width: 0;',
+                                //      'src': '<?php echo $this->baseUrl('/files/index/row/id/'); ?>' + colId
+                                // }).appendTo('body');
+                            }
+                        })
+                    }
                 }
 
                 if ($('#daiquiri-samp-connect').length == 0) {
@@ -563,22 +587,6 @@ daiquiri.query.Query.prototype.displayResults = function(){
                 // setting SAMP options
                 daiquiri.samp.item.table = self.job.table.value;
                 daiquiri.samp.item.username = self.job.username.value;
-
-                // if (table.opt.select == true) {
-                //     var div = $('<div />', {
-                //         'class': 'daiquiri-query-file-download',
-                //         'html': '<button class="btn daiquiri-query-file-download-button">Download files from selected rows</button>'
-                //     }).appendTo($('#results-tab'));
-                //     $('.daiquiri-query-file-download-button').click(function(){
-                //         var ids = $('#results-table-table').getGridParam('selarrrow').join();
-                //         var url = self.url.fileDownload + '?table=' + self.job.table.value + '&id=' + ids;
-
-                //         $('<iframe />', {
-                //             'style': 'visibility: hidden; height: 0; width: 0;',
-                //             'src': url
-                //         }).appendTo(div);
-                //     })
-                // }
             }
         });
     }

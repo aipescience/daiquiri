@@ -77,12 +77,11 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
 
         // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
+        $select = $this->getTable()->select();
+        $select->setIntegrityCheck(false);
+        $select->from($this->getTable());
         $select->where("`$t`.`id` = ?", $id);
         $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
-
-        // add inner joins for the category, the status and the user
-        $select->setIntegrityCheck(false);
         $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
         $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 
