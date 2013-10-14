@@ -39,13 +39,9 @@ class Data_Model_DbTable_Viewer extends Daiquiri_Model_DbTable_Abstract {
             $cols = array_intersect($sqloptions['from'], $cols);
         }
         // escape expressions with round brackets since Zend will not
+        $quote = $this->getAdapter()->quoteIdentifier("");
         foreach($cols as &$currCol) {
-            if (strpos($currCol, '(') !== false && strpos($currCol, ')') !== false) {
-               $currCol = new Zend_Db_Expr($this->getAdapter()->quoteIdentifier($currCol));
-            } else if (strpos($currCol, '.') !== false) {
-               $quote = $this->getAdapter()->quoteIdentifier("");
-               $currCol = new Zend_Db_Expr($quote[0] . $currCol . $quote[0]);
-            }
+           $currCol = new Zend_Db_Expr($quote[0] . $currCol . $quote[0]);
         }
         $select->from($this, $cols);
 
@@ -76,7 +72,7 @@ class Data_Model_DbTable_Viewer extends Daiquiri_Model_DbTable_Abstract {
             }
         }
 
-        // Zend_Debug::dump($select->__toString()); // die(0);
+        //Zend_Debug::dump($select->__toString()); die(0);
         
         // remove the join that is some times added by Zend, by getting rid of 
         // the FROM stuff, and adding it again...
