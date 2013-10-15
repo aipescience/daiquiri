@@ -34,7 +34,7 @@ daiquiri.AdminTable = function (opt) {
             'options': true
         },
         'success': function() {
-            $('a','#table').click(function(){
+            $('a','tbody','#table').click(function(){
                 // remove any other old modal
                 $('.daiquiri-modal').remove();
 
