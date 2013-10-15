@@ -283,8 +283,8 @@ daiquiri.table.Table.prototype.cols = function () {
                 var width,colId;
                 for (var i = 0; i < self.ncols; i++) {
                     // get the id of the column
-                    colId = self.colsmodel["id"];
-                    if (typeof colId === 'undefined') colId = i;
+                    colId = self.colsmodel[i]["id"];
+                    //if (typeof colId === 'undefined') colId = i;
 
                     if (self.colsmodel[i].hidden != true) {
                         if (self.colsmodel[i].width != undefined) {
