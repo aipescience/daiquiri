@@ -493,22 +493,26 @@ daiquiri.table.Table.prototype.rows = function () {
                             // format cell according to colsmodel
                             classes = 'daiquiri-table-col-' + colId + ' daiquiri-table-row-' + rowId;
 
-                            if (typeof col.format !== 'undefined') {
+                            if (typeof col.format === 'undefined') {
+                                text = cell[i];
+                            } else {
                                 if (col.format.type == 'filelink' && cell[i] != null) {
-                                    ext = cell[i].match(/(?:\.([^.]+))?$/)[1].toLowerCase();
+                                    extension = cell[i].match(/(?:\.([^.]+))?$/)[1];
 
-                                    if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' || ext == 'bmp') {
-                                        text = '<a href="' + col.format.base + '?name=' + cell[i] + '" target="_blank">' + cell[i] + '</a>';
+                                    if ($.inArray(extension.toLowerCase(),['jpg','jpeg','png','bmp','txt']) != -1) {
+                                        target = 'target="_blank"';
                                     } else {
-                                       text = '<a href="' + col.format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>';
+                                        target = '';
                                     }
 
                                     classes += ' daiquiri-table-downloadable';
+                                    text = '<a ' + target + 'href="' + col.format.base + '?name=' + cell[i] + '">' +\
+                                    cell[i] + '</a>';
                                 } else if (col.format.type == 'link') {
-                                    text = '<a href="' + cell[i] + '">' + cell[i] + '</a>';
+                                    text = '<a target="_blank" href="' + cell[i] + '">' + cell[i] + '</a>';
+                                } else {
+                                    text = cell[i];
                                 }
-                            } else {
-                                text = cell[i];
                             }
 
                             // add the selected class for cells in the selected column
