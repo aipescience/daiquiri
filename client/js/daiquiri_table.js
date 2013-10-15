@@ -280,19 +280,23 @@ daiquiri.table.Table.prototype.cols = function () {
 
                 // contruct and append html elements for column headers
                 var html = '<tr>';
-                var width;
+                var width,colId;
                 for (var i = 0; i < self.ncols; i++) {
+                    // get the id of the column
+                    colId = self.colsmodel["id"];
+                    if (typeof colId === 'undefined') colId = i;
+
                     if (self.colsmodel[i].hidden != true) {
                         if (self.colsmodel[i].width != undefined) {
                             width = self.colsmodel[i].width;
                         } else {
                             width = self.opt.colsWidth;
                         }
-                        classes = 'daiquiri-table-col-' + i;
+                        classes = 'daiquiri-table-col-' + colId;
                         if (self.colsmodel[i].sortable != 'false') {
                             classes += ' sortable';
                         }
-                        html += '<th id="' + self.id + '-thead-col-' + i + '" style="width:' + width + '" class="' + classes + '">';
+                        html += '<th id="' + self.id + '-thead-col-' + colId + '" style="width:' + width + '" class="' + classes + '">';
                         if (i != 0) {
                             html += '<div class="handle-left pull-left"></div>';
                         }
