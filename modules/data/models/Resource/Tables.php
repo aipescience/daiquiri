@@ -114,9 +114,11 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
                     $data['columns'][] = $cols[$j];
                 }
             }
-        }
 
-        return $data;
+            return $data;
+        } else {
+            return array();
+        }
     }
 
     /**
