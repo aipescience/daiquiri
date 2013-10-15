@@ -79,7 +79,6 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         // get the primary sql select object
         $select = $this->getTable()->select();
         $select->setIntegrityCheck(false);
-        $select->from($this->getTable());
         $select->where("`$t`.`id` = ?", $id);
         $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
         $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));

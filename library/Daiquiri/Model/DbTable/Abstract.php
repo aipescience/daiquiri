@@ -147,11 +147,6 @@ abstract class Daiquiri_Model_DbTable_Abstract extends Zend_Db_Table_Abstract {
         if (!empty($sqloptions['from'])) {
             $cols = array_intersect($sqloptions['from'], $cols);
         }
-        // escape expressions with round brackets since Zend will not
-        $quote = $this->getAdapter()->quoteIdentifier("");
-        foreach($cols as &$currCol) {
-           $currCol = new Zend_Db_Expr($quote[0] . $currCol . $quote[0]);
-        }
         $select->from($this, $cols);
 
         // set limit

@@ -76,7 +76,7 @@ class Data_Model_DbTable_Viewer extends Daiquiri_Model_DbTable_Abstract {
         
         // remove the join that is some times added by Zend, by getting rid of 
         // the FROM stuff, and adding it again...
-        $select->reset( Zend_Db_Select::FROM );
+        $select->reset(Zend_Db_Select::FROM);
         $select->from($this, $cols);
 
         return $select;
