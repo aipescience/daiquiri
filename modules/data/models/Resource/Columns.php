@@ -43,7 +43,6 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
      * @return type 
      */
     public function fetchRow($id) {
-        $sqloptions = array();
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the names of the involved tables
@@ -52,7 +51,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
         $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
 
         // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
+        $select = $this->getTable()->getSelect();
         $select->where("`$c`.`id` = ?", $id);
 
         // add inner joins for the category, the status and the user
@@ -85,10 +84,8 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
      * @return array
      */
     public function fetchIdWithName($tableId, $name) {
-        $sqloptions = array();
-
         // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
+        $select = $this->getTable()->getSelect();
 
         $select->where("`name` = ?", $name)
                 ->where("`table_id` = ?", $tableId);
