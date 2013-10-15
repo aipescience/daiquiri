@@ -506,8 +506,7 @@ daiquiri.table.Table.prototype.rows = function () {
                                     }
 
                                     classes += ' daiquiri-table-downloadable';
-                                    text = '<a ' + target + 'href="' + col.format.base + '?name=' + cell[i] + '">' +\
-                                    cell[i] + '</a>';
+                                    text = '<a ' + target + 'href="' + col.format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>';
                                 } else if (col.format.type == 'link') {
                                     text = '<a target="_blank" href="' + cell[i] + '">' + cell[i] + '</a>';
                                 } else {
