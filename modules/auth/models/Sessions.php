@@ -61,7 +61,7 @@ class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
             }
         }
 
-        return $this->_response($rows, $sqloptions);
+        return $this->_response($rows, $sqloptions, 'session');
     }
 
     /**

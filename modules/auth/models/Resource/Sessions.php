@@ -39,7 +39,7 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
     public function fetchRows($sqloptions = array()) {
         // get select object
         $sqloptions['from'][] = 'data';
-        $select = $this->getTable()->getSelect();
+        $select = $this->getTable()->getSelect($sqloptions);
         $select->where("`data` LIKE '%Zend_Auth%'");
 
         // get result convert to array
