@@ -28,19 +28,37 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         // get the user adapter
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
 
-        // check if this db is configured in the tables module
-        if ($db !== Daiquiri_Config::getInstance()->getUserDbName($username)) {
+        // check if this db is the user datasbase
+        if ($db === Daiquiri_Config::getInstance()->getUserDbName($username)) {
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
+        } else {
+            // get all databases which the user is allowed to accessed
             $databasesModel = new Data_Model_Databases();
             $databases = $databasesModel->index();
 
             // THIS IS DANGEROUS, IT IS THE ONLY CHECK FOR $db
             if (in_array($db, $databases)) {
-                $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username, $db);
-            } else {
-                throw new AuthError('db not found');
+                throw new AuthError('Requested database not available');
             }
-        } else {
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
+
+            // check permission on table access
+            if ($table) {
+                $database = $databasesModel->show($db, true, true);
+                $accessGranted = false;
+                foreach ($database['tables'] as $currTable) {
+                    if ($currTable['name'] == $table) {
+                        $accessGranted = true;
+                        break;
+                    }
+                }
+
+                if ($accessGranted !== true) {
+                    throw new AuthError("Requested table not available");
+                }
+            }
+
+            // if everything went ok get adapter
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username, $db);
         }
 
         // set adapter
@@ -50,20 +68,6 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         $this->getTable()->setDb($db);
 
         if ($table) {
-            // check permission on table access
-            $database = $databasesModel->show($db, true, true);
-            $accessGranted = false;
-            foreach ($database['tables'] as $currTable) {
-                if ($currTable['name'] == $table) {
-                    $accessGranted = true;
-                    break;
-                }
-            }
-
-            if ($accessGranted !== true) {
-                throw new AuthError("Requested table not available");
-            }
-
             // set table and primary key
             try {
                 $this->getTable()->setName($table);
