@@ -37,7 +37,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             if (in_array($db, $databases)) {
                 $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username, $db);
             } else {
-                throw new Daiquiri_Exception_RuntimeError('db not found');
+                throw new AuthError('db not found');
             }
         } else {
             $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
@@ -50,18 +50,18 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         $this->getTable()->setDb($db);
 
         if ($table) {
-            //check permission on table access
+            // check permission on table access
             $database = $databasesModel->show($db, true, true);
             $accessGranted = false;
-            foreach($database['tables'] as $currTable) {
-                if($currTable['name'] == $table) {
+            foreach ($database['tables'] as $currTable) {
+                if ($currTable['name'] == $table) {
                     $accessGranted = true;
                     break;
                 }
             }
 
-            if($accessGranted !== true) {
-                throw new Exception("Requested table not available");
+            if ($accessGranted !== true) {
+                throw new AuthError("Requested table not available");
             }
 
             // set table and primary key
@@ -69,7 +69,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
                 $this->getTable()->setName($table);
                 $this->getTable()->setPrimary();
             } catch (Exception $e) {
-                throw new Exception("Requested table not available");
+                throw new AuthError("Requested table not available");
             }
         }
     }
@@ -107,12 +107,12 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             throw new Exception('Error in database connection configuration.');
         }
 
-        //check permissions on the dump script
-        //(scripts need to be executable by every body...)
+        // check permissions on the dump script
+        // (scripts need to be executable by every body...)
         $perm = fileperms($adapter);
         $refPerm = octdec(111);
 
-        //check if execution bits are set
+        // check if execution bits are set
         if (($perm & $refPerm) !== $refPerm) {
             throw new Exception('Error with dump script permissions. Please set them correctly.');
         }
@@ -154,17 +154,17 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             throw new Exception('Error in database connection configuration.');
         }
 
-        //check permissions on the dump script
-        //(scripts need to be executable by every body...)
+        // check permissions on the dump script
+        // (scripts need to be executable by every body...)
         $perm = fileperms($adapter);
         $refPerm = octdec(111);
 
-        //check if execution bits are set
+        // check if execution bits are set
         if (($perm & $refPerm) !== $refPerm) {
             throw new Exception('Error with dump script permissions. Please set them correctly.');
         }
 
-        //fire up gearman and submit job
+        // fire up gearman and submit job
         $gearmanConf = Daiquiri_Config::getInstance()->query->download->queue->gearman;
 
         $gmclient = new GearmanClient();
@@ -174,8 +174,8 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         $jobHandle = $gmclient->doBackground("dumpTableJob", json_encode($job));
     }
 
-    //at this stage, the HTML header is already set to download file - any errors thrown here
-    //are written to the file and are not shown in the browser!
+    // at this stage, the HTML header is already set to download file - any errors thrown here
+    // are written to the file and are not shown in the browser!
     public function streamTable($format, $file, $script) {
         // get the adapter config
         $config = $this->getTable()->getAdapter()->getConfig();
