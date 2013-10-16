@@ -63,7 +63,7 @@ class Daiquiri_View_Helper_Table extends Zend_View_Helper_Abstract {
         if (!empty($rows)) {
             foreach ($rows as $row) {
                 $s .= "<tr>";
-                foreach ($row as $value) {
+                foreach ($row['cell'] as $value) {
                     $s .= "<td>" . $this->view->escape($value) . "</td>";
                 }
                 $s .= "</tr>";

@@ -70,15 +70,13 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
      * @return type 
      */
     public function fetchRow($id, $fullData = true) {
-        $sqloptions = array();
-
         //get the roles
         $rolesModel = new Auth_Model_Roles();
         $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
+        $select = $this->getTable()->getSelect();
         $select->where("`id` = ?", $id);
         $select->where("`publication_role_id` <= ?", count($usrRoles));
 
@@ -149,11 +147,10 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
      * @return array
      */
     public function fetchIdWithName($name) {
-        $sqloptions = array();
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
+        $select = $this->getTable()->getSelect();
         $select->where("`name` = ?", trim($name));
         $select->where("`publication_role_id` <= ?", count($usrRoles));
 

@@ -60,7 +60,8 @@ daiquiri.table.opt = {
     'nrows': 10,
     'nrowsList': [10,100],
     'sort': null,
-    'columnWidth': '100px'
+    'columnWidth': '100px',
+    'multiselect': false
 };
 
 /**
@@ -279,19 +280,23 @@ daiquiri.table.Table.prototype.cols = function () {
 
                 // contruct and append html elements for column headers
                 var html = '<tr>';
-                var width;
+                var width,colId;
                 for (var i = 0; i < self.ncols; i++) {
+                    // get the id of the column
+                    colId = self.colsmodel[i]["id"];
+                    //if (typeof colId === 'undefined') colId = i;
+
                     if (self.colsmodel[i].hidden != true) {
                         if (self.colsmodel[i].width != undefined) {
                             width = self.colsmodel[i].width;
                         } else {
                             width = self.opt.colsWidth;
                         }
-                        classes = 'daiquiri-table-col-' + i;
+                        classes = 'daiquiri-table-col-' + colId;
                         if (self.colsmodel[i].sortable != 'false') {
                             classes += ' sortable';
                         }
-                        html += '<th id="' + self.id + '-thead-col-' + i + '" style="width:' + width + '" class="' + classes + '">';
+                        html += '<th id="' + self.id + '-thead-col-' + colId + '" style="width:' + width + '" class="' + classes + '">';
                         if (i != 0) {
                             html += '<div class="handle-left pull-left"></div>';
                         }
@@ -468,33 +473,52 @@ daiquiri.table.Table.prototype.rows = function () {
 
                 // construct html elements for the rows
                 html = '';
-                var i,j,classes,text,format;
+                var i,j,classes,text,format,rowId,colId,cell,ext;
                 for (j = 0; j < json.nrows; j++) {
                     html += '<tr>';
-                    for (i = 0; i < self.ncols; i++) {
-                        if (self.colsmodel[i].hidden != true) {
-                            // format cell according to colsmodel
-                            text = json.rows[j][i];
-                            
-                            format = self.colsmodel[i].format;
-                            if (format != undefined) {
-                                if (format.type == 'filelink' && text != null) {
-                                    var re = /(?:\.([^.]+))?$/;
-                                    var ext = re.exec(text)[1];
-                                    ext = ext.toLowerCase();
 
-                                    if(ext == 'jpg' || ext == 'jpeg' || ext == 'png' || ext == 'bmp') {
-                                        text = '<a href="' + format.base + '?name=' + text + '" target="_blank">' + text + '</a>';
+                    // get the id of the row
+                    rowId = json.rows[j]["id"];
+                    if (typeof rowId === 'undefined') rowId = j;
+
+                    // get the "cell" with the actual data
+                    cell = json.rows[j]["cell"];
+
+                    // loop over rows
+                    for (i = 0; i < self.ncols; i++) {
+                        // get the column
+                        col = self.colsmodel[i];
+
+                        if (col.hidden != true) {
+                            // get the id of the column
+                            colId = col["id"];
+                            if (typeof colId === 'undefined') colId = i;
+
+                            // format cell according to colsmodel
+                            classes = 'daiquiri-table-col-' + colId + ' daiquiri-table-row-' + rowId;
+
+                            if (typeof col.format === 'undefined') {
+                                text = cell[i];
+                            } else {
+                                if (col.format.type == 'filelink' && cell[i] != null) {
+                                    extension = cell[i].match(/(?:\.([^.]+))?$/)[1];
+
+                                    if ($.inArray(extension.toLowerCase(),['jpg','jpeg','png','bmp','txt']) != -1) {
+                                        target = 'target="_blank"';
                                     } else {
-                                        text = '<a href="' + format.base + '?name=' + text + '">' + text + '</a>';
+                                        target = '';
                                     }
-                                } else if (format.type == 'link') {
-                                    text = '<a href="' + text + '">' + text + '</a>';
+
+                                    classes += ' daiquiri-table-downloadable';
+                                    text = '<a ' + target + 'href="' + col.format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>';
+                                } else if (col.format.type == 'link') {
+                                    text = '<a target="_blank" href="' + cell[i] + '">' + cell[i] + '</a>';
+                                } else {
+                                    text = cell[i];
                                 }
                             }
 
                             // add the selected class for cells in the selected column
-                            classes = 'daiquiri-table-col-' + i + ' daiquiri-table-row-' + j;
                             if (selectedId != undefined && i == selectedId) {
                                 classes += ' daiquiri-table-col-selected';
                             }
@@ -521,7 +545,13 @@ daiquiri.table.Table.prototype.rows = function () {
                     var classes = element.attr('class');
                     var rowClass = classes.match(/daiquiri-table-row-\d+/)[0];
 
-                    $('.daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
+                    if (self.opt.multiselect) {
+                        // deselect only THIS row
+                        $('.' + rowClass).removeClass('daiquiri-table-row-selected');
+                    } else {
+                        // deselect all rows
+                        $('.daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
+                    }
 
                     if (classes.indexOf('daiquiri-table-row-selected') == -1) {
                         $('.' + rowClass).addClass('daiquiri-table-row-selected');

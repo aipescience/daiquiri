@@ -39,7 +39,7 @@ class Data_TablesController extends Daiquiri_Controller_Abstract {
             $id = $this->_getParam('table');
         }
         
-        //dive down recusively?
+        // dive down recusively?
         $all = true;
         if($this->_hasParam('all')) {
             $a = $this->_getParam('all');
@@ -49,12 +49,11 @@ class Data_TablesController extends Daiquiri_Controller_Abstract {
             }
         }
 
-        $this->view->data = $this->_model->show($id, $db, $all);
+        $response = $this->_model->show($id, $db, $all);
 
-        if($this->view->data === false) {
-            $this->view->status = 'error';
-        } else {
-            $this->view->status = 'ok';
+        // assign to view
+        foreach ($response as $key => $value) {
+            $this->view->$key = $value;
         }
     }
 

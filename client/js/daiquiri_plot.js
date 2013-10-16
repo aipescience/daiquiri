@@ -126,9 +126,9 @@ function Daiquiri_Plot(container, opt) {
 
                 // gather data for plot
                 for (var i = 0; i < json.rows.length; i++) {
-                    x = json.rows[i][0];
-                    if (json.rows[i].length > 1) {
-                        y = json.rows[i][1];
+                    x = json.rows[i]['cell'][0];
+                    if (json.rows[i]['cell'].length > 1) {
+                        y = json.rows[i]['cell'][1];
                     } else {
                         y = x;
                     }

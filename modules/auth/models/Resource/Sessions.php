@@ -38,7 +38,8 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
 
     public function fetchRows($sqloptions = array()) {
         // get select object
-        $select = $this->getTable()->getSelect();
+        $sqloptions['from'][] = 'data';
+        $select = $this->getTable()->getSelect($sqloptions);
         $select->where("`data` LIKE '%Zend_Auth%'");
 
         // get result convert to array
@@ -109,4 +110,29 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
         return $sessions;
     }
 
+    public function countRows(array $sqloptions = null, $tableclass = null) {
+        //get the table
+        $table = $this->getTable($tableclass);
+
+        // create selcet object
+        $select = $table->select();
+        $select->from($table, 'COUNT(*) as count');
+        $select->where("`data` LIKE '%Zend_Auth%'");
+        
+        if ($sqloptions) {
+            if (isset($sqloptions['where'])) {
+                foreach ($sqloptions['where'] as $w) {
+                    $select = $select->where($w);
+                }
+            }
+            if (isset($sqloptions['orWhere'])) {
+                foreach ($sqloptions['orWhere'] as $w) {
+                    $select = $select->orWhere($w);
+                }
+            }
+        }
+
+        // query database and return
+        return (int) $table->fetchRow($select)->count;
+    }
 }

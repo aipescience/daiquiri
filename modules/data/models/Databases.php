@@ -87,10 +87,10 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
      * @return array
      */
     public function show($id, $idIsName = false, $fullData = true) {
-        if($idIsName === true) {
+        if ($idIsName === true) {
             $id = $this->getResource()->fetchIdWithName($id);
 
-            if($id === false) {
+            if ($id === false) {
                 return false;
             }
         }

@@ -64,7 +64,7 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
         $select->where("`id` = ?", $id);
         $select->where("`publication_role_id` <= ?", count($usrRoles));
 
-        $data = $this->getTable()->fetchAll($select)->current();
+        $data = $this->getTable()->fetchAll($select)->current()->toArray();
 
         //get the roles
         $rolesModel = new Auth_Model_Roles();
