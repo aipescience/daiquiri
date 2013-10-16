@@ -50,6 +50,20 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         $this->getTable()->setDb($db);
 
         if ($table) {
+            //check permission on table access
+            $database = $databasesModel->show($db, true, true);
+            $accessGranted = false;
+            foreach($database['tables'] as $currTable) {
+                if($currTable['name'] == $table) {
+                    $accessGranted = true;
+                    break;
+                }
+            }
+
+            if($accessGranted !== true) {
+                throw new Exception("Requested table not available");
+            }
+
             // set table and primary key
             try {
                 $this->getTable()->setName($table);

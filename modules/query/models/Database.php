@@ -149,7 +149,7 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
         $compress = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->compress;
-        $filename = $table . $suffix;
+        $filename = $this->_generateFileName($table, $suffix);
         $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
         $file = $dir . DIRECTORY_SEPARATOR . $filename;
 
@@ -174,6 +174,148 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
         return $this->_createDownloadFile($table, $format);
     }
 
+    public function stream($table, $format) {
+        if (empty($table)) {
+            return array('status' => 'error', 'error' => 'Error: table not set');
+        }
+
+        if (empty($format)) {
+            return array('status' => 'error', 'error' => 'Error: format not set');
+        }
+
+        // create link and file sysytem path for table dump
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        if (isset(Daiquiri_Config::getInstance()->query->download->adapter->config->$format)) {
+            $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
+
+            //remove any additional stuff (like compression endings) from suffix
+            $parts = explode(".", $suffix);
+            $suffix = "." . $parts[1];
+        } else {
+            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
+        }
+
+        $filename = $this->_generateFileName($table, $suffix);
+        $url = '/query/index/file?table=' . $table . '&format=' . $format;
+        $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
+        $file = $dir . DIRECTORY_SEPARATOR . $filename;
+
+        // create dir if neccessary
+        if (!is_dir($dir)) {
+            if (mkdir($dir) === false) {
+                return array('status' => 'error', 'error' => 'Error: configuration of download setup wrong');
+            }
+
+            chmod($dir, 0775);
+        }
+
+        //check if we support this method
+        $formats = array();
+        $adapter = Daiquiri_Config::getInstance()->query->download->adapter->toArray();
+        $bin = $adapter['config'][$format]['adapter'];
+        foreach ($adapter['enabled'] as $key) {
+            $formats[$key] = $adapter['config'][$key]['name'];
+        }
+
+        if (!array_key_exists($format, $formats)) {
+            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
+        }
+
+        //construct the streming file name (which has to be $bin with _stream at the end)
+        $scriptName = pathinfo($bin);
+
+        if (empty($scriptName['dirname']) && empty($scriptName['filename'])) {
+            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
+        }
+
+        $newScriptName = $scriptName['dirname'] . DIRECTORY_SEPARATOR . $scriptName['filename'] . "_stream." .
+                $scriptName['extension'];
+
+        if (!file_exists($newScriptName)) {
+            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
+        }
+
+        //check permissions on the dump script
+        //(scripts need to be executable by every body...)
+        $perm = fileperms($newScriptName);
+        $refPerm = octdec(111);
+
+        //check if execution bits are set
+        if (($perm & $refPerm) !== $refPerm) {
+            return array('status' => 'error', 'error' => 'Error with stream script permissions. Please set them correctly.');
+        }
+
+        //get rid of all the Zend output stuff
+        $controller = Zend_Controller_Front::getInstance();
+        $controller->getDispatcher()->setParam('disableOutputBuffering', true);
+
+        ob_end_clean();
+
+        http_send_content_disposition($filename);
+        http_send_content_type("application/octet-stream");
+
+        //check if this file already exists...
+        //if yes just stream
+        if (file_exists($file)) {
+            passthru("cat " . escapeshellarg($file));
+            exit();
+        }
+
+        if (!file_exists($file)) {
+            //get the user db name
+            $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+            $db = Daiquiri_Config::getInstance()->getUserDbName($username);
+
+            // get the resource and create dump
+            $resource = new Data_Model_Resource_Viewer();
+            $resource->init($db, $table);
+            $resource->streamTable($format, $file, $newScriptName);
+        }
+
+        return array('status' => 'ok');
+    }
+
+    public function file($table, $format) {
+        if (empty($format) || empty($table)) {
+            throw new Daiquiri_Exception_AuthError();
+        }
+
+        // create link and file sysytem path for table dump
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
+        $compress = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->compress;
+        $filename = $this->_generateFileName($table, $suffix);
+        $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
+        $file = $dir . DIRECTORY_SEPARATOR . $filename;
+
+        //security
+        if (!is_dir($dir)) {
+            throw new Daiquiri_Exception_AuthError();
+        }
+        if (!file_exists($file)) {
+            throw new Daiquiri_Exception_AuthError();
+        }
+
+        //determine mime type of this file
+        $finfo = new finfo;
+
+        $mime = $finfo->file($file, FILEINFO_MIME);
+
+        return array('file' => $file, 'filename' => $filename, 'mime' => $mime, 'compress' => $compress, 'status' => 'ok');
+    }
+
+    private function _generateFileName($table, $suffix) {
+        //function generating the file name and escaping dangerous characters
+        if ($suffix[0] != '.') {
+            $suffix = '.' . $suffix;
+        }
+
+        //escaping the table
+        $table = str_replace(array('/', '\\', '?', '%', '*', ':', '|', '"', '<', '>', ' '), "_", $table);
+
+        return $table . $suffix;
+    }
+
     private function _createDownloadFile($table, $format) {
         // sanity check for format
         if (!in_array($format, Daiquiri_Config::getInstance()->query->download->adapter->enabled->toArray())) {
@@ -183,7 +325,7 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
         // create link and file sysytem path for table dump
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
-        $filename = $table . $suffix;
+        $filename = $this->_generateFileName($table, $suffix);
         $url = '/query/index/file?table=' . $table . '&format=' . $format;
         $regenUrl = '/query/index/regen?table=' . $table . '&format=' . $format;
         $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
@@ -306,135 +448,4 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
             'regenerateLink' => Daiquiri_Config::getInstance()->getSiteUrl() . $regenUrl
             );
     }
-
-    public function stream($table, $format) {
-        if (empty($table)) {
-            return array('status' => 'error', 'error' => 'Error: table not set');
-        }
-
-        if (empty($format)) {
-            return array('status' => 'error', 'error' => 'Error: format not set');
-        }
-
-        // create link and file sysytem path for table dump
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        if (isset(Daiquiri_Config::getInstance()->query->download->adapter->config->$format)) {
-            $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
-
-            //remove any additional stuff (like compression endings) from suffix
-            $parts = explode(".", $suffix);
-            $suffix = "." . $parts[1];
-        } else {
-            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
-        }
-
-        $filename = $table . $suffix;
-        $url = '/query/index/file?table=' . $table . '&format=' . $format;
-        $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
-        $file = $dir . DIRECTORY_SEPARATOR . $filename;
-
-        // create dir if neccessary
-        if (!is_dir($dir)) {
-            if (mkdir($dir) === false) {
-                return array('status' => 'error', 'error' => 'Error: configuration of download setup wrong');
-            }
-
-            chmod($dir, 0775);
-        }
-
-        //check if we support this method
-        $formats = array();
-        $adapter = Daiquiri_Config::getInstance()->query->download->adapter->toArray();
-        $bin = $adapter['config'][$format]['adapter'];
-        foreach ($adapter['enabled'] as $key) {
-            $formats[$key] = $adapter['config'][$key]['name'];
-        }
-
-        if (!array_key_exists($format, $formats)) {
-            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
-        }
-
-        //construct the streming file name (which has to be $bin with _stream at the end)
-        $scriptName = pathinfo($bin);
-
-        if (empty($scriptName['dirname']) && empty($scriptName['filename'])) {
-            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
-        }
-
-        $newScriptName = $scriptName['dirname'] . DIRECTORY_SEPARATOR . $scriptName['filename'] . "_stream." .
-                $scriptName['extension'];
-
-        if (!file_exists($newScriptName)) {
-            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
-        }
-
-        //check permissions on the dump script
-        //(scripts need to be executable by every body...)
-        $perm = fileperms($newScriptName);
-        $refPerm = octdec(111);
-
-        //check if execution bits are set
-        if (($perm & $refPerm) !== $refPerm) {
-            return array('status' => 'error', 'error' => 'Error with stream script permissions. Please set them correctly.');
-        }
-
-        //get rid of all the Zend output stuff
-        $controller = Zend_Controller_Front::getInstance();
-        $controller->getDispatcher()->setParam('disableOutputBuffering', true);
-
-        ob_end_clean();
-
-        http_send_content_disposition($filename);
-        http_send_content_type("application/octet-stream");
-
-        //check if this file already exists...
-        //if yes just stream
-        if (file_exists($file)) {
-            passthru("cat " . escapeshellarg($file));
-            exit();
-        }
-
-        if (!file_exists($file)) {
-            //get the user db name
-            $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-            $db = Daiquiri_Config::getInstance()->getUserDbName($username);
-
-            // get the resource and create dump
-            $resource = new Data_Model_Resource_Viewer();
-            $resource->init($db, $table);
-            $resource->streamTable($format, $file, $newScriptName);
-        }
-
-        return array('status' => 'ok');
-    }
-
-    public function file($table, $format) {
-        if (empty($format) || empty($table)) {
-            throw new Daiquiri_Exception_AuthError();
-        }
-
-        // create link and file sysytem path for table dump
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
-        $compress = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->compress;
-        $filename = $table . $suffix;
-        $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
-        $file = $dir . DIRECTORY_SEPARATOR . $filename;
-
-        //security
-        if (!is_dir($dir)) {
-            throw new Daiquiri_Exception_AuthError();
-        }
-        if (!file_exists($file)) {
-            throw new Daiquiri_Exception_AuthError();
-        }
-
-        //determine mime type of this file
-        $finfo = new finfo;
-
-        $mime = $finfo->file($file, FILEINFO_MIME);
-
-        return array('file' => $file, 'filename' => $filename, 'mime' => $mime, 'compress' => $compress, 'status' => 'ok');
-    }
-
 }
