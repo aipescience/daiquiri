@@ -280,28 +280,26 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
             return true;
         }
 
-        //check in the data module first, if metadata exists and handle them
-        //accordingly
-        $metaDb = new Data_Model_Databases();
+        // check in the data module first, if metadata exists and handle them
+        // accordingly
+        $databasesModel = new Data_Model_Databases();
+        $response = $databasesModel->show(false, $database);
 
-        $dbId = $metaDb->fetchIdWithName($database);
-
-        if ($dbId !== false && $metaDb->checkACL($dbId, $permission)) {
-            if($table === false) {
+        if ($response['status'] === 'ok' && $databasesModel->checkACL($response['data']['id'], $permission)) {
+            if ($table === false) {
                 return true;
-            }
+            } else {
+                //access to database granted, so let's check for table access
+                $tablesModel = new Data_Model_Tables();
+                $response = $tablesModel->show(false, $database, $table);
 
-            //access to database granted, so let's check for table access
-            $metaTable = new Data_Model_Tables();
-
-            $tableId = $metaTable->fetchIdWithName($dbId, $table);
-
-            if ($tableId !== false && $metaTable->checkACL($tableId, $permission)) {
-                return true;
+                if ($response['status'] === 'ok' && $tablesModel->checkACL($response['data']['id'], $permission)) {
+                    return true;
+                }
             }
         }
 
-        //scratch database has read access
+        // scratch database has read access
         $scratchDB = Daiquiri_Config::getInstance()->query->scratchdb;
 
         if (!empty($scratchDB) && $database === $scratchDB && ($permission === "select" ||

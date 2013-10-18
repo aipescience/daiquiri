@@ -74,8 +74,8 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
                     $values['adapter'] = $adapter[$values['adapter']];
                 }
 
-                //check if entry is already there
-                if ($this->getResource()->fetchIdWithName($values['name']) !== false) {
+                // check if entry is already there
+                if ($this->getResource()->fetchId($values['name']) !== false) {
                     throw new Exception("Database entry already exists.");
                 }
 

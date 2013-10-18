@@ -39,9 +39,10 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
     public function create($tableId = null, array $formParams = array()) {
         // create the form object
         $tablesModel = new Data_Model_Tables();
+        $tables = $tablesModel->index();
 
         $form = new Data_Form_Column(array(
-                    'tables' => $tablesModel->getValues(),
+                    'tables' => $tables,
                     'tableId' => $tableId,
                     'submit' => 'Create column entry'
                 ));
@@ -55,7 +56,10 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                     unset($values['ucd_list']);
                 }
 
-                if ($this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
+                $tmp = explode('.',$tables[$values['table_id']]);
+                $db = $tmp[0];
+                $table = $tmp[1];
+                if ($this->getResource()->fetchId($db, $table, $values['name']) !== false) {
                     throw new Exception("Column entry already exists.");
                 }
 
@@ -63,7 +67,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
                 return array('status' => 'ok');
             } else {
-                return array('status' => 'error', 'errors' => $form->getMessages());
+                return array('form' => $form, 'status' => 'error', 'errors' => $form->getMessages());
             }
         }
 

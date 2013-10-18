@@ -261,15 +261,14 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                     break;
             }
 
-            //check function ACL in metadata
-            $metaFunc = new Data_Model_Functions();
-
-            $funcId = $metaFunc->fetchIdWithName($currNode['base_expr']);
-            if ($funcId !== false && $metaFunc->checkACL($funcId)) {
+            // check function ACL in metadata
+            $functionModel = new Data_Model_Functions();
+            $response = $functionModel->show(false, $currNode['base_expr']);
+            if ($response['status'] !== 'ok' && $functionModel>checkACL($response['data']['id'])) {
                 return true;
             }
-
-            //are functions generally allowed?
+            
+            // are functions generally allowed?
             if ($auth->checkDbTable($db, "*", "fnc=ANY")) {
                 return true;
             } else if (!($auth->checkDbTable($db, "*", "fnc={$currNode['base_expr']}"))) {

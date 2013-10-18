@@ -37,16 +37,6 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Returns the proper columns of the database entries.
-     * @return array 
-     */
-    // public function fetchCols() {
-    //     return array('id', 'name', 'info', 'adapter', 'publication_role_id',
-    //         'publication_select', 'publication_update', 'publication_insert',
-    //         'publication_show', 'tables');
-    // }
-
-    /**
      * Returns all databases that user has access permission
      * @param type $id
      * @throws Exception
@@ -159,29 +149,6 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
 
         return $data;
     }
-
-    /**
-     * Returns the id of the database with the given name
-     * @param string $name
-     * @return array
-     */
-    // public function fetchIdWithName($name) {
-    //     $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
-    //     // get the primary sql select object
-    //     $select = $this->getTable()->getSelect();
-    //     $select->where("`name` = ?", trim($name));
-    //     $select->where("`publication_role_id` <= ?", count($usrRoles));
-
-    //     // get the rowset and return
-    //     $row = $this->getTable()->fetchAll($select)->toArray();
-
-    //     if ($row) {
-    //         return $row[0]['id'];
-    //     }
-
-    //     return false;
-    // }
 
     /**
      * Checks whether the user can access this database

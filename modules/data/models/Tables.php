@@ -31,6 +31,21 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
     }
 
     /**
+     * Returns a list of all table entries.
+     * @return array
+     */
+    public function index() {
+        $data = array();
+        foreach(array_keys($this->getValues()) as $id) {
+            $response = $this->show($id);
+            if ($response['status'] == 'ok') {
+                $data[] = $response['data']['database'] . '.' . $response['data']['name'];
+            }
+        }
+        return $data;
+    }
+
+    /**
      * Creates table entry.
      * @param array $formParams
      * @return array
@@ -38,13 +53,14 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
     public function create($databaseId = null, array $formParams = array()) {
         // get databases model
         $databasesModel = new Data_Model_Databases();
+        $databases = $databasesModel->index();
 
         // get roles model
         $rolesModel = new Auth_Model_Roles();
 
         // create the form object
         $form = new Data_Form_Table(array(
-                    'databases' => $databasesModel->index(),
+                    'databases' => $databases,
                     'databaseId' => $databaseId,
                     'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
                     'submit' => 'Create table entry'
@@ -56,7 +72,8 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                 $values = $form->getValues();
 
                 //check if entry is already there
-                if ($this->getResource()->fetchIdWithName($values['database_id'], $values['name']) !== false) {
+                $database = $databases[$values['database_id']];
+                if ($this->getResource()->fetchId($database, $values['name']) !== false) {
                     throw new Exception("Table entry already exists.");
                 }
 

@@ -38,16 +38,16 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
      * @throws Exception
      * @return type 
      */
-    // public function fetchRows($sqloptions = array()) {
-    //     $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
+    public function fetchRows($sqloptions = array()) {
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
-    //     //roles starting at 1, therefore check for <=
-    //     $select = $this->getTable()->select();
-    //     $select->where('`publication_role_id` <= ?', count($usrRoles));
-    //     $rows = $this->getTable()->fetchAll($select);
+        // roles starting at 1, therefore check for <=
+        $select = $this->getTable()->select();
+        $select->where('`publication_role_id` <= ?', count($usrRoles));
+        $rows = $this->getTable()->fetchAll($select);
 
-    //     return $rows;
-    // }    
+        return $rows;
+    }
 
     public function fetchId($function) {
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
@@ -99,30 +99,6 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
         }
 
         return $data;
-    }
-
-    /**
-     * Returns the id of the function by name
-     * @param string $name
-     * @return array
-     */
-    public function fetchIdWithName($name) {
-        $sqloptions = array();
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`name` = ?", trim($name));
-        $select->where("`publication_role_id` <= ?", count($usrRoles));
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-
-        if ($row) {
-            return $row[0]['id'];
-        }
-
-        return false;
     }
 
     /**
