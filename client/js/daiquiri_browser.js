@@ -51,10 +51,8 @@ daiquiri.browser.items = {};
  * Object to hold the default options of the browser.
  */
 daiquiri.browser.opt = {
-    'name': null,
-    'url': null,
-    'width': null,
-    'height': null
+    'action': null,
+    'url': null
 };
 
 /**
@@ -68,17 +66,6 @@ daiquiri.browser.Browser = function(container, opt) {
 
     // clear old container
     this.container.children().remove();
-
-    // set the dimensions of the container
-    if (opt.width) {
-        this.container.width(opt.width);
-    }
-    this.width = this.container.width();
-    
-    if (opt.height) {
-        this.container.height(opt.height);
-    }
-    this.height = this.container.height();
 
     // set class
     this.container.addClass('daiquiri-browser');
@@ -186,7 +173,8 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
             if (i == iActive) {
                 $('a',li).click(function() {
                     var iText = $(this).text();
-                    self.opt.action('`' + iText + '`');
+                    if (self.opt.action) 
+                        self.opt.action({'db': iText});
                     return false;
                 });
             } else {
@@ -216,7 +204,8 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
                     $('a',li).click(function() {
                         var iText = $('.active','.daiquiri-browser-left', self.container).text();
                         var jText = $(this).text();
-                        self.opt.action('`' + iText + '`.`' + jText + '`');
+                        if (self.opt.action) 
+                            self.opt.action({'db': iText, 'table': jText});
                         return false;
                     });
                 } else {
@@ -237,10 +226,15 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
                     }).appendTo($('.daiquiri-browser-body','.daiquiri-browser-right', self.container));
         
                     $('a',li).click(function() {
+                        $('.active','.daiquiri-browser-right').removeClass('active');
+                        $(this).parent().addClass('active');
+
                         var iText = $('.active','.daiquiri-browser-left', self.container).text();
                         var jText = $('.active','.daiquiri-browser-center', self.container).text();
                         var kText = $(this).text();
-                        self.opt.action('`' + iText + '`.`' + jText + '`.`' + kText + '`');
+
+                        if (self.opt.action) 
+                            self.opt.action({'db': iText, 'table': jText, 'column': kText});
                         return false;
                     })
                 }
@@ -254,26 +248,36 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
  */
 daiquiri.browser.Browser.prototype.resize = function() {
     var self = this;
-    
-    var currentWidth;
-    var width = Math.ceil((self.width - 2) / 3);
-    // subtract more pixels if zoomed out
-    var zoom = window.outerWidth/window.innerWidth;
-    if (zoom < 0.99) width -= 1;
-    if (zoom < 0.51) width -= 1;
-    if (zoom < 0.26) width -= 1;
-    var remainingWidth = self.width - 2; /* -2 for 2 borders, apearantly ? */
+    var width = self.container.width();
+    var height = self.container.height();
+    var zoom = window.outerWidth / window.innerWidth;
 
-    $('div', self.container).each(function () {
-        if (remainingWidth < width) {
-            currentWidth = remainingWidth;
-        } else {
-            currentWidth = width;
-        }
-        remainingWidth -= currentWidth;
-        $('.daiquiri-browser-body', this).width(currentWidth);
+    var currWidth,currHeight;
+    var remainingWidth = width - 2;
+    if (zoom < 0.99) remainingWidth -= 1;
+    if (zoom < 0.68) remainingWidth -= 2;
+    if (zoom < 0.34) remainingWidth -= 2;
+    if (zoom < 0.26) remainingWidth -= 2;
 
-        var height = self.height - $('.daiquiri-browser-head',this).height() - 1;
-        $('.daiquiri-browser-body', this).height(height);
-    });
+    var partWidth = Math.floor(width / 3);
+
+    // left part
+    currWidth = partWidth;
+    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-left').height() - 1;
+    $('.daiquiri-browser-left').width(currWidth);
+    $('.daiquiri-browser-body','.daiquiri-browser-left').height(currHeight);
+    remainingWidth -= currWidth;
+
+    // center part
+    currWidth = partWidth;
+    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-center').height() - 1;
+    $('.daiquiri-browser-center').width(currWidth);
+    $('.daiquiri-browser-body','.daiquiri-browser-center').height(currHeight);
+    remainingWidth -= currWidth;
+
+    // right part
+    currWidth = remainingWidth;
+    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-right').height() - 1;
+    $('.daiquiri-browser-right').width(currWidth);
+    $('.daiquiri-browser-body','.daiquiri-browser-right').height(currHeight);
 };

@@ -36,6 +36,33 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         ));
     }
 
+    public function fetchId($db, $table) {
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
+
+        // get the names of the involved tables
+        $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
+        $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
+
+        // get the primary sql select object
+        $select = $this->getTable()->select();
+        $select = $select->from($this->getTable());
+        $select->setIntegrityCheck(false);
+        $select->where("`$t`.`name` = ?", trim($table));
+        $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
+        $select->join($d, "`$t`.`database_id` = `$d`.`id`");
+        $select->where("`$d`.`name` = ?", trim($db));
+        $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
+
+        // get the rowset and return
+        $row = $this->getTable()->fetchAll($select)->current();
+        
+        if ($row) {
+            return $row->id;
+        } else {
+            return false;
+        }
+    }
+
     public function fetchRows($sqloptions = array()) {
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
@@ -119,32 +146,6 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         } else {
             return array();
         }
-    }
-
-    /**
-     * Returns the id of the table with the given name and given database id
-     * @param int $dbId
-     * @param string $name
-     * @return array
-     */
-    public function fetchIdWithName($dbId, $name) {
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect();
-
-        $select->where("`name` = ?", trim($name))
-                ->where("`database_id` = ?", $dbId);
-        $select->where('`publication_role_id` <= ?', count($usrRoles));
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-
-        if ($row) {
-            return $row[0]['id'];
-        }
-
-        return false;
     }
 
     /**

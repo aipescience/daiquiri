@@ -23,10 +23,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $('#browser').daiquiri_browser({
-            'url': "<?php echo $this->baseUrl('/tables/databases') ?>",
-            'action': function (string) {
-                $('#sql_query').insertAtCaret(string);
-            }
+            'url': <?php echo this->baseUrl('/query/index/database') ?>
         });
     });
 </script>

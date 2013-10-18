@@ -22,218 +22,35 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#expand-button').click(function () {
-            $('.collapse').addClass('no-transition').collapse('show').removeClass('no-transition');
-        });
-        $('#collapse-button').click(function () {
-            $('.collapse').addClass('no-transition').collapse('hide').removeClass('no-transition');
+        $('#browser').daiquiri_browser({
+            'url': "<?php echo $this->baseUrl('/data/databases'); ?>",
+            'action': function(opt) {
+                console.log(opt);
+            }
         });
     });
 </script>
 
 <h2>Database management</h2>
 
-<p>
-    <button id="expand-button" class="btn">Show all entries</button>
-    <button id="collapse-button" class="btn">Collapse all entries</button>
-</p>
+<div id="database-management">
 
-<table class='table table-bordered'>
-    <tr>
-        <td>
-            <h4>Databases</h4>
-        </td> 
-    </tr>
-    <?php foreach ($this->databases as $database): ?>
-        <tr>
-            <td>
-                <table class='table table-bordered'>
-                    <?php foreach ($database as $dbKey => $dbValue): ?>
-                        <tr>
-                            <td class="onehundredtwenty"><?php echo ucfirst($this->escape($dbKey)); ?></td>
-                            <td>
-                                <?php if (is_array($dbValue)): ?>
-                                    <div class="accordion" id="accordion-database-tables-<?php echo $this->escape($database['id']); ?>">
-                                        <?php foreach ($dbValue as $table): ?>
-                                            <div class="accordion-group">
-                                                <div class="accordion-heading">
-                                                    <a class="accordion-toggle" data-toggle="collapse" 
-                                                       data-parent="#accordion-database-tables-<?php echo $this->escape($database['id']); ?>" 
-                                                       href="#collapse-table-<?php echo $this->escape($table['id']); ?>">
-                                                           <?php echo $this->escape($table['name']); ?>
-                                                    </a>
-                                                </div>
-                                                <div id="collapse-table-<?php echo $this->escape($table['id']); ?>" class="accordion-body collapse">
-                                                    <div class="accordion-inner">
-                                                        <table class='table table-bordered'>
-                                                            <?php foreach ($table as $tableKey => $tableValue): ?>
-                                                                <tr>
-                                                                    <td class="onehundredtwenty"><?php echo ucfirst($this->escape($tableKey)); ?></td>
-                                                                    <td>
-                                                                        <?php if (is_array($tableValue)): ?>
-                                                                            <div class="accordion" id="accordion-table-columns-<?php echo $this->escape($table['id']); ?>">
-                                                                                <?php foreach ($tableValue as $col): ?>
-                                                                                    <div class="accordion-group">
-                                                                                        <div class="accordion-heading">
-                                                                                            <a class="accordion-toggle" data-toggle="collapse" 
-                                                                                               data-parent="#accordion-table-columns-<?php echo $this->escape($table['id']); ?>" 
-                                                                                               href="#collapse-col-<?php echo $this->escape($col['id']); ?>">
-                                                                                                   <?php echo $this->escape($col['name']); ?>
-                                                                                            </a>
-                                                                                        </div>
-                                                                                        <div id="collapse-col-<?php echo $this->escape($col['id']); ?>" class="accordion-body collapse">
-                                                                                            <div class="accordion-inner">
-                                                                                                <table class='table table-bordered'>
-                                                                                                    <?php foreach ($col as $colKey => $colValue): ?>
-                                                                                                        <tr>
-                                                                                                            <td class="onehundredtwenty"><?php echo $this->escape($colKey); ?></td>
-                                                                                                            <td><?php echo $this->escape($colValue); ?></td>
-                                                                                                        </tr>
-                                                                                                    <?php endforeach; ?>
-                                                                                                    <?php
-                                                                                                    echo $this->internalLink(array(
-                                                                                                        'text' => 'Update this column entry',
-                                                                                                        'href' => '/data/columns/update/id/' . $col['id'],
-                                                                                                        'prepend' => '<tr><td colspan="2">',
-                                                                                                        'append' => '</td></tr>'));
-                                                                                                    echo $this->internalLink(array(
-                                                                                                        'text' => 'Delete this column entry',
-                                                                                                        'href' => '/data/columns/delete/id/' . $col['id'],
-                                                                                                        'prepend' => '<tr><td colspan="2">',
-                                                                                                        'append' => '</td></tr>'));
-                                                                                                    ?>
-                                                                                                </table>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
+    <p>Please click on a database, table or column to show or edit its metadata.</p>
 
-                                                                                <?php endforeach; ?>
-                                                                            </div>
-                                                                        <?php else: ?>
-                                                                            <?php echo $this->escape($tableValue); ?>
-                                                                        <?php endif; ?>
-                                                                    </td>
-                                                                </tr>   
-                                                            <?php endforeach; ?>
-                                                            <?php
-                                                            echo $this->internalLink(array(
-                                                                'text' => 'Update this table entry',
-                                                                'href' => '/data/tables/update/id/' . $table['id'],
-                                                                'prepend' => '<tr><td colspan="2">',
-                                                                'append' => '</td></tr>'));
-                                                            echo $this->internalLink(array(
-                                                                'text' => 'Delete this table entry',
-                                                                'href' => '/data/tables/delete/id/' . $table['id'],
-                                                                'prepend' => '<tr><td colspan="2">',
-                                                                'append' => '</td></tr>'));
-                                                            echo $this->internalLink(array(
-                                                                'text' => 'Create new column entry for this table',
-                                                                'href' => '/data/columns/create/tableId/' . $table['id'],
-                                                                'prepend' => '<tr><td colspan="2">',
-                                                                'append' => '</td></tr>'));
-                                                            ?>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php else: ?>
-                                    <?php echo $dbValue ?>
-                                <?php endif; ?>
-                            </td>
-                        </tr>   
-                    <?php endforeach; ?>
-                    <?php
-                    echo $this->internalLink(array(
-                        'text' => 'Update this database entry',
-                        'href' => '/data/databases/update/id/' . $database['id'],
-                        'prepend' => '<tr><td colspan="2">',
-                        'append' => '</td></tr>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Delete this database entry',
-                        'href' => '/data/databases/delete/id/' . $database['id'],
-                        'prepend' => '<tr><td colspan="2">',
-                        'append' => '</td></tr>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Create new table entry for this database',
-                        'href' => '/data/tables/create/databaseId/' . $database['id'],
-                        'prepend' => '<tr><td colspan="2">',
-                        'append' => '</td></tr>'));
-                    ?>
-                </table>
-            </td>
-        </tr>
-    <?php endforeach; ?>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create new database entry',
-        'href' => '/data/databases/create',
-        'prepend' => '<tr><td>',
-        'append' => '</td></tr>'));
-    ?>
-</table>
+    <div id="browser" style="height: 200px;"></div>
 
-<table class='table table-bordered'>
-    <tr>
-        <td>
-            <h4>Functions</h4>
-        </td> 
-    </tr>
-    <tr>
-        <td>
-            <div class="accordion" id="collapse-functions">
-                <?php foreach ($this->functions as $function): ?>
-                    <div class="accordion-group">
-                        <div class="accordion-heading">
-                            <a class="accordion-toggle" data-toggle="collapse" 
-                               data-parent="#collapse-functions" 
-                               href="#collapse-function-<?php echo $function['id'] ?>">
-                                   <?php echo $function['name'] ?>
-                            </a>
-                        </div>
-                        <div id="collapse-function-<?php echo $function['id'] ?>" class="accordion-body collapse">
-                            <div class="accordion-inner">
-                                <table class='table table-bordered'>
-                                    <?php foreach ($function as $functionKey => $functionValue): ?>
-                                        <tr>
-                                            <td class="onehundredtwenty"><?php echo ucfirst($functionKey) ?></td>
-                                            <td><?php echo $functionValue ?></td>
-                                        </tr>  
-                                    <?php endforeach; ?>
-                                    <?php
-                                    echo $this->internalLink(array(
-                                        'text' => 'Update this function entry',
-                                        'href' => '/data/functions/update/id/' . $function['id'],
-                                        'prepend' => '<tr><td colspan="2">',
-                                        'append' => '</td></tr>'));
-                                    echo $this->internalLink(array(
-                                        'text' => 'Delete this function entry',
-                                        'href' => '/data/functions/delete/id/' . $function['id'],
-                                        'prepend' => '<tr><td colspan="2">',
-                                        'append' => '</td></tr>'));
-                                    ?>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </td>
-    </tr> 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create new function entry',
-        'href' => '/data/functions/create',
-        'prepend' => '<tr><td>',
-        'append' => '</td></tr>'));
-    ?>
-</table>
+    <div class="row">
+        <div class="span9"></div>
+        <div class="span3"></div>
+    </div>
 
-<?php
-echo $this->internalLink(array(
-    'text' => 'Export in php syntax for init.php',
-    'href' => '/data/index/export',
-    'prepend' => '<p>',
-    'append' => '</p>'));
-?>
+    <div class="">
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Export in php syntax for init.php',
+            'href' => '/data/index/export',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    </div>
+</div>

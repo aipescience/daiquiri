@@ -196,3 +196,6 @@ li.dropdown li li li li li a {
 li.dropdown ul ul {
     margin-left: 0;
 }
+.modal-body {
+    max-height: 500px;
+}

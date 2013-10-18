@@ -20,9 +20,6 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the currently running query jobs.
- */
 class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
     /**
@@ -34,16 +31,8 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
     }
 
     /**
-     * Returns a column entry.
-     * @param int $id
-     * @return array
-     */
-    public function show($id) {
-        return $this->getResource()->fetchRow($id);
-    }
-
-    /**
      * Creates column entry.
+     * @param int $tableId id of the parent table (only form default value)
      * @param array $formParams
      * @return array
      */
@@ -58,26 +47,71 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $values = $form->getValues();
 
-            if(array_key_exists("ucd_list", $values)) {
-                unset($values['ucd_list']);
+                if(array_key_exists("ucd_list", $values)) {
+                    unset($values['ucd_list']);
+                }
+
+                if ($this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
+                    throw new Exception("Column entry already exists.");
+                }
+
+                $this->store($values);
+
+                return array('status' => 'ok');
+            } else {
+                return array('status' => 'error', 'errors' => $form->getMessages());
             }
-
-            if ($this->getResource()->fetchIdWithName($values['table_id'], $values['name']) !== false) {
-                throw new Exception("Column entry already exists.");
-            }
-
-            $this->store($values);
-
-            return array('status' => 'ok');
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function update($id, array $formParams = array()) {
+    /**
+     * Returns a column entry.
+     * @param int $id
+     * @return array
+     */
+    public function show($id, $db = false, $table = false, $column = false) {
+        // process input
+        if ($id === false) {
+            if ($db === false || $table === false || $column === false) {
+                throw new Exception('Either $id or $db, $table and must be provided.');
+            }
+
+            $id = $this->getResource()->fetchId($db, $table, $column);
+
+            if (empty($id)) {
+                return array('status' => 'error');
+            }
+        }
+
+        $data = $this->getResource()->fetchRow($id);
+
+        if (empty($data)) {
+            return array('status' => 'error');
+        } else {
+            return array('status' => 'ok', 'data' => $data);
+        }
+    }
+
+    public function update($id, $db = false, $table = false, $column = false, array $formParams = array()) {
+        // process input
+        if ($id === false) {
+            if ($db === false || $table === false || $column === false) {
+                throw new Exception('Either $id or $db, $table and must be provided.');
+            }
+
+            $id = $this->getResource()->fetchId($db, $table, $column);
+
+            if (empty($id)) {
+                return array('status' => 'error');
+            }
+        }
+
         // get the entry
         $tablesModel = new Data_Model_Tables();
         $entry = $this->getResource()->fetchRow($id);
@@ -93,35 +127,55 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // get the form values
-            $values = $form->getValues();
+                unset($values['ucd_list']);
 
-            unset($values['ucd_list']);
+                $this->getResource()->updateRow($id, $values);
 
-            $this->getResource()->updateRow($id, $values);
+                if (Daiquiri_Config::getInstance()->data->writeToDB) {
+                    $this->_writeColumnComment($entry['database'], $entry['table'], $entry['name'], $values);
+                }
 
-            if (Daiquiri_Config::getInstance()->data->writeToDB) {
-                $this->_writeColumnComment($entry['database'], $entry['table'], $entry['name'], $values);
+                return array('status' => 'ok');
+            } else {
+                return array('status' => 'error', 'errors' => $form->getMessages());
             }
-
-            return array('status' => 'ok');
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function delete($id, array $formParams = array()) {
+    public function delete($id, $db = false, $table = false, $column = false, array $formParams = array()) {
+        // process input
+        if ($id === false) {
+            if ($db === false || $table === false || $column === false) {
+                throw new Exception('Either $id or $db, $table and must be provided.');
+            }
+
+            $id = $this->getResource()->fetchId($db, $table, $column);
+
+            if (empty($id)) {
+                return array('status' => 'error');
+            }
+        }
+
         // create the form object
         $form = new Data_Form_Delete(array(
                     'submit' => 'Delete column entry'
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $this->getResource()->deleteRow($id);
-            return array('status' => 'ok');
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $this->getResource()->deleteRow($id);
+                return array('status' => 'ok');
+            } else {
+                return array('status' => 'error', 'errors' => $form->getMessages());
+            } 
         }
 
         return array('form' => $form, 'status' => 'form');
@@ -163,7 +217,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
     }
 
     private function _writeColumnComment($db, $table, $column, $values, $oldComment = false) {
-        //write metadata into comment field of the column (if supported)
+        // write metadata into comment field of the column (if supported)
         $descResource = new Data_Model_Resource_Description();
         $databasesModel = new Data_Model_Databases();
 
@@ -179,11 +233,11 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
         $json = Zend_Json::encode($values);
 
-        //check if there is already a comment present with our metadata
+        // check if there is already a comment present with our metadata
         $charPos = strpos($comment, "DQIMETA=");
 
         if ($charPos !== false) {
-            //find end of json
+            // find end of json
             $endPos = $descResource->findJSONEnd($comment, $charPos);
 
             if ($endPos === false) {
@@ -199,7 +253,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
             }
         }
 
-        //only do something if there is a change...
+        // only do something if there is a change...
         if ($comment !== $oldComment) {
             $descResource->setColumnComment($db, $table, $column, $comment);
         }

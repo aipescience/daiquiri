@@ -30,20 +30,17 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
         $this->_redirect('/data/');
     }
 
-    public function showAction() {
-        $id = $this->_getParam('id');
-        $this->view->data = $this->_model->show($id);
-        $this->view->status = 'ok';
-    }
-
     public function createAction() {
+        // get params
+        $redirect = $this -> _getParam('redirect','/data/');
+
         // check if POST or GET
         if ($this->_request->isPost()) {
             if ($this->_getParam('cancel')) {
                 // user clicked cancel
-                $this->_redirect('/data/');
+                $this->_redirect($redirect);
             } else {
-                // validate form and create new user
+                // validate form and do stuff
                 $response = $this->_model->create($this->_request->getPost());
             }
         } else {
@@ -52,54 +49,91 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
         }
 
         // assign to view
+        $this->view->redirect = $redirect;
+        foreach ($response as $key => $value) {
+            $this->view->$key = $value;
+        }
+    }
+
+    public function showAction() {
+        // get params
+        $redirect = $this -> _getParam('redirect','/data/');
+        if ($this->_hasParam('id')) {
+            $id = $this->_getParam('id');
+            $function = false;
+        } else {
+            $id = false;
+            $function = $this->_getParam('function');
+        }
+
+        $response = $this->_model->show($id, $function);
+        
+        // assign to view
+        $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
     }
 
     public function updateAction() {
-        // get redirect url
-        $id = $this->_getParam('id');
+        // get params
+        $redirect = $this -> _getParam('redirect','/data/');
+        if ($this->_hasParam('id')) {
+            $id = $this->_getParam('id');
+            $function = false;
+        } else {
+            $id = false;
+            $function = $this->_getParam('function');
+        }
 
         // check if POST or GET
         if ($this->_request->isPost()) {
             if ($this->_getParam('cancel')) {
                 // user clicked cancel
-                $this->_redirect('/data/');
+                $this->_redirect($redirect);
             } else {
-                // validate form and create new user
-                $response = $this->_model->update($id, $this->_request->getPost());
+                // validate form and do stuff
+                $response = $this->_model->update($id, $function, $this->_request->getPost());
             }
         } else {
             // just display the form
-            $response = $this->_model->update($id);
+            $response = $this->_model->update($id, $function);
         }
 
         // assign to view
+        $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
     }
 
     public function deleteAction() {
-        // get redirect url and the id
-        $id = $this->_getParam('id');
+        // get params
+        $redirect = $this -> _getParam('redirect','/data/');
+        if ($this->_hasParam('id')) {
+            $id = $this->_getParam('id');
+            $function = false;
+        } else {
+            $id = false;
+            $function = $this->_getParam('function');
+        }
 
         // check if POST or GET
         if ($this->_request->isPost()) {
             if ($this->_getParam('cancel')) {
                 // user clicked cancel
-                $this->_redirect('/data/');
+                $this->_redirect($redirect);
             } else {
-                // validate form and delete user
-                $response = $this->_model->delete($id, $this->_request->getPost());
+                // validate form and do stuff
+                $response = $this->_model->delete($id, $function, $this->_request->getPost());
             }
         } else {
             // just display the form
-            $response = $this->_model->delete($id);
+            $response = $this->_model->delete($id, $function);
         }
 
         // assign to view
+        $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
