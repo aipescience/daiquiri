@@ -51,7 +51,7 @@ fi
 if [ -z "$socket" ]; then
     ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file
 else
-    ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file
+    ${toolBin}mysql -S$socket -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file
 fi
 
 #mysqldump writes \N for any NULL value, however we don't want this.                                                                                                      
