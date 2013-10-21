@@ -22,27 +22,18 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#browser').daiquiri_browser({
-            'url': "<?php echo $this->baseUrl('/data/databases'); ?>",
-            'action': function(opt) {
-                console.log(opt);
-            }
-        });
+        new daiquiri.data.Data('<?php echo $this->baseUrl(); ?>');
     });
 </script>
 
 <h2>Database management</h2>
 
-<div id="database-management">
+<div id="data">
 
     <p>Please click on a database, table or column to show or edit its metadata.</p>
 
-    <div id="browser" style="height: 200px;"></div>
-
-    <div class="row">
-        <div class="span9"></div>
-        <div class="span3"></div>
-    </div>
+    <div id="browser"></div>
+    <div id="display"></div>
 
     <div class="">
         <?php

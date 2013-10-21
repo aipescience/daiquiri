@@ -169,21 +169,30 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
                 'class': cl,
                 'html': '<a href="#daiquiri-browser-left-' + i + '">' + self.databases[i].name + '</a>'
             }).appendTo($('.daiquiri-browser-body','.daiquiri-browser-left', self.container));
-        
-            if (i == iActive) {
-                $('a',li).click(function() {
-                    var iText = $(this).text();
-                    if (self.opt.action) 
-                        self.opt.action({'db': iText});
-                    return false;
+
+            $('a',li).click(function() {
+                self.displayColumns($(this).attr('href').split("-").pop(),0);
+                if (self.opt.action) self.opt.action({
+                    'db': $(this).text(),
+                    'same': $(this).parent().hasClass('active')
                 });
-            } else {
-                $('a',li).click(function() {
-                    var iNew = $(this).attr('href').split("-").pop();
-                    self.displayColumns(iNew,0);
-                    return false;
-                });
-            }
+                return false;
+            });
+
+            // if (i == iActive) {
+            //     $('a',li).click(function() {
+            //         var iText = $(this).text();
+            //         if (self.opt.action) 
+            //             self.opt.action({'db': iText});
+            //         return false;
+            //     });
+            // } else {
+            //     $('a',li).click(function() {
+            //         var iNew = $(this).attr('href').split("-").pop();
+            //         self.displayColumns(iNew,0);
+            //         return false;
+            //     });
+            // }
         }
         
         // center column (tables)
@@ -200,21 +209,31 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
                     'html': '<a href="#daiquiri-browser-center-' + j + '">' + self.databases[iActive].tables[j].name + '</a>'
                 }).appendTo($('.daiquiri-browser-body','.daiquiri-browser-center', self.container));
 
-                if (j == jActive) {
-                    $('a',li).click(function() {
-                        var iText = $('.active','.daiquiri-browser-left', self.container).text();
-                        var jText = $(this).text();
-                        if (self.opt.action) 
-                            self.opt.action({'db': iText, 'table': jText});
-                        return false;
+                $('a',li).click(function() {
+                    self.displayColumns(iActive,$(this).attr('href').split("-").pop());
+                    if (self.opt.action) self.opt.action({
+                        'db': $('.active','.daiquiri-browser-left', self.container).text(),
+                        'table': $(this).text(),
+                        'same': $(this).parent().hasClass('active')
                     });
-                } else {
-                    $('a',li).click(function() {
-                        var jNew = $(this).attr('href').split("-").pop();
-                        self.displayColumns(iActive,jNew);
-                        return false;
-                    });
-                }
+                    return false;
+                });
+
+                // if (j == jActive) {
+                //     $('a',li).click(function() {
+                //         var iText = $('.active','.daiquiri-browser-left', self.container).text();
+                //         var jText = $(this).text();
+                //         if (self.opt.action) 
+                //             self.opt.action({'db': iText, 'table': jText});
+                //         return false;
+                //     });
+                // } else {
+                //     $('a',li).click(function() {
+                //         var jNew = $(this).attr('href').split("-").pop();
+                //         self.displayColumns(iActive,jNew);
+                //         return false;
+                //     });
+                // }
             }
     
             // right column (columns)
@@ -226,15 +245,15 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
                     }).appendTo($('.daiquiri-browser-body','.daiquiri-browser-right', self.container));
         
                     $('a',li).click(function() {
+                        var same = $(this).parent().hasClass('active');
                         $('.active','.daiquiri-browser-right').removeClass('active');
                         $(this).parent().addClass('active');
-
-                        var iText = $('.active','.daiquiri-browser-left', self.container).text();
-                        var jText = $('.active','.daiquiri-browser-center', self.container).text();
-                        var kText = $(this).text();
-
-                        if (self.opt.action) 
-                            self.opt.action({'db': iText, 'table': jText, 'column': kText});
+                        if (self.opt.action) self.opt.action(
+                            {'db': $('.active','.daiquiri-browser-left', self.container).text(),
+                            'table': $('.active','.daiquiri-browser-center', self.container).text(),
+                            'column': $(this).text(),
+                            'same': same
+                        });
                         return false;
                     })
                 }

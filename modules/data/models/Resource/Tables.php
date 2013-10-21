@@ -45,11 +45,11 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
 
         // get the primary sql select object
         $select = $this->getTable()->select();
-        $select = $select->from($this->getTable());
+        $select = $select->from($this->getTable(),'id');
         $select->setIntegrityCheck(false);
         $select->where("`$t`.`name` = ?", trim($table));
         $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`");
+        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('dbname' => 'name'));
         $select->where("`$d`.`name` = ?", trim($db));
         $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 

@@ -63,15 +63,15 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
             $id = $this->_getParam('id');
             $db = false;
             $table = false;
-            $col = false;
+            $column = false;
         } else {
             $id = false;
             $db = $this->_getParam('db');
             $table = $this->_getParam('table');
-            $col = $this->_getParam('column');;
+            $column = $this->_getParam('column');;
         }
         
-        $response = $this->_model->show($id, $db, $table, $col);
+        $response = $this->_model->show($id, $db, $table, $column);
 
         // assign to view
         $this->view->redirect = $redirect;
@@ -87,12 +87,12 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
             $id = $this->_getParam('id');
             $db = false;
             $table = false;
-            $col = false;
+            $column = false;
         } else {
             $id = false;
             $db = $this->_getParam('db');
             $table = $this->_getParam('table');
-            $col = $this->_getParam('column');;
+            $column = $this->_getParam('column');;
         }
 
         // check if POST or GET
@@ -102,11 +102,11 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
                 $this->_redirect($redirect);
             } else {
                 // validate form and do stuff
-                $response = $this->_model->update($id, $db, $table, $col, $this->_request->getPost());
+                $response = $this->_model->update($id, $db, $table, $column, $this->_request->getPost());
             }
         } else {
             // just display the form
-            $response = $this->_model->update($id, $db, $table, $col);
+            $response = $this->_model->update($id, $db, $table, $column);
         }
 
         // assign to view
@@ -123,12 +123,12 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
             $id = $this->_getParam('id');
             $db = false;
             $table = false;
-            $col = false;
+            $column = false;
         } else {
             $id = false;
             $db = $this->_getParam('db');
             $table = $this->_getParam('table');
-            $col = $this->_getParam('column');;
+            $column = $this->_getParam('column');;
         }
 
         // check if POST or GET
@@ -138,11 +138,11 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
                 $this->_redirect($redirect);
             } else {
                 // validate form and do stuff
-                $response = $this->_model->delete($id, $db, $table, $col, $this->_request->getPost());
+                $response = $this->_model->delete($id, $db, $table, $column, $this->_request->getPost());
             }
         } else {
             // just display the form
-            $response = $this->_model->delete($id, $db, $table, $col);
+            $response = $this->_model->delete($id, $db, $table, $column);
         }
 
         // assign to view

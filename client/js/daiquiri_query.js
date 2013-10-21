@@ -442,22 +442,22 @@ daiquiri.query.Query.prototype.displayBrowser = function(){
     $('#browser').daiquiri_browser({
         'url': self.url.browser,
         'action': function (opt) {
-            console.log(opt);
-            var items = [];
-            if (typeof opt.db !== 'undefined') {
-                items.push('`' + opt.db + '`');
-            }
-            if (typeof opt.table !== 'undefined') {
-                items.push('`' + opt.table + '`');
-            }
-            if (typeof opt.column !== 'undefined') {
-                items.push('`' + opt.column + '`');
-            }
-            var string = items.join('.');
+            if ((typeof opt.same !== 'undefined' && opt.same) || typeof opt.column !== 'undefined') {
+                var items = [];
+                if (typeof opt.db !== 'undefined') {
+                    items.push('`' + opt.db + '`');
+                }
+                if (typeof opt.table !== 'undefined') {
+                    items.push('`' + opt.table + '`');
+                }
+                if (typeof opt.column !== 'undefined') {
+                    items.push('`' + opt.column + '`');
+                }
 
-            $('#sql_query').insertAtCaret(string);
-            $('#sql_query').daiquiri_codemirror_insertAtCaret(string);
-
+                var string = items.join('.');
+                $('#sql_query').insertAtCaret(string);
+                $('#sql_query').daiquiri_codemirror_insertAtCaret(string);
+            }
             $('.active','.daiquiri-browser-right').removeClass('active');
         }
     });
