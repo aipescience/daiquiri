@@ -40,15 +40,34 @@
         </div>
     </div>
 
-    <div id="display"></div>
-
-    <div>
-        <?php
-        echo $this->internalLink(array(
-            'text' => 'Export database management settings in php syntax for init.php',
-            'href' => '/data/index/export',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        ?>
+    <div id="display">
+        <div class="row">
+            <div class="span3">
+                <div class="options">
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'Create new database entry',
+                        'href' => '/data/databases/create',
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new table entry',
+                        'href' => '/data/tables/create',
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new column entry',
+                        'href' => '/data/columns/create',
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new function entry',
+                        'href' => '/data/functions/create',
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    ?>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
