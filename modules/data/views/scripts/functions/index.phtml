@@ -20,9 +20,9 @@
  */
 ?>
 
-<?php foreach ($this->databases as $database): ?>
+<?php foreach ($this->functions as $function): ?>
     <table class='table table-bordered'>
-        <?php foreach ($database as $dbKey => $dbValue): ?>
+        <?php foreach ($function as $dbKey => $dbValue): ?>
             <tr>
                 <td class="onehundredtwenty"><?php echo ucfirst($this->escape($dbKey)); ?></td>
                 <td>

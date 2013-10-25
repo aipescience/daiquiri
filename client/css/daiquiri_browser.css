@@ -32,9 +32,11 @@
 .daiquiri-browser-body {
     overflow-y: auto;
 }
-.daiquiri-browser-left,
-.daiquiri-browser-center {
+.daiquiri-browser div {
     border-right: 1px solid #ddd;
+}
+.daiquiri-browser div:last-child {
+    border-right: 0px;
 }
 .daiquiri-browser .daiquiri-browser-body li a {
     margin-top: 0;

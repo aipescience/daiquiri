@@ -21,31 +21,37 @@
 ?>
 
 <?php if ($this->status === 'ok'): ?>
-    <table class='table table-bordered'>
-        <?php foreach($this->data as $key => $value): ?>
-            <?php if ($key !== 'columns'): ?>
-            <tr>
-                <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
-                <td>
-                    <?php echo $this->escape($value); ?>
-                </td>
-            </tr>
-            <?php endif; ?>
-        <?php endforeach ?>
-    </table>
-    <?php
-    $redirect = '/data/functions/show?id=' . $this->escape($this->data['id']);
-    echo $this->internalLink(array(
-        'text' => 'Update table entry',
-        'href' => '/data/functions/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Delete function entry',
-        'href' => '/data/functions/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <div class="row">
+        <div class="span9">
+            <table class='table table-bordered'>
+                <?php foreach($this->data as $key => $value): ?>
+                    <tr>
+                        <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
+                        <td>
+                            <?php echo $this->escape($value); ?>
+                        </td>
+                    </tr>
+                <?php endforeach ?>
+            </table>
+        </div>
+        <div class="span3">
+            <div id="options">
+                <?php
+                $redirect = '/data/functions/show?id=' . $this->escape($this->data['id']);
+                echo $this->internalLink(array(
+                    'text' => 'Update function entry',
+                    'href' => '/data/functions/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                echo $this->internalLink(array(
+                    'text' => 'Delete function entry',
+                    'href' => '/data/functions/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+        </div>
+    </div>
 <?php else: ?>
 <h5>Error retrieving table information</h5>
 <?php endif; ?>

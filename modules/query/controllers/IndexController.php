@@ -367,7 +367,7 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
         $userDbModel = Daiquiri_Proxy::factory('Query_Model_Database');
         $data[] = $userDbModel->show();
 
-        $this->view->data = $data;
+        $this->view->databases = $data;
         $this->view->status = 'ok';
     }
 

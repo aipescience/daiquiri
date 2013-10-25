@@ -49,6 +49,13 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
             $response = $this->_model->create($tableId);
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/columns/create';
+            $form->setAction($action);
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -109,6 +116,18 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
             $response = $this->_model->update($id, $db, $table, $column);
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/columns/update';
+            if ($id !== false) {
+                $action .= '?id=' . $id;
+            } else {
+                $action .= '?db=' . $db . '&table=' . $table . '&column=' . $column;
+            }
+            $form->setAction($action);
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -143,6 +162,18 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $this->_model->delete($id, $db, $table, $column);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/columns/delete';
+            if ($id !== false) {
+                $action .= '?id=' . $id;
+            } else {
+                $action .= '?db=' . $db . '&table=' . $table . '&column=' . $column;
+            }
+            $form->setAction($action);
         }
 
         // assign to view

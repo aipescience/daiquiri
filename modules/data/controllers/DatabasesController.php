@@ -35,7 +35,7 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
             }
         }
 
-        $this->view->data = $data;
+        $this->view->databases = $data;
         $this->view->status = 'ok';
     }
 
@@ -58,6 +58,13 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $this->_model->create();
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/databases/create';
+            $form->setAction($action);
         }
 
         // assign to view
@@ -114,6 +121,18 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
             $response = $this->_model->update($id, $db);
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/databases/update';
+            if ($id !== false) {
+                $action .= '?id=' . $id;
+            } else {
+                $action .= '?db=' . $db;
+            }
+            $form->setAction($action);
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -144,6 +163,18 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $this->_model->delete($id, $db);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/databases/delete';
+            if ($id !== false) {
+                $action .= '?id=' . $id;
+            } else {
+                $action .= '?db=' . $db;
+            }
+            $form->setAction($action);
         }
 
         // assign to view

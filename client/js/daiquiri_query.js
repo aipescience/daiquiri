@@ -441,19 +441,15 @@ daiquiri.query.Query.prototype.displayBrowser = function(){
 
     $('#browser').daiquiri_browser({
         'url': self.url.browser,
+        'columns': ['databases','tables','columns'],
         'action': function (opt) {
-            if ((typeof opt.same !== 'undefined' && opt.same) || typeof opt.column !== 'undefined') {
+            if ((typeof opt.same !== 'undefined' && opt.same) || typeof opt.right !== 'undefined') {
                 var items = [];
-                if (typeof opt.db !== 'undefined') {
-                    items.push('`' + opt.db + '`');
-                }
-                if (typeof opt.table !== 'undefined') {
-                    items.push('`' + opt.table + '`');
-                }
-                if (typeof opt.column !== 'undefined') {
-                    items.push('`' + opt.column + '`');
-                }
-
+                $.each(['left','center','right'], function (key, value) {
+                    if (typeof opt[value] !== 'undefined') {
+                        items.push('`' + opt[value] + '`');
+                    }
+                })
                 var string = items.join('.');
                 $('#sql_query').insertAtCaret(string);
                 $('#sql_query').daiquiri_codemirror_insertAtCaret(string);

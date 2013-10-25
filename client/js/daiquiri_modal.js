@@ -110,9 +110,6 @@ daiquiri.Modal.prototype.display = function () {
         var margin = - ((this.opt.width /2) + 30);
         this.dialog.css('marginLeft', margin + 'px');
     }
-    if (typeof this.opt.top !== 'undefined') {
-        
-    }
     if (typeof this.opt.success!== 'undefined') {
         this.opt.success();
     }

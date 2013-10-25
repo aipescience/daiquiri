@@ -27,7 +27,16 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $this->_redirect('/data/');
+        $data = array();
+        foreach (array_keys($this->_model->index()) as $id) {
+            $response = $this->_model->show($id, false, true);
+            if ($response['status'] == 'ok') {
+                $data[] = $response['data'];
+            }
+        }
+
+        $this->view->functions = $data;
+        $this->view->status = 'ok';
     }
 
     public function createAction() {
@@ -46,6 +55,13 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $this->_model->create();
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/functions/create';
+            $form->setAction($action);
         }
 
         // assign to view
@@ -100,6 +116,18 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
             $response = $this->_model->update($id, $function);
         }
 
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/functions/update';
+            if ($id !== false) {
+                $action .= '?id=' . $id;
+            } else {
+                $action .= '?function=' . $function;
+            }
+            $form->setAction($action);
+        }
+
         // assign to view
         $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
@@ -130,6 +158,18 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
         } else {
             // just display the form
             $response = $this->_model->delete($id, $function);
+        }
+
+        // set action for form
+        if (array_key_exists('form',$response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/functions/delete';
+            if ($id !== false) {
+                $action .= '?id=' . $id;
+            } else {
+                $action .= '?function=' . $function;
+            }
+            $form->setAction($action);
         }
 
         // assign to view

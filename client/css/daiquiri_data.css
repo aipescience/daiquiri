@@ -1,5 +1,4 @@
-<?php
-/*
+/*  
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
@@ -17,38 +16,16 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- */
-?>
+*/
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        new daiquiri.data.Data('<?php echo $this->baseUrl(); ?>');
-    });
-</script>
+#data #database-browser,
+#data #function-browser {
+    height: 150px;
+    margin-bottom: 20px;
+}
 
-<h2>Database management</h2>
-
-<div id="data">
-
-    <p>Please click on a database, a table, a column or a function to show or edit its metadata.</p>
-    <div class="row">
-        <div class="span9">
-            <div id="database-browser"></div>
-        </div>
-        <div class="span3">
-            <div id="function-browser"></div>
-        </div>
-    </div>
-
-    <div id="display"></div>
-
-    <div>
-        <?php
-        echo $this->internalLink(array(
-            'text' => 'Export in php syntax for init.php',
-            'href' => '/data/index/export',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        ?>
-    </div>
-</div>
+#data #display #options {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px 10px 0 10px;
+}

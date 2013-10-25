@@ -52,7 +52,8 @@ daiquiri.browser.items = {};
  */
 daiquiri.browser.opt = {
     'action': null,
-    'url': null
+    'url': null,
+    'columns': []
 };
 
 /**
@@ -88,40 +89,43 @@ daiquiri.browser.Browser.prototype.reset = function (opt) {
 daiquiri.browser.Browser.prototype.displayBrowser = function () {
     var self = this;
 
+    var html = ''; 
     // left column
-    var html = '<div class="daiquiri-browser-left pull-left">'
-    html += '<ul class="daiquiri-browser-head nav nav-pills nav-stacked">';
-    html += '<li class="nav-header">Databases</li>';
-    html += '</ul>';
-    html += '<ul class="daiquiri-browser-body nav nav-pills nav-stacked">';
-    html += '</ul>';
-    html += '</div>';
-    
-    
-    // center column
-    html += '<div class="daiquiri-browser-center pull-left">'
-    html += '<ul class="daiquiri-browser-head nav nav-pills nav-stacked">';
-    html += '<li class="nav-header">Tables</li>';
-    html += '</ul>';
-    html += '<ul class="daiquiri-browser-body nav nav-pills nav-stacked">';
-    html += '</ul>';
-    html += '</div>';
-    
-    // right column
-    html += '<div class="daiquiri-browser-right pull-left">'
-    html += '<ul class="daiquiri-browser-head nav nav-pills nav-stacked">';
-    html += '<li class="nav-header">Columns</li>';
-    html += '</ul>';
-    html += '<ul class="daiquiri-browser-body nav nav-pills nav-stacked">';
-    html += '</ul>';
-    html += '</div>';
+    if (self.opt.columns.length > 0) {
+        html += '<div class="daiquiri-browser-left pull-left">'
+        html += '<ul class="daiquiri-browser-head nav nav-pills nav-stacked">';
+        html += '<li class="nav-header">' + self.opt.columns[0] + '</li>';
+        html += '</ul>';
+        html += '<ul class="daiquiri-browser-body nav nav-pills nav-stacked">';
+        html += '</ul>';
+        html += '</div>';
+    }
+    if (self.opt.columns.length > 1) {
+        // center column
+        html += '<div class="daiquiri-browser-center pull-left">'
+        html += '<ul class="daiquiri-browser-head nav nav-pills nav-stacked">';
+        html += '<li class="nav-header">' + self.opt.columns[1] + '</li>';
+        html += '</ul>';
+        html += '<ul class="daiquiri-browser-body nav nav-pills nav-stacked">';
+        html += '</ul>';
+        html += '</div>';
+    }
+    if (self.opt.columns.length > 2) {   
+        // right column
+        html += '<div class="daiquiri-browser-right pull-left">'
+        html += '<ul class="daiquiri-browser-head nav nav-pills nav-stacked">';
+        html += '<li class="nav-header">' + self.opt.columns[2] + '</li>';
+        html += '</ul>';
+        html += '<ul class="daiquiri-browser-body nav nav-pills nav-stacked">';
+        html += '</ul>';
+        html += '</div>';
+    }
 
     self.container.append(html);
     
-    this.resize();
+    self.resize();
 
     $.ajax({
-        type: 'POST',
         url: self.opt.url,
         dataType: 'json',
         headers: {
@@ -131,7 +135,7 @@ daiquiri.browser.Browser.prototype.displayBrowser = function () {
         success: function(json) {
             // check if everything went ok
             if (json.status == 'ok') {
-                self.databases = json.data;
+                self.json = json;
                 self.displayColumns(0,0);
                 
                 $(window).bind('resize', function() {
@@ -149,55 +153,41 @@ daiquiri.browser.Browser.prototype.displayBrowser = function () {
  */
 daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) {
     var self = this;
-    var i,j,k,html,cl,li;
+    var i,j,k,html,cl,li,leftData,centerData,rightData;
 
     // remove content
-    $('.nav-item','.daiquiri-browser-left', self.container).remove();
-    $('.nav-item','.daiquiri-browser-center', self.container).remove();
-    $('.nav-item','.daiquiri-browser-right', self.container).remove();
+    $('.daiquiri-browser-left .nav-item', self.container).remove();
+    $('.daiquiri-browser-center .nav-item', self.container).remove();
+    $('.daiquiri-browser-right .nav-item', self.container).remove();
     
     // left column (databases)
-    if (self.databases != undefined) {
-        for (i = 0; i < self.databases.length; i++){
+    leftData = self.json[self.opt.columns[0]];
+    if (leftData != undefined) {
+        for (i = 0; i < leftData.length; i++){
             if (i == iActive) {
                 cl = "nav-item active";
             } else {
                 cl = "nav-item";
             }
-
             li = $('<li/>',{
                 'class': cl,
-                'html': '<a href="#daiquiri-browser-left-' + i + '">' + self.databases[i].name + '</a>'
-            }).appendTo($('.daiquiri-browser-body','.daiquiri-browser-left', self.container));
+                'html': '<a href="#daiquiri-browser-left-' + i + '">' + leftData[i].name + '</a>'
+            }).appendTo($('.daiquiri-browser-left .daiquiri-browser-body', self.container));
 
             $('a',li).click(function() {
                 self.displayColumns($(this).attr('href').split("-").pop(),0);
                 if (self.opt.action) self.opt.action({
-                    'db': $(this).text(),
+                    'left': $(this).text(),
                     'same': $(this).parent().hasClass('active')
                 });
                 return false;
             });
-
-            // if (i == iActive) {
-            //     $('a',li).click(function() {
-            //         var iText = $(this).text();
-            //         if (self.opt.action) 
-            //             self.opt.action({'db': iText});
-            //         return false;
-            //     });
-            // } else {
-            //     $('a',li).click(function() {
-            //         var iNew = $(this).attr('href').split("-").pop();
-            //         self.displayColumns(iNew,0);
-            //         return false;
-            //     });
-            // }
         }
         
         // center column (tables)
-        if (self.databases[iActive] != undefined) {
-            for (j = 0; j < self.databases[iActive].tables.length; j++){
+        centerData = leftData[iActive][self.opt.columns[1]];
+        if (centerData != undefined) {
+            for (j = 0; j < centerData.length; j++){
                 if (j == jActive) {
                     cl = 'nav-item active';
                 } else {
@@ -206,52 +196,37 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
             
                 li = $('<li/>',{
                     'class': cl,
-                    'html': '<a href="#daiquiri-browser-center-' + j + '">' + self.databases[iActive].tables[j].name + '</a>'
-                }).appendTo($('.daiquiri-browser-body','.daiquiri-browser-center', self.container));
+                    'html': '<a href="#daiquiri-browser-center-' + j + '">' + centerData[j].name + '</a>'
+                }).appendTo($('.daiquiri-browser-center .daiquiri-browser-body', self.container));
 
                 $('a',li).click(function() {
                     self.displayColumns(iActive,$(this).attr('href').split("-").pop());
                     if (self.opt.action) self.opt.action({
-                        'db': $('.active','.daiquiri-browser-left', self.container).text(),
-                        'table': $(this).text(),
+                        'left': $('.daiquiri-browser-left .active', self.container).text(),
+                        'center': $(this).text(),
                         'same': $(this).parent().hasClass('active')
                     });
                     return false;
                 });
-
-                // if (j == jActive) {
-                //     $('a',li).click(function() {
-                //         var iText = $('.active','.daiquiri-browser-left', self.container).text();
-                //         var jText = $(this).text();
-                //         if (self.opt.action) 
-                //             self.opt.action({'db': iText, 'table': jText});
-                //         return false;
-                //     });
-                // } else {
-                //     $('a',li).click(function() {
-                //         var jNew = $(this).attr('href').split("-").pop();
-                //         self.displayColumns(iActive,jNew);
-                //         return false;
-                //     });
-                // }
             }
     
             // right column (columns)
-            if (self.databases[iActive].tables[jActive] != undefined) {
-                for (k = 0; k < self.databases[iActive].tables[jActive].columns.length; k++){
+            rightData = centerData[jActive][self.opt.columns[2]];
+            if (rightData != undefined) {
+                for (k = 0; k < rightData.length; k++){
                     li = $('<li/>',{
                         'class': 'nav-item',
-                        'html': '<a href="#daiquiri-browser-right-' + k + '">' + self.databases[iActive].tables[jActive].columns[k].name + '</a>'
-                    }).appendTo($('.daiquiri-browser-body','.daiquiri-browser-right', self.container));
+                        'html': '<a href="#daiquiri-browser-right-' + k + '">' + rightData[k].name + '</a>'
+                    }).appendTo($('.daiquiri-browser-right .daiquiri-browser-body', self.container));
         
                     $('a',li).click(function() {
                         var same = $(this).parent().hasClass('active');
-                        $('.active','.daiquiri-browser-right').removeClass('active');
+                        $('.daiquiri-browser-right .active').removeClass('active');
                         $(this).parent().addClass('active');
-                        if (self.opt.action) self.opt.action(
-                            {'db': $('.active','.daiquiri-browser-left', self.container).text(),
-                            'table': $('.active','.daiquiri-browser-center', self.container).text(),
-                            'column': $(this).text(),
+                        if (self.opt.action) self.opt.action({
+                            'left': $('.daiquiri-browser-left .active', self.container).text(),
+                            'center': $('.daiquiri-browser-center .active', self.container).text(),
+                            'right': $(this).text(),
                             'same': same
                         });
                         return false;
@@ -278,25 +253,25 @@ daiquiri.browser.Browser.prototype.resize = function() {
     if (zoom < 0.34) remainingWidth -= 2;
     if (zoom < 0.26) remainingWidth -= 2;
 
-    var partWidth = Math.floor(width / 3);
+    var partWidth = Math.floor(width / self.opt.columns.length);
 
     // left part
     currWidth = partWidth;
-    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-left').height() - 1;
-    $('.daiquiri-browser-left').width(currWidth);
-    $('.daiquiri-browser-body','.daiquiri-browser-left').height(currHeight);
+    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-left', self.container).height() - 1;
+    $('.daiquiri-browser-left', self.container).width(currWidth);
+    $('.daiquiri-browser-body','.daiquiri-browser-left', self.container).height(currHeight);
     remainingWidth -= currWidth;
 
     // center part
     currWidth = partWidth;
-    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-center').height() - 1;
-    $('.daiquiri-browser-center').width(currWidth);
-    $('.daiquiri-browser-body','.daiquiri-browser-center').height(currHeight);
+    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-center', self.container).height() - 1;
+    $('.daiquiri-browser-center', self.container).width(currWidth);
+    $('.daiquiri-browser-body','.daiquiri-browser-center', self.container).height(currHeight);
     remainingWidth -= currWidth;
 
     // right part
     currWidth = remainingWidth;
-    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-right').height() - 1;
-    $('.daiquiri-browser-right').width(currWidth);
-    $('.daiquiri-browser-body','.daiquiri-browser-right').height(currHeight);
+    currHeight = height - $('.daiquiri-browser-head','.daiquiri-browser-right', self.container).height() - 1;
+    $('.daiquiri-browser-right', self.container).width(currWidth);
+    $('.daiquiri-browser-body','.daiquiri-browser-right', self.container).height(currHeight);
 };
