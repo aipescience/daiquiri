@@ -39,7 +39,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
         foreach(array_keys($this->getValues()) as $id) {
             $response = $this->show($id);
             if ($response['status'] == 'ok') {
-                $data[] = $response['data']['database'] . '.' . $response['data']['name'];
+                $data[$response['data']['id']] = $response['data']['database'] . '.' . $response['data']['name'];
             }
         }
         return $data;

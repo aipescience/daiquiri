@@ -35,7 +35,14 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
      * @return array
      */
     public function index() {
-        return $this->getValues();
+        $data = array();
+        foreach(array_keys($this->getValues()) as $id) {
+            $response = $this->show($id);
+            if ($response['status'] == 'ok') {
+                $data[$response['data']['id']] = $response['data']['name'];
+            }
+        }
+        return $data;
     }
 
     /**

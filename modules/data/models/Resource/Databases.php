@@ -35,26 +35,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
             'Data_Model_DbTable_Tables'
         ));
     }
-
-    /**
-     * Returns all databases that user has access permission
-     * @param type $id
-     * @throws Exception
-     * @return type 
-     */
-    // public function fetchRows($sqloptions = array()) {
-    //     $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
-    //     //roles starting at 1, therefore check for <=
-    //     $adapter = $this->getTable()->getAdapter();
-    //     $sqloptions['where'][] = $adapter->quoteInto('`publication_role_id` <= ?', count($usrRoles));
-    //     $select = $this->getTable()->getSelect($sqloptions);
-
-    //     $rows = $this->getTable()->fetchAll($select);
-
-    //     return $rows;
-    // }    
-
+  
     public function fetchId($db) {
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
@@ -92,8 +73,6 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();
-
-        $data = false;
 
         if ($row) {
             $data = $row->toArray();
@@ -145,9 +124,11 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
                     $data['tables'][] = $table;
                 }
             }
-        }
 
-        return $data;
+            return $data;
+        } else {
+            return array();
+        }
     }
 
     /**

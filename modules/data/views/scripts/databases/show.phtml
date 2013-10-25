@@ -37,22 +37,41 @@
             </table>
         </div>
         <div class="span3">
-            <div id="options">
+            <div class="options">
                 <?php
                 $redirect = '/data/databases/show?id=' . $this->escape($this->data['id']);
                 echo $this->internalLink(array(
-                    'text' => 'Update database entry',
+                    'text' => 'Update this database entry',
                     'href' => '/data/databases/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
                     'prepend' => '<p>',
                     'append' => '</p>'));
                 echo $this->internalLink(array(
-                    'text' => 'Delete database entry',
+                    'text' => 'Delete this database entry',
                     'href' => '/data/databases/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+            <div class="options">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Create new database entry',
+                    'href' => '/data/databases/create?redirect=' . $redirect,
                     'prepend' => '<p>',
                     'append' => '</p>'));
                 echo $this->internalLink(array(
                     'text' => 'Create new table entry',
                     'href' => '/data/tables/create?databaseId=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                echo $this->internalLink(array(
+                    'text' => 'Create new column entry',
+                    'href' => '/data/columns/create?redirect=' . $redirect,
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                echo $this->internalLink(array(
+                    'text' => 'Create new function entry',
+                    'href' => '/data/functions/create?redirect=' . $redirect,
                     'prepend' => '<p>',
                     'append' => '</p>'));
                 ?>

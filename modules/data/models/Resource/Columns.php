@@ -49,10 +49,10 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
         $select = $select->from($this->getTable(),'id');
         $select->setIntegrityCheck(false);
         $select->where("`$c`.`name` = ?", trim($column));
-        $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('tablename' => 'name'));
+        $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name', 'tableId' => 'id'));
         $select->where("`$t`.`name` = ?", trim($table));
         $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('dbname' => 'name'));
+        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name', 'databaseId' => 'id'));
         $select->where("`$d`.`name` = ?", trim($db));
         $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 
@@ -86,22 +86,17 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
 
         // add inner joins for the category, the status and the user
         $select->setIntegrityCheck(false);
-        $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name'));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
+        $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name', 'tableId' => 'id'));
+        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name', 'databaseId' => 'id'));
         $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
         $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();
-
-        $data = false;
-
-        if($row) {
-            $row = $row->toArray();
-            unset($row['database_id']);
-            unset($row['table_id']);
-
-            $data = $row;
+        if ($row) {
+            return $row->toArray();
+        } else {
+            return array();
         }
 
         return $data;
