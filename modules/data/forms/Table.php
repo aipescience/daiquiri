@@ -68,7 +68,6 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'name', array(
             'label' => 'Table name:',
-            'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -77,7 +76,6 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'description', array(
             'label' => 'Database description',
-            'class' => 'input-xxlarge',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),

@@ -23,6 +23,12 @@
 <?php if ($this->status === 'ok'): ?>
     <div class="row">
         <div class="span9">
+            <div class="box">
+                <p>
+                    <span class="meta">FUNCTION</span>
+                    <strong><?php echo $this->escape($this->data['name']); ?></strong>
+                </p>
+            </div>
             <table class='table table-bordered'>
                 <?php foreach($this->data as $key => $value): ?>
                     <tr>
@@ -35,22 +41,22 @@
             </table>
         </div>
         <div class="span3">
-            <div class="options">
+            <div class="box">
                 <?php
                 $redirect = '/data/functions/show?id=' . $this->escape($this->data['id']);
                 echo $this->internalLink(array(
-                    'text' => 'Update function entry',
+                    'text' => 'Update this function entry',
                     'href' => '/data/functions/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
                     'prepend' => '<p>',
                     'append' => '</p>'));
                 echo $this->internalLink(array(
-                    'text' => 'Delete function entry',
+                    'text' => 'Delete this function entry',
                     'href' => '/data/functions/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
                     'prepend' => '<p>',
                     'append' => '</p>'));
                 ?>
             </div>
-            <div class="options">
+            <div class="box">
                 <?php
                 echo $this->internalLink(array(
                     'text' => 'Create new database entry',

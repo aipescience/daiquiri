@@ -24,9 +24,16 @@
     margin-bottom: 20px;
 }
 
-#data .options {
+#data .box {
     border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 10px 10px 0 10px;
+    padding: 10px 10px 0px 10px;
     margin-bottom: 20px;
+}
+
+#data .box .meta {
+    color: #999;
+    font-size: 11px;
+    font-weight: bold;
+    margin-right: 10px;
 }

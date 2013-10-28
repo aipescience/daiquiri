@@ -23,6 +23,12 @@
 <?php if ($this->status === 'ok'): ?>
     <div class="row">
         <div class="span9">
+            <div class="box">
+                <p>
+                    <span class="meta">COLUMN</span>
+                    <strong><?php echo $this->escape($this->data['database']); ?>.<?php echo $this->escape($this->data['table']); ?>.<?php echo $this->escape($this->data['name']); ?></strong>
+                </p>
+            </div>
             <table class='table table-bordered'>
                 <?php foreach($this->data as $key => $value): ?>
                     <?php if ($key !== 'columns'): ?>
@@ -37,22 +43,22 @@
             </table>
         </div>
         <div class="span3">
-            <div class="options">
+            <div class="box">
                 <?php
                 $redirect = '/data/columns/show?id=' . $this->escape($this->data['id']);
                 echo $this->internalLink(array(
-                    'text' => 'Update column entry',
+                    'text' => 'Update this column entry',
                     'href' => '/data/columns/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
                     'prepend' => '<p>',
                     'append' => '</p>'));
                 echo $this->internalLink(array(
-                    'text' => 'Delete column entry',
+                    'text' => 'Delete this column entry',
                     'href' => '/data/columns/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
                     'prepend' => '<p>',
                     'append' => '</p>'));
                 ?>
             </div>
-            <div class="options">
+            <div class="box">
                 <?php
                 echo $this->internalLink(array(
                     'text' => 'Create new database entry',

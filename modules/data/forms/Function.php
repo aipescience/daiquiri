@@ -45,7 +45,6 @@ class Data_Form_Function extends Daiquiri_Form_Abstract {
         // add elements
         $this->addElement('text', 'name', array(
             'label' => 'Function name:',
-            'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -54,7 +53,6 @@ class Data_Form_Function extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'description', array(
             'label' => 'Function description',
-            'class' => 'input-xxlarge',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),

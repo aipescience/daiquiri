@@ -188,16 +188,21 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // get the form values
-            $values = $form->getValues();
+                // resolve database adapter index
+                $values['adapter'] = $adapter[$values['adapter']];
 
-            // resolve database adapter index
-            $values['adapter'] = $adapter[$values['adapter']];
-
-            $this->getResource()->updateRow($id, $values);
-            return array('status' => 'ok');
+                $this->getResource()->updateRow($id, $values);
+                return array('status' => 'ok');
+            } else {
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+            }
         }
 
         return array('form' => $form, 'status' => 'form');

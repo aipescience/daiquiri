@@ -67,7 +67,9 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
                 return array('status' => 'ok');
             } else {
-                return array('form' => $form, 'status' => 'error', 'errors' => $form->getMessages());
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
             }
         }
 
@@ -146,7 +148,9 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
                 return array('status' => 'ok');
             } else {
-                return array('status' => 'error', 'errors' => $form->getMessages());
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
             }
         }
 
@@ -178,7 +182,9 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 $this->getResource()->deleteRow($id);
                 return array('status' => 'ok');
             } else {
-                return array('status' => 'error', 'errors' => $form->getMessages());
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
             } 
         }
 
