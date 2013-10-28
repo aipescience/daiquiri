@@ -30,6 +30,7 @@
 // Include daiquiri shortcodes
 require_once('daiquiri_shortcodes.php');
 require_once('daiquiri_options.php');
+require_once('daiquiri_navigation.php');
 
 /*
  * Automatiacally login the user which is logged in into daiquiri right now.
