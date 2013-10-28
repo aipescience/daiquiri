@@ -363,8 +363,19 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             }
 
             $sql = "";
+            $oldToken = NULL;
             foreach ($parsed['sub_tree'] as $k => $v) {
+                if(!empty($oldToken) && $v['expr_type'] !== "operator" && $oldToken['expr_type'] !== "operator") {
+                    $sql .= ($this->isReserved($oldToken)  ? " " : ", ");
+                } else {
+                    $sql .= " ";
+                }
+                
                 $len = strlen($sql);
+                $sql .= $this->processReserved($v);
+                $sql .= $this->processSign($v);
+                $sql .= $this->processSelectExpression($v);
+                $sql .= $this->processOperator($v);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processColRef($v);
@@ -374,10 +385,10 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                     throw new UnableToCreateSQLException('function subtree', $k, $v, 'expr_type');
                 }
 
-                $sql .= ($this->isReserved($v) ? " " : ",");
+                $oldToken = $v;
             }
 
-            $sql = $parsed['base_expr'] . "(" . substr($sql, 0, -1) . ")";
+            $sql = $parsed['base_expr'] . "(" . trim($sql, "() ") . ")";
 
             if(array_key_exists('alias', $parsed)) {
                 $sql .= $this->processAlias($parsed['alias']);
@@ -395,6 +406,14 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
+        protected function processSign($parsed) {
+            if ($parsed['expr_type'] !== 'sign') {
+                return "";
+            }
+            $sql = $parsed['base_expr'];
+            return $sql;
+        }
+
         protected function processSubTree($parsed, $delim = " ") {
             if ($parsed['sub_tree'] === '') {
                 return "";
@@ -402,6 +421,9 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             $sql = "";
             foreach ($parsed['sub_tree'] as $k => $v) {
                 $len = strlen($sql);
+                $sql .= $this->processReserved($v);
+                $sql .= $this->processSign($v);
+                $sql .= $this->processSelectExpression($v);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processColRef($v);

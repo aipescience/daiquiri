@@ -840,7 +840,6 @@ daiquiri.query.Query.prototype.displayDownloadErrors = function (error) {
 
 daiquiri.query.Query.prototype.removeJob = function () {
     var self = this;
-    console.log(self.job);
     // prepare dialog
     var modal = new daiquiri.Modal({
         'url': self.url.remove + '?id=' + self.job.id.value,
