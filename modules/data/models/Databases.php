@@ -226,10 +226,15 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
         ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $this->getResource()->deleteDatabase($id);
-
-            return array('status' => 'ok');
+        if (!empty($formParams)){
+            if ($form->isValid($formParams)) {
+                $this->getResource()->deleteDatabase($id);
+                return array('status' => 'ok');
+            } else {
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+            } 
         }
 
         return array('form' => $form, 'status' => 'form');
