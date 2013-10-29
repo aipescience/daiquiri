@@ -63,8 +63,8 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         // daiquiri data management
         'daiquiri/css/daiquiri_data.css',
         'daiquiri/js/daiquiri_data.js',
-        // daiquiri cms
-        'daiquiri/css/daiquiri_cms.css',
+        // daiquiri wordpress stylesheet
+        'daiquiri/css/daiquiri_wp.css',
         // daiquiri misc
         'daiquiri/js/daiquiri_plot.js',
         'daiquiri/js/daiquiri_query_buttons.js',
