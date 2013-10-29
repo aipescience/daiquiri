@@ -53,11 +53,6 @@
 #wp-content fieldset {
     margin-bottom: 0;
 }
-#wp-content #comments h3 {
-    font-size: 1em;
-    font-weight: bold;
-    line-height: 20px;
-}
 
 #wp-content #recent-news {
     margin-top: 40px;
@@ -88,11 +83,6 @@
     display: inline-block;
 }
 
-#wp-sidebar h3 {
-    font-size: 1em;
-    font-weight: bold;
-    line-height: 20px;
-}
 #wp-sidebar ul {
     margin-left: 0px;
 }
