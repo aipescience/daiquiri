@@ -180,7 +180,7 @@ function daiquiri_authenticate($username, $password) {
 add_action('profile_personal_options', 'daiquiri_hide_start');
 
 function daiquiri_hide_start() {
-    echo '<div style="visibility: hidden;"><!-- the following fields are hidden since a change to these values would be overwritten at the next login. -->';
+    echo '<div style="display: none;"><!-- the following fields are hidden since a change to these values would be overwritten at the next login. -->';
 }
 
 add_action('show_user_profile', 'daiquiri_hide_end');

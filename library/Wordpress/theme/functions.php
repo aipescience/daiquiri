@@ -85,11 +85,23 @@ class Daiquiri_Layout {
     }
 
     public function get_header() {
-        echo $this->_header;
+        // get the closing tag of the html head
+        $pos = strpos($this->_header,'</head>');
+
+        // echo the header and 'inject' the wp_head hook
+        echo substr($this->_header, 0, $pos);
+        wp_head();
+        echo substr($this->_header, $pos);
     }
 
     public function get_footer() {
-        echo $this->_footer;
+        // get the closing tag of the html body
+        $pos = strpos($this->_footer,'</body>');
+
+        // echo the footer and 'inject' the wp_footer hook
+        echo substr($this->_footer, 0, $pos);
+        wp_footer();
+        echo substr($this->_footer, $pos);
     }
 
 }

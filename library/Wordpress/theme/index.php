@@ -19,7 +19,8 @@
  *  limitations under the License.
  */
 ?>
-<?php Daiquiri_Layout::getInstance()->get_header(); ?>
+
+<?php get_header(); ?>
 
 <div class="row">
     <div id="wp-content" class="span9">
@@ -54,4 +55,4 @@
     </div>
 </div>   
 
-<?php Daiquiri_Layout::getInstance()->get_footer(); ?>
+<?php get_footer(); ?>

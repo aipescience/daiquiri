@@ -19,35 +19,4 @@
  *  limitations under the License.
  */
 ?>
-
-<?php get_header(); ?>
-
-<div class="row">
-    <div id="wp-content" class="span9">
-        <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-                <div class="post">
-                    <h2><?php the_title(); ?></h2>
-
-                    <?php the_content(); ?>
-
-		    <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>
-
-                    <?php if (comments_open(get_the_ID())): ?>
-                        <?php comments_template() ?>
-                    <?php endif ?>
-                </div>
-                <?php
-            endwhile;
-        else:
-            ?>
-            <p>Sorry, no page found.</p>
-        <?php endif; ?>
-
-        <p align="center"><?php posts_nav_link(); ?></p>
-    </div>
-    <div id="wp-sidebar" class="span3">
-        <?php get_sidebar(); ?>
-    </div>
-</div> 
-
-<?php get_footer(); ?>
+<?php Daiquiri_Layout::getInstance()->get_footer(); ?>
