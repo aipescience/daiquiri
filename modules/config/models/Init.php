@@ -82,7 +82,8 @@ class Config_Model_Init extends Daiquiri_Model_Init {
             'cms' => array(
                 'enabled' => false,
                 'url' => '/cms/',
-                'path' => '/var/lib/daiquiri/wordpress'
+                'path' => '/var/lib/daiquiri/wordpress',
+                'navPath' => '/var/lib/daiquiri/navigation'
             ),
             'query' => array(
                 'adapter' => 'user',
