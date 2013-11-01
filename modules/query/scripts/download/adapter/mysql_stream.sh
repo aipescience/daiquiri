@@ -26,13 +26,13 @@ for a in $(echo $1 | tr "&" " "); do
     eval ${b[0]}=${b[1]}
 done
 
-if [ ! -z "$toolBin" ]; then
-	toolBin+="/"
+if [ ! -z "$binPath" ]; then
+	binPath+="/"
 fi
 
 # dump the table
 if [ -z "$socket" ]; then
-    ${toolBin}mysqldump -h$host -P$port -u$username -p$password $dbname $table
+    ${binPath}mysqldump -h$host -P$port -u$username -p$password $dbname $table
 else
-    ${toolBin}mysqldump --socket=$socket -u$username -p$password $dbname $table
+    ${binPath}mysqldump --socket=$socket -u$username -p$password $dbname $table
 fi

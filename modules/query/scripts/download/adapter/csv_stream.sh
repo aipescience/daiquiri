@@ -30,12 +30,12 @@ path=$(dirname $file)
 fileName=$(basename $file)
 fileName=${fileName%.*}
 
-if [ ! -z "$toolBin" ]; then
-	toolBin+="/"
+if [ ! -z "$binPath" ]; then
+	binPath+="/"
 fi
 
 if [ -z "$socket" ]; then
-    ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g'
+    ${binPath}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g'
 else
-    ${toolBin}mysql -S$socket -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g'
+    ${binPath}mysql -S$socket -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g'
 fi
