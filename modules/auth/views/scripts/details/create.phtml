@@ -20,16 +20,18 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>User detail created.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to user',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Create user detail</h2>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>User detail created.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to user',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Create user detail</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

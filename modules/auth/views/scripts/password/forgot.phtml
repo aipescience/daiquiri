@@ -20,13 +20,15 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>
-        Thank you. If your email is in our database, you will receive a 
-        validation email which contains a temporary link to change your password.
-    </p>
-<?php else: ?>
-    <h2>Request new password</h2>
-    <p>Please enter the email address registered with your user account.</p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>
+            Thank you. If your email is in our database, you will receive a 
+            validation email which contains a temporary link to change your password.
+        </p>
+    <?php else: ?>
+        <h2>Request new password</h2>
+        <p>Please enter the email address registered with your user account.</p>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

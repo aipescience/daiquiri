@@ -20,26 +20,28 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Config entry created.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to configuration overview',
-        'href' => '/config/entries',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php elseif ($this->status === 'error'): ?>
-    <h2>An error occured.</h2>
-    <p><?php echo ucfirst($this->error).'.'; ?></p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => '/config/entries/create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Create new config entry</h2>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Config entry created.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to configuration overview',
+            'href' => '/config/entries',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php elseif ($this->status === 'error'): ?>
+        <h2>An error occured.</h2>
+        <p><?php echo ucfirst($this->error).'.'; ?></p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => '/config/entries/create',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Create new config entry</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

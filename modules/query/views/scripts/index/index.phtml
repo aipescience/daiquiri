@@ -27,56 +27,58 @@
     });
 </script>
 
-<h2>Query interface</h2>
+<div class="main">
+    <h2>Query interface</h2>
 
-<div class="row">
-    <div class="span3">
-        <div id="jobs" class="">
-            <!-- ajax widget for job display -->
+    <div class="row">
+        <div class="span3">
+            <div id="jobs" class="">
+                <!-- ajax widget for job display -->
+            </div>
         </div>
-    </div>
-    <div class="span9">
-        <div id="query" class=""> 
-            <div class="tabbable">
-                <ul class="nav nav-tabs">
-                    <?php foreach ($this->forms as $key => $form): ?>
-                        <li id="<?php echo $this->escape($key); ?>-form-tab-header" 
-                            class="<?php if (!empty($form['default'])) echo 'active default-tab'; ?>" >
-                            <a href="#<?php echo $key ?>-form-tab" data-toggle="tab"><?php echo $this->escape($form['title']); ?></a>
+        <div class="span9">
+            <div id="query" class=""> 
+                <div class="tabbable">
+                    <ul class="nav nav-tabs">
+                        <?php foreach ($this->forms as $key => $form): ?>
+                            <li id="<?php echo $this->escape($key); ?>-form-tab-header" 
+                                class="<?php if (!empty($form['default'])) echo 'active default-tab'; ?>" >
+                                <a href="#<?php echo $key ?>-form-tab" data-toggle="tab"><?php echo $this->escape($form['title']); ?></a>
+                            </li>
+                        <?php endforeach; ?>
+                        <li id="details-tab-header">
+                            <a href="#details-tab" data-toggle="tab">Job Details</a>
                         </li>
-                    <?php endforeach; ?>
-                    <li id="details-tab-header">
-                        <a href="#details-tab" data-toggle="tab">Job Details</a>
-                    </li>
-                    <li id="results-tab-header">
-                        <a href="#results-tab" data-toggle="tab">Results Table</a>
-                    </li>
-                    <li id="plot-tab-header">
-                        <a href="#plot-tab" data-toggle="tab">Plot</a>
-                    </li>
-                    <li id="download-tab-header">
-                        <a href="#download-tab" data-toggle="tab">Download</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <?php foreach ($this->forms as $key => $form): ?>
-                        <div class="tab-pane <?php if (isset($form['default']) && $form['default'] == true) echo 'active'; ?>" id="<?php echo $this->escape($key); ?>-form-tab">
-                            <?php echo $this->action('form', 'index', 'query', array('form' => $key)); ?>
-                        </div>
-                    <?php endforeach; ?>
-                    <div class="tab-pane" id="details-tab"></div>
-                    <div class="tab-pane" id="results-tab">
-                        <div id="results-table"></div>
-                    </div>
-                    <div class="tab-pane row" id="plot-tab">
-                        <div class="span6">
-                            <div id="plot-container">
-                                <div id="plot"></div>
+                        <li id="results-tab-header">
+                            <a href="#results-tab" data-toggle="tab">Results Table</a>
+                        </li>
+                        <li id="plot-tab-header">
+                            <a href="#plot-tab" data-toggle="tab">Plot</a>
+                        </li>
+                        <li id="download-tab-header">
+                            <a href="#download-tab" data-toggle="tab">Download</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <?php foreach ($this->forms as $key => $form): ?>
+                            <div class="tab-pane <?php if (isset($form['default']) && $form['default'] == true) echo 'active'; ?>" id="<?php echo $this->escape($key); ?>-form-tab">
+                                <?php echo $this->action('form', 'index', 'query', array('form' => $key)); ?>
                             </div>
+                        <?php endforeach; ?>
+                        <div class="tab-pane" id="details-tab"></div>
+                        <div class="tab-pane" id="results-tab">
+                            <div id="results-table"></div>
                         </div>
-                        <div id="plot-form" class="span3"></div>
+                        <div class="tab-pane row" id="plot-tab">
+                            <div class="span6">
+                                <div id="plot-container">
+                                    <div id="plot"></div>
+                                </div>
+                            </div>
+                            <div id="plot-form" class="span3"></div>
+                        </div>
+                        <div class="tab-pane" id="download-tab"></div>
                     </div>
-                    <div class="tab-pane" id="download-tab"></div>
                 </div>
             </div>
         </div>

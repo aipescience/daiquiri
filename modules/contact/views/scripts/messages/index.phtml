@@ -34,14 +34,16 @@
     });
 </script>
 
-<h2>Contact messages management</h2>
+<div class="main">
+    <h2>Contact messages management</h2>
 
-<p id="table"></p>
+    <p id="table"></p>
 
-<?php
-echo $this->internalLink(array(
-    'href' => '/admin',
-    'text' => 'Back to Administration',
-    'prepend' => '<p>',
-    'append' => '</p>'));
-?>
+    <?php
+    echo $this->internalLink(array(
+        'href' => '/admin',
+        'text' => 'Back to Administration',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
+</div>

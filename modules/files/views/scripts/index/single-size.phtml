@@ -20,7 +20,9 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <h1>Single file size:</h1>
-    <?php echo $this->size . " bytes"; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <h1>Single file size:</h1>
+        <?php echo $this->size . " bytes"; ?>
+    <?php endif; ?>
+</div>

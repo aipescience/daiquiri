@@ -26,48 +26,51 @@
     });
 </script>
 
-<h2>Database management</h2>
+<div class="main">
+    <h2>Database management</h2>
 
-<div id="data">
+    <div id="data">
 
-    <p>Please click on a database, a table, a column or a function to show or edit its metadata.</p>
-    <div class="row">
-        <div class="span9">
-            <div id="database-browser"></div>
-        </div>
-        <div class="span3">
-            <div id="function-browser"></div>
-        </div>
-    </div>
-
-    <div id="display">
+        <p>Please click on a database, a table, a column or a function to show or edit its metadata.</p>
         <div class="row">
+            <div class="span9">
+                <div id="database-browser"></div>
+            </div>
             <div class="span3">
-                <div class="box">
-                    <?php
-                    echo $this->internalLink(array(
-                        'text' => 'Create new database entry',
-                        'href' => '/data/databases/create',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Create new table entry',
-                        'href' => '/data/tables/create',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Create new column entry',
-                        'href' => '/data/columns/create',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Create new function entry',
-                        'href' => '/data/functions/create',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    ?>
+                <div id="function-browser"></div>
+            </div>
+        </div>
+
+        <div id="display">
+            <div class="row">
+                <div class="span3">
+                    <div class="box">
+                        <?php
+                        echo $this->internalLink(array(
+                            'text' => 'Create new database entry',
+                            'href' => '/data/databases/create',
+                            'prepend' => '<p>',
+                            'append' => '</p>'));
+                        echo $this->internalLink(array(
+                            'text' => 'Create new table entry',
+                            'href' => '/data/tables/create',
+                            'prepend' => '<p>',
+                            'append' => '</p>'));
+                        echo $this->internalLink(array(
+                            'text' => 'Create new column entry',
+                            'href' => '/data/columns/create',
+                            'prepend' => '<p>',
+                            'append' => '</p>'));
+                        echo $this->internalLink(array(
+                            'text' => 'Create new function entry',
+                            'href' => '/data/functions/create',
+                            'prepend' => '<p>',
+                            'append' => '</p>'));
+                        ?>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+

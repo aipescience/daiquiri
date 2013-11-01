@@ -20,16 +20,18 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Column entry updated.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Update column entry</h2>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Column entry updated.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Update column entry</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

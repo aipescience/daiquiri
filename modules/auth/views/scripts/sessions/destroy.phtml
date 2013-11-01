@@ -20,13 +20,13 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Session destroyed.</p>
-<?php elseif ($this->status === 'error'): ?>
-    <p><?php $this->errors ?></p>
-<?php else: ?>
-    <p>Really destroy session?</p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
-
-
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Session destroyed.</p>
+    <?php elseif ($this->status === 'error'): ?>
+        <p><?php $this->errors ?></p>
+    <?php else: ?>
+        <p>Really destroy session?</p>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

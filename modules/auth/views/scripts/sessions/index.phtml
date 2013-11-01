@@ -29,14 +29,16 @@
     });  
 </script>
 
-<h2>Session management</h2>
+<div class="main">
+    <h2>Session management</h2>
 
-<div id="table"></div>
+    <div id="table"></div>
 
-<?php
-echo $this->internalLink(array(
-    'href' => '/admin',
-    'text' => 'Back to Administration',
-    'prepend' => '<p>',
-    'append' => '</p>'));
-?>
+    <?php
+    echo $this->internalLink(array(
+        'href' => '/admin',
+        'text' => 'Back to Administration',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
+</div>

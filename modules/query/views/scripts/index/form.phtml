@@ -20,32 +20,33 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Query successfully submitted.</p>
-<?php elseif ($this->status === 'redirect'): ?>
-    <?php $this->redirector($this->redirect); ?>
-<?php elseif ($this->status === 'form'): ?>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $("#<?php echo $this->escape($this->form->getAttrib('id')); ?>").daiquiri_query_buttons();
-        });
-    </script>
-    <h4><?php echo $this->escape($this->formOptions['title']); ?></h4>
-    <p><?php echo $this->escape($this->formOptions['help']); ?></p>
-    <?php echo $this->form; ?>
-    <?php if (!empty($this->errors['form'])): ?>
-        <p class="text-error">An error has occured.</p>
-        <ul class="text-error">
-            <?php foreach ($this->errors['form'] as $error): ?>
-                <?php if (is_array($error)): ?>
-                    <?php foreach ($error as $e): ?>
-                        <li><?php echo $this->escape($e); ?></li>
-                    <?php endforeach ?>
-                <?php else: ?>
-                    <li><?php echo $this->escape($error); ?></li>
-                <?php endif ?>
-            <?php endforeach ?>
-        </ul>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Query successfully submitted.</p>
+    <?php elseif ($this->status === 'redirect'): ?>
+        <?php $this->redirector($this->redirect); ?>
+    <?php elseif ($this->status === 'form'): ?>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#<?php echo $this->escape($this->form->getAttrib('id')); ?>").daiquiri_query_buttons();
+            });
+        </script>
+        <h4><?php echo $this->escape($this->formOptions['title']); ?></h4>
+        <p><?php echo $this->escape($this->formOptions['help']); ?></p>
+        <?php echo $this->form; ?>
+        <?php if (!empty($this->errors['form'])): ?>
+            <p class="text-error">An error has occured.</p>
+            <ul class="text-error">
+                <?php foreach ($this->errors['form'] as $error): ?>
+                    <?php if (is_array($error)): ?>
+                        <?php foreach ($error as $e): ?>
+                            <li><?php echo $this->escape($e); ?></li>
+                        <?php endforeach ?>
+                    <?php else: ?>
+                        <li><?php echo $this->escape($error); ?></li>
+                    <?php endif ?>
+                <?php endforeach ?>
+            </ul>
+        <?php endif ?>
     <?php endif ?>
-<?php endif ?>
-
+</div>

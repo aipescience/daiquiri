@@ -20,16 +20,18 @@
  */
 ?>
 
-<?php if ($this->hasIdentity): ?>
-    <h2>You don't have the permission to view this page.</h2>
-    <p>
-        You might want to login or logout and login as a different user. <br />
-        <?php echo $this->loginLink(); ?>
-    </p>
-<?php else: ?>
-    <h2>You need to be logged in to view this page.</h2>
-    <?php
-    $redirect = preg_replace('`' . preg_quote($this->baseUrl()) . '`', '', $this->url());
-    echo $this->action('index', 'login', 'auth', array('redirect' => $redirect));
-    ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->hasIdentity): ?>
+        <h2>You don't have the permission to view this page.</h2>
+        <p>
+            You might want to login or logout and login as a different user. <br />
+            <?php echo $this->loginLink(); ?>
+        </p>
+    <?php else: ?>
+        <h2>You need to be logged in to view this page.</h2>
+        <?php
+        $redirect = preg_replace('`' . preg_quote($this->baseUrl()) . '`', '', $this->url());
+        echo $this->action('index', 'login', 'auth', array('redirect' => $redirect));
+        ?>
+    <?php endif; ?>
+</div>

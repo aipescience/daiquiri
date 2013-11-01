@@ -20,17 +20,19 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>User detail deleted.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Delete user detail</h2>
-    <p>Really delete config entry?</p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>User detail deleted.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Delete user detail</h2>
+        <p>Really delete config entry?</p>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

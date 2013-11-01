@@ -20,21 +20,23 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Table entry created.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php elseif ($this->status === 'error'): ?>
-    <p>An error occurred when creating the table entry:</p>
-    <p><?php
-    echo $this->errors;
-    ?></p>
-<?php else: ?>
-    <h2>Create table entry</h2>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Table entry created.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php elseif ($this->status === 'error'): ?>
+        <p>An error occurred when creating the table entry:</p>
+        <p><?php
+        echo $this->errors;
+        ?></p>
+    <?php else: ?>
+        <h2>Create table entry</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

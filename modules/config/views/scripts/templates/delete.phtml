@@ -20,17 +20,19 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Template deleted.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to template overview',
-        'href' => '/config/templates',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Delete template</h2>
-    <p>Really delete template?</p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Template deleted.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to template overview',
+            'href' => '/config/templates',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Delete template</h2>
+        <p>Really delete template?</p>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

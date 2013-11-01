@@ -20,43 +20,45 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>The response has been send to the user.</p>
-    <?php
-    echo $this->internalLink(array(
-        'href' => '/admin',
-        'text' => 'Back to Administration',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>
-        Contact message by 
-        <?php echo $this->escape($this->message['firstname']) . ' ' . $this->escape($this->message['lastname']); ?>
-    </h2>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>The response has been send to the user.</p>
+        <?php
+        echo $this->internalLink(array(
+            'href' => '/admin',
+            'text' => 'Back to Administration',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>
+            Contact message by 
+            <?php echo $this->escape($this->message['firstname']) . ' ' . $this->escape($this->message['lastname']); ?>
+        </h2>
 
-    <h4>Sender information</h4>
-    <dl class="dl-horizontal">
-        <?php foreach (array('firstname', 'lastname', 'email') as $key): ?>
-            <dt><?php echo ucfirst($this->escape($key)); ?>:</dt>
-            <dd><?php echo $this->escape($this->message[$key]); ?></dd>
-        <?php endforeach; ?>
-    </dl>
+        <h4>Sender information</h4>
+        <dl class="dl-horizontal">
+            <?php foreach (array('firstname', 'lastname', 'email') as $key): ?>
+                <dt><?php echo ucfirst($this->escape($key)); ?>:</dt>
+                <dd><?php echo $this->escape($this->message[$key]); ?></dd>
+            <?php endforeach; ?>
+        </dl>
 
-    <h4>Message</h4>
-    <dl class="dl-horizontal">
-        <?php foreach (array('status', 'category', 'subject', 'message') as $key): ?>
-            <dt><?php echo ucfirst($this->escape($key)); ?>:</dt>
-            <dd><?php echo $this->escape($this->message[$key]); ?></dd>
-        <?php endforeach; ?>
-    </dl>
+        <h4>Message</h4>
+        <dl class="dl-horizontal">
+            <?php foreach (array('status', 'category', 'subject', 'message') as $key): ?>
+                <dt><?php echo ucfirst($this->escape($key)); ?>:</dt>
+                <dd><?php echo $this->escape($this->message[$key]); ?></dd>
+            <?php endforeach; ?>
+        </dl>
 
-    <h4>Your response</h4>
+        <h4>Your response</h4>
 
-    <p class="text-warning">
-        Your message will not be stored on the server. It will, however, 
-        be send to your address as well.
-    </p>
+        <p class="text-warning">
+            Your message will not be stored on the server. It will, however, 
+            be send to your address as well.
+        </p>
 
-    <?php echo $this->form; ?>
-<?php endif; ?>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

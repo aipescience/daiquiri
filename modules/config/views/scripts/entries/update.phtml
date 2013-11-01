@@ -20,16 +20,18 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Config entry updated.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to Configuration overview',
-        'href' => '/config',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Update config entry</h2>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Config entry updated.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to Configuration overview',
+            'href' => '/config',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Update config entry</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

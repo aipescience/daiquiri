@@ -20,9 +20,11 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Password changed.</p>
-<?php else: ?>
-    <h2>Change password</h2>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Password changed.</p>
+    <?php else: ?>
+        <h2>Change password</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>
