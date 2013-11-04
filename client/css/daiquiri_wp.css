@@ -18,15 +18,10 @@
  *  limitations under the License.
 */
 
-#wp-sidebar form,
-#wp-sidebar input {
-    margin: 0;
-}
 #wp-content .post-footer,
 #wp-content .post-nav {
     color: #999;
 }
-
 #wp-content #list,
 #wp-content #respond{
     margin-top: 20px;
@@ -42,22 +37,12 @@
 #wp-content #commentform {
     margin-top: 0;
 }
-#wp-content .comment-form input[type=text],
-#wp-content .comment-form textarea {
-    width: 506px; /* + 14 padding and border */
-}
-#wp-content .comment-form .input {
-    padding-top: 5px;
-    margin-bottom: 5px;
-}
 #wp-content fieldset {
     margin-bottom: 0;
 }
-
 #wp-content #recent-news {
     margin-top: 40px;
 }
-
 #wp-content .wp-caption {
     padding: 10px 0 10px 10px;
     border: 1px solid #ccc;
@@ -83,15 +68,25 @@
     display: inline-block;
 }
 
-#wp-sidebar ul {
+#wp-content .sidebar form,
+#wp-content .sidebar input {
+    margin: 0;
+}
+#wp-content .sidebar ul {
     margin-left: 0px;
 }
-#wp-sidebar .menu ul li {
+#wp-content .sidebar ul li {
+    margin-bottom: 20px;
+}
+#wp-content .sidebar ul li ul li {
+    margin-bottom: 0;
+}
+#wp-content .sidebar .menu ul li {
     margin-left: 20px;
 }
-#wp-sidebar li {
+#wp-content .sidebar li {
     list-style: none;
 }
-#wp-sidebar .sidebar-container {
+#wp-content .sidebar .sidebar-container {
     margin-bottom: 20px;
 }

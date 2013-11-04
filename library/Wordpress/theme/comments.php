@@ -40,14 +40,14 @@
         </div>
     </div>
 </fieldset>',
-        'comment_notes_after' => '<p class="form-allowed-tags">' . sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s' ), ' <span class="mono">' . trim(allowed_tags()) . '</span>' ) . '. Your email address will not be published.</p>',
+        'comment_notes_after' => '<p class="form-allowed-tags">' . sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes:<br />%s' ), ' <span class="mono">' . trim(allowed_tags()) . '</span>' ) . '</p><p>Your email address will not be published.</p>',
         'fields' => array(
             'author' => '
 <fieldset class="form-horizontal">
     <div class="control-group comment-form-author">
         <label class="control-label" for="inputAuthor">' . __('Name', 'domainreference') . '</label>
         <div class="controls">
-            <input id="inputAuthor" class="span6" name="author" type="text" value="' . esc_attr($commenter['comment_author']) . '" size="30"' . $aria_req . ' />
+            <input id="inputAuthor" class="input-block-level" name="author" type="text" value="' . esc_attr($commenter['comment_author']) . '" size="30"' . $aria_req . ' />
         </div>
     </div>
 </fieldset>',
@@ -56,7 +56,7 @@
     <div class="control-group comment-form-email">
         <label class="control-label" for="inputEmail">' . __('Email', 'domainreference') . '</label>
         <div class="controls">
-            <input id="inputEmail" class="span6" name="email" type="text" value="' . esc_attr($commenter['comment_author_email']) . '" size="30"' . $aria_req . ' />
+            <input id="inputEmail" class="input-block-level" name="email" type="text" value="' . esc_attr($commenter['comment_author_email']) . '" size="30"' . $aria_req . ' />
         </div>
     </div>
 </fieldset>',
@@ -65,7 +65,7 @@
     <div class="control-group comment-form-url">
         <label class="control-label" for="inputUrl">' . __('Website', 'domainreference') . ' (not required)</label>
         <div class="controls">
-            <input id="inputUrl" class="span6" name="url" type="text" value="' . esc_attr($commenter['comment_author_url']) . '" size="30"' . $aria_req . ' />
+            <input id="inputUrl" class="input-block-level" name="url" type="text" value="' . esc_attr($commenter['comment_author_url']) . '" size="30"' . $aria_req . ' />
         </div>
     </div>
 </fieldset>'
@@ -75,7 +75,7 @@
     <div class="control-group comment-form-comment">
         <label class="control-label" for="inputComment">' . _x('Comment', 'noun') . '</label>
         <div class="controls">
-            <textarea id="inputComment" class="span6" name="comment" type="text" value="' . esc_attr($commenter['comment_author_url']) . '" size="30"' . $aria_req . ' rows="8"></textarea>
+            <textarea id="inputComment" class="input-block-level" name="comment" type="text" value="' . esc_attr($commenter['comment_author_url']) . '" size="30"' . $aria_req . ' rows="8"></textarea>
         </div>
     </div>
 </fieldset>'

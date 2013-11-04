@@ -22,35 +22,34 @@
 
 <?php get_header(); ?>
 
-<div class="row">
-    <div id="wp-content" class="span9">
+<div id="wp-content" class="row">
+    <div class="span9 main">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-                <div class="post">
-                    <h2><?php the_title(); ?></h2>
+            <div class="post">
+                <h2>
+                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                </h2>
 
-                    <?php the_content(); ?>
+                <?php the_content(); ?>
 
-                    <?php if (comments_open(get_the_ID())): ?>
-                        <p class="small">
-                            <?php if (get_comments_number() > 0): ?>
-                                <a href="<?php comments_link(); ?>"><?php comments_number(); ?></a>
-                            <?php else: ?>
-                                <?php comments_number(); ?>
-                                (<a href="<?php comments_link(); ?>">write a comment</a>)
-                            <?php endif ?>
-                        </p>
-                    <?php endif ?>
-                </div>
-                <?php
-            endwhile;
-        else:
-            ?>
+                <?php if (comments_open(get_the_ID())): ?>
+                    <p class="small">
+                        <?php if (get_comments_number() > 0): ?>
+                            <a href="<?php comments_link(); ?>"><?php comments_number(); ?></a>
+                        <?php else: ?>
+                            <?php comments_number(); ?>
+                            (<a href="<?php comments_link(); ?>">write a comment</a>)
+                        <?php endif ?>
+                    </p>
+                <?php endif ?>
+            </div>
+
+            <p align="center"><?php posts_nav_link(); ?></p>
+        <?php endwhile; else: ?>
             <p>Sorry, no page found.</p>
         <?php endif; ?>
-
-        <p align="center"><?php posts_nav_link(); ?></p>
     </div>
-    <div id="wp-sidebar" class="span3">
+    <div class="span3 sidebar">
         <?php get_sidebar(); ?>
     </div>
 </div>   

@@ -32,6 +32,10 @@ require_once('daiquiri_shortcodes.php');
 require_once('daiquiri_options.php');
 require_once('daiquiri_navigation.php');
 
+/* disable admin bar */
+
+$show_admin_bar = false;
+
 /*
  * Automatiacally login the user which is logged in into daiquiri right now.
  */ 

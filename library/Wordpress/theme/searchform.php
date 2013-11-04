@@ -21,5 +21,5 @@
 ?>
 
 <form role="search" method="get" id="searchform" action="<?php echo home_url( '/' ); ?>">
-    <input name="s" id="s" type="text" class="span3">
+    <input name="s" id="s" type="text" class="input-block-level">
 </form>

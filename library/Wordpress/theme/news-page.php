@@ -25,39 +25,42 @@ Template Name: News
  */
 ?>
 
-<?php Daiquiri_Layout::getInstance()->get_header(); ?>
+<?php get_header(); ?>
 
-<div class="row">
-    <div id="wp-content" class="span9">
-        <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-                <div class="post">
-		    <h2><?php the_title(); ?></h2>
-                    <?php the_content(); ?>
+<div id="wp-content" class="main">
+    <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+        <div class="post">
+    	    <h2>
+                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+            </h2>
 
-                    <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>
+            <?php the_content(); ?>
+
+            <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>
                     
-                    <?php if (comments_open(get_the_ID())): ?>
-                        <?php comments_template() ?>
-                    <?php endif ?>
-                </div>
-                <?php
-            endwhile;
-        else:
-            ?>
-            <p>Sorry, no page found.</p>
-        <?php endif; ?>
+            <?php if (comments_open(get_the_ID())): ?>
+                <?php comments_template() ?>
+            <?php endif ?>
+        </div>
+    <?php endwhile; else: ?>
+        <p>Sorry, no page found.</p>
+    <?php endif; ?>
 	
 	<div id="recent-news">
-	<h3>Recent News</h3>
-	<ul class="unstyled">
-        <?php 
-        foreach (wp_get_recent_posts() as $post) {
-	    echo '<li><a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"].'</a></li>';
-        }
-        ?>
-	</ul>
-	</div>
+    	<h3>Recent News</h3>
+        <ul class="unstyled">
+            <?php 
+            foreach (wp_get_recent_posts() as $post) {
+            echo '<li class="news-entry">';
+            echo '<span class="news-entry-date">';
+            echo date('F jS, Y', strtotime($post["post_date"]));
+            echo '</span>';
+            echo '<a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"].'</a>';
+            echo '</li>';
+            }
+            ?>
+        </ul>
     </div>
 </div> 
 
-<?php Daiquiri_Layout::getInstance()->get_footer(); ?>
+<?php get_footer(); ?>
