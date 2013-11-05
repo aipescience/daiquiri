@@ -81,21 +81,17 @@ daiquiri.common.updateCsrf = function(form, csrf) {
  * Displays errors with ajax calls.
  */
 daiquiri.common.ajaxError = function(jqXHR, textStatus, errorThrown) {
-    if (typeof daiquiri.common.poll == 'undefined') {
-        console.log('Ajax error: ' + jqXHR.statusText + '" (' + jqXHR.status + ')');
-    } else {
+    if (typeof daiquiri.common.poll != 'undefined') {
         clearTimeout(daiquiri.common.poll);
+    }
+        
+    console.log('Ajax error: ' + jqXHR.statusText + ' (' + jqXHR.status + ')');
 
-        if (jqXHR.status == 403) {
-            var label = 'Session expired';
-            var body = '<p>Your session is expired. Please log in again.</p>';
-            var primary = 'Login';
-        } else {
-            var label = 'Ajax Error';
-            var body = '<p>An error occured while connecting to the server.</p><p>The corresponding HTTP status is "' + jqXHR.statusText + '" (' + jqXHR.status + ').</p>';
-            var primary = 'Reload page';
-        }
-
+    if (jqXHR.status == 403) {
+        var label = 'Session expired';
+        var body = '<p>Your session is expired. Please log in again.</p>';
+        var primary = 'Login';
+    
         var modal = new daiquiri.Modal({
             'label': label,
             'body': body,
