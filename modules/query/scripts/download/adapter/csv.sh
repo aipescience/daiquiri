@@ -49,9 +49,9 @@ then
 fi
 
 if [ -z "$socket" ]; then
-    ${toolBin}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file 2> $path/$fileName.err
+    ${binPath}mysql -h$host -P$port -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file 2> $path/$fileName.err
 else
-    ${toolBin}mysql -S$socket -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file 2> $path/$fileName.err
+    ${binPath}mysql -S$socket -u$username -p$password $dbname -e "SELECT * FROM \`$table\`" | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > $file 2> $path/$fileName.err
 fi
 
 #mysqldump writes \N for any NULL value, however we don't want this.                                                                                                      
