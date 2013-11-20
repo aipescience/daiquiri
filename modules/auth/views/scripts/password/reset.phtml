@@ -20,20 +20,22 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Password changed.</p>
-    <?php if ($this->disable): ?>
-        <p>
-            For security, you account needs to be re-enabled by an administrator. 
-            This can take one or two days. If you do not receive a corresponding 
-            mail by then, please contact the administrators directly.
-        </p>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Password changed.</p>
+        <?php if ($this->disable): ?>
+            <p>
+                For security, you account needs to be re-enabled by an administrator. 
+                This can take one or two days. If you do not receive a corresponding 
+                mail by then, please contact the administrators directly.
+            </p>
+        <?php endif; ?>
+    <?php elseif ($this->status === 'form'): ?>
+        <h2>Change password</h2>
+        <p>Please give your username and a new password.</p>
+        <p>If you cannot remember your username, please contact the support directly.</p>
+        <?php echo $this->form; ?>
+    <?php else: ?>
+        <p>The provided url is not valid.</p>
     <?php endif; ?>
-<?php elseif ($this->status === 'form'): ?>
-    <h2>Change password</h2>
-    <p>Please give your username and a new password.</p>
-    <p>If you cannot remember your username, please contact the support directly.</p>
-    <?php echo $this->form; ?>
-<?php else: ?>
-    <p>The provided url is not valid.</p>
-<?php endif; ?>
+</div>

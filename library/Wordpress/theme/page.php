@@ -20,34 +20,33 @@
  */
 ?>
 
-<?php Daiquiri_Layout::getInstance()->get_header(); ?>
+<?php get_header(); ?>
 
-<div class="row">
-    <div id="wp-content" class="span9">
+<div id="wp-content" class="row">
+    <div class="span9 main">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-                <div class="post">
-                    <h2><?php the_title(); ?></h2>
+            <div class="post">
+                <h2>
+                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                </h2>
 
-                    <?php the_content(); ?>
+                <?php the_content(); ?>
 
-		    <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>
+                <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>
 
-                    <?php if (comments_open(get_the_ID())): ?>
-                        <?php comments_template() ?>
-                    <?php endif ?>
-                </div>
-                <?php
-            endwhile;
-        else:
-            ?>
+                <?php if (comments_open(get_the_ID())): ?>
+                    <?php comments_template() ?>
+                <?php endif ?>
+
+                <p align="center"><?php posts_nav_link(); ?></p>
+            </div>
+        <?php endwhile; else: ?>
             <p>Sorry, no page found.</p>
         <?php endif; ?>
-
-        <p align="center"><?php posts_nav_link(); ?></p>
     </div>
-    <div id="wp-sidebar" class="span3">
+    <div class="span3 sidebar">
         <?php get_sidebar(); ?>
     </div>
 </div> 
 
-<?php Daiquiri_Layout::getInstance()->get_footer(); ?>
+<?php get_footer(); ?>

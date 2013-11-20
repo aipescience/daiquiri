@@ -20,13 +20,15 @@
  */
 ?>
 
-<h2>Available files:</h2>
+<div class="main">
+    <h2>Available files:</h2>
 
-<table class='table table-bordered'>
-    <?php foreach ($this->files as $files): ?>
-        <tr>
-            <td><?php echo $this->escape($files['name']); ?></td>
-            <td class="onehundredtwenty"><?php echo $this->escape($files['size']); ?></td>
-        </tr>   
-    <?php endforeach; ?>
-</table>
+    <table class='table table-bordered'>
+        <?php foreach ($this->files as $files): ?>
+            <tr>
+                <td><?php echo $this->escape($files['name']); ?></td>
+                <td class="onehundredtwenty"><?php echo $this->escape($files['size']); ?></td>
+            </tr>   
+        <?php endforeach; ?>
+    </table>
+</div>

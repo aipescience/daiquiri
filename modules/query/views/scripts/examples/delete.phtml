@@ -20,17 +20,19 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Example deleted.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Delete example</h2>
-    <p>Really delete example?</p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Example deleted.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Delete example</h2>
+        <p>Really delete example?</p>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

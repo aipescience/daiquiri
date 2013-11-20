@@ -21,11 +21,13 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>User rejected.</p>
-<?php elseif ($this->status === 'error'): ?>
-    <p><?php $this->errors ?></p>
-<?php else: ?>
-    <p>Really reject user?</p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>User rejected.</p>
+    <?php elseif ($this->status === 'error'): ?>
+        <p><?php $this->errors ?></p>
+    <?php else: ?>
+        <p>Really reject user?</p>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

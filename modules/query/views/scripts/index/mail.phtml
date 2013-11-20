@@ -20,16 +20,18 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Your message was send to the Daiquiri developers by mail.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to query interface',
-        'href' => '/query',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php elseif ($this->status === 'form'): ?>
-    <h4>Your message to the Daiquiri developers</h4>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Your message was send to the Daiquiri developers by mail.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to query interface',
+            'href' => '/query',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php elseif ($this->status === 'form'): ?>
+        <h4>Your message to the Daiquiri developers</h4>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

@@ -20,19 +20,21 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Thank you for using our Contact Form. You should get a response within the next days.</p>
-    <?php
-    echo $this->internalLink(array(
-        'href' => '/',
-        'text' => 'Back to Home',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Contact Form</h2>
-    <p>
-        Please send us your questions/comments/bug reports etc. via the following form.
-    </p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Thank you for using our Contact Form. You should get a response within the next days.</p>
+        <?php
+        echo $this->internalLink(array(
+            'href' => '/',
+            'text' => 'Back to Home',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Contact Form</h2>
+        <p>
+            Please send us your questions/comments/bug reports etc. via the following form.
+        </p>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

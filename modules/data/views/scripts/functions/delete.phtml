@@ -20,16 +20,18 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Function entry deleted.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => '/data/',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Delete function entry</h2>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Function entry deleted.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => '/data/',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Delete function entry</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

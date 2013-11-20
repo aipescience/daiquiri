@@ -20,26 +20,27 @@
  */
 ?>
 
-<?php if ($this->status === 'pending'): ?>
-    <p>Your file is beeing created... Please wait...</p>
-<?php elseif ($this->status === 'ok'): ?>
-    <p>You can now download the file using:</p>
-    <p>
-        <a target="_blank" href="<?php $this->escape($this->link); ?>">
-            <?php $this->escape($this->link); ?>
-        </a>
-    </p>
-<?php elseif ($this->status === 'form'): ?>
-    <h4>Download table</h4>
-    <p>
-        Please select the format for your download:
-    </p>
-    <p>
-        <?php echo $this->form; ?>
-    </p>
-<?php else: ?>
-    <p class="hint">
-        <?php echo $this->escape($this->error); ?>
-    </p>
-<?php endif; ?>
-
+<div class="main">
+    <?php if ($this->status === 'pending'): ?>
+        <p>Your file is beeing created... Please wait...</p>
+    <?php elseif ($this->status === 'ok'): ?>
+        <p>You can now download the file using:</p>
+        <p>
+            <a target="_blank" href="<?php $this->escape($this->link); ?>">
+                <?php $this->escape($this->link); ?>
+            </a>
+        </p>
+    <?php elseif ($this->status === 'form'): ?>
+        <h4>Download table</h4>
+        <p>
+            Please select the format for your download:
+        </p>
+        <p>
+            <?php echo $this->form; ?>
+        </p>
+    <?php else: ?>
+        <p class="hint">
+            <?php echo $this->escape($this->error); ?>
+        </p>
+    <?php endif; ?>
+</div>

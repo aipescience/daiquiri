@@ -20,17 +20,72 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-<h2>Column details</h2>
-
-<table class='table table-bordered'>
-    <?php foreach ($this->data as $key => $value): ?>
-        <tr>
-            <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
-            <td><?php echo $this->escape($value); ?></td>
-        </tr>   
-    <?php endforeach; ?>
-</table>
-<?php else: ?>
-<h5>Error retrieving column information</h5>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <div class="row">
+            <div class="span9">
+                <div class="box">
+                    <p>
+                        <span class="meta">COLUMN</span>
+                        <strong><?php echo $this->escape($this->data['database']); ?>.<?php echo $this->escape($this->data['table']); ?>.<?php echo $this->escape($this->data['name']); ?></strong>
+                    </p>
+                </div>
+                <table class='table table-bordered'>
+                    <?php foreach($this->data as $key => $value): ?>
+                        <?php if ($key !== 'columns'): ?>
+                        <tr>
+                            <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
+                            <td>
+                                <?php echo $this->escape($value); ?>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+                    <?php endforeach ?>
+                </table>
+            </div>
+            <div class="span3">
+                <div class="box">
+                    <?php
+                    $redirect = '/data/columns/show?id=' . $this->escape($this->data['id']);
+                    echo $this->internalLink(array(
+                        'text' => 'Update this column entry',
+                        'href' => '/data/columns/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Delete this column entry',
+                        'href' => '/data/columns/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    ?>
+                </div>
+                <div class="box">
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'Create new database entry',
+                        'href' => '/data/databases/create?redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new table entry',
+                        'href' => '/data/tables/create?databaseId=' . $this->escape($this->data['databaseId']) . '&redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new column entry',
+                        'href' => '/data/columns/create?tableId=' . $this->escape($this->data['tableId']) . '&redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new function entry',
+                        'href' => '/data/functions/create?redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    ?>
+                </div>
+            </div>
+        </div>
+    <?php else: ?>
+    <h5>Error retrieving column information</h5>
+    <?php endif; ?>
+</div>

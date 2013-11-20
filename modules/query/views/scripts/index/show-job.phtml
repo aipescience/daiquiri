@@ -20,21 +20,23 @@
  */
 ?>
 
-<h2>Job details</h2>
+<div class="main">
+    <h2>Job details</h2>
 
-<table class='table table-bordered'>
-    <?php foreach ($this->data as $element): ?>
-        <tr>
-            <td class="onehundredfifty"><?php echo $this->escape($element['name']); ?></td>
-            <td>
-                <?php
-                if ($element['key'] === "query" || $element['key'] === "actualQuery") {
-                    echo nl2br($this->escape($element['value']));
-                } else {
-                    echo $this->escape($element['value']);
-                }
-                ?>
-            </td>
-        </tr>   
-    <?php endforeach; ?>
-</table>
+    <table class='table table-bordered'>
+        <?php foreach ($this->data as $element): ?>
+            <tr>
+                <td class="onehundredfifty"><?php echo $this->escape($element['name']); ?></td>
+                <td>
+                    <?php
+                    if ($element['key'] === "query" || $element['key'] === "actualQuery") {
+                        echo nl2br($this->escape($element['value']));
+                    } else {
+                        echo $this->escape($element['value']);
+                    }
+                    ?>
+                </td>
+            </tr>   
+        <?php endforeach; ?>
+    </table>
+</div>

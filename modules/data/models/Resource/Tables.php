@@ -36,7 +36,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         ));
     }
 
-    public function fetchRows($sqloptions = array()) {
+    public function fetchId($db, $table) {
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the names of the involved tables
@@ -44,18 +44,23 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
 
         // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
-
-        // add inner joins for the category and the status
+        $select = $this->getTable()->select();
+        $select = $select->from($this->getTable(),'id');
         $select->setIntegrityCheck(false);
-        if (isset($sqloptions['from']) && in_array('database', $sqloptions['from'])) {
-            $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
-            $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
-        }
+        $select->where("`$t`.`name` = ?", trim($table));
+        $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
+        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
+        $select->where("`$d`.`name` = ?", trim($db));
+        $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
+
         // get the rowset and return
-        $rows = $this->getTable()->fetchAll($select);
-        return $rows->toArray();
+        $row = $this->getTable()->fetchAll($select)->current();
+        
+        if ($row) {
+            return $row->id;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -79,7 +84,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         $select->setIntegrityCheck(false);
         $select->where("`$t`.`id` = ?", $id);
         $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
+        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name','databaseId' => 'id'));
         $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 
         // get the rowset and return
@@ -88,8 +93,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         if ($row) {
             // get the columns for this table
             $data = $row->toArray();
-            unset($data['database_id']);
-
+            
             if (!empty($roles[$data['publication_role_id']])) {
                 $data['publication_role'] = $roles[$data['publication_role_id']];
             } else {
@@ -109,8 +113,6 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
 
                 // convert rows to flat array
                 for ($j = 0; $j < count($cols); $j++) {
-                    unset($cols[$j]['database_id']);
-                    unset($cols[$j]['table_id']);
                     $data['columns'][] = $cols[$j];
                 }
             }
@@ -119,32 +121,6 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         } else {
             return array();
         }
-    }
-
-    /**
-     * Returns the id of the table with the given name and given database id
-     * @param int $dbId
-     * @param string $name
-     * @return array
-     */
-    public function fetchIdWithName($dbId, $name) {
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect();
-
-        $select->where("`name` = ?", trim($name))
-                ->where("`database_id` = ?", $dbId);
-        $select->where('`publication_role_id` <= ?', count($usrRoles));
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-
-        if ($row) {
-            return $row[0]['id'];
-        }
-
-        return false;
     }
 
     /**

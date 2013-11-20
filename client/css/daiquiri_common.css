@@ -182,17 +182,18 @@ li.dropdown li {
     list-style: none;
 }
 li.dropdown li li a {
+    font-size: 13px;
+    line-height: 13px;
     padding-left: 30px;
 }
 li.dropdown li li li a {
+    font-size: 10px;
+    line-height: 10px;
     padding-left: 40px;
-}
-li.dropdown li li li li a {
-    padding-left: 50px;
-}
-li.dropdown li li li li li a {
-    padding-left: 60px;
 }
 li.dropdown ul ul {
     margin-left: 0;
+}
+.modal-body {
+    max-height: 500px;
 }

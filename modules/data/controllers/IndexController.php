@@ -23,44 +23,34 @@
 class Data_IndexController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        $this->_model = Daiquiri_Proxy::factory('Data_Model_Databases');
+
     }
 
     public function indexAction() {
+        
+    }
+
+    public function exportAction() {
         $databasesModel = Daiquiri_Proxy::factory('Data_Model_Databases');
         $databases = array();
-        foreach (array_keys($databasesModel->index()) as $key) {
-            $databases[] = $databasesModel->show($key);
+        foreach (array_keys($databasesModel->index()) as $id) {
+            $response = $databasesModel->show($id, false, true);
+            if ($response['status'] == 'ok') {
+                $databases[] = $response['data'];
+            }
         }
 
         $functionsModel = Daiquiri_Proxy::factory('Data_Model_Functions');
         $functions = array();
-        foreach (array_keys($functionsModel->index()) as $key) {
-            $functions[] = $functionsModel->show($key);
+        foreach (array_keys($functionsModel->index()) as $id) {
+            $response = $functionsModel->show($id, false, true);
+            if ($response['status'] == 'ok') {
+                $functions[] = $response['data'];
+            }
         }
 
         $this->view->databases = $databases;
         $this->view->functions = $functions;
-        $this->view->status = 'ok';
-    }
-
-    public function exportAction() {
-        $databases = $this->_model->index();
-
-        $data = array();
-        foreach (array_keys($databases) as $key) {
-            $data[] = $this->_model->show($key);
-        }
-
-        $functions = Daiquiri_Proxy::factory('Data_Model_Functions');
-        $func = array();
-        foreach (array_keys($functions->index()) as $key) {
-            $func[] = $functions->show($key);
-        }
-
-        $this->view->data = $data;
-        $this->view->func = $func;
-        $this->view->status = 'ok';
     }
 
 }

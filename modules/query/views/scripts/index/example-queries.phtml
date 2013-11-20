@@ -20,12 +20,14 @@
  */
 ?>
 
-<?php if (is_array($this->examples)): ?>
-    <?php foreach ($this->examples as $example): ?>
-        <p>
-            <a href='#' class="daiquiri-query-example" data-toggle="<?php echo $this->escape($example['query']) ?>">
-                <?php echo $this->escape($example['name']); ?>
-            </a>
-        </p>
-    <?php endforeach; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if (is_array($this->examples)): ?>
+        <?php foreach ($this->examples as $example): ?>
+            <p>
+                <a href='#' class="daiquiri-query-example" data-toggle="<?php echo $this->escape($example['query']) ?>">
+                    <?php echo $this->escape($example['name']); ?>
+                </a>
+            </p>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>

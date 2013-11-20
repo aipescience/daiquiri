@@ -19,34 +19,32 @@
  *  limitations under the License.
  */
 ?>
-<?php if ($this->status === 'ok'): ?>
-    <p>Column entry created.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to data management',
-        'href' => '/data/',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php elseif ($this->status === 'error'): ?>
-    <p>An error occurred when creating the column entry:</p>
-    <p><?php
-    echo $this->errors;
-    ?></p>
-<?php else: ?>
-    <h2>Create column entry</h2>
-    <?php echo $this->form; ?>
 
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#ucd_list').after('<button name="add_ucd" id="add_ucd" type="button" class="btn">Add UCD</button>');
-            $('#add_ucd').click(function() {
-                if( !$.trim($('#ucd').val()) ) {
-                    $('#ucd').val($('#ucd_list').val());
-                } else {
-                    $('#ucd').val($.trim($('#ucd').val()) + "; " + $('#ucd_list').val());
-                }
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Column entry created.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Create column entry</h2>
+        <?php echo $this->form; ?>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#ucd_list').after('<button name="add_ucd" id="add_ucd" type="button" class="btn">Add UCD</button>');
+                $('#add_ucd').click(function() {
+                    if( !$.trim($('#ucd').val()) ) {
+                        $('#ucd').val($('#ucd_list').val());
+                    } else {
+                        $('#ucd').val($.trim($('#ucd').val()) + "; " + $('#ucd_list').val());
+                    }
+                });
             });
-        });
-    </script>
-<?php endif; ?>
+        </script>
+    <?php endif; ?>
+</div>

@@ -355,17 +355,19 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     }
 
     public function databaseAction() {
-        $dbModel = Daiquiri_Proxy::factory('Data_Model_Databases');
-        $databases = $dbModel->index();
+        $databasesModel = Daiquiri_Proxy::factory('Data_Model_Databases');
         $data = array();
-        foreach (array_keys($databases) as $key) {
-            $data[] = $dbModel->show($key);
+        foreach (array_keys($databasesModel->index()) as $id) {
+            $response = $databasesModel->show($id, false, true);
+            if ($response['status'] == 'ok') {
+                $data[] = $response['data'];
+            }
         }
 
         $userDbModel = Daiquiri_Proxy::factory('Query_Model_Database');
         $data[] = $userDbModel->show();
 
-        $this->view->data = $data;
+        $this->view->databases = $data;
         $this->view->status = 'ok';
     }
 

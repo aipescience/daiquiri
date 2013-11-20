@@ -441,9 +441,20 @@ daiquiri.query.Query.prototype.displayBrowser = function(){
 
     $('#browser').daiquiri_browser({
         'url': self.url.browser,
-        'action': function (string) {
-            $('#sql_query').insertAtCaret(string);
-            $('#sql_query').daiquiri_codemirror_insertAtCaret(string);
+        'columns': ['databases','tables','columns'],
+        'action': function (opt) {
+            if ((typeof opt.same !== 'undefined' && opt.same) || typeof opt.right !== 'undefined') {
+                var items = [];
+                $.each(['left','center','right'], function (key, value) {
+                    if (typeof opt[value] !== 'undefined') {
+                        items.push('`' + opt[value] + '`');
+                    }
+                })
+                var string = items.join('.');
+                $('#sql_query').insertAtCaret(string);
+                $('#sql_query').daiquiri_codemirror_insertAtCaret(string);
+            }
+            $('.active','.daiquiri-browser-right').removeClass('active');
         }
     });
 }

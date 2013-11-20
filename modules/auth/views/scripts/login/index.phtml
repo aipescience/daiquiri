@@ -20,19 +20,21 @@
  */
 ?>
 
-<?php echo $this->form; ?>
+<div class="main">
+    <?php echo $this->form; ?>
 
-<p class="align-form-horizontal">
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Help, I forgot my password!',
-        'href' => '/auth/password/forgot'));
-    ?>
-</p>
-<p class="align-form-horizontal">
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Register as a new user.',
-        'href' => '/auth/registration'));
-    ?>
-</p>
+    <p class="align-form-horizontal">
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Help, I forgot my password!',
+            'href' => '/auth/password/forgot'));
+        ?>
+    </p>
+    <p class="align-form-horizontal">
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Register as a new user.',
+            'href' => '/auth/registration'));
+        ?>
+    </p>
+</div>

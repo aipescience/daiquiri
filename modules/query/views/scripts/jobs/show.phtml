@@ -20,24 +20,23 @@
  */
 ?>
 
-<h2>Job details</h2>
+<div class="main">
+    <h2>Job details</h2>
 
-<table class='table table-bordered'>
-    <?php foreach ($this->data as $key => $value): ?>
-        <tr>
-            <td class="onehundredfifty"><?php echo ucfirst($this->escape($key)); ?></td>
-            <td><?php echo $this->escape($value); ?></td>
-        </tr>   
-    <?php endforeach; ?>
-</table>
+    <table class='table table-bordered'>
+        <?php foreach ($this->data as $key => $value): ?>
+            <tr>
+                <td class="onehundredfifty"><?php echo ucfirst($this->escape($key)); ?></td>
+                <td><?php echo $this->escape($value); ?></td>
+            </tr>   
+        <?php endforeach; ?>
+    </table>
 
-<?php
-echo $this->internalLink(array(
-    'href' => $this->redirect,
-    'text' => 'Back',
-    'prepend' => '<p>',
-    'append' => '<p>'));
-?>
-
-
-
+    <?php
+    echo $this->internalLink(array(
+        'href' => $this->redirect,
+        'text' => 'Back',
+        'prepend' => '<p>',
+        'append' => '<p>'));
+    ?>
+</div>

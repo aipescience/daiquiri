@@ -21,8 +21,10 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>File is beeing regenerated...</p>
-<?php else: ?>
-    <?php echo $this->escape($this->error); ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>File is beeing regenerated...</p>
+    <?php else: ?>
+        <?php echo $this->escape($this->error); ?>
+    <?php endif; ?>
+</div>

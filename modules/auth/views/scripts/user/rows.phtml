@@ -21,13 +21,13 @@
  */
 ?>
 
-<?php echo $this->table(array(), $this->rows) ?>
-
-<?php
-
-echo $this->internalLink(array(
-    'text' => 'Back',
-    'href' => $this->redirect,
-    'prepend' => '<p>',
-    'append' => '</p>'));
-?>
+<div class="main">
+    <?php 
+    echo $this->table(array(), $this->rows);
+    echo $this->internalLink(array(
+        'text' => 'Back',
+        'href' => $this->redirect,
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
+</div>

@@ -20,9 +20,11 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <h1>All files in given column size:</h1>
-    <?php
-    echo $this->escape($this->size) . " bytes";
-    ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <h1>All files in given column size:</h1>
+        <?php
+        echo $this->escape($this->size) . " bytes";
+        ?>
+    <?php endif; ?>
+</div>

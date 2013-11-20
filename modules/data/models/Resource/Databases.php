@@ -35,33 +35,24 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
             'Data_Model_DbTable_Tables'
         ));
     }
-
-    /**
-     * Returns the proper columns of the database entries.
-     * @return array 
-     */
-    public function fetchCols() {
-        return array('id', 'name', 'info', 'adapter', 'publication_role_id',
-            'publication_select', 'publication_update', 'publication_insert',
-            'publication_show', 'tables');
-    }
-
-    /**
-     * Returns all databases that user has access permission
-     * @param type $id
-     * @throws Exception
-     * @return type 
-     */
-    public function fetchRows() {
+  
+    public function fetchId($db) {
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
-        //roles starting at 1, therefore check for <=
+        // get the primary sql select object
         $select = $this->getTable()->select();
-        $select->where('`publication_role_id` <= ?', count($usrRoles));
-        $rows = $this->getTable()->fetchAll($select);
+        $select->where("`name` = ?", trim($db));
+        $select->where("`publication_role_id` <= ?", count($usrRoles));
 
-        return $rows;
-    }    
+        // get the rowset and return
+        $row = $this->getTable()->fetchAll($select)->current();
+
+        if ($row) {
+            return $row->id;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Returns a specific row from the (joined) Databases/Tables/Columns tables.
@@ -69,7 +60,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
      * @throws Exception
      * @return type 
      */
-    public function fetchRow($id, $fullData = true) {
+    public function fetchRow($id, $fullData = false) {
         //get the roles
         $rolesModel = new Auth_Model_Roles();
         $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
@@ -83,10 +74,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();
 
-        $data = false;
-
         if ($row) {
-            // get the columns for this table
             $data = $row->toArray();
 
             if (!empty($roles[$data['publication_role_id']])) {
@@ -136,32 +124,11 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
                     $data['tables'][] = $table;
                 }
             }
+
+            return $data;
+        } else {
+            return array();
         }
-
-        return $data;
-    }
-
-    /**
-     * Returns the id of the database with the given name
-     * @param string $name
-     * @return array
-     */
-    public function fetchIdWithName($name) {
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect();
-        $select->where("`name` = ?", trim($name));
-        $select->where("`publication_role_id` <= ?", count($usrRoles));
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-
-        if ($row) {
-            return $row[0]['id'];
-        }
-
-        return false;
     }
 
     /**

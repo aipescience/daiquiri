@@ -25,6 +25,7 @@
 
 function daiquiri_activate() {
     add_option('daiquiri_url', 'http://localhost/');
+    add_option('daiquiri_navigation_path', '/var/lib/daiquiri/navigation');
 }
 
 register_activation_hook(WP_PLUGIN_DIR . '/daiquiri/daiquiri.php', 'daiquiri_activate');
@@ -35,6 +36,7 @@ register_activation_hook(WP_PLUGIN_DIR . '/daiquiri/daiquiri.php', 'daiquiri_act
 
 function daiquiri_admin_init() {
     register_setting('daiquiri', 'daiquiri_url');
+    register_setting('daiquiri', 'daiquiri_navigation_path');
 }
 
 add_action('admin_init', 'daiquiri_admin_init');
@@ -62,6 +64,14 @@ function daiquiri_admin_display() {
                     </th>
                     <td>
                         <input type="text" class="regular-text" name="daiquiri_url" value="<?php echo get_option('daiquiri_url'); ?>" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label>daiquiri_navigation_path</label>
+                    </th>
+                    <td>
+                        <input type="text" class="regular-text" name="daiquiri_navigation_path" value="<?php echo get_option('daiquiri_navigation_path'); ?>" />
                     </td>
                 </tr>
             </table>

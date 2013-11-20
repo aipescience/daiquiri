@@ -34,26 +34,17 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         } else {
             // get all databases which the user is allowed to accessed
             $databasesModel = new Data_Model_Databases();
-            $databases = $databasesModel->index();
-
-            // THIS IS DANGEROUS, IT IS THE ONLY CHECK FOR $db
-            if (in_array($db, $databases)) {
-                throw new AuthError('Requested database not available');
+            $response = $databasesModel->show(false, $db);
+            if ($response['status'] !== 'ok') {
+                throw new Exception("Requested table not available");
             }
 
             // check permission on table access
             if ($table) {
-                $database = $databasesModel->show($db, true, true);
-                $accessGranted = false;
-                foreach ($database['tables'] as $currTable) {
-                    if ($currTable['name'] == $table) {
-                        $accessGranted = true;
-                        break;
-                    }
-                }
-
-                if ($accessGranted !== true) {
-                    throw new AuthError("Requested table not available");
+                $tablesModel = new Data_Model_Tables();
+                $response = $tablesModel->show(false, $db, $table);
+                if ($response['status'] !== 'ok') {
+                    throw new Exception("Requested table not available");
                 }
             }
 
@@ -73,7 +64,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
                 $this->getTable()->setName($table);
                 $this->getTable()->setPrimary();
             } catch (Exception $e) {
-                throw new AuthError("Requested table not available");
+                throw new Exception("Requested table not available");
             }
         }
     }

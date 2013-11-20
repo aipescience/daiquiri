@@ -20,84 +20,72 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <h4>Database details</h4>
-
-    <table class='table table-bordered'>
-        <tr>
-            <td class="onehundredtwenty">Database name</td>
-            <td>
-                <?php echo $this->escape($this->data['name']); ?>
-            </td>
-        </tr>   
-        <tr>
-            <td class="onehundredtwenty">Description</td>
-            <td>
-                <?php echo $this->escape($this->data['description']); ?>
-            </td>
-        </tr>   
-    </table>
-
-    <?php if(array_key_exists("tables", $this->data) && !empty($this->data['tables'])): ?>
-        <?php foreach ($this->data['tables'] as $table): ?>
-            <h5>Table details</h5>
-
-            <table class='table table-bordered'>
-                <tr>
-                    <td class="onehundredtwenty">Database name</td>
-                    <td>
-                        <?php echo $this->escape($this->data['name']); ?>
-                    </td>
-                </tr>   
-                <tr>
-                    <td class="onehundredtwenty">Table name</td>
-                    <td>
-                        <?php echo $this->escape($table['name']); ?>
-                    </td>
-                </tr>   
-                <tr>
-                    <td class="onehundredtwenty">Description</td>
-                    <td>
-                        <?php echo $this->escape($table['description']); ?>
-                    </td>
-                </tr>   
-            </table>
-
-            <?php if(array_key_exists("columns", $table) && !empty($table['columns'])): ?>
-                <h6>Column details</h6>
-
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <div class="row">
+            <div class="span9">
+                <div class="box">
+                    <p>
+                        <span class="meta">DATABASE</span>
+                        <strong><?php echo $this->escape($this->data['name']); ?></strong>
+                    </p>
+                </div>
                 <table class='table table-bordered'>
-                    <tr>
-                        <td class="onehundredtwenty">Column</td>
-                        <td class="eighty">Type</td>
-                        <td class="onehundredtwenty">UCD</td>
-                        <td class="onehundred">Unit</td>
-                        <td>Description</td>
-                    </tr>   
-
-                    <?php foreach ($table['columns'] as $cols): ?>
+                    <?php foreach($this->data as $key => $value): ?>
+                        <?php if ($key !== 'tables'): ?>
                         <tr>
-                            <td class="onehundredtwenty">
-                                <?php echo $this->escape($cols['name']); ?>
-                            </td>
-                            <td class="eighty">
-                                <?php echo $this->escape($cols['type']); ?>
-                            </td>
-                            <td class="onehundredtwenty">
-                                <?php echo $this->escape($cols['ucd']); ?>
-                            </td>
-                            <td class="onehundred">
-                                <?php echo $this->escape($cols['unit']); ?>
-                            </td>
+                            <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
                             <td>
-                                <?php echo $this->escape($cols['description']); ?>
+                                <?php echo $this->escape($value); ?>
                             </td>
-                        </tr>   
-                    <?php endforeach; ?>
+                        </tr>
+                        <?php endif; ?>
+                    <?php endforeach ?>
                 </table>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    <?php endif; ?>    
-<?php else: ?>
-<h5>Error retrieving database information</h5>
-<?php endif; ?>
+            </div>
+            <div class="span3">
+                <div class="box">
+                    <?php
+                    $redirect = '/data/databases/show?id=' . $this->escape($this->data['id']);
+                    echo $this->internalLink(array(
+                        'text' => 'Update this database entry',
+                        'href' => '/data/databases/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Delete this database entry',
+                        'href' => '/data/databases/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    ?>
+                </div>
+                <div class="box">
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'Create new database entry',
+                        'href' => '/data/databases/create?redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new table entry',
+                        'href' => '/data/tables/create?databaseId=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new column entry',
+                        'href' => '/data/columns/create?redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    echo $this->internalLink(array(
+                        'text' => 'Create new function entry',
+                        'href' => '/data/functions/create?redirect=' . $redirect,
+                        'prepend' => '<p>',
+                        'append' => '</p>'));
+                    ?>
+                </div>
+            </div>
+        </div>
+    <?php else: ?>
+    <h5>Error retrieving database information</h5>
+    <?php endif; ?>
+</div>

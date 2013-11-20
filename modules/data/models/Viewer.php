@@ -36,13 +36,9 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
      * @return array 
      */
     public function cols($db, $table, array $params = array()) {
-        // set init table
-        try {
-            $this->getResource()->init($db, $table);
-        } catch (Exception $e) {
-            return array('status' => 'error', 'error' => $e->getMessage());
-        }
-
+        // init table
+        $this->getResource()->init($db, $table);
+        
         // get the columns and the corresponding ids from the database
         if (empty($params['cols'])) {
             $params['cols'] = $this->getResource()->fetchCols();
@@ -59,24 +55,21 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
         }
 
         // obtain column metadata (if this exists)
-        $databaseModel = new Data_Model_Databases();
         $tableModel = new Data_Model_Tables();
-        $dbId = $databaseModel->fetchIdWithName($db);
-       
-        if (!empty($dbId)) {
-            $tableId = $tableModel->fetchIdWithName($dbId, $table);
-            $response = $tableModel->show($tableId);
-            $tableData = $response['data'];
+        $response = $tableModel->show(false, $db, $table, true);
+
+        if ($response['status'] === 'ok') {
+            $tableMeta = $response['data'];
         } else {
             // this table is not in the metadata table - let's see if we can get
             // further information from the table itself
             $describeResource = new Data_Model_Resource_Description();
-            $tableData = $describeResource->describeTable($db, $table);
-        }
+            $tableMeta = $describeResource->describeTable($db, $table);
+        } 
 
         $params['colUcd'] = array();
         foreach ($colsIds as $id => $colsId) {
-            $params['colUcd'][$id] = $tableData['columns'][$colsId]['ucd'];
+            $params['colUcd'][$id] = $tableMeta['columns'][$colsId]['ucd'];
         }
 
         // return columns ot this table

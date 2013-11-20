@@ -20,16 +20,18 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Example created.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to example overview',
-        'href' => '/query/examples',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Create example</h2>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Example created.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to example overview',
+            'href' => '/query/examples',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Create example</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

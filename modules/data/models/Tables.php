@@ -20,9 +20,6 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the currently running query jobs.
- */
 class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
 
     /**
@@ -33,67 +30,19 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
         $this->setValueField('name');
     }
 
-    public function getValues() {
-        // check if $_valueField is set
-        if ($this->_valueField === null) {
-            throw new Exception('$_valueField is not set in ' . __METHOD__);
-        }
-
-        // get rows from database
-        $rows = $this->getResource()->fetchRows(array('order' => 'id asc',
-            'from' => array('id', $this->_valueField, 'database')));
-
-        // convert to flat array and return
-        $values = array();
-        foreach ($rows as $row) {
-            $values[$row['id']] = $row['database'] . '.' . $row[$this->_valueField];
-        }
-        return $values;
-    }
-
     /**
-     * Returns the id of the table with the given name and given database id
-     * @param int $dbId
-     * @param string $name
+     * Returns a list of all table entries.
      * @return array
      */
-    public function fetchIdWithName($dbId, $name) {
-        return $this->getResource()->fetchIdWithName($dbId, $name);
-    }
-
-    /**
-     * Checks whether the user can access this table
-     * @param int $id
-     * @param string $command SQL command
-     * @return array
-     */
-    public function checkACL($id, $command) {
-        return $this->getResource()->checkACL($id, $command);
-    }
-
-    /**
-     * Returns a database entry.
-     * @param int $id
-     * @param str $tablename if set, $id is assumed to be the table name
-     * @param bool $fullData if tables and columns should be retrieved as well...
-     * @return array
-     */
-    public function show($id, $tablename = false, $fullData = true) {
-        if($tablename !== false) {
-            // get databases model
-            $databasesModel = new Data_Model_Databases();
-            $tableId = $databasesModel->getResource()->fetchIdWithName($tablename);
-            $id = $this->getResource()->fetchIdWithName($tableId, $id);
-
-            if ($id === false) {
-                return array('status' => 'error');
+    public function index() {
+        $data = array();
+        foreach(array_keys($this->getValues()) as $id) {
+            $response = $this->show($id);
+            if ($response['status'] == 'ok') {
+                $data[$response['data']['id']] = $response['data']['database'] . '.' . $response['data']['name'];
             }
         }
-
-        return array(
-            'status' => 'ok',
-            'data' => $this->getResource()->fetchRow($id, $fullData)
-        );
+        return $data;
     }
 
     /**
@@ -101,39 +50,90 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
      * @param array $formParams
      * @return array
      */
-    public function create($databaseId = null, array $formParams = array(), array $tableDescription = array()) {
+    public function create($databaseId = null, array $formParams = array()) {
         // get databases model
         $databasesModel = new Data_Model_Databases();
+        $databases = $databasesModel->index();
 
         // get roles model
         $rolesModel = new Auth_Model_Roles();
 
         // create the form object
         $form = new Data_Form_Table(array(
-                    'databases' => $databasesModel->getValues(),
+                    'databases' => $databases,
                     'databaseId' => $databaseId,
                     'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
                     'submit' => 'Create table entry'
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $values = $form->getValues();
 
-            //check if entry is already there
-            if ($this->getResource()->fetchIdWithName($values['database_id'], $values['name']) !== false) {
-                throw new Exception("Table entry already exists.");
+                //check if entry is already there
+                $database = $databases[$values['database_id']];
+                if ($this->getResource()->fetchId($database, $values['name']) !== false) {
+                    throw new Exception("Table entry already exists.");
+                }
+
+                $this->store($values);
+
+                return array('status' => 'ok');
+            } else {
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
             }
-
-            $this->store($values);
-
-            return array('status' => 'ok');
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function update($id, array $formParams = array()) {
+    /**
+     * Returns a table entry.
+     * @param int $id
+     * @param str $tablename if set, $id is assumed to be the table name
+     * @param bool $fullData if tables and columns should be retrieved as well...
+     * @return array
+     */
+    public function show($id, $db = false, $table = false, $fullData = false) {
+        // process input
+        if ($id === false) {
+            if ($db === false || $table === false) {
+                throw new Exception('Either $id or $db and $table must be provided.');
+            }
+
+            $id = $this->getResource()->fetchId($db, $table);
+
+            if (empty($id)) {
+                return array('status' => 'error');
+            }
+        }
+
+        $data = $this->getResource()->fetchRow($id, $fullData);
+
+        if (empty($data)) {
+            return array('status' => 'error');
+        } else {
+            return array('status' => 'ok', 'data' => $data);
+        }
+    }
+
+    public function update($id, $db = false, $table = false, array $formParams = array()) {
+        // process input
+        if ($id === false) {
+            if ($db === false || $table === false) {
+                throw new Exception('Either $id or $db and $table must be provided.');
+            }
+
+            $id = $this->getResource()->fetchId($db, $table);
+
+            if (empty($id)) {
+                return array('status' => 'error');
+            }
+        }
+
         // get the entry
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
@@ -153,29 +153,54 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // get the form values
-            $values = $form->getValues();
+                $this->getResource()->updateRow($id, $values);
 
-            $this->getResource()->updateRow($id, $values);
-            return array('status' => 'ok');
+                return array('status' => 'ok');
+            } else {
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+            }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function delete($id, array $formParams = array()) {
+    public function delete($id, $db = false, $table = false, array $formParams = array()) {
+        // process input
+        if ($id === false) {
+            if ($db === false || $table === false) {
+                throw new Exception('Either $id or $db and $table must be provided.');
+            }
+
+            $id = $this->getResource()->fetchId($db, $table);
+
+            if (empty($id)) {
+                return array('status' => 'error');
+            }
+        }
+
         // create the form object
         $form = new Data_Form_Delete(array(
                     'submit' => 'Delete table entry'
                 ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $this->getResource()->deleteTable($id);
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $this->getResource()->deleteTable($id);
 
-            return array('status' => 'ok');
+                return array('status' => 'ok');
+            } else {
+                $csrf = $form->getElement('csrf');
+                $csrf->initCsrfToken();
+                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+            }
         }
 
         return array('form' => $form, 'status' => 'form');
@@ -219,5 +244,15 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                 throw $e;
             }
         }        
+    }
+
+    /**
+     * Checks whether the user can access this table
+     * @param int $id
+     * @param string $command SQL command
+     * @return array
+     */
+    public function checkACL($id, $command) {
+        return $this->getResource()->checkACL($id, $command);
     }
 }

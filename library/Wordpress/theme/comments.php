@@ -30,12 +30,55 @@
     <?php
     comment_form(array(
         'title_reply' => 'Write a Reply or Comment',
+        'comment_notes_before' => '',
+        'logged_in_as' => '
+<fieldset class="form-horizontal">
+    <div class="control-group">
+        <label class="control-label">Logged in as</label>
+        <div class="controls">
+            <div class="input">' . sprintf( __( '<a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>' ), admin_url( 'profile.php' ), $user_identity, wp_logout_url( apply_filters( 'the_permalink', get_permalink( ) ) ) ) . '</div>
+        </div>
+    </div>
+</fieldset>',
+        'comment_notes_after' => '<p class="form-allowed-tags">' . sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes:<br />%s' ), ' <span class="mono">' . trim(allowed_tags()) . '</span>' ) . '</p><p>Your email address will not be published.</p>',
         'fields' => array(
-            'author' => '<p class="comment-form-author"><input class="span9" placeholder="' . __('Name', 'domainreference') . ( $req ? ' (required)' : '' ) . '" id="author" name="author" type="text" value="' . esc_attr($commenter['comment_author']) . '" size="30"' . $aria_req . ' /></p>',
-            'email' => '<p class="comment-form-email"><input class="span9" placeholder="' . __('Email', 'domainreference') . ( $req ? ' (required)' : '' ) . '" id="email" name="email" type="text" value="' . esc_attr($commenter['comment_author_email']) . '" size="30"' . $aria_req . ' /></p>',
-            'url' => '<p class="comment-form-url"><input class="span9" placeholder="' . __('Website', 'domainreference') . /* ( $req ? ' (required)' : '' ) . */ '" id="url" name="url" type="text" value="' . esc_attr($commenter['comment_author_url']) . '" size="30" /></p>'
+            'author' => '
+<fieldset class="form-horizontal">
+    <div class="control-group comment-form-author">
+        <label class="control-label" for="inputAuthor">' . __('Name', 'domainreference') . '</label>
+        <div class="controls">
+            <input id="inputAuthor" class="input-block-level" name="author" type="text" value="' . esc_attr($commenter['comment_author']) . '" size="30"' . $aria_req . ' />
+        </div>
+    </div>
+</fieldset>',
+            'email' => '
+<fieldset class="form-horizontal">
+    <div class="control-group comment-form-email">
+        <label class="control-label" for="inputEmail">' . __('Email', 'domainreference') . '</label>
+        <div class="controls">
+            <input id="inputEmail" class="input-block-level" name="email" type="text" value="' . esc_attr($commenter['comment_author_email']) . '" size="30"' . $aria_req . ' />
+        </div>
+    </div>
+</fieldset>',
+            'url' => '
+<fieldset class="form-horizontal">
+    <div class="control-group comment-form-url">
+        <label class="control-label" for="inputUrl">' . __('Website', 'domainreference') . ' (not required)</label>
+        <div class="controls">
+            <input id="inputUrl" class="input-block-level" name="url" type="text" value="' . esc_attr($commenter['comment_author_url']) . '" size="30"' . $aria_req . ' />
+        </div>
+    </div>
+</fieldset>'
         ),
-        'comment_field' => '<p class="comment-form-comment"><textarea class="span9" placeholder="' . _x('Comment', 'noun') . '" id="comment" name="comment" cols="45" rows="8" aria-required="true"></textarea></p>'
+        'comment_field' => '
+<fieldset class="form-horizontal">
+    <div class="control-group comment-form-comment">
+        <label class="control-label" for="inputComment">' . _x('Comment', 'noun') . '</label>
+        <div class="controls">
+            <textarea id="inputComment" class="input-block-level" name="comment" type="text" value="' . esc_attr($commenter['comment_author_url']) . '" size="30"' . $aria_req . ' rows="8"></textarea>
+        </div>
+    </div>
+</fieldset>'
     ));
     ?>
 

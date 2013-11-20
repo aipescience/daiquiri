@@ -20,44 +20,30 @@
  */
 ?>
 
-<h2>Table management</h2>
+<div class="main">
+    <h2>Table management</h2>
 
-<pre>
-    <?php
-    echo PHP_EOL;
-    echo "'data' => array(" . PHP_EOL;
-    echo "    'databases' => array(" . PHP_EOL;
-    foreach ($this->data as $database) {
-        echo "        array(" . PHP_EOL;
-        foreach ($database as $key => $value) {
-            if (!in_array($key, array('id', 'tables'))) {
-                echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
-            }
-        }
-        echo "        )," . PHP_EOL;
-    }
-    echo "    )," . PHP_EOL;
-    echo "    'tables' => array(" . PHP_EOL;
-    foreach ($this->data as $database) {
-        foreach ($database['tables'] as $table) {
+    <pre>
+        <?php
+        echo PHP_EOL;
+        echo "'data' => array(" . PHP_EOL;
+        echo "    'databases' => array(" . PHP_EOL;
+        foreach ($this->databases as $database) {
             echo "        array(" . PHP_EOL;
-            echo "            'database_id' => '{$this->escape($database['id'])}', // {$this->escape($database['name'])}" . PHP_EOL;
-            foreach ($table as $key => $value) {
-                if (!in_array($key, array('id', 'columns'))) {
+            foreach ($database as $key => $value) {
+                if (!in_array($key, array('id', 'tables'))) {
                     echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
                 }
             }
             echo "        )," . PHP_EOL;
         }
-    }
-    echo "    )," . PHP_EOL;
-    echo "    'columns' => array(" . PHP_EOL;
-    foreach ($this->data as $database) {
-        foreach ($database['tables'] as $table) {
-            foreach ($table['columns'] as $column) {
+        echo "    )," . PHP_EOL;
+        echo "    'tables' => array(" . PHP_EOL;
+        foreach ($this->databases as $database) {
+            foreach ($database['tables'] as $table) {
                 echo "        array(" . PHP_EOL;
-                echo "            'table_id' => '{$this->escape($table['id'])}', // {$this->escape($table['name'])}" . PHP_EOL;
-                foreach ($column as $key => $value) {
+                echo "            'database_id' => '{$this->escape($database['id'])}', // {$this->escape($database['name'])}" . PHP_EOL;
+                foreach ($table as $key => $value) {
                     if (!in_array($key, array('id', 'columns'))) {
                         echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
                     }
@@ -65,28 +51,44 @@
                 echo "        )," . PHP_EOL;
             }
         }
-    }
-    echo "    )," . PHP_EOL;
-    echo "    'functions' => array(";
-    foreach ($this->func as $function) {
-        echo PHP_EOL;
-        echo "        array(" . PHP_EOL;
-        foreach ($function as $key => $value) {
-            if ($key !== 'id') {
-                echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
+        echo "    )," . PHP_EOL;
+        echo "    'columns' => array(" . PHP_EOL;
+        foreach ($this->databases as $database) {
+            foreach ($database['tables'] as $table) {
+                foreach ($table['columns'] as $column) {
+                    echo "        array(" . PHP_EOL;
+                    echo "            'table_id' => '{$this->escape($table['id'])}', // {$this->escape($table['name'])}" . PHP_EOL;
+                    foreach ($column as $key => $value) {
+                        if (!in_array($key, array('id', 'columns'))) {
+                            echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
+                        }
+                    }
+                    echo "        )," . PHP_EOL;
+                }
             }
         }
-        echo "        )," . PHP_EOL;
-    }
-    echo "    )," . PHP_EOL;
+        echo "    )," . PHP_EOL;
+        echo "    'functions' => array(";
+        foreach ($this->functions as $function) {
+            echo PHP_EOL;
+            echo "        array(" . PHP_EOL;
+            foreach ($function as $key => $value) {
+                if ($key !== 'id') {
+                    echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
+                }
+            }
+            echo "        )," . PHP_EOL;
+        }
+        echo "    )," . PHP_EOL;
 
-    echo ")" . PHP_EOL;
+        echo ")" . PHP_EOL;
+        ?>
+    </pre>
+    <?php
+    echo $this->internalLink(array(
+        'text' => 'Back to data management',
+        'href' => '/data/',
+        'prepend' => '<p>',
+        'append' => '</p>'));
     ?>
-</pre>
-<?php
-echo $this->internalLink(array(
-    'text' => 'Back to data management',
-    'href' => '/data/',
-    'prepend' => '<p>',
-    'append' => '</p>'));
-?>
+</div>

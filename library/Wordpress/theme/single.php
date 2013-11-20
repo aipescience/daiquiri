@@ -20,41 +20,40 @@
  */
 ?>
 
-<?php Daiquiri_Layout::getInstance()->get_header(); ?>
+<?php get_header(); ?>
 
-<div class="row">
-    <div id="wp-content"  class="span9">
+<div id="wp-content" class="row">
+    <div class="span9 main">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-                <h2><?php the_title(); ?></h2>
+            <h2>
+                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+            </h2>
 
-                <?php the_content(); ?>
+            <?php the_content(); ?>
 
-                <div class="post-footer">
-                    This post was first published on 
-                    <?php the_date(); ?>
-                    and last modified on 
-                    <?php the_modified_date(); ?>.
-                </div>
+            <div class="post-footer">
+                This post was first published on 
+                <?php the_date(); ?>
+                and last modified on 
+                <?php the_modified_date(); ?>.
+            </div>
 
-                <div class="post-nav">
-                    <?php echo get_previous_posts_link(); ?>
-                    <?php previous_post_link('Previous post: %link&nbsp&nbsp&nbsp'); ?>
-                    <?php next_post_link('Next post: %link'); ?>
-                </div>
+            <div class="post-nav">
+                <?php echo get_previous_posts_link(); ?>
+                <?php previous_post_link('Previous post: %link&nbsp&nbsp&nbsp'); ?>
+                <?php next_post_link('Next post: %link'); ?>
+            </div>
 
-                <?php if (comments_open(get_the_ID())): ?>
-                    <?php comments_template() ?>
-                <?php endif ?>
-            <?php
-            endwhile;
-        else:
-            ?>
+            <?php if (comments_open(get_the_ID())): ?>
+                <?php comments_template() ?>
+            <?php endif ?>
+        <?php endwhile; else: ?>
             <p>Sorry, no post was found.</p>
-<?php endif; ?>
+        <?php endif; ?>
     </div>
-    <div id="wp-sidebar" class="span3">
-<?php get_sidebar() ?>
+    <div class="span3 sidebar">
+        <?php get_sidebar() ?>
     </div>
 </div>
 
-<?php Daiquiri_Layout::getInstance()->get_footer(); ?>
+<?php get_footer(); ?>

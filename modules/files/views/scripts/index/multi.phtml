@@ -20,8 +20,10 @@
  */
 ?>
 
-<?php if ($this->status === 'err_multi'): ?>
-    <h2>Multiple files with given name found</h2>
-<?php else: ?>
-    <h2>Error in serving you the requested file</h2>
-<?php endif; ?>
+<div class="main">
+    <?php if ($this->status === 'err_multi'): ?>
+        <h2>Multiple files with given name found</h2>
+    <?php else: ?>
+        <h2>Error in serving you the requested file</h2>
+    <?php endif; ?>
+</div>    

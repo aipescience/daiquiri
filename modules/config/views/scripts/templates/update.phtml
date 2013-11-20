@@ -20,20 +20,22 @@
  */
 ?>
 
-<?php if ($this->status === 'ok'): ?>
-    <p>Template updated.</p>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to template overview',
-        'href' => '/config/templates',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-<?php else: ?>
-    <h2>Update template <?php echo $this->escape($this->template); ?></h2>
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Template updated.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to template overview',
+            'href' => '/config/templates',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Update template <?php echo $this->escape($this->template); ?></h2>
 
-    <p class="text-info">In this template you can use the variables: 
-        <?php echo $this->escape($this->variables); ?>.
-    </p>
-    <?php echo $this->form; ?>
-<?php endif; ?>
+        <p class="text-info">In this template you can use the variables: 
+            <?php echo $this->escape($this->variables); ?>.
+        </p>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

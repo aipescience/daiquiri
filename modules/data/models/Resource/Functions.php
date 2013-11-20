@@ -38,16 +38,34 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
      * @throws Exception
      * @return type 
      */
-    public function fetchRows() {
+    public function fetchRows($sqloptions = array()) {
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
-        //roles starting at 1, therefore check for <=
+        // roles starting at 1, therefore check for <=
         $select = $this->getTable()->select();
         $select->where('`publication_role_id` <= ?', count($usrRoles));
         $rows = $this->getTable()->fetchAll($select);
 
         return $rows;
-    }    
+    }
+
+    public function fetchId($function) {
+        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
+
+        // get the primary sql select object
+        $select = $this->getTable()->select();
+        $select->where("`name` = ?", trim($function));
+        $select->where("`publication_role_id` <= ?", count($usrRoles));
+
+        // get the rowset and return
+        $row = $this->getTable()->fetchAll($select)->current();
+
+        if ($row) {
+            return $row->id;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Returns a specific row from the (joined) Databases/Tables/Columns tables.
@@ -56,51 +74,31 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
      * @return type 
      */
     public function fetchRow($id) {
-        $sqloptions = array();
         $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
 
         // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
+        $select = $this->getTable()->getSelect();
         $select->where("`id` = ?", $id);
         $select->where("`publication_role_id` <= ?", count($usrRoles));
 
-        $data = $this->getTable()->fetchAll($select)->current()->toArray();
+        $row = $this->getTable()->fetchAll($select)->current();
 
-        //get the roles
-        $rolesModel = new Auth_Model_Roles();
-        $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
+        $data = false;
+        if ($row) {
+            $data = $row->toArray();
 
-        if (!empty($roles[$data['publication_role_id']])) {
-            $data['publication_role'] = $roles[$data['publication_role_id']];
-        } else {
-            $data['publication_role'] = "unknown";
+            //get the roles
+            $rolesModel = new Auth_Model_Roles();
+            $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
+
+            if (!empty($roles[$data['publication_role_id']])) {
+                $data['publication_role'] = $roles[$data['publication_role_id']];
+            } else {
+                $data['publication_role'] = "unknown";
+            }
         }
 
         return $data;
-    }
-
-    /**
-     * Returns the id of the function by name
-     * @param string $name
-     * @return array
-     */
-    public function fetchIdWithName($name) {
-        $sqloptions = array();
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`name` = ?", trim($name));
-        $select->where("`publication_role_id` <= ?", count($usrRoles));
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-
-        if ($row) {
-            return $row[0]['id'];
-        }
-
-        return false;
     }
 
     /**
