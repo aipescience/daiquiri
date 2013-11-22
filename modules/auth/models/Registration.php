@@ -90,10 +90,27 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
             $resource = new Auth_Model_Resource_Details();
             $resource->logEvent($user['id'], 'validate');
 
-            // send mail
-            $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/user';
-            $mailResource = new Auth_Model_Resource_Mail();
-            $mailResource->sendValidateMail($user, array('link' => $link));
+            if (Daiquiri_Config::getInstance()->auth->activation) {
+                // send mail since the user needs to be activated/confirmed
+                $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/user';
+                $mailResource = new Auth_Model_Resource_Mail();
+                $mailResource->sendValidateMail($user, array('link' => $link));
+            } else {
+                // get the new status id
+                $statusModel = new Auth_Model_Status();
+                $statusId = $statusModel->getId('active');
+
+                // confirm user in database
+                $this->getResource()->updateUser($user['id'], array('status_id' => $statusId));
+
+                // log the event
+                $detailResource = new Auth_Model_Resource_Details();
+                $detailResource->logEvent($user['id'], 'activate');
+
+                // send mail
+                $mailResource = new Auth_Model_Resource_Mail();
+                $mailResource->sendActivateMail($user);
+            }
 
             return array('status' => 'ok');
         } else {

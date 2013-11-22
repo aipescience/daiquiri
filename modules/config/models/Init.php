@@ -62,6 +62,7 @@ class Config_Model_Init extends Daiquiri_Model_Init {
             ),
             'auth' => array(
                 'registration' => false,
+                'activation' => false,
                 'confirmation' => false,
                 'password' => array(
                     'default' => array(
