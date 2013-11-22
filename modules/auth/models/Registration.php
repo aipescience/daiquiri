@@ -95,24 +95,19 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                 $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/user';
                 $mailResource = new Auth_Model_Resource_Mail();
                 $mailResource->sendValidateMail($user, array('link' => $link));
+
+                return array('status' => 'ok','pending' => true);
+
             } else {
                 // get the new status id
                 $statusModel = new Auth_Model_Status();
                 $statusId = $statusModel->getId('active');
 
-                // confirm user in database
+                // activate user in database
                 $this->getResource()->updateUser($user['id'], array('status_id' => $statusId));
 
-                // log the event
-                $detailResource = new Auth_Model_Resource_Details();
-                $detailResource->logEvent($user['id'], 'activate');
-
-                // send mail
-                $mailResource = new Auth_Model_Resource_Mail();
-                $mailResource->sendActivateMail($user);
+                return array('status' => 'ok','pending' => false);
             }
-
-            return array('status' => 'ok');
         } else {
             return array(
                 'status' => 'error',
@@ -196,7 +191,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     $statusModel = new Auth_Model_Status();
                     $statusId = $statusModel->getId('disabled');
 
-                    // confirm user in database
+                    // disable user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
                     // log the event
@@ -245,7 +240,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     $statusModel = new Auth_Model_Status();
                     $statusId = $statusModel->getId('active');
 
-                    // confirm user in database
+                    // activate user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
                     // log the event
@@ -293,8 +288,8 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     // get the new status id
                     $statusModel = new Auth_Model_Status();
                     $statusId = $statusModel->getId('disabled');
-                    Zend_Debug::dump($statusId); // die(0);
-                    // confirm user in database
+
+                    // disable user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
                     // invalidate the session of the user
@@ -345,7 +340,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     $statusModel = new Auth_Model_Status();
                     $statusId = $statusModel->getId('active');
 
-                    // confirm user in database
+                    // activate user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
                     // log the event
