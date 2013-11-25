@@ -503,8 +503,10 @@ daiquiri.table.Table.prototype.rows = function () {
                                 if (col.format.type == 'filelink' && cell[i] != null) {
                                     extension = cell[i].match(/(?:\.([^.]+))?$/)[1];
 
-                                    if ($.inArray(extension.toLowerCase(),['jpg','jpeg','png','bmp','txt']) != -1) {
+                                    if ($.inArray(extension.toLowerCase(),['txt']) != -1) {
                                         target = 'target="_blank"';
+                                    } else if ($.inArray(extension.toLowerCase(),['jpg','jpeg','png','bmp']) != -1) {
+                                        target = 'data-lightbox="col' + i + '"';
                                     } else {
                                         target = '';
                                     }
