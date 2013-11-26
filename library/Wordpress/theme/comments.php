@@ -36,7 +36,7 @@
     <div class="control-group">
         <label class="control-label">Logged in as</label>
         <div class="controls">
-            <div class="input">' . sprintf( __( '<a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>' ), admin_url( 'profile.php' ), $user_identity, wp_logout_url( apply_filters( 'the_permalink', get_permalink( ) ) ) ) . '</div>
+            <div class="input-block-level">' . sprintf( __( '<a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>' ), admin_url( 'profile.php' ), $user_identity, wp_logout_url( apply_filters( 'the_permalink', get_permalink( ) ) ) ) . '</div>
         </div>
     </div>
 </fieldset>',
