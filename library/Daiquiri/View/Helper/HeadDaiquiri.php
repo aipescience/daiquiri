@@ -44,6 +44,9 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         'daiquiri/lib/codemirror/lib/codemirror.css',
         'daiquiri/lib/codemirror/addon/runmode/runmode.js',
         'daiquiri/lib/codemirror/mode/sql/sql.js',
+        // lightbox2
+        'daiquiri/lib/lightbox2/js/lightbox-2.6.min.js',
+        'daiquiri/lib/lightbox2/css/lightbox.css',
         // other libs
         'daiquiri/lib/insert_at_caret.js',
         // daiquiri common
