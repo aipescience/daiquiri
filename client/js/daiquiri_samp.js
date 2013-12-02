@@ -37,7 +37,7 @@ daiquiri.samp.opt = {
     meta: {
         "samp.name": "Daiquiri-SAMP",
         "samp.description": "SAMP client for the Daiquiri Application",
-        "samp.icon.url": "http://escience.aip.de/daiquiri/favicon.ico"
+        "samp.icon.url": $('link[rel="shortcut icon"]')[0].href.replace(/.ico$/, ".png")
     }
 };
 
