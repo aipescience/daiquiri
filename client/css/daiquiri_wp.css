@@ -47,6 +47,9 @@
 #wp-content #commentform {
     margin-top: 0;
 }
+#wp-content div.input-block-level {
+    padding: 5px 0;
+}
 #wp-content fieldset {
     margin-bottom: 0;
 }

@@ -47,12 +47,15 @@ Template Name: News (no title)
     	<ul class="unstyled">
             <?php 
             foreach (wp_get_recent_posts() as $post) {
-    	    echo '<li class="news-entry">';
-    	    echo '<span class="news-entry-date">';
-    	    echo date('F jS, Y', strtotime($post["post_date"]));
-    	    echo '</span>';
-    	    echo '<a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"].'</a>';
-    	    echo '</li>';
+        	    echo '<li class="news-entry">';
+        	    echo '<div class="pull-left onehundredeighty" class="news-entry-date">';
+        	    echo date('F jS, Y', strtotime($post["post_date"]));
+        	    echo '</div>';
+                echo '<div class="align-form-horizontal">';
+        	    echo '<p><a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"].'</a></p>';
+                echo '<p>' . $post["post_content"] . '</p>';
+                echo '</div>';
+                echo '</li>';
             }
             ?>
     	</ul>

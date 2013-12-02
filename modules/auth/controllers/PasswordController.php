@@ -77,7 +77,7 @@ class Auth_PasswordController extends Daiquiri_Controller_Abstract {
         if ($this->_request->isPost()) {
             if ($this->_getParam('cancel')) {
                 // user clicked cancel
-                $this->_helper->redirector('index', 'user', 'admin');
+                $this->_redirect('/auth/login');
             } else {
                 // validate form and login
                 $response = $this->_model->forgot($this->_request->getPost());

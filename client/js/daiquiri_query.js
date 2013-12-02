@@ -25,7 +25,7 @@ daiquiri.query = {};
 /**
  * Object to hold the Query instance.
  */
-daiquiri.table.item = null;
+daiquiri.query.item = null;
 
 /**
  * Constructor-like function for the Query class. 

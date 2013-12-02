@@ -506,7 +506,7 @@ daiquiri.table.Table.prototype.rows = function () {
                                     if ($.inArray(extension.toLowerCase(),['txt']) != -1) {
                                         target = 'target="_blank"';
                                     } else if ($.inArray(extension.toLowerCase(),['jpg','jpeg','png','bmp']) != -1) {
-                                        target = 'data-lightbox="col' + i + '" title=\'<a href="' + col.format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>\';
+                                        target = 'data-lightbox="col' + i + '" title=\'<a href="' + col.format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>\'';
                                     } else {
                                         target = '';
                                     }

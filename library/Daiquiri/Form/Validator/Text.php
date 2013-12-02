@@ -37,7 +37,7 @@ class Daiquiri_Form_Validator_Text extends Zend_Validate_Abstract {
      * Default error message produced by this validator.
      */
     protected $_messageTemplates = array(
-        self::CHARS => "< > { } are not allowed"
+        self::CHARS => "Special Character like < > { } or newlines are not allowed"
     );
 
     /**
@@ -56,7 +56,7 @@ class Daiquiri_Form_Validator_Text extends Zend_Validate_Abstract {
 
         $isValid = true;
 
-        if (preg_match("/[^ \/\,\;\.\'\"\-\=\?\!\@\#\$\%\^\&\*\(\)\]\[\_\+\:\`\p{L}0-9]/u", $value)) {
+        if (preg_match("/[^ \|\/\,\;\.\'\"\-\=\?\!\@\#\$\%\^\&\*\(\)\]\[\_\+\:\`\p{L}0-9]/u", $value)) {
             $this->_error(self::CHARS);
             $isValid = false;
         }

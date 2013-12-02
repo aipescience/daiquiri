@@ -151,7 +151,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
         if (Daiquiri_Config::getInstance()->auth->lowerCaseUsernames) {
             $field->addValidator(new Daiquiri_Form_Validator_LowerCaseAlnum());
         } else {
-            $field->addValidator('alnum');
+            $field->addValidator(new Daiquiri_Form_Validator_Text());
         }
 
         $minLength = Daiquiri_Config::getInstance()->auth->usernameMinLength;
@@ -204,7 +204,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
         if (Daiquiri_Config::getInstance()->auth->lowerCaseUsernames) {
             $field->addValidator(new Daiquiri_Form_Validator_LowerCaseAlnum());
         } else {
-            $field->addValidator('alnum');
+            $field->addValidator(new Daiquiri_Form_Validator_Text());
         }
 
         $minLength = Daiquiri_Config::getInstance()->auth->usernameMinLength;
