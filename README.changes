@@ -1,11 +1,15 @@
-22.11.2013:
+2013/12/03
+==========
+
+In init.php $options['auth']['user'] the status and the role are now given by the corresponding  string and not by the ID. Therefore status_id and role_id are not valid anymore.
+
+2013/11/22
+==========
 
 From now on, add the following config entry to your instance:
 
-auth.activation:
+    auth.activation:
 
-set this to 1 if you want the user account to be validated by a moderator.
-
-default: 0
+set this to 1 if you want the user account to be validated by a moderator, the default value is 0.
 
 WARNING! not setting this might be a potential security problem!

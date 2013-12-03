@@ -47,6 +47,13 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
 
         // construct roles array
         $output['roles'] = array('guest', 'user');
+        if (isset($input['roles'])) {
+            foreach ($input['roles'] as $role) {
+                if (! in_array($role, array('guest','user','support','manager','admin'))) {
+                    $output['roles'][] = $role;
+                }
+            }
+        }
         if ($options['config']['contact']) {
             $output['roles'][] = 'support';
         }
@@ -271,6 +278,12 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $user = $authUserModel->rows();
         if ($user['nrows'] == 0) {
             foreach ($options['auth']['user'] as $credentials) {
+                // get the corresponding role_id and status_id 
+                $credentials['role_id'] = $authRoleModel->getId($credentials['role']);
+                unset($credentials['role']);
+                $credentials['status_id'] = $authStatusModel->getId($credentials['status']);
+                unset($credentials['status']);
+
                 // pre-process password first
                 $credentials['newPassword'] = $credentials['password'];
                 $credentials['confirmPassword'] = $credentials['password'];
