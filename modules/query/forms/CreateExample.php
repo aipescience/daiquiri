@@ -22,6 +22,12 @@
 
 class Query_Form_CreateExample extends Daiquiri_Form_Abstract {
 
+    protected $_roles = array();
+
+    public function setRoles($roles) {
+        $this->_roles = $roles;
+    }
+
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
@@ -39,18 +45,33 @@ class Query_Form_CreateExample extends Daiquiri_Form_Abstract {
         $this->addElement('textarea', 'query', array(
             'label' => 'Query',
             'class' => 'input-xxlarge',
-            'rows' => '12',
+            'rows' => '6',
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
+        $this->addElement('textarea', 'description', array(
+            'label' => 'Description (optional)',
+            'class' => 'input-xxlarge',
+            'rows' => '4',
+            'required' => false,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+            )
+        ));
+        $this->addElement('select', 'publication_role_id', array(
+            'label' => 'Published for',
+            'required' => true,
+            'multiOptions' => $this->_roles,
+        ));
         $this->addPrimaryButtonElement('submit', 'Create Example');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('name', 'query'));
+        $this->addHorizontalGroup(array('name', 'query', 'description', 'publication_role_id'));
         $this->addActionGroup(array('submit', 'cancel'));
     }
 

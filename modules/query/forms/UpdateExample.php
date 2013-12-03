@@ -22,15 +22,15 @@
 
 class Query_Form_UpdateExample extends Daiquiri_Form_Abstract {
 
-    protected $_name = null;
-    protected $_query = null;
+    protected $_example = null;
+    protected $_roles = array();
 
-    public function setName($name) {
-        $this->_name = $name;
+    public function setExample($example) {
+        $this->_example = $example;
     }
 
-    public function setQuery($query) {
-        $this->_query = $query;
+    public function setRoles($roles) {
+        $this->_roles = $roles;
     }
 
     public function init() {
@@ -50,27 +50,40 @@ class Query_Form_UpdateExample extends Daiquiri_Form_Abstract {
         $this->addElement('textarea', 'query', array(
             'label' => 'Query',
             'class' => 'input-xxlarge',
-            'rows' => '12',
+            'rows' => '6',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+            )
+        ));
+        $this->addElement('textarea', 'description', array(
+            'label' => 'Description (optional)',
+            'class' => 'input-xxlarge',
+            'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
+        $this->addElement('select', 'publication_role_id', array(
+            'label' => 'Published for',
+            'required' => true,
+            'multiOptions' => $this->_roles,
+        ));
         $this->addPrimaryButtonElement('submit', 'Update Example');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('name', 'query'));
+        $this->addHorizontalGroup(array('name', 'query', 'description', 'publication_role_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        if (isset($this->_name)) {
-            $this->setDefault('name', $this->_name);
-        }
-        if (isset($this->_query)) {
-            $this->setDefault('query', $this->_query);
+        if (isset($this->_example)) {
+            foreach (array('name', 'query', 'description', 'publication_role_id') as $element) {
+                $this->setDefault($element, $this->_example[$element]);
+            }
         }
     }
-
 }

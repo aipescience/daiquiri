@@ -26,9 +26,7 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * Constructor. Sets resource object and primary field.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Table');
-        $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
-        $this->getResource()->getTable()->setName('Query_Examples');
+        $this->setResource('Query_Model_Resource_Examples');
     }
 
     /**
@@ -39,10 +37,6 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
         return $this->getResource()->fetchRows();
     }
 
-    public function show($key) {
-        return $this->getResource()->fetchValue($key);
-    }
-
     /**
      * Creates Example.
      * @param string $key
@@ -51,8 +45,14 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      */
     public function create(array $formParams = array()) {
 
+        // get roles from rolesmodel
+        $rolesModel = new Auth_Model_Roles();
+        $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
+
         // create the form object
-        $form = new Query_Form_CreateExample();
+        $form = new Query_Form_CreateExample(array(
+            'roles' => $roles
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -87,11 +87,15 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
             return array('status' => 'error', 'error' => 'id not found');
         }
 
+        // get roles from rolesmodel
+        $rolesModel = new Auth_Model_Roles();
+        $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
+
         // create the form object
         $form = new Query_Form_UpdateExample(array(
-                    'name' => $example['name'],
-                    'query' => $example['query']
-                ));
+            'example' => $example,
+            'roles' => $roles
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams) && $form->isValid($formParams)) {

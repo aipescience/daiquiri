@@ -27,6 +27,7 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Published for</th>
                 <th>Options</th>
             </tr>
         </thead>
@@ -34,6 +35,7 @@
             <?php foreach ($this->data as $example): ?>
                 <tr>
                     <td><?php echo $this->escape($example['name']); ?></td>
+                    <td><?php echo $this->escape($example['publication_role']); ?></td>
                     <td>
                         <?php
                         echo $this->internalLink(array(

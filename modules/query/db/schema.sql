@@ -14,5 +14,7 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
 CREATE TABLE IF NOT EXISTS `Query_Examples` (
   `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(256) NOT NULL,
-  `query` TEXT NOT NULL
+  `query` TEXT NOT NULL,
+  `description` TEXT,
+  `publication_role_id` INTEGER
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';

@@ -3,6 +3,8 @@
 
 In init.php $options['auth']['user'] the status and the role are now given by the corresponding  string and not by the ID. Therefore status_id and role_id are not valid anymore.
 
+Fields `description`, and `publication_role_id` added to Table `Query_Examples`. Re-Init of query example needed.
+
 2013/11/22
 ==========
 
