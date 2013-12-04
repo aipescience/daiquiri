@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
+class Config_Form_CreateMessages extends Daiquiri_Form_Abstract {
 
     public function init() {
         $this->setFormDecorators();
@@ -38,7 +38,7 @@ class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
             )
         ));
         $this->addElement('textarea', 'value', array(
-            'label' => 'Value',
+            'label' => 'Message',
             'class' => 'input-xxlarge',
             'rows' => '4',
             'required' => false,
@@ -48,7 +48,7 @@ class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
                 array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
-        $this->addPrimaryButtonElement('submit', 'Create config entry');
+        $this->addPrimaryButtonElement('submit', 'Create status message');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

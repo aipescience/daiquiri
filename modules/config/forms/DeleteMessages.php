@@ -20,39 +20,17 @@
  *  limitations under the License.
  */
 
-class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
+class Config_Form_DeleteMessages extends Daiquiri_Form_Abstract {
 
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
         
-        // add elements
-        $this->addElement('text', 'key', array(
-            'label' => 'Key',
-            'class' => 'input-xxlarge',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
-            )
-        ));
-        $this->addElement('textarea', 'value', array(
-            'label' => 'Value',
-            'class' => 'input-xxlarge',
-            'rows' => '4',
-            'required' => false,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
-                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
-            )
-        ));
-        $this->addPrimaryButtonElement('submit', 'Create config entry');
+        // add fields
+        $this->addDangerButtonElement('submit', 'Delete config entry');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('key', 'value'));
         $this->addActionGroup(array('submit', 'cancel'));
     }
 

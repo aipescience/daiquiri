@@ -20,40 +20,48 @@
  *  limitations under the License.
  */
 
-class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
+class Config_Form_EditMessages extends Daiquiri_Form_Abstract {
+
+    protected $_key = null;
+    protected $_value = null;
+
+    public function setKey($key) {
+        $this->_key = $key;
+    }
+
+    public function setValue($value) {
+        $this->_value = $value;
+    }
 
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
-        
+
         // add elements
-        $this->addElement('text', 'key', array(
-            'label' => 'Key',
-            'class' => 'input-xxlarge',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
-            )
-        ));
         $this->addElement('textarea', 'value', array(
-            'label' => 'Value',
+            'label' => ucfirst($this->_key),
             'class' => 'input-xxlarge',
             'rows' => '4',
-            'required' => false,
+            'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
                 array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
-        $this->addPrimaryButtonElement('submit', 'Create config entry');
+
+
+        $this->addPrimaryButtonElement('submit', 'Edit config entry');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('key', 'value'));
+        $this->addHorizontalGroup(array('value'));
         $this->addActionGroup(array('submit', 'cancel'));
+
+        // set fields
+        if (isset($this->_value)) {
+            $this->setDefault('value', $this->_value);
+        }
     }
 
 }

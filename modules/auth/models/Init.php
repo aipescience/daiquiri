@@ -186,6 +186,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Auth_Model_Password' => array('set'),
             'Auth_Model_Details' => array('show', 'create', 'update', 'delete'),
             'Config_Model_Entries' => array('index', 'create', 'update', 'delete'),
+            'Config_Model_Messages' => array('index', 'create', 'update', 'delete'),
             'Config_Model_Templates' => array('index', 'create', 'update', 'delete'),
             'Auth_Model_Sessions' => array('rows', 'cols', 'destroy')
         );
