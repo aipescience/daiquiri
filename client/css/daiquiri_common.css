@@ -167,6 +167,36 @@ dl.dl-horizontal dd {
 .daiquiri-nav ul {
     margin-bottom: 2px;
 }
+.daiquiri-widget {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.daiquiri-widget .nav .nav-header {
+    border-bottom: 1px solid #ddd;
+}
+.daiquiri-widget li.nav-item a,
+.daiquiri-widget li.nav-item p {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 0;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: small;
+}
+.daiquiri-widget li.nav-item p {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.daiquiri-widget a:hover {
+    border-radius: 0;
+}
+.daiquiri-widget ul {
+    margin-bottom: 2px;
+}
+
 .no-transition {
     -webkit-transition: height 0.001s;
     -moz-transition: height 0.001s;

@@ -34,6 +34,9 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     public function indexAction() {
         $this->view->status = 'ok';
 
+        $messagesModel = new Config_Model_Messages();
+        $this->view->message = $messagesModel->show('query');
+
         // get the forms to display
         if (Daiquiri_Config::getInstance()->query->forms) {
             $this->view->forms = Daiquiri_Config::getInstance()->query->forms->toArray();
