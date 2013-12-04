@@ -104,14 +104,12 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
         if (!empty($options['config']['query']) && $options['config']['query']['guest']) {
             $rules['guest']['Query_Model_Form'] = array('submit');
-            $rules['guest']['Query_Model_CurrentJobs'] =
-                    array('index', 'show', 'kill', 'remove', 'rename');
+            $rules['guest']['Query_Model_CurrentJobs'] = array('index', 'show', 'kill', 'remove', 'rename');
             $rules['guest']['Query_Model_Database'] = array('show', 'download', 'file', 'stream', 'regen');
             $rules['guest']['Data_Model_Databases'] = array('index', 'show');
             $rules['guest']['Data_Model_Viewer'] = array('rows', 'cols');
-
-            $rules['guest']['Query_Model_Examples'] =
-                    array('index', 'show');
+            $rules['guest']['Config_Model_Messages'] = array('index');
+            $rules['guest']['Query_Model_Examples'] = array('index', 'show');
         }
 
 
@@ -122,12 +120,10 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $rules['user']['Auth_Model_Account'] = array('show','update');
         if (!empty($options['config']['query'])) {
             $rules['user']['Query_Model_Form'] = array('submit');
-            $rules['user']['Query_Model_CurrentJobs'] =
-                    array('index', 'show', 'kill', 'remove', 'rename');
+            $rules['user']['Query_Model_CurrentJobs'] = array('index', 'show', 'kill', 'remove', 'rename');
             $rules['user']['Query_Model_Database'] = array('show', 'download', 'file', 'stream', 'regen');
-
-            $rules['user']['Query_Model_Examples'] =
-                    array('index', 'show');
+            $rules['guest']['Config_Model_Messages'] = array('index');
+            $rules['user']['Query_Model_Examples'] = array('index', 'show');
         }
         if ($options['config']['data']) {
             $rules['user']['Data_Model_Databases'] = array('index', 'show');

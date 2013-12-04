@@ -1,7 +1,14 @@
+2013/12/04
+==========
+
+Table `Config_Messages` added. Ressource 'Config_Model_Messages' with permission 'index,show,create,update,delete' for admin and 'show' for guest/user added.
+
+Re-Init or manual fix needed.
+
 2013/12/03
 ==========
 
-In init.php $options['auth']['user'] the status and the role are now given by the corresponding  string and not by the ID. Therefore status_id and role_id are not valid anymore.
+In init.php $options['auth']['user'] the status and the role are now given by the corresponding string and not by the ID. Therefore status_id and role_id are not valid anymore.
 
 Fields `description`, and `publication_role_id` added to Table `Query_Examples`. Re-Init of query example needed.
 
