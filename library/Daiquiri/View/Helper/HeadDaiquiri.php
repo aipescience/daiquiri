@@ -61,20 +61,20 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         // daiquiri query
         'daiquiri/css/daiquiri_query.css',
         'daiquiri/js/daiquiri_query.js',
-        // daiquiri user table
-        'daiquiri/js/daiquiri_admin_table.js',
         // daiquiri data management
         'daiquiri/css/daiquiri_data.css',
         'daiquiri/js/daiquiri_data.js',
+        // daiquiri head
+        'daiquiri/css/daiquiri_modal.css',
+        'daiquiri/js/daiquiri_modal.js',
         // daiquiri wordpress stylesheet
         'daiquiri/css/daiquiri_wp.css',
         // daiquiri misc
         'daiquiri/js/daiquiri_plot.js',
         'daiquiri/js/daiquiri_query_buttons.js',
         'daiquiri/js/daiquiri_codemirror.js',
-        'daiquiri/js/daiquiri_modal.js',
-        'daiquiri/lib/sampjs/samp.js',
-        'daiquiri/js/daiquiri_samp.js',
+        //'daiquiri/lib/sampjs/samp.js',
+        //'daiquiri/js/daiquiri_samp.js',
     );
     public $view;
 

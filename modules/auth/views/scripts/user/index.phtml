@@ -22,9 +22,23 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        daiquiri.adminTable = new daiquiri.AdminTable({
+        // create the user table inside the div
+        $('#table').daiquiri_table({
             "rowsurl": "<?php echo $this->baseUrl('/auth/user/rows') ?>",
-            "colsurl": "<?php echo $this->baseUrl('/auth/user/cols') ?>"
+            "colsurl": "<?php echo $this->baseUrl('/auth/user/cols') ?>",
+            'params': {
+                'options': true
+            },
+            'success': function() {
+                $('a','tbody','#table').click(function(){
+                    new daiquiri.Modal({
+                        'url': this.href,
+                        'width': 700,
+                        'success': daiquiri.table.items['table'].rows
+                    });
+                    return false;
+                });
+            }
         });
     });
 </script>
