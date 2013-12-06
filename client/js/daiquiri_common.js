@@ -89,7 +89,7 @@ daiquiri.common.ajaxError = function(jqXHR, textStatus, errorThrown) {
 
     if (jqXHR.status == 403) {
         new daiquiri.Modal({
-            'html': '<h4>Session expired</h4><p>Your session is expired. Please log in again.</p><p><button class="btn btn-primary">Login</button></p>',
+            'html': '<h2>Session expired</h2><p>Your session is expired. Please log in again.</p><p><button class="btn btn-primary">Login</button></p>',
             'success': function () {
                 window.location.replace(window.location.pathname);
             }

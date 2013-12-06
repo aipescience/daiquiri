@@ -183,7 +183,7 @@ daiquiri.query.Query.prototype.storeNewJob = function(job) {
 
     // prepare dialog
     new daiquiri.Modal({
-        'html': '<h4>Query submitted</h4><p>Your query has been submitted as job ' + job.table + '.</p><p>When the job is done you can obtain the results via the job browser on the left side.</p><p><button class="btn btn-primary">Ok</button></p>',
+        'html': '<h2>Query submitted</h2><p>Your query has been submitted as job ' + job.table + '.</p><p>When the job is done you can obtain the results via the job browser on the left side.</p><p><button class="btn btn-primary">Ok</button></p>',
         'width': 600,
     });
 };
