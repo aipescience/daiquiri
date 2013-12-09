@@ -27,6 +27,8 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      */
     public function __construct() {
         $this->setResource('Query_Model_Resource_Examples');
+        $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
+        $this->getResource()->getTable()->setName('Query_Examples');
     }
 
     /**
@@ -34,7 +36,24 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function index() {
-        return $this->getResource()->fetchRows();
+        // get roles from rolesmodel
+        $rolesModel = new Auth_Model_Roles();
+        $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
+        $curRole = Daiquiri_Auth::getInstance()->getCurrentRoleId();
+
+        // get examples from database
+        $examples = $this->getResource()->fetchRows();
+
+        $data = array();
+        foreach ($examples as $example) {
+            // check for permission to access
+            if ($curRole >= $example['publication_role_id']) {
+                $example['publication_role'] = $roles[$example['publication_role_id']];
+                $data[] = $example;
+            }
+        }
+
+        return array('status' => 'ok', 'data' => $data);;
     }
 
     /**
@@ -81,8 +100,8 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function update($id, array $formParams = array()) {
+        // get example from database
         $example = $this->getResource()->fetchRow($id);
-
         if ($example === null) {
             return array('status' => 'error', 'error' => 'id not found');
         }

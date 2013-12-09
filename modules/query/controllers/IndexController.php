@@ -376,8 +376,10 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
 
     public function exampleQueriesAction() {
         $model = Daiquiri_Proxy::factory('Query_Model_Examples');
-        $examples = $model->index();
-        $this->view->examples = $model->index();
+        $response = $model->index();
+
+        $this->view->data   = $response['data'];
+        $this->view->status = $response['status'];
     }
 
     public function databaseBrowserAction() {
