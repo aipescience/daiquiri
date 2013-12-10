@@ -29,9 +29,8 @@ class Query_ExamplesController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $response = $this->_model->index();
-        $this->view->data   = $response['data'];
-        $this->view->status = $response['status'];;
+        $this->view->examples = $this->_model->index();
+        $this->view->status = 'ok';
     }
 
     public function createAction() {
@@ -111,6 +110,11 @@ class Query_ExamplesController extends Daiquiri_Controller_Abstract {
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
+    }
+
+    public function exportAction() {
+        $this->view->examples = $this->_model->index();
+        $this->view->status = 'ok';
     }
 
 }

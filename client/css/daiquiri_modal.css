@@ -28,20 +28,32 @@
 
     background: rgba(1,1,1,0.75);
 }
-
 .daiquiri-modal .daiquiri-modal-dialog {
     background-color: white;
     border-radius: 5px;
     border: 1px solid silver;
 
     margin: auto;
-    padding: 20px;
+    padding: 10px;
 
     -webkit-box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
 }
-
-.daiquiri-modal .daiquiri-modal-dialog :last-child {
+.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-close {
+    float: right;
+    line-height: 10px;
+    font-style: bold;
+}
+.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-close a:hover{
+    text-decoration: none;
+}
+.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-body {
+    padding: 10px;
+}
+.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-body :first-child {
+    margin-top: 0;
+}
+.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-body :last-child {
     margin-bottom: 0;
 }

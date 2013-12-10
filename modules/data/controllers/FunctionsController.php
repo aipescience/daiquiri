@@ -27,15 +27,7 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $data = array();
-        foreach (array_keys($this->_model->index()) as $id) {
-            $response = $this->_model->show($id, false, true);
-            if ($response['status'] == 'ok') {
-                $data[] = $response['data'];
-            }
-        }
-
-        $this->view->functions = $data;
+        $this->view->functions = $this->_model->index();
         $this->view->status = 'ok';
     }
 

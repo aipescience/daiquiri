@@ -55,14 +55,14 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
         $databasesModel = new Data_Model_Databases();
         $databases = $databasesModel->index();
 
-        // get roles model
-        $rolesModel = new Auth_Model_Roles();
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         // create the form object
         $form = new Data_Form_Table(array(
                     'databases' => $databases,
                     'databaseId' => $databaseId,
-                    'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
+                    'roles' => $roles,
                     'submit' => 'Create table entry'
                 ));
 
@@ -141,14 +141,14 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
         }
 
         // create the form object
-        $rolesModel = new Auth_Model_Roles();
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
         $databasesModel = new Data_Model_Databases();
 
         $form = new Data_Form_Table(array(
                     'databases' => $databasesModel->getValues(),
                     'databaseId' => $databasesModel->getId($entry['database']),
                     'entry' => $entry,
-                    'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
+                    'roles' => $roles,
                     'submit' => 'Update table entry'
                 ));
 
