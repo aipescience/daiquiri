@@ -25,8 +25,7 @@
 .daiquiri-imageview-navigation button {
     width: 140px;
 }
-
-.daiquiri-imageview-title {
+#daiquiri-imageview-title {
     text-align: center;
     padding-top: 5px;
     padding-bottom: 5px;
