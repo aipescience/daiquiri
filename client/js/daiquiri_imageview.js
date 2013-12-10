@@ -49,23 +49,30 @@ daiquiri.imageview.item = null;
  */
 daiquiri.imageview.opt = {
     'width': 600,
-    'height': 640
+    'height': 600
 };
 
 /**
  * Constructor-like function for the ImageView class. 
  */
-daiquiri.imageview.ImageView = function (link, opt) {
+daiquiri.imageview.ImageView = function (a, opt) {
     var self = this;
 
-    this.url = link.attr('href');
+    this.url = a.attr('href');
+    this.title = a.text();
     this.opt = $.extend({}, daiquiri.imageview.opt, opt);
+
+
+    var tablecell = a.parent().attr('class');
+
+    this.col = parseInt(tablecell.match(/daiquiri-table-col-(\d+)/)[1]);
+    this.row = parseInt(tablecell.match(/daiquiri-table-row-(\d+)/)[1]);
 
     // create modal
     this.modal = new daiquiri.Modal({
-        'html': '<div><img src="' + this.url + '"></img></div><div class="daiquiri-imageview-navigation"><div class="pull-left"><button class="btn" id="daiquiri-imageview-prev">Previous Image</button></div><div class="pull-right"><button class="btn" id="daiquiri-imageview-next">Next Image</button></div></div>',
-        'width': this.opt.width,
-        'height': this.opt.height,
+        'html': '<div style="width: ' + this.opt.width + 'px; height: ' + this.opt.height + 'px;"><img id="daiquiri-imageview-img" src="' + this.url + '"></img></div><div class="daiquiri-imageview-navigation"><div class="pull-left"><button class="btn" id="daiquiri-imageview-prev">Previous Image</button></div><div class="pull-right"><button class="btn" id="daiquiri-imageview-next">Next Image</button></div><div class="daiquiri-imageview-title">' + this.title + '</div></div>',
+        'width': this.opt.width + 20,
+        'height': this.opt.height + 60,
         'success': function (button) {
             if (button.attr('id') === 'daiquiri-imageview-prev') {
                 daiquiri.imageview.item.prev();
@@ -81,12 +88,27 @@ daiquiri.imageview.ImageView = function (link, opt) {
  * Get the next image. 
  */
 daiquiri.imageview.ImageView.prototype.next = function () {
-    console.log('next');
+    this.row += 1;
+    var a = $('.daiquiri-table-col-' + this.col + '.daiquiri-table-row-' + this.row + ' a');
+
+    if (a.length !== 0) {
+        this.url = a.attr('href');
+        this.title = a.text();
+        $('#daiquiri-imageview-img').attr('src', this.url);
+    }
 }
 
 /**
  * Get the previous image. 
  */
 daiquiri.imageview.ImageView.prototype.prev = function () {
-    console.log('prev');
+    this.row -= 1;
+    var a = $('.daiquiri-table-col-' + this.col + '.daiquiri-table-row-' + this.row + ' a');
+
+    if (a.length !== 0) {
+        this.url = a.attr('href');
+        this.title = a.text();
+        $('#daiquiri-imageview-img').attr('src', this.url);
+        $('#daiquiri-imageview-title').children().remove();
+    }
 }

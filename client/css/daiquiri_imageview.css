@@ -22,12 +22,13 @@
     padding-top: 20px;
     padding-bottom: 10px;
 }
-.daiquiri-imageview-navigation a {
-    display: block;
+.daiquiri-imageview-navigation button {
+    width: 140px;
 }
-.daiquiri-imageview-navigation a.daiquiri-imageview-navigation-prev {
-    float: left;
-}
-.daiquiri-imageview-navigation a.daiquiri-imageview-navigation-next {
-    float: right;
+
+.daiquiri-imageview-title {
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: bold;
 }
