@@ -598,10 +598,8 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
                 unset($user['details']);
 
                 // get the users status and role
-                $statusModel = new Auth_Model_Status();
-                $user['status_id'] = $statusModel->getId('registered');
-                $roleModel = new Auth_Model_Roles();
-                $user['role_id'] = $roleModel->getId('user');
+                $user['status_id'] = Daiquiri_Auth::getInstance()->getStatusId('registered');
+                $user['role_id'] = Daiquiri_Auth::getInstance()->getRoleId('user');
 
                 // create user
                 $newId = $this->storeUser($user);

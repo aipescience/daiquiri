@@ -38,6 +38,9 @@ class Data_Model_Init extends Daiquiri_Model_Init {
 
     public function init(array $options) {
         if ($options['config']['data']) {
+            // get role model
+            $authRoleModel = new Auth_Model_Roles();
+
             // create database entries in the tables module
             if (isset($options['data']['databases'])
                     && is_array($options['data']['databases'])) {
@@ -45,6 +48,9 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                 if (count($dataDatabasesModel->getValues()) == 0) {
                     foreach ($options['data']['databases'] as $a) {
                         echo '    Generating metadata for database: ' . $a['name'] . PHP_EOL;
+
+                        $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                        unset($a['publication_role']);
 
                         try {
                             $r = $dataDatabasesModel->create($a);
@@ -64,6 +70,9 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                     foreach ($options['data']['tables'] as $a) {
                         echo '    Generating metadata for table: ' . $a['name'] . PHP_EOL;
 
+                        $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                        unset($a['publication_role']);
+
                         try {
                             $r = $dataTablesModel->create(null, $a);
                         } catch (Exception $e) {
@@ -80,6 +89,10 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                 $dataColumnsModel = new Data_Model_Columns();
                 if (count($dataColumnsModel->getValues()) == 0) {
                     foreach ($options['data']['columns'] as $a) {
+
+                        $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                        unset($a['publication_role']);
+
                         try {
                             $r = $dataColumnsModel->create(null, $a);
                         } catch (Exception $e) {
@@ -96,6 +109,10 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                 $dataFunctionsModel = new Data_Model_Functions();
                 if (count($dataFunctionsModel->getValues()) == 0) {
                     foreach ($options['data']['functions'] as $a) {
+
+                        $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                        unset($a['publication_role']);
+                        
                         try {
                             $r = $dataFunctionsModel->create($a);
                         } catch (Exception $e) {

@@ -86,7 +86,7 @@ abstract class Daiquiri_Model_SimpleTable extends Daiquiri_Model_Abstract {
     public function getValues() {
         // check if $_valueField is set
         if ($this->_valueField === null) {
-            throw new Exception('$_valueField is not set in ' . __METHOD__);
+            throw new Exception('$_valueField is not set in ' . get_class($this) . '::getValues()');
         }
 
         // get rows from databse
@@ -115,7 +115,7 @@ abstract class Daiquiri_Model_SimpleTable extends Daiquiri_Model_Abstract {
     public function getValue($id) {
         // check if $_valueField is set
         if ($this->_valueField === null) {
-            throw new Exception('$_valueField is not set in ' . __METHOD__);
+            throw new Exception('$_valueField is not set in ' . get_class($this) . '::getValue()');
         }
 
         // get row from the database
@@ -125,7 +125,7 @@ abstract class Daiquiri_Model_SimpleTable extends Daiquiri_Model_Abstract {
         if ($row) {
             return $row[$this->_valueField];
         } else {
-            throw new Daiquiri_Exception_RuntimeError('id not found in database in ' . __METHOD__);
+            throw new Daiquiri_Exception_RuntimeError('id not found in database in ' . get_class($this) . '::getValue()');
         }
     }
 
@@ -144,7 +144,7 @@ abstract class Daiquiri_Model_SimpleTable extends Daiquiri_Model_Abstract {
     public function getId($value) {
         // check if $_valueField is set
         if ($this->_valueField === null) {
-            throw new Exception('$_valueField is not set in ' . __METHOD__);
+            throw new Exception('$_valueField is not set in ' . get_class($this) . '::getId()');
         }
 
         // escape where statment
@@ -176,7 +176,7 @@ abstract class Daiquiri_Model_SimpleTable extends Daiquiri_Model_Abstract {
     public function addValue($value) {
         // check if $_valueField is set
         if ($this->_valueField === null) {
-            throw new Exception('$_valueField is not set in ' . __METHOD__);
+            throw new Exception('$_valueField is not set in ' . get_class($this) . '::addValue()');
         }
 
         // insert into database

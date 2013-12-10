@@ -37,8 +37,6 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
     }
 
     public function fetchId($db, $table, $column) {
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
         // get the names of the involved tables
         $c = $this->getTable('Data_Model_DbTable_Columns')->getName();
         $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
@@ -51,10 +49,8 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
         $select->where("`$c`.`name` = ?", trim($column));
         $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name', 'tableId' => 'id'));
         $select->where("`$t`.`name` = ?", trim($table));
-        $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
         $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name', 'databaseId' => 'id'));
         $select->where("`$d`.`name` = ?", trim($db));
-        $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();
@@ -73,8 +69,6 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
      * @return type 
      */
     public function fetchRow($id) {
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
         // get the names of the involved tables
         $c = $this->getTable('Data_Model_DbTable_Columns')->getName();
         $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
@@ -88,8 +82,6 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
         $select->setIntegrityCheck(false);
         $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name', 'tableId' => 'id'));
         $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name', 'databaseId' => 'id'));
-        $select->where("`$t`.`publication_role_id` <= ?", count($usrRoles));
-        $select->where("`$d`.`publication_role_id` <= ?", count($usrRoles));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();

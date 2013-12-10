@@ -41,6 +41,18 @@
                         </tr>
                         <?php endif; ?>
                     <?php endforeach ?>
+                    <?php if (!empty($this->data['columns'])): ?>
+                    <tr>
+                        <td class="onehundredtwenty">Columns</td>
+                        <td>
+                            <ul class="unstyled">
+                                <?php foreach($this->data['columns'] as $column): ?>
+                                <li><?php echo $this->escape($column['name']); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </td>
+                    </tr>
+                    <?php endif; ?>
                 </table>
             </div>
             <div class="span3">

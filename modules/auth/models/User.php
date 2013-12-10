@@ -212,15 +212,14 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
      */
     public function create(array $formParams = array()) {
         // get the status model, the roles model and the roles
-        $statusModel = new Auth_Model_Status();
-        $roleModel = new Auth_Model_Roles();
-        $roles = $roleModel->getValues();
+        $status = Daiquiri_Auth::getInstance()->getStatus();
+        $roles = Daiquiri_Auth::getInstance()->getRoles();
         unset($roles[1]); // unset the guest user
 
         // create the form object
         $form = new Auth_Form_Create(array(
                     'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
-                    'status' => $statusModel->getValues(),
+                    'status' => $status,
                     'roles' => $roles
                 ));
 
@@ -256,16 +255,15 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
      */
     public function update($id, array $formParams = array()) {
         // get the status model, the roles model and the roles
-        $statusModel = new Auth_Model_Status();
-        $roleModel = new Auth_Model_Roles();
-        $roles = $roleModel->getValues();
+        $status = Daiquiri_Auth::getInstance()->getStatus();
+        $roles = Daiquiri_Auth::getInstance()->getRoles();
         unset($roles[1]); // unset the guest user
 
         // create the form object
         $form = new Auth_Form_Update(array(
                     'user' => $this->getResource()->fetchRow($id),
                     'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
-                    'status' => $statusModel->getValues(),
+                    'status' => $status,
                     'roles' => $roles,
                     'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
                     'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,

@@ -29,7 +29,7 @@ class Query_ExamplesController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $this->view->data = $this->_model->index();
+        $this->view->examples = $this->_model->index();
         $this->view->status = 'ok';
     }
 
@@ -110,6 +110,11 @@ class Query_ExamplesController extends Daiquiri_Controller_Abstract {
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
+    }
+
+    public function exportAction() {
+        $this->view->examples = $this->_model->index();
+        $this->view->status = 'ok';
     }
 
 }

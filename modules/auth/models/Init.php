@@ -105,13 +105,20 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         if (!empty($options['config']['query']) && $options['config']['query']['guest']) {
             $rules['guest']['Query_Model_Form'] = array('submit');
             $rules['guest']['Query_Model_CurrentJobs'] = array('index', 'show', 'kill', 'remove', 'rename');
-            $rules['guest']['Query_Model_Database'] = array('show', 'download', 'file', 'stream', 'regen');
-            $rules['guest']['Data_Model_Databases'] = array('index', 'show');
-            $rules['guest']['Data_Model_Viewer'] = array('rows', 'cols');
-            $rules['guest']['Config_Model_Messages'] = array('index');
+            $rules['guest']['Query_Model_Database'] = array('index', 'download', 'file', 'stream', 'regen');
             $rules['guest']['Query_Model_Examples'] = array('index', 'show');
-        }
+            $rules['guest']['Data_Model_Viewer'] = array('rows', 'cols');
 
+            if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
+                strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
+
+                $rules['guest']['Query_Model_Form'][] = 'plan';
+                $rules['guest']['Query_Model_Form'][] = 'mail';
+            }
+        }
+        if ($options['config']['data']) {
+            $rules['guest']['Data_Model_Viewer'] = array('rows', 'cols');
+        }
 
         // construct rules for the user
         $rules['user'] = array();
@@ -121,35 +128,26 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         if (!empty($options['config']['query'])) {
             $rules['user']['Query_Model_Form'] = array('submit');
             $rules['user']['Query_Model_CurrentJobs'] = array('index', 'show', 'kill', 'remove', 'rename');
-            $rules['user']['Query_Model_Database'] = array('show', 'download', 'file', 'stream', 'regen');
-            $rules['guest']['Config_Model_Messages'] = array('index');
+            $rules['user']['Query_Model_Database'] = array('index', 'download', 'file', 'stream', 'regen');
             $rules['user']['Query_Model_Examples'] = array('index', 'show');
-        }
-        if ($options['config']['data']) {
-            $rules['user']['Data_Model_Databases'] = array('index', 'show');
-            $rules['user']['Data_Model_Functions'] = array('index', 'show');
             $rules['user']['Data_Model_Viewer'] = array('rows', 'cols');
-        }
-        if (!empty($options['config']['query']) &&
-                strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
+
+            if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
                 strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
 
-            if ($options['config']['query']['guest']) {
-                $rules['guest']['Query_Model_Form'][] = 'plan';
-                $rules['guest']['Query_Model_Form'][] = 'mail';
-            } else {
                 $rules['user']['Query_Model_Form'][] = 'plan';
                 $rules['user']['Query_Model_Form'][] = 'mail';
             }
+
+            $rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote','createJobId', 'getPendingJob', 'getQuote', 'setDestructTime','setDestructTimeImpl', 'setExecutionDuration', 'setParameters','deleteJob', 'abortJob', 'runJob');
+        }
+        if ($options['config']['data']) {
+            $rules['user']['Data_Model_Viewer'] = array('rows', 'cols');
         }
         if (!empty($options['config']['files'])) {
             $rules['user']['Files_Model_Files'] = array('index', 'single', 'singleSize', 'multi', 'multiSize', 'row', 'rowSize');
         }
-        $rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote',
-            'createJobId', 'getPendingJob', 'getQuote', 'setDestructTime',
-            'setDestructTimeImpl', 'setExecutionDuration', 'setParameters',
-            'deleteJob', 'abortJob', 'runJob');
-
+        
         // add options for paqu parallel query
         if (!empty($options['config']['query']) &&
                 strtolower($options['config']['query']['processor']['name'] === 'paqu')) {
@@ -197,13 +195,14 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                     array('index', 'show', 'create', 'update', 'delete');
         }
         if ($options['config']['data']) {
+            $rules['admin']['Data_Model_Viewer'] = array('rows', 'cols');
+            $rules['admin']['Data_Model_Functions'] =
+                    array('index', 'create', 'show', 'update', 'delete');
             $rules['admin']['Data_Model_Databases'] =
                     array('index', 'create', 'show', 'update', 'delete');
             $rules['admin']['Data_Model_Tables'] =
                     array('create', 'show', 'update', 'delete');
             $rules['admin']['Data_Model_Columns'] =
-                    array('create', 'show', 'update', 'delete');
-            $rules['admin']['Data_Model_Functions'] =
                     array('create', 'show', 'update', 'delete');
         }
 

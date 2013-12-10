@@ -1,3 +1,13 @@
+2013/12/10
+==========
+
+Data permissions rewritten, resources in data do not check the publication role anymore. Concodantly, the Models in data should only be accessible by admin. Remove permissions on Data_Model_Databases, Data_Model_Tables, Data_Model_Columns, and Data_Model_Functions for user and guest.
+
+WARNING! not setting this might be a potential security problem!
+
+In init.php $options['data']['database'], $options['data']['tables'], $options['data']['columns'], $options['data']['functions'], $options['query']['examples'], the publication_role is now given by the corresponding string and not by the ID. Therefore publication_role_id is not valid anymore.
+
+
 2013/12/04
 ==========
 

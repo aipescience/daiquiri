@@ -26,7 +26,9 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * Constructor. Sets resource object and primary field.
      */
     public function __construct() {
-        $this->setResource('Query_Model_Resource_Examples');
+        $this->setResource('Daiquiri_Model_Resource_Table');
+        $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
+        $this->getResource()->getTable()->setName('Query_Examples');
     }
 
     /**
@@ -34,7 +36,16 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function index() {
-        return $this->getResource()->fetchRows();
+        $examples = array();
+        foreach ($this->getResource()->fetchRows() as $example) {
+            // check for permission to access
+            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($example['publication_role_id'])) {
+                $example['publication_role'] = Daiquiri_Auth::getInstance()->getRole($example['publication_role_id']);
+                unset($example['publication_role_id']);
+                $examples[] = $example;
+            }
+        }
+        return $examples;
     }
 
     /**
@@ -44,10 +55,8 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function create(array $formParams = array()) {
-
-        // get roles from rolesmodel
-        $rolesModel = new Auth_Model_Roles();
-        $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         // create the form object
         $form = new Query_Form_CreateExample(array(
@@ -81,15 +90,14 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function update($id, array $formParams = array()) {
+        // get example from database
         $example = $this->getResource()->fetchRow($id);
-
         if ($example === null) {
             return array('status' => 'error', 'error' => 'id not found');
         }
 
-        // get roles from rolesmodel
-        $rolesModel = new Auth_Model_Roles();
-        $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         // create the form object
         $form = new Query_Form_UpdateExample(array(

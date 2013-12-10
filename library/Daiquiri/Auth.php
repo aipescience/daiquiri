@@ -36,6 +36,9 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
     private $_appAdapter = null;
     private $_csrf = true;
 
+    private $_roles = array();
+    private $_status = array();
+
     /**
      * @brief   constructor - initialises password cryptography and all required database tables
      * 
@@ -45,6 +48,15 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
     protected function __construct() {
         // get the acl class, this could be more general
         $this->_acl = new Daiquiri_Acl();
+
+        // store roles in auth object
+        foreach($this->_acl->getRoles() as $key => $value) {
+            $this->_roles[$key + 1] = $value;
+        }
+
+        // store status in auth object
+        $statusModel = new Auth_Model_Status();
+        $this->_status = $statusModel->getValues();
 
         // get treatment from default crypt object
         try {
@@ -58,8 +70,7 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
 
             // get treatment for users
             $userTreatment = $treatment;
-            $statusModel = new Auth_Model_Status();
-            $activeId = $statusModel->getId('active');
+            $activeId = $this->getStatusId('active');
             if (is_numeric($activeId)) {
                 $userTreatment .= 'AND status_id=' . $activeId;
             }
@@ -118,11 +129,9 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
             $row->ip = $this->getRemoteAddr();
             $row->userAgent = $this->getUserAgent();
 
-            // get role and status from the corresponding resources
-            $statusModel = new Auth_Model_Status();
-            $row->status = $statusModel->getValue($row->status_id);
-            $roleModel = new Auth_Model_Roles();
-            $row->role = $roleModel->getValue($row->role_id);
+            // get role and status
+            $row->status = $this->getStatus($row->status_id);
+            $row->role = $this->getRole($row->role_id);
 
             // get the auth singleton and its storage and store the row
             $storage = Zend_Auth::getInstance()->getStorage();
@@ -310,6 +319,18 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         return false;
     }
 
+    function checkPublicationRoleId($publication_role_id) {
+        $currRole = $this->getCurrentRole();
+        $publication_role = $this->getRole($publication_role_id);
+
+
+        if ($currRole === $publication_role) {
+            return true;
+        } else {
+            return $this->_acl->inheritsRole($currRole, $publication_role);
+        }
+    }
+
     /**
      * @brief   isAdmin method - checks if the role of the currently authenticated user is 'admin'
      * @return  bool
@@ -392,27 +413,6 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
     }
 
     /**
-     * @brief   getCurrentRoleParents method - get all parents of the current user role
-     * @return  array parent roles
-     * 
-     * Returns all parents of the current user role.
-     */
-    public function getCurrentRoleParents() {
-        $role = $this->getCurrentRole();
-
-        $parents = $this->_acl->getParentsForRole($role);
-
-        if (empty($parents)) {
-            $parents[] = "guest";
-        } else {
-            //add self
-           $parents[] = $role;
-        }
-
-        return $parents;
-    }
-
-    /**
      * @brief   getCurrentEmail method - get current email address of user
      * @return  string email address
      * 
@@ -480,4 +480,30 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         return ($this->_csrf === true);
     }
     
+    public function getRoles() {
+        return $this->_roles;
+    }
+
+    public function getRole($id) {
+        return $this->_roles[$id];
+    }
+
+    public function getRoleId($role) {
+        return array_search($role, $this->_roles);
+    }
+
+    public function getStatus($id = false) {
+        // this is overloaded because of status is a stupid word and to fool the enemy
+        if (empty($id)) {
+            return $this->_status;
+        } else {
+            return $this->_status[$id];
+        }
+    }
+
+    public function getStatusId($status) {
+        return array_search($status, $this->_status);
+    }
+
 }
+

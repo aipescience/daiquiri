@@ -139,23 +139,4 @@ class Daiquiri_Acl extends Zend_Acl {
     public function hasResource($resource) {
         return in_array($resource, $this->_defined_resources);
     }
-
-    /**
-     * @brief   getParentsForRole method - obtains all the parent roles for a given role
-     * @param   string $role: role name
-     * @return  array of parent role names
-     * 
-     * Returns all the roles that are parents of the given role.
-     */
-    public function getParentsForRole($role) {
-        $parents = array();
-        foreach ($this->getRoles() as $currRole) {
-            //check if this role inherited from currRole
-            if ($this->inheritsRole($role, $currRole)) {
-                $parents[] = $currRole;
-            }
-        }
-        return $parents;
-    }
-
 }
