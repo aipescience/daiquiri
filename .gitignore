@@ -1,2 +1,3 @@
 *.so
 nbproject
+.DS_Store
