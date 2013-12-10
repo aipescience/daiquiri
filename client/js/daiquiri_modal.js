@@ -95,13 +95,14 @@ daiquiri.Modal.prototype.display = function () {
 
     // enable button
     $('.daiquiri-modal button').on('click', function () {
-        // remove modal
-        $('.daiquiri-modal').remove();
-        $('body').css('overflow','auto');
-
+        if (self.opt.persitent === 'undefined' || self.opt.persitent !== true) {
+            // remove modal
+            $('.daiquiri-modal').remove();
+            $('body').css('overflow','auto');
+        }
         // call success function
-        if (typeof self.opt.success!== 'undefined') {
-            self.opt.success();
+        if (typeof self.opt.success !== 'undefined') {
+            self.opt.success($(this));
         }
     });
 
