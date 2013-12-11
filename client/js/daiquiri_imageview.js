@@ -77,7 +77,7 @@ daiquiri.imageview.ImageView = function (a, tableId, opt) {
 
     // create modal
     this.modal = new daiquiri.Modal({
-        'html': '<div class="daiquiri-imageview-img" style="width: ' + this.opt.width + 'px; height: ' + this.opt.height + 'px;"><img src="' + url + '"></img></div><div class="daiquiri-imageview-navigation"><div class="pagination pull-left text-left"><ul><li><a class="daiquiri-modal-prev" href="#">Previous</a></li></ul></div><div class="pagination pull-right text-right"><ul><li><a class="daiquiri-modal-next" href="#">Next</a></li></ul></div><div class="daiquiri-imageview-title"><span>' + title + '</span></div></div>',
+        'html': '<div class="daiquiri-imageview-img" style="width: ' + this.opt.width + 'px; height: ' + this.opt.height + 'px;"><img src="' + url + '"></img></div><div class="daiquiri-imageview-navigation"><div class="pagination pull-left text-left"><ul><li><a class="daiquiri-modal-prev" href="#">Previous</a></li></ul></div><div class="pagination pull-right text-right"><ul><li><a class="daiquiri-modal-next" href="#">Next</a></li></ul></div><div class="daiquiri-imageview-title"><a href="' + url + '" target="_blank">' + title + '</a></div></div>',
         'width': this.opt.width + 20,
         'height': this.opt.height + 50,
         'next': function () {
@@ -148,8 +148,8 @@ daiquiri.imageview.ImageView.prototype.update = function () {
     var url = this.a.attr('href');
     var title = this.a.text();
     $('.daiquiri-imageview-img img').attr('src', url);
-    $('.daiquiri-imageview-title span').remove();
-    $('<span />', {html: title}).appendTo($('.daiquiri-imageview-title'));
+    $('.daiquiri-imageview-title a').remove();
+    $('<a />', {html: title, href: url, target: '_blank'}).appendTo($('.daiquiri-imageview-title'));
     $('#' + this.tableId + ' .daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
     $('#' + this.tableId + ' .daiquiri-table-row-' + this.row).addClass('daiquiri-table-row-selected');
 }
