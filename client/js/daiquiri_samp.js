@@ -37,7 +37,7 @@ daiquiri.samp.opt = {
     meta: {
         "samp.name": "Daiquiri-SAMP",
         "samp.description": "SAMP client for the Daiquiri Application",
-        "samp.icon.url": $('link[rel="shortcut icon"]')[0].href.replace(/.ico$/, ".png")
+        "samp.icon.url": null // set in constructor of daiquiri.samp.SAMP
     }
 };
 
@@ -65,6 +65,18 @@ daiquiri.samp.SAMP = function (container, opt) {
     this.container = $(container);
     this.id = container.attr('id');
     this.opt = $.extend({},daiquiri.samp.opt, opt);
+
+    // try to get favicon
+    var icon = $('link[rel="icon"]');
+    if (typeof icon !== 'undefined') {
+        this.opt.meta["samp.icon.url"] = icon.attr('href');
+
+    } else {
+        icon = $('link[rel="shortcut icon"]');
+        if (typeof icon !== 'undefined') {
+            this.opt.meta["samp.icon.url"] = icon.attr('href');
+        }
+    }
 
     // store object globally, kind of a poor mans singleton.
     daiquiri.samp.item = this;

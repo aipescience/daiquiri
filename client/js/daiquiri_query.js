@@ -539,6 +539,9 @@ daiquiri.query.Query.prototype.displayResults = function(){
             'width': '700px',
             'multiselect': true,
             'success': function (table) {
+                // enable image viewer for possible images
+                $('#results-table').daiquiri_imageview();
+
                 if ($('.daiquiri-table-downloadable','#results-tab').length != 0) {
                     if ($('#daiquiri-file-download-rows-button').length == 0) {
                         $('#results-tab').append('<div><button id="daiquiri-file-download-rows-button" class="linkbutton">Download files from selected rows</button></div>')

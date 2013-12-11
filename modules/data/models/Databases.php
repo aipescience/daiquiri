@@ -42,11 +42,9 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
                 $database = $response['data'];
 
                 $database['publication_role'] = Daiquiri_Auth::getInstance()->getRole($database['publication_role_id']);
-                unset($database['publication_role_id']);
 
                 foreach ($database['tables'] as &$table) {
                     $table['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
-                    unset($table['publication_role_id']);
                 }
 
                 $databases[] = $database;

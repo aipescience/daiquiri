@@ -42,7 +42,6 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
                 $function = $response['data'];
 
                 $function['publication_role'] = Daiquiri_Auth::getInstance()->getRole($function['publication_role_id']);
-                unset($function['publication_role_id']);
 
                 $functions[] = $function;
             }
