@@ -19,18 +19,22 @@
 */
 
 .daiquiri-imageview-navigation {
-    padding-top: 20px;
-    padding-bottom: 10px;
+    margin-top: 10px;
 }
-.daiquiri-imageview-navigation button {
-    width: 140px;
+.daiquiri-imageview-navigation .pagination {
+    margin: 0;
+    font-size: 8pt;
 }
-#daiquiri-imageview-title {
+.daiquiri-imageview-navigation .pagination a {
+    width: 42px;
+    text-align: center;
+}
+.daiquiri-imageview-title {
     text-align: center;
     padding-top: 5px;
     padding-bottom: 5px;
     font-weight: bold;
 }
-#daiquiri-imageview-img {
+.daiquiri-imageview-img {
     overflow: hidden;
 }

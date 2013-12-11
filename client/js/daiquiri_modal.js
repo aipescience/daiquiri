@@ -70,7 +70,7 @@ daiquiri.Modal.prototype.display = function () {
 
     // create diolog
     this.modal = $('<div />',{
-        'html': '<div class="daiquiri-modal-dialog"><div class="daiquiri-modal-close"><a href="#">x</a></div><div class="daiquiri-modal-body">' + this.html + '</div></div>',
+        'html': '<div class="daiquiri-modal-dialog"><div class="daiquiri-modal-close-container"><a class="daiquiri-modal-close" href="#">x</a></div><div class="daiquiri-modal-body">' + this.html + '</div></div>',
         'class': 'daiquiri-modal'
     }).appendTo('body');
 
@@ -93,16 +93,38 @@ daiquiri.Modal.prototype.display = function () {
     var topMargin = ($(window).height() - dialog.height()) / 2 - 30;
     dialog.css('marginTop', topMargin);
 
+    // close button link
+    $('.daiquiri-modal-close').click(function() {
+        $('.daiquiri-modal').remove();
+        $('body').css('overflow','auto');
+        return false;
+    });
+
+    // prev and next button
+    $('.daiquiri-modal-next').click(function() {
+        // call success function
+        if (typeof self.opt.next !== 'undefined') {
+            self.opt.next();
+        }
+        return false;
+    });
+    $('.daiquiri-modal-prev').click(function() {
+        // call success function
+        if (typeof self.opt.prev !== 'undefined') {
+            self.opt.prev();
+        }
+        return false;
+    });
+
     // enable button
     $('.daiquiri-modal button').on('click', function () {
-        if (self.opt.persitent === 'undefined' || self.opt.persitent !== true) {
-            // remove modal
-            $('.daiquiri-modal').remove();
-            $('body').css('overflow','auto');
-        }
+        // remove modal
+        $('.daiquiri-modal').remove();
+        $('body').css('overflow','auto');
+        
         // call success function
         if (typeof self.opt.success !== 'undefined') {
-            self.opt.success($(this));
+            self.opt.success();
         }
     });
 
@@ -146,20 +168,6 @@ daiquiri.Modal.prototype.display = function () {
             $('body').css('overflow','auto');
         }
 
-        return false;
-    });
-
-    // adjust back link
-    $('.daiquiri-user-back').click(function() {
-        $('.daiquiri-modal').remove();
-        $('body').css('overflow','auto');
-        return false;
-    });
-
-    // enable close x
-    $('.daiquiri-modal-close a').click(function() {
-        $('.daiquiri-modal').remove();
-        $('body').css('overflow','auto');
         return false;
     });
 

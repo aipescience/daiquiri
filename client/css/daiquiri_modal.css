@@ -26,7 +26,7 @@
     left: 0;
     z-index: 100;
 
-    background: rgba(1,1,1,0.75);
+    background: rgba(1,1,1,0.5);
 }
 .daiquiri-modal .daiquiri-modal-dialog {
     background-color: white;
@@ -40,12 +40,12 @@
     -moz-box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
 }
-.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-close {
+.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-close-container {
     float: right;
     line-height: 10px;
     font-style: bold;
 }
-.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-close a:hover{
+.daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-close:hover{
     text-decoration: none;
 }
 .daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-body {

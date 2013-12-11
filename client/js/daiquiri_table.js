@@ -142,6 +142,8 @@ daiquiri.table.Table.prototype.first = function (callback) {
     if (this.params.page != 1) {
         this.params.page = 1;
         this.rows(callback);
+    } else {
+        callback();
     }
 }
 
@@ -152,6 +154,7 @@ daiquiri.table.Table.prototype.prev = function (callback) {
     this.params.page -= 1; 
     if (this.params.page < 1) {
         this.params.page = 1;
+        callback();
     } else {
         this.rows(callback);
     }
@@ -164,6 +167,7 @@ daiquiri.table.Table.prototype.next = function (callback) {
     this.params.page += 1;
     if (this.params.page > this.pages) {
         this.params.page = this.pages;
+        callback();
     } else {
         this.rows(callback);
     }
@@ -176,6 +180,8 @@ daiquiri.table.Table.prototype.last = function (callback) {
     if (this.params.page != this.pages) {
         this.params.page = this.pages;
         this.rows(callback);
+    } else {
+        callback();
     }
 }
 
