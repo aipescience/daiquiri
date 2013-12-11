@@ -138,39 +138,45 @@ daiquiri.table.Table.prototype.reinit = function (opt) {
 /**
  * Switches the table to the fist page.
  */
-daiquiri.table.Table.prototype.first = function () {
-    this.params.page = 1;
-    this.rows();
+daiquiri.table.Table.prototype.first = function (callback) {
+    if (this.params.page != 1) {
+        this.params.page = 1;
+        this.rows(callback);
+    }
 }
 
 /**
  * Switches the table to the previous page.
  */
-daiquiri.table.Table.prototype.prev = function () {
+daiquiri.table.Table.prototype.prev = function (callback) {
     this.params.page -= 1; 
     if (this.params.page < 1) {
         this.params.page = 1;
+    } else {
+        this.rows(callback);
     }
-    this.rows();
 }
 
 /**
  * Switches the table to the next page.
  */
-daiquiri.table.Table.prototype.next = function () {
+daiquiri.table.Table.prototype.next = function (callback) {
     this.params.page += 1;
     if (this.params.page > this.pages) {
         this.params.page = this.pages;
+    } else {
+        this.rows(callback);
     }
-    this.rows();
 }
 
 /**
  * Switches the table to the last page.
  */
-daiquiri.table.Table.prototype.last = function () {
-    this.params.page = this.pages;
-    this.rows();
+daiquiri.table.Table.prototype.last = function (callback) {
+    if (this.params.page != this.pages) {
+        this.params.page = this.pages;
+        this.rows(callback);
+    }
 }
 
 /**
@@ -464,7 +470,7 @@ daiquiri.table.Table.prototype.cols = function () {
 /**
  * Gets the rows by ajax and constructs the td elements. On success it calls an optional function.
  */
-daiquiri.table.Table.prototype.rows = function () {
+daiquiri.table.Table.prototype.rows = function (callback) {
     var self = this;
 
     // get the rows via ajax
@@ -484,15 +490,6 @@ daiquiri.table.Table.prototype.rows = function () {
 
                 // update pager
                 var html = '<p>Page ' + json.page + ' of ' + json.pages;
-                /*
-                var html = '<p>Page ' + json.page + ' of ' + json.pages + ' (' + json.total + ' ';
-                if (json.total == 1) {
-                    html += 'row';
-                } else {
-                    html += 'rows';
-                }
-                html += ' total)</p>';
-                */
                 var paging = $('#' + self.id + '-pager-paging');
                 paging.children().remove();
                 paging.append(html);
@@ -537,8 +534,9 @@ daiquiri.table.Table.prototype.rows = function () {
 
                                     if ($.inArray(extension.toLowerCase(),['txt']) != -1) {
                                         target = 'target="_blank"';
-                                    // } else if ($.inArray(extension.toLowerCase(),['jpg','jpeg','png','bmp']) != -1) {
-                                    //     target = 'data-lightbox="col' + i + '" title=\'<a href="' + col.format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>\'';
+                                    } else if ($.inArray(extension.toLowerCase(),['jpg','jpeg','png','bmp']) != -1) {
+                                        target = '';
+                                        classes += ' daiquiri-table-image';
                                     } else {
                                         target = '';
                                     }
@@ -593,9 +591,13 @@ daiquiri.table.Table.prototype.rows = function () {
                 });
 
                 // call the success function;
-                if (self.opt.success != undefined) {
+                if (typeof self.opt.success !== 'undefined') {
                     self.opt.success(self);
                 }
+                if (typeof callback !== 'undefined') {
+                    callback();
+                }
+
             } else {
                 daiquiri.common.jsonError(json);
             }

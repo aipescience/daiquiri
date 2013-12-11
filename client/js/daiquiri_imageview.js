@@ -35,8 +35,9 @@ daiquiri.imageview.item = null;
         daiquiri_imageview: function(opt) {
             opt = $.extend({},daiquiri.browser.defaults, opt);
             return this.each(function() {
-                $(this).on('click', function () {
-                    daiquiri.imageview.item = new daiquiri.imageview.ImageView($(this),opt);
+                var tableId = $(this).attr('id');
+                $('.daiquiri-table-image a', this).on('click', function () {
+                    daiquiri.imageview.item = new daiquiri.imageview.ImageView($(this),tableId,opt);
                     return false;
                 });
             });
@@ -55,10 +56,13 @@ daiquiri.imageview.opt = {
 /**
  * Constructor-like function for the ImageView class. 
  */
-daiquiri.imageview.ImageView = function (a, opt) {
+daiquiri.imageview.ImageView = function (a, tableId, opt) {
     var self = this;
 
+    this.idle = true;
+
     this.a = a;
+    this.tableId = tableId;
     this.opt = $.extend({}, daiquiri.imageview.opt, opt);
 
     var url = a.attr('href');
@@ -68,16 +72,22 @@ daiquiri.imageview.ImageView = function (a, opt) {
     this.col = parseInt(tablecell.match(/daiquiri-table-col-(\d+)/)[1]);
     this.row = parseInt(tablecell.match(/daiquiri-table-row-(\d+)/)[1]);
 
+    $('#' + this.tableId + ' .daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
+    $('#' + this.tableId + ' .daiquiri-table-row-' + this.row).addClass('daiquiri-table-row-selected');
+
     // create modal
     this.modal = new daiquiri.Modal({
-        'html': '<div style="width: ' + this.opt.width + 'px; height: ' + this.opt.height + 'px;"><img id="daiquiri-imageview-img" src="' + url + '"></img></div><div class="daiquiri-imageview-navigation"><div class="pull-left"><button class="btn" id="daiquiri-imageview-prev">Previous Image</button></div><div class="pull-right"><button class="btn" id="daiquiri-imageview-next">Next Image</button></div><div id="daiquiri-imageview-title"><span>' + title + '</span></div></div>',
+        'html': '<div id="daiquiri-imageview-img" style="width: ' + this.opt.width + 'px; height: ' + this.opt.height + 'px;"><img src="' + url + '"></img></div><div class="daiquiri-imageview-navigation"><div class="pull-left"><button class="btn" id="daiquiri-imageview-prev">Previous Image</button></div><div class="pull-right"><button class="btn" id="daiquiri-imageview-next">Next Image</button></div><div id="daiquiri-imageview-title"><span>' + title + '</span></div></div>',
         'width': this.opt.width + 20,
         'height': this.opt.height + 60,
         'success': function (button) {
-            if (button.attr('id') === 'daiquiri-imageview-prev') {
-                daiquiri.imageview.item.prev();
-            } else {
-                daiquiri.imageview.item.next();
+            if (daiquiri.imageview.item.idle) {
+                daiquiri.imageview.item.idle = false;
+                if (button.attr('id') === 'daiquiri-imageview-prev') {
+                    daiquiri.imageview.item.prev();
+                } else {
+                    daiquiri.imageview.item.next();
+                }
             }
         },
         'persitent' : true
@@ -88,29 +98,57 @@ daiquiri.imageview.ImageView = function (a, opt) {
  * Get the next image. 
  */
 daiquiri.imageview.ImageView.prototype.next = function () {
-    this.row += 1;
-    this.a = $('.daiquiri-table-col-' + this.col + '.daiquiri-table-row-' + this.row + ' a');
-    this.update();
+    this.a = $('.daiquiri-table-col-' + this.col + '.daiquiri-table-row-' + (this.row + 1) + ' a');
+    if (this.a.length === 0) {
+        // switch table to next page
+        daiquiri.table.items[this.tableId].next(function() {
+            var self = daiquiri.imageview.item;
+            self.a = $('.daiquiri-table-col-' + self.col + '.daiquiri-table-row-' + (self.row + 1) + ' a');
+            if (self.a.length !== 0) {
+                self.row += 1;
+                self.update();
+            }
+            self.idle = true;
+        });
+    } else {
+        this.row += 1;
+        this.update();
+        this.idle = true;
+    }
 }
 
 /**
  * Get the previous image. 
  */
 daiquiri.imageview.ImageView.prototype.prev = function () {
-    this.row -= 1;
-    this.a = $('.daiquiri-table-col-' + this.col + '.daiquiri-table-row-' + this.row + ' a');
-    this.update();
+    this.a = $('.daiquiri-table-col-' + this.col + '.daiquiri-table-row-' + (this.row - 1) + ' a');
+    if (this.a.length === 0) {
+        // switch table to next page
+        daiquiri.table.items[this.tableId].prev(function() {
+            var self = daiquiri.imageview.item;
+            self.a = $('.daiquiri-table-col-' + self.col + '.daiquiri-table-row-' + (self.row - 1) + ' a');
+            if (self.a.length !== 0) {
+                self.row -= 1;
+                self.update();
+            }
+            self.idle = true;
+        });
+    } else {
+        this.row -= 1;
+        this.update();
+        this.idle = true;
+    }
 }
 
 /**
  * Updates the image. 
  */
 daiquiri.imageview.ImageView.prototype.update = function () {
-    if (this.a.length !== 0) {
-        var url = this.a.attr('href');
-        var title = this.a.text();
-        $('#daiquiri-imageview-img').attr('src', url);
-        $('#daiquiri-imageview-title span').remove();
-        $('<span />', {html: title}).appendTo($('#daiquiri-imageview-title'));
-    }
+    var url = this.a.attr('href');
+    var title = this.a.text();
+    $('#daiquiri-imageview-img img').attr('src', url);
+    $('#daiquiri-imageview-title span').remove();
+    $('<span />', {html: title}).appendTo($('#daiquiri-imageview-title'));
+    $('#' + this.tableId + ' .daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
+    $('#' + this.tableId + ' .daiquiri-table-row-' + this.row).addClass('daiquiri-table-row-selected');
 }

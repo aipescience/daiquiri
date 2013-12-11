@@ -31,3 +31,6 @@
     padding-bottom: 5px;
     font-weight: bold;
 }
+#daiquiri-imageview-img {
+    overflow: hidden;
+}
