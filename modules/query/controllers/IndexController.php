@@ -34,6 +34,9 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     public function indexAction() {
         $this->view->status = 'ok';
 
+        $messagesModel = new Config_Model_Messages();
+        $this->view->message = $messagesModel->show('query');
+
         // get the forms to display
         if (Daiquiri_Config::getInstance()->query->forms) {
             $this->view->forms = Daiquiri_Config::getInstance()->query->forms->toArray();
@@ -355,30 +358,17 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     }
 
     public function databaseAction() {
-        $databasesModel = Daiquiri_Proxy::factory('Data_Model_Databases');
-        $data = array();
-        foreach (array_keys($databasesModel->index()) as $id) {
-            $response = $databasesModel->show($id, false, true);
-            if ($response['status'] == 'ok') {
-                $data[] = $response['data'];
-            }
-        }
+        $model = Daiquiri_Proxy::factory('Query_Model_Database');
+        $databases = $model->index();
 
-        $userDbModel = Daiquiri_Proxy::factory('Query_Model_Database');
-        $data[] = $userDbModel->show();
-
-        $this->view->databases = $data;
-        $this->view->status = 'ok';
+        $this->view->databases = $databases;
+        $this->view->status    = 'ok';
     }
 
     public function exampleQueriesAction() {
         $model = Daiquiri_Proxy::factory('Query_Model_Examples');
-        $examples = $model->index();
         $this->view->examples = $model->index();
-    }
-
-    public function databaseBrowserAction() {
-        
+        $this->view->status = 'ok';
     }
 
 }

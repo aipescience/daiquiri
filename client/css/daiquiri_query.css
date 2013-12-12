@@ -21,28 +21,6 @@
 .tab-content {
     overflow:visible
 }
-#jobs .nav {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-#jobs .nav .nav-header {
-    border-bottom: 1px solid #ddd;
-}
-#jobs li.nav-item a {
-    margin-top: 0;
-    margin-bottom: 0;
-    border-radius: 0;
-
-    padding-top: 5px;
-    padding-bottom: 5px;
-    font-size: small;
-}
-#jobs a:hover {
-    border-radius: 0;
-}
-#jobs ul {
-    margin-bottom: 2px;
-}
 #query #browser {
     width: 666px;
     height: 200px;

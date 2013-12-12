@@ -123,8 +123,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
 
                     if (Daiquiri_Config::getInstance()->auth->disableOnForgotPassword) {
                         // disable user
-                        $statusModel = new Auth_Model_Status();
-                        $statusId = $statusModel->getId('disabled');
+                        $statusId = Daiquiri_Auth::getInstance()->getStatusId('disabled');
                         $this->getResource()->updateUser($id, array('status_id' => $statusId));
 
                         // send mail to admins

@@ -182,17 +182,10 @@ daiquiri.query.Query.prototype.storeNewJob = function(job) {
     this.displayBrowser();
 
     // prepare dialog
-    var body = '<p>Your query has been submitted as job ' + job.table + '.</p>';
-    body += '<p>When the job is done you can obtain the results ';
-    body += 'via the job browser on the left side.</p>';
-
-    var modal = new daiquiri.Modal({
-        'label': 'Query submitted',
-        'body': body,
-        'primary': 'Ok',
-        'width': 800,
+    new daiquiri.Modal({
+        'html': '<h2>Query submitted</h2><p>Your query has been submitted as job ' + job.table + '.</p><p>When the job is done you can obtain the results via the job browser on the left side.</p><p><button class="btn btn-primary">Ok</button></p>',
+        'width': 600,
     });
-    modal.show();
 };
 
 /**
@@ -201,7 +194,7 @@ daiquiri.query.Query.prototype.storeNewJob = function(job) {
 daiquiri.query.Query.prototype.displayPlan = function(redirect){ 
     var self = this;
 
-    var modal = new daiquiri.Modal({
+    new daiquiri.Modal({
         'url': redirect,
         'width': 700,
         'success': function () {
@@ -225,7 +218,6 @@ daiquiri.query.Query.prototype.displayPlan = function(redirect){
             });
         }                    
     });
-    modal.show();
 };
 
 /**
@@ -547,6 +539,9 @@ daiquiri.query.Query.prototype.displayResults = function(){
             'width': '700px',
             'multiselect': true,
             'success': function (table) {
+                // enable image viewer for possible images
+                $('#results-table').daiquiri_imageview();
+
                 if ($('.daiquiri-table-downloadable','#results-tab').length != 0) {
                     if ($('#daiquiri-file-download-rows-button').length == 0) {
                         $('#results-tab').append('<div><button id="daiquiri-file-download-rows-button" class="linkbutton">Download files from selected rows</button></div>')
@@ -840,160 +835,62 @@ daiquiri.query.Query.prototype.displayDownloadErrors = function (error) {
 
 daiquiri.query.Query.prototype.removeJob = function () {
     var self = this;
+
     // prepare dialog
-    var modal = new daiquiri.Modal({
+    new daiquiri.Modal({
         'url': self.url.remove + '?id=' + self.job.id.value,
         'success': function () {
-            $('#submit').click(function () {
-                var form = $('form','.daiquiri-modal');
-                var action = form.attr('action');
-                var values = form.serialize() + '&submit=' + $(this).attr('value');
-                $.ajax({
-                    url: action,
-                    type: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    data: values,
-                    error: daiquiri.common.ajaxError,
-                    success: function (json) {
-                        if (json.status == 'ok') {
-                            $('.daiquiri-modal').modal('hide');
+            //switch to query tab
+            $('a', '.default-tab').tab('show');
 
-                            // switch to query tab
-                            $('a', '.default-tab').tab('show');
+            // hide job tabs
+            self.header.details.hide();
+            self.header.results.hide();
+            self.header.plot.hide();
+            self.header.download.hide();
 
-                            // hide job tabs
-                            self.header.details.hide();
-                            self.header.results.hide();
-                            self.header.plot.hide();
-                            self.header.download.hide();
-
-                            // reload jobs
-                            self.displayJobs();
-
-                        } else if (json.status == 'error') {
-                            daiquiri.common.updateCsrf(form, json.csrf);
-                            daiquiri.common.showFormErrors(form, json.errors);
-                        } else {
-                            daiquiri.common.jsonError(json);
-                        }
-                    }
-                });
-                return false;
-            });
-            $('#cancel').click(function () {
-                $('.daiquiri-modal').modal('hide');
-                return false;
-            });
+            // reload jobs
+            self.displayJobs();
         }
     });
-    modal.show();
 };
 
 daiquiri.query.Query.prototype.killJob = function () {
     var self = this;
 
     // prepare dialog
-    var modal = new daiquiri.Modal({
+    new daiquiri.Modal({
         'url': self.url.kill + '?id=' + self.job.id.value,
         'success': function () {
-            $('#submit').click(function () {
-                var form = $('form','.daiquiri-modal');
-                var action = form.attr('action');
-                var values = form.serialize() + '&submit=' + $(this).attr('value');
-                $.ajax({
-                    url: action,
-                    type: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    data: values,
-                    error: daiquiri.common.ajaxError,
-                    success: function (json) {
-                        if (json.status == 'ok') {
-                            $('.daiquiri-modal').modal('hide');
+            // switch to query tab
+            $('a', '.default-tab').tab('show');
 
-                            // switch to query tab
-                            $('a', '.default-tab').tab('show');
+            // hide job tabs
+            self.header.details.hide();
+            self.header.results.hide();
+            self.header.plot.hide();
+            self.header.download.hide();
 
-                            // hide job tabs
-                            self.header.details.hide();
-                            self.header.results.hide();
-                            self.header.plot.hide();
-                            self.header.download.hide();
-
-                            // reload jobs
-                            self.displayJobs();
-
-                        } else if (json.status == 'error') {
-                            daiquiri.common.updateCsrf(form, json.csrf);
-                            daiquiri.common.showFormErrors(form, json.errors);
-                        } else {
-                            daiquiri.common.jsonError(json);
-                        }
-                    }
-                });
-                return false;
-            });
-            $('#cancel').click(function () {
-                $('.daiquiri-modal').modal('hide');
-                return false;
-            });
+            // reload jobs
+            self.displayJobs();
         }
     });
-    modal.show();
 };
 
 daiquiri.query.Query.prototype.renameJob = function () {
     var self = this;
 
     // prepare dialog
-    var modal = new daiquiri.Modal({
+    new daiquiri.Modal({
         'url': self.url.rename + '?id=' + self.job.id.value,
         'width': 700,
         'success': function () {
-            $('#submit').click(function () {
-                var form = $('form','.daiquiri-modal');
-                var action = form.attr('action');
-                var values = form.serialize() + '&submit=' + $(this).attr('value');
-                $.ajax({
-                    url: action,
-                    type: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    data: values,
-                    error: daiquiri.common.ajaxError,
-                    success: function (json) {
-                        if (json.status == 'ok') {
-                            $('.daiquiri-modal').modal('hide');
+            // reload jobs
+            self.displayDetails();
+            self.displayJobs();
 
-                            // reload jobs
-                            self.displayDetails();
-                            self.displayJobs();
-
-                            // reload the current job
-                            self.loadJob(self.job.id.value)
-                        } else if (json.status == 'error') {
-                            console.log(json.errors);
-                            daiquiri.common.updateCsrf(form, json.csrf);
-                            daiquiri.common.showFormErrors(form, json.errors);
-                        } else {
-                            daiquiri.common.jsonError(json);
-                        }
-                    }
-                });
-                return false;
-            }); 
-            $('#cancel').click(function () {
-                $('.daiquiri-modal').modal('hide');
-                return false;
-            });
+            // reload the current job
+            self.loadJob(self.job.id.value)
         }
     });
-    modal.show();
 }

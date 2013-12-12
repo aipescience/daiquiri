@@ -39,23 +39,17 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
      * @return type 
      */
     public function fetchRows($sqloptions = array()) {
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
         // roles starting at 1, therefore check for <=
         $select = $this->getTable()->select();
-        $select->where('`publication_role_id` <= ?', count($usrRoles));
         $rows = $this->getTable()->fetchAll($select);
 
         return $rows;
     }
 
     public function fetchId($function) {
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
         // get the primary sql select object
         $select = $this->getTable()->select();
         $select->where("`name` = ?", trim($function));
-        $select->where("`publication_role_id` <= ?", count($usrRoles));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();
@@ -74,31 +68,17 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
      * @return type 
      */
     public function fetchRow($id) {
-        $usrRoles = Daiquiri_Auth::getInstance()->getCurrentRoleParents();
-
         // get the primary sql select object
         $select = $this->getTable()->getSelect();
         $select->where("`id` = ?", $id);
-        $select->where("`publication_role_id` <= ?", count($usrRoles));
 
         $row = $this->getTable()->fetchAll($select)->current();
 
-        $data = false;
         if ($row) {
-            $data = $row->toArray();
-
-            //get the roles
-            $rolesModel = new Auth_Model_Roles();
-            $roles = array_merge(array(0 => 'not published'), $rolesModel->getValues());
-
-            if (!empty($roles[$data['publication_role_id']])) {
-                $data['publication_role'] = $roles[$data['publication_role_id']];
-            } else {
-                $data['publication_role'] = "unknown";
-            }
+            return $row->toArray();
+        } else {
+            return array();
         }
-
-        return $data;
     }
 
     /**
@@ -109,17 +89,8 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
      * @return array
      */
     public function checkACL($id) {
-        $acl = Daiquiri_Auth::getInstance();
-
         $row = $this->fetchRow($id);
-
-        $parentRoles = $acl->getCurrentRoleParents();
-
-        if (in_array($row['publication_role'], $parentRoles)) {
-            return true;
-        }
-
-        return false;
+        return Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id']);
     }
 
 }

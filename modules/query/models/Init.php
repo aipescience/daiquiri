@@ -48,10 +48,16 @@ class Query_Model_Init extends Daiquiri_Model_Init {
     }
 
     public function init(array $options) {
+        // get role model
+        $authRoleModel = new Auth_Model_Roles();
+
         // create config entries
         $queryExamplesModel = new Query_Model_Examples();
         if (count($queryExamplesModel->index()) == 0) {
             foreach ($options['query']['examples'] as $a) {
+                $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                unset($a['publication_role']);
+
                 $r = $queryExamplesModel->create($a);
                 $this->_check($r, $a);
             }

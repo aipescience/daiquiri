@@ -100,8 +100,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
 
             } else {
                 // get the new status id
-                $statusModel = new Auth_Model_Status();
-                $statusId = $statusModel->getId('active');
+                $statusId = Daiquiri_Auth::getInstance()->getStatusId('active');
 
                 // activate user in database
                 $this->getResource()->updateUser($user['id'], array('status_id' => $statusId));
@@ -138,8 +137,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     );
                 } else {
                     // get the new status id
-                    $statusModel = new Auth_Model_Status();
-                    $statusId = $statusModel->getId('confirmed');
+                    $statusId = Daiquiri_Auth::getInstance()->getStatusId('confirmed');
 
                     // confirm user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));
@@ -188,8 +186,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     );
                 } else {
                     // get the new status id
-                    $statusModel = new Auth_Model_Status();
-                    $statusId = $statusModel->getId('disabled');
+                    $statusId = Daiquiri_Auth::getInstance()->getStatusId('disabled');
 
                     // disable user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));
@@ -237,8 +234,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     );
                 } else {
                     // get the new status id
-                    $statusModel = new Auth_Model_Status();
-                    $statusId = $statusModel->getId('active');
+                    $statusId = Daiquiri_Auth::getInstance()->getStatusId('active');
 
                     // activate user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));
@@ -286,8 +282,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     );
                 } else {
                     // get the new status id
-                    $statusModel = new Auth_Model_Status();
-                    $statusId = $statusModel->getId('disabled');
+                    $statusId = Daiquiri_Auth::getInstance()->getStatusId('disabled');
 
                     // disable user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));
@@ -337,8 +332,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                     );
                 } else {
                     // get the new status id
-                    $statusModel = new Auth_Model_Status();
-                    $statusId = $statusModel->getId('active');
+                    $statusId = Daiquiri_Auth::getInstance()->getStatusId('active');
 
                     // activate user in database
                     $this->getResource()->updateUser($id, array('status_id' => $statusId));

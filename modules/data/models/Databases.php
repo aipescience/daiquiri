@@ -34,15 +34,23 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
      * Returns a lis of all database entries.
      * @return array
      */
-    public function index() {
-        $data = array();
+    public function index($fullData = false) {
+        $databases = array();
         foreach(array_keys($this->getValues()) as $id) {
-            $response = $this->show($id);
+            $response = $this->show($id, false, $fullData);
             if ($response['status'] == 'ok') {
-                $data[$response['data']['id']] = $response['data']['name'];
+                $database = $response['data'];
+
+                $database['publication_role'] = Daiquiri_Auth::getInstance()->getRole($database['publication_role_id']);
+
+                foreach ($database['tables'] as &$table) {
+                    $table['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
+                }
+
+                $databases[] = $database;
             }
         }
-        return $data;
+        return $databases;
     }
 
     /**
@@ -53,11 +61,11 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
     public function create(array $formParams = array()) {
 
         // create the form object
-        $rolesModel = new Auth_Model_Roles();
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
         $adapter = Daiquiri_Config::getInstance()->getDbAdapter();
 
         $form = new Data_Form_Database(array(
-                    'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
+                    'roles' => $roles,
                     'adapter' => $adapter,
                     'submit' => 'Create database entry'
                 ));
@@ -147,13 +155,10 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
             }
         }
 
-        $data = $this->getResource()->fetchRow($id, $fullData);
+        // get database from database
+        $database = $this->getResource()->fetchRow($id, $fullData);
 
-        if (empty($data)) {
-            return array('status' => 'error');
-        } else {
-            return array('status' => 'ok', 'data' => $data);
-        }
+        return array('status' => 'ok', 'data' => $database);
     }
 
     public function update($id, $db, array $formParams = array()) {
@@ -174,15 +179,17 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
             throw new Exception('$id ' . $id . ' not found.');
         }
 
+
+
         // create the form object
-        $rolesModel = new Auth_Model_Roles();
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
         $adapter = Daiquiri_Config::getInstance()->getDbAdapter();
 
         $entry['adapter'] = array_search($entry['adapter'], $adapter);
 
         $form = new Data_Form_Database(array(
                     'entry' => $entry,
-                    'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
+                    'roles' => $roles,
                     'adapter' => $adapter,
                     'submit' => 'Update database entry'
                 ));

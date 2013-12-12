@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Config_Model_Entries extends Daiquiri_Model_Abstract {
+class Config_Model_Messages extends Daiquiri_Model_Abstract {
 
     /**
      * Constructor. Sets resource object and primary field.
@@ -28,23 +28,27 @@ class Config_Model_Entries extends Daiquiri_Model_Abstract {
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_KeyValue');
         $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
-        $this->getResource()->getTable()->setName('Config_Entries');
+        $this->getResource()->getTable()->setName('Config_Messages');
     }
 
     /**
-     * Returns all configuration entries as an array.
+     * Returns all status messages as an array.
      * @return array
      */
     public function index() {
         return $this->getResource()->fetchRows();
     }
 
+    /**
+     * Returns a particular status message.
+     * @return array
+     */
     public function show($key) {
         return $this->getResource()->fetchValue($key);
     }
 
     /**
-     * Creates config entry.
+     * Creates a status message.
      * @param string $key
      * @param string $value
      * @return array
@@ -52,7 +56,7 @@ class Config_Model_Entries extends Daiquiri_Model_Abstract {
     public function create(array $formParams = array()) {
 
         // create the form object
-        $form = new Config_Form_CreateEntries();
+        $form = new Config_Form_CreateMessages();
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -79,7 +83,7 @@ class Config_Model_Entries extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Edit an entry in the config table.
+     * Edit an status message.
      * @param array $formParams
      * @return array
      */
@@ -91,7 +95,7 @@ class Config_Model_Entries extends Daiquiri_Model_Abstract {
         }
 
         // create the form object
-        $form = new Config_Form_EditEntries(array(
+        $form = new Config_Form_EditMessages(array(
                     'key' => $key,
                     'value' => $value
                 ));
@@ -110,14 +114,14 @@ class Config_Model_Entries extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Deletes an config entry.
+     * Deletes an status message.
      * @param string $key
      * @param array $formParams
      * @return Array 
      */
     public function delete($key, array $formParams = array()) {
         // create the form object
-        $form = new Config_Form_DeleteEntries();
+        $form = new Config_Form_DeleteMessages();
 
         // valiadate the form if POST
         if (!empty($formParams) && $form->isValid($formParams)) {

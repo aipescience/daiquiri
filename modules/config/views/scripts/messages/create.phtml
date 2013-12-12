@@ -21,16 +21,27 @@
 ?>
 
 <div class="main">
-    <?php foreach ($this->functions as $function): ?>
-        <table class='table table-bordered'>
-            <?php foreach($function as $key => $value): ?>
-                <tr>
-                    <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
-                    <td>
-                        <?php echo $this->escape($value); ?>
-                    </td>
-                </tr>
-            <?php endforeach ?>
-        </table>
-    <?php endforeach; ?>
+    <?php if ($this->status === 'ok'): ?>
+        <p>Status message created.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to status messages overview',
+            'href' => '/config/messages',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php elseif ($this->status === 'error'): ?>
+        <h2>An error occured.</h2>
+        <p><?php echo ucfirst($this->error).'.'; ?></p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => '/config/messages/create',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Create new status message</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
 </div>

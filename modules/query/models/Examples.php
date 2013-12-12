@@ -36,11 +36,16 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function index() {
-        return $this->getResource()->fetchRows();
-    }
-
-    public function show($key) {
-        return $this->getResource()->fetchValue($key);
+        $examples = array();
+        foreach ($this->getResource()->fetchRows() as $example) {
+            // check for permission to access
+            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($example['publication_role_id'])) {
+                $example['publication_role'] = Daiquiri_Auth::getInstance()->getRole($example['publication_role_id']);
+                unset($example['publication_role_id']);
+                $examples[] = $example;
+            }
+        }
+        return $examples;
     }
 
     /**
@@ -50,9 +55,13 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function create(array $formParams = array()) {
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         // create the form object
-        $form = new Query_Form_CreateExample();
+        $form = new Query_Form_CreateExample(array(
+            'roles' => $roles
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -81,17 +90,20 @@ class Query_Model_Examples extends Daiquiri_Model_Abstract {
      * @return array
      */
     public function update($id, array $formParams = array()) {
+        // get example from database
         $example = $this->getResource()->fetchRow($id);
-
         if ($example === null) {
             return array('status' => 'error', 'error' => 'id not found');
         }
 
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
+
         // create the form object
         $form = new Query_Form_UpdateExample(array(
-                    'name' => $example['name'],
-                    'query' => $example['query']
-                ));
+            'example' => $example,
+            'roles' => $roles
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams) && $form->isValid($formParams)) {

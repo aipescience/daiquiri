@@ -22,10 +22,11 @@
 var daiquiri = daiquiri || {};
 
 /**
- * Constructor-like function for the Table class. 
+ * Constructor-like function for the modal class. 
  */
 daiquiri.Modal = function (opt) {
     this.opt = opt;
+    this.show();
 };
 
 /**
@@ -33,11 +34,9 @@ daiquiri.Modal = function (opt) {
  */
 daiquiri.Modal.prototype.show = function() {
     var self = this;
-    this.html = '';
-    this.padding = '0px';
 
     // get rid of any old modals
-    $('#daiquiri-modal').remove();
+    $('.daiquiri-modal').remove();
 
     if (typeof this.opt.url !== 'undefined') {
         // get the body by ajax
@@ -51,35 +50,11 @@ daiquiri.Modal.prototype.show = function() {
             error: daiquiri.common.ajaxError,
             success: function (html) {
                 self.html = html;
-                self.padding = '20px';
                 self.display();
             }
         });
-    } else {
-        if (typeof this.opt.label !== 'undefined') {
-            this.html += '<div class="modal-header">';
-            this.html += '<h3 id="daiquiri-modal-label">' + this.opt.label + '</h3>';
-            this.html += '</div>';
-        }
-
-        if (typeof this.opt.body !== 'undefined') {
-            this.html += '<div class="modal-body">' + this.opt.body + '</div>';
-        }
-
-        if (typeof this.opt.primary !== 'undefined' || typeof this.opt.danger !== 'undefined' || typeof this.opt.button !== 'undefined') {
-            this.html += '<div class="modal-footer">';
-            if (typeof this.opt.primary !== 'undefined') {
-                this.html += '<button id="daiquiri-modal-primary" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">' + this.opt.primary + '</button>';
-            }
-            if (typeof this.opt.danger !== 'undefined') {
-                this.html += '<button id="daiquiri-modal-danger" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">' + this.opt.danger + '</button>';
-            } 
-            if (typeof this.opt.button !== 'undefined') {
-                this.html += '<button id="daiquiri-modal-button" class="btn" data-dismiss="modal" aria-hidden="true">' + this.opt.button + '</button>';
-            }
-            this.html += '</div>';
-        }
-
+    } else if (typeof this.opt.html !== 'undefined') {
+        self.html = this.opt.html;
         self.display();
     }
 };
@@ -88,43 +63,126 @@ daiquiri.Modal.prototype.show = function() {
  * Displays the modal.
  */
 daiquiri.Modal.prototype.display = function () {
-    var classes = 'modal hide fade daiquiri-modal ';
-    if (typeof this.opt.class !== 'undefined') {
-        classes += this.opt.class;
-    } 
-    this.dialog = $('<p/>',{
-        'aria-hidden': 'true',
-        'aria-labelledby': 'daiquiri-modal-label',
-        'class' : classes,
-        'id': 'daiquiri-modal',
-        'role': 'dialog',
-        'tabindex': '-1',
-        'html': this.html
-    });
-    this.dialog.appendTo('body');
-    this.dialog.css('padding', this.padding);
+    var self = this;
 
+    // 'lock' body
+    $('body').css('overflow','hidden');
+
+    // create diolog
+    this.modal = $('<div />',{
+        'html': '<div class="daiquiri-modal-dialog"><div class="daiquiri-modal-close-container"><a class="daiquiri-modal-close" href="#">x</a></div><div class="daiquiri-modal-body">' + this.html + '</div></div>',
+        'class': 'daiquiri-modal'
+    }).appendTo('body');
+
+    // get dialog div
+    var dialog = $('.daiquiri-modal-dialog');
+
+    // adjust height and width
+    if (typeof this.opt.height !== 'undefined') {
+        dialog.height(this.opt.height);
+    }
     if (typeof this.opt.width !== 'undefined') {
-        this.dialog.css('width', this.opt.width + 'px');
-        // left margin must be half of the width, minus scrollbar on the left (30px)
-        var margin = - ((this.opt.width /2) + 30);
-        this.dialog.css('marginLeft', margin + 'px');
+        dialog.width(this.opt.width);
+    } else {
+        dialog.width(600);
     }
-    if (typeof this.opt.success!== 'undefined') {
-        this.opt.success();
-    }
+
+    // adjust left and top margin
+    var leftMargin = ($(window).width() - dialog.width()) / 2;
+    dialog.css('marginLeft', leftMargin);
+    var topMargin = ($(window).height() - dialog.height()) / 2 - 30;
+    dialog.css('marginTop', topMargin);
+
+    // close button link
+    $('.daiquiri-modal-close').click(function() {
+        $('.daiquiri-modal').remove();
+        $('body').css('overflow','auto');
+        return false;
+    });
+
+    // prev and next button
+    $('.daiquiri-modal-next').click(function() {
+        // call success function
+        if (typeof self.opt.next !== 'undefined') {
+            self.opt.next();
+        }
+        return false;
+    });
+    $('.daiquiri-modal-prev').click(function() {
+        // call success function
+        if (typeof self.opt.prev !== 'undefined') {
+            self.opt.prev();
+        }
+        return false;
+    });
+
+    // enable button
+    $('.daiquiri-modal button').on('click', function () {
+        // remove modal
+        $('.daiquiri-modal').remove();
+        $('body').css('overflow','auto');
+        
+        // call success function
+        if (typeof self.opt.success !== 'undefined') {
+            self.opt.success();
+        }
+    });
+
+    // ajaxify form
+    $('.daiquiri-modal form input[type=submit]').on('click', function() {
+        if ($(this).attr('name') == 'submit') {
+            var form = $('form','.daiquiri-modal');
+            var action = form.attr('action');
+            var values = form.serialize() + '&submit=' + $(this).attr('value');
+
+            $.ajax({
+                url: action,
+                type: 'POST',
+                dataType: 'json',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                data: values,
+                error: daiquiri.common.ajaxError,
+                success: function (json) {
+                    if (json.status == 'ok') {
+                        // remove modal
+                        $('.daiquiri-modal').remove();
+                        $('body').css('overflow','auto');
+
+                        // call success function
+                        if (typeof self.opt.success!== 'undefined') {
+                            self.opt.success();
+                        }
+                    } else if (json.status == 'error') {
+                        daiquiri.common.updateCsrf(form, json.csrf);
+                        daiquiri.common.showFormErrors(form, json.errors);
+                    } else {
+                        daiquiri.common.jsonError(json);
+                    }
+                }
+            });
+        } else {
+            // cancel was clicked
+            $('.daiquiri-modal').remove();
+            $('body').css('overflow','auto');
+        }
+
+        return false;
+    });
+
+    // enable esc and enter keys
+    $(document).keyup(function(e) {
+        if (e.keyCode == 27) {
+            // esc pressed
+            $('.daiquiri-modal').remove();
+            $('body').css('overflow','auto');
+            return false;
+        } else if (e.keyCode == 13) {
+            $('.daiquiri-modal .btn-primary').trigger('click');
+        }
+    });
 
     // refresh a possible code mirror textarea
-    this.dialog.on('shown', function () {
-        $('textarea', this.dialog).daiquiri_codemirror_refresh();
-    });
-
-    this.dialog.modal();
-};
-
-/**
- * Hides the modal.
- */
-daiquiri.Modal.prototype.hide = function() {
-    this.dialog.modal('hide');
+    $('textarea', this.dialog).daiquiri_codemirror_refresh();
 };

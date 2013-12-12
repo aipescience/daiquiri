@@ -35,7 +35,18 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
      * @return array
      */
     public function index() {
-        return $this->getValues();
+        $functions = array();
+        foreach(array_keys($this->getValues()) as $id) {
+            $response = $this->show($id);
+            if ($response['status'] == 'ok') {
+                $function = $response['data'];
+
+                $function['publication_role'] = Daiquiri_Auth::getInstance()->getRole($function['publication_role_id']);
+
+                $functions[] = $function;
+            }
+        }
+        return $functions;
     }
 
     /**
@@ -44,15 +55,12 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
      * @return array
      */
     public function create(array $formParams = array()) {
-        // get databases model
-        $databasesModel = new Data_Model_Databases();
-
-        // get roles model
-        $rolesModel = new Auth_Model_Roles();
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         // create the form object
         $form = new Data_Form_Function(array(
-                    'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
+                    'roles' => $roles,
                     'submit' => 'Create function entry'
                 ));
 
@@ -103,6 +111,8 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
         }
 
         $data = $this->getResource()->fetchRow($id);
+        
+
 
         if (empty($data)) {
             return array('status' => 'error');
@@ -130,12 +140,13 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
             throw new Exception('$id ' . $id . ' not found.');
         }
 
-        // create the form object
-        $rolesModel = new Auth_Model_Roles();
+        // get roles
+        $roles = $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
+        // create the form object
         $form = new Data_Form_Function(array(
                     'entry' => $entry,
-                    'roles' => array_merge(array(0 => 'not published'), $rolesModel->getValues()),
+                    'roles' => $roles,
                     'submit' => 'Update table entry'
                 ));
 

@@ -35,7 +35,7 @@ daiquiri.table = {};
                 if (daiquiri.table.items[id] == undefined) {
                     daiquiri.table.items[id] = new daiquiri.table.Table($(this),opt);
                 } else {
-                    daiquiri.table.items[id].reset(opt);
+                    daiquiri.table.items[id].reinit(opt);
                 }
             });
         }
@@ -70,11 +70,14 @@ daiquiri.table.opt = {
 daiquiri.table.Table = function(container, opt) {
     this.container = container;
     this.id = container.attr('id');
-    this.opt = opt;
+    this.opt = $.extend({}, daiquiri.table.opt, opt);
     params = null;
     pages = null;
     ncols = null;
     colsmodel = null;
+
+    // assign this table to the globel array of tables
+    daiquiri.table.items[this.id] = this;
 
     // create pager
     $('<div/>',{
@@ -111,7 +114,7 @@ daiquiri.table.Table = function(container, opt) {
 /**
  * Resets the table to its inital state and overwrites the opt object.
  */
-daiquiri.table.Table.prototype.reset = function (opt) {
+daiquiri.table.Table.prototype.reinit = function (opt) {
     this.opt = opt;
 
     $('thead','.daiquiri-table-pane', this.container).children().remove();
@@ -130,6 +133,68 @@ daiquiri.table.Table.prototype.reset = function (opt) {
     // display table
     this.pager();
     this.cols();
+}
+
+/**
+ * Switches the table to the fist page.
+ */
+daiquiri.table.Table.prototype.first = function (callback) {
+    if (this.params.page != 1) {
+        this.params.page = 1;
+        this.rows(callback);
+    } else {
+        callback();
+    }
+}
+
+/**
+ * Switches the table to the previous page.
+ */
+daiquiri.table.Table.prototype.prev = function (callback) {
+    this.params.page -= 1; 
+    if (this.params.page < 1) {
+        this.params.page = 1;
+        callback();
+    } else {
+        this.rows(callback);
+    }
+}
+
+/**
+ * Switches the table to the next page.
+ */
+daiquiri.table.Table.prototype.next = function (callback) {
+    this.params.page += 1;
+    if (this.params.page > this.pages) {
+        this.params.page = this.pages;
+        callback();
+    } else {
+        this.rows(callback);
+    }
+}
+
+/**
+ * Switches the table to the last page.
+ */
+daiquiri.table.Table.prototype.last = function (callback) {
+    if (this.params.page != this.pages) {
+        this.params.page = this.pages;
+        this.rows(callback);
+    } else {
+        callback();
+    }
+}
+
+/**
+ * Switches the table to the last page.
+ */
+daiquiri.table.Table.prototype.reset = function () {
+    $('input','.daiquiri-table-pager-search-form', this.container).val('');
+        
+    this.params.search = null
+    this.params.sort = null
+    this.params.page = 1
+    this.rows();
 }
 
 /**
@@ -177,52 +242,31 @@ daiquiri.table.Table.prototype.pager = function () {
 
     $('#' + self.id + '-pager-first').click(function () {
         var id = $(this).attr('id').match(/(.+)-pager-first/)[1];
-        var self = daiquiri.table.items[id];
-        self.params.page = 1;
-        self.rows();
+        daiquiri.table.items[id].first();
         return false;
     });
     
     $('#' + self.id + '-pager-prev').click(function () {
         var id = $(this).attr('id').match(/(.+)-pager-prev/)[1];
-        var self = daiquiri.table.items[id];
-        self.params.page -= 1; 
-        if (self.params.page < 1) {
-            self.params.page = 1;
-        }
-        self.rows();
+        daiquiri.table.items[id].prev();
         return false;
     });
 
     $('#' + self.id + '-pager-next').click(function () {
         var id = $(this).attr('id').match(/(.+)-pager-next/)[1];
-        var self = daiquiri.table.items[id];
-        self.params.page += 1;
-        if (self.params.page > self.pages) {
-            self.params.page = self.pages;
-        }
-        self.rows();
+        daiquiri.table.items[id].next();
         return false;
     });
     
     $('#' + self.id + '-pager-last').click(function () {
         var id = $(this).attr('id').match(/(.+)-pager-last/)[1];
-        var self = daiquiri.table.items[id];
-        self.params.page = self.pages;
-        self.rows();
+        daiquiri.table.items[id].last();
         return false;
     });
 
     $('#' + self.id + '-pager-reset').click(function () {
         var id = $(this).attr('id').match(/(.+)-pager-reset/)[1];
-        var self = daiquiri.table.items[id];
-        
-        $('input','.daiquiri-table-pager-search-form', self.container).val('');
-            
-        self.params.search = null
-        self.params.sort = null
-        self.params.page = 1
-        self.rows();
+        daiquiri.table.items[id].reset();
         return false;
     });
 
@@ -432,7 +476,7 @@ daiquiri.table.Table.prototype.cols = function () {
 /**
  * Gets the rows by ajax and constructs the td elements. On success it calls an optional function.
  */
-daiquiri.table.Table.prototype.rows = function () {
+daiquiri.table.Table.prototype.rows = function (callback) {
     var self = this;
 
     // get the rows via ajax
@@ -452,15 +496,6 @@ daiquiri.table.Table.prototype.rows = function () {
 
                 // update pager
                 var html = '<p>Page ' + json.page + ' of ' + json.pages;
-                /*
-                var html = '<p>Page ' + json.page + ' of ' + json.pages + ' (' + json.total + ' ';
-                if (json.total == 1) {
-                    html += 'row';
-                } else {
-                    html += 'rows';
-                }
-                html += ' total)</p>';
-                */
                 var paging = $('#' + self.id + '-pager-paging');
                 paging.children().remove();
                 paging.append(html);
@@ -506,7 +541,8 @@ daiquiri.table.Table.prototype.rows = function () {
                                     if ($.inArray(extension.toLowerCase(),['txt']) != -1) {
                                         target = 'target="_blank"';
                                     } else if ($.inArray(extension.toLowerCase(),['jpg','jpeg','png','bmp']) != -1) {
-                                        target = 'data-lightbox="col' + i + '" title=\'<a href="' + col.format.base + '?name=' + cell[i] + '">' + cell[i] + '</a>\'';
+                                        target = '';
+                                        classes += ' daiquiri-table-image';
                                     } else {
                                         target = '';
                                     }
@@ -561,9 +597,13 @@ daiquiri.table.Table.prototype.rows = function () {
                 });
 
                 // call the success function;
-                if (self.opt.success != undefined) {
+                if (typeof self.opt.success !== 'undefined') {
                     self.opt.success(self);
                 }
+                if (typeof callback !== 'undefined') {
+                    callback();
+                }
+
             } else {
                 daiquiri.common.jsonError(json);
             }

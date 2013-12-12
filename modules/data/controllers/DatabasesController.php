@@ -27,15 +27,7 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $data = array();
-        foreach (array_keys($this->_model->index()) as $id) {
-            $response = $this->_model->show($id, false, true);
-            if ($response['status'] == 'ok') {
-                $data[] = $response['data'];
-            }
-        }
-
-        $this->view->databases = $data;
+        $this->view->databases = $this->_model->index(true);
         $this->view->status = 'ok';
     }
 

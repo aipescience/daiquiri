@@ -37,25 +37,10 @@ class Data_IndexController extends Daiquiri_Controller_Abstract {
 
     public function exportAction() {
         $databasesModel = Daiquiri_Proxy::factory('Data_Model_Databases');
-        $databases = array();
-        foreach (array_keys($databasesModel->index()) as $id) {
-            $response = $databasesModel->show($id, false, true);
-            if ($response['status'] == 'ok') {
-                $databases[] = $response['data'];
-            }
-        }
-
         $functionsModel = Daiquiri_Proxy::factory('Data_Model_Functions');
-        $functions = array();
-        foreach (array_keys($functionsModel->index()) as $id) {
-            $response = $functionsModel->show($id, false, true);
-            if ($response['status'] == 'ok') {
-                $functions[] = $response['data'];
-            }
-        }
 
-        $this->view->databases = $databases;
-        $this->view->functions = $functions;
+        $this->view->databases = $databasesModel->index(true);
+        $this->view->functions = $functionsModel->index();
     }
 
 }

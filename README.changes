@@ -1,11 +1,60 @@
-22.11.2013:
+2013/12/10
+==========
+
+Data permissions rewritten, resources in data do not check the publication role anymore. Concodantly, the Models in data should only be accessible by admin. Remove permissions on Data_Model_Databases, Data_Model_Tables, Data_Model_Columns, and Data_Model_Functions for user and guest.
+
+WARNING! not setting this might be a potential security problem!
+
+In init.php $options['data']['database'], $options['data']['tables'], $options['data']['columns'], $options['data']['functions'], $options['query']['examples'], the publication_role is now given by the corresponding string and not by the ID. Therefore publication_role_id is not valid anymore.
+
+
+2013/12/04
+==========
+
+Table `Config_Messages` added. Ressource 'Config_Model_Messages' with permission 'index,show,create,update,delete' for admin and 'show' for guest/user added.
+
+Re-Init or manual fix needed:
+
+CREATE TABLE IF NOT EXISTS `Config_Messages` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `key` VARCHAR(256) NOT NULL,
+  `value` TEXT NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+INSERT INTO `Auth_Resources` VALUES (NULL,'Config_Model_Messages');
+
+SET @ressource_id := (SELECT id FROM `Auth_Ressources` WHERE `ressource`='Auth_Resources');
+
+SET @role_id := (SELECT id FROM `Auth_Roles` WHERE `role`='admin');
+INSERT INTO `Auth_Rules` VALUES (NULL,@role_id,@ressource_id,'index,create,show,update,delete');
+
+SET @role_id := (SELECT id FROM `Auth_Roles` WHERE `role`='user');
+or
+SET @role_id := (SELECT id FROM `Auth_Roles` WHERE `role`='guest');
+
+INSERT INTO `Auth_Rules` VALUES (NULL,@role_id,@ressource_id,'show');
+
+
+2013/12/03
+==========
+
+In init.php $options['auth']['user'] the status and the role are now given by the corresponding string and not by the ID. Therefore status_id and role_id are not valid anymore.
+
+Fields `description`, and `publication_role_id` added to Table `Query_Examples`. Re-Init of query example needed:
+
+Re-Init or manual fix needed:
+
+ALTER TABLE `Query_Examples` ADD `description` TEXT;
+ALTER TABLE `Query_Examples` ADD `publication_role_id` INTEGER;
+
+
+2013/11/22
+==========
 
 From now on, add the following config entry to your instance:
 
-auth.activation:
+    auth.activation:
 
-set this to 1 if you want the user account to be validated by a moderator.
-
-default: 0
+set this to 1 if you want the user account to be validated by a moderator, the default value is 0.
 
 WARNING! not setting this might be a potential security problem!

@@ -20,28 +20,25 @@
  *  limitations under the License.
  */
 
-class Query_ExamplesController extends Daiquiri_Controller_Abstract {
+class Config_MessagesController extends Daiquiri_Controller_Abstract {
 
     private $_model;
 
     public function init() {
-        $this->_model = Daiquiri_Proxy::factory('Query_Model_Examples');
+        $this->_model = Daiquiri_Proxy::factory('Config_Model_Messages');
     }
 
     public function indexAction() {
-        $this->view->examples = $this->_model->index();
+        $this->view->data = $this->_model->index();
         $this->view->status = 'ok';
     }
 
     public function createAction() {
-        // get redirect url
-        $redirect = $this->_getParam('redirect', '/query/examples/');
-
         // check if POST or GET
         if ($this->_request->isPost()) {
             if ($this->_getParam('cancel')) {
                 // user clicked cancel
-                $this->_redirect($redirect);
+                $this->_redirect('/config/messages/');
             } else {
                 // validate form and create new user
                 $response = $this->_model->create($this->_request->getPost());
@@ -59,25 +56,23 @@ class Query_ExamplesController extends Daiquiri_Controller_Abstract {
 
     public function updateAction() {
         // get redirect url
-        $redirect = $this->_getParam('redirect', '/query/examples/');
-        $id = $this->_getParam('id');
+        $key = $this->_getParam('key');
 
         // check if POST or GET
         if ($this->_request->isPost()) {
             if ($this->_getParam('cancel')) {
                 // user clicked cancel
-                $this->_redirect($redirect);
+                $this->_redirect('/config/messages/');
             } else {
                 // validate form and edit user
-                $response = $this->_model->update($id, $this->_request->getPost());
+                $response = $this->_model->update($key, $this->_request->getPost());
             }
         } else {
             // just display the form
-            $response = $this->_model->update($id);
+            $response = $this->_model->update($key);
         }
 
         // assign to view
-        $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
@@ -88,33 +83,26 @@ class Query_ExamplesController extends Daiquiri_Controller_Abstract {
      */
     public function deleteAction() {
         // get the id of the user to be deleted
-        $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', '/query/examples/');
+        $key = $this->_getParam('key');
 
         // check if POST or GET
         if ($this->_request->isPost()) {
             if ($this->_getParam('cancel')) {
                 // user clicked cancel
-                $this->_redirect($redirect);
+                $this->_redirect('/config/messages/');
             } else {
                 // validate form and delete user
-                $response = $this->_model->delete($id, $this->_request->getPost());
+                $response = $this->_model->delete($key, $this->_request->getPost());
             }
         } else {
             // just display the form
-            $response = $this->_model->delete($id);
+            $response = $this->_model->delete($key);
         }
 
         // assign to view
-        $this->view->redirect = $redirect;
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
-    }
-
-    public function exportAction() {
-        $this->view->examples = $this->_model->index();
-        $this->view->status = 'ok';
     }
 
 }

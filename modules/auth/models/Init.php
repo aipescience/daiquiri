@@ -47,6 +47,13 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
 
         // construct roles array
         $output['roles'] = array('guest', 'user');
+        if (isset($input['roles'])) {
+            foreach ($input['roles'] as $role) {
+                if (! in_array($role, array('guest','user','support','manager','admin'))) {
+                    $output['roles'][] = $role;
+                }
+            }
+        }
         if ($options['config']['contact']) {
             $output['roles'][] = 'support';
         }
@@ -97,16 +104,21 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
         if (!empty($options['config']['query']) && $options['config']['query']['guest']) {
             $rules['guest']['Query_Model_Form'] = array('submit');
-            $rules['guest']['Query_Model_CurrentJobs'] =
-                    array('index', 'show', 'kill', 'remove', 'rename');
-            $rules['guest']['Query_Model_Database'] = array('show', 'download', 'file', 'stream', 'regen');
-            $rules['guest']['Data_Model_Databases'] = array('index', 'show');
+            $rules['guest']['Query_Model_CurrentJobs'] = array('index', 'show', 'kill', 'remove', 'rename');
+            $rules['guest']['Query_Model_Database'] = array('index', 'download', 'file', 'stream', 'regen');
+            $rules['guest']['Query_Model_Examples'] = array('index', 'show');
             $rules['guest']['Data_Model_Viewer'] = array('rows', 'cols');
 
-            $rules['guest']['Query_Model_Examples'] =
-                    array('index', 'show');
-        }
+            if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
+                strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
 
+                $rules['guest']['Query_Model_Form'][] = 'plan';
+                $rules['guest']['Query_Model_Form'][] = 'mail';
+            }
+        }
+        if ($options['config']['data']) {
+            $rules['guest']['Data_Model_Viewer'] = array('rows', 'cols');
+        }
 
         // construct rules for the user
         $rules['user'] = array();
@@ -115,38 +127,27 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $rules['user']['Auth_Model_Account'] = array('show','update');
         if (!empty($options['config']['query'])) {
             $rules['user']['Query_Model_Form'] = array('submit');
-            $rules['user']['Query_Model_CurrentJobs'] =
-                    array('index', 'show', 'kill', 'remove', 'rename');
-            $rules['user']['Query_Model_Database'] = array('show', 'download', 'file', 'stream', 'regen');
-
-            $rules['user']['Query_Model_Examples'] =
-                    array('index', 'show');
-        }
-        if ($options['config']['data']) {
-            $rules['user']['Data_Model_Databases'] = array('index', 'show');
-            $rules['user']['Data_Model_Functions'] = array('index', 'show');
+            $rules['user']['Query_Model_CurrentJobs'] = array('index', 'show', 'kill', 'remove', 'rename');
+            $rules['user']['Query_Model_Database'] = array('index', 'download', 'file', 'stream', 'regen');
+            $rules['user']['Query_Model_Examples'] = array('index', 'show');
             $rules['user']['Data_Model_Viewer'] = array('rows', 'cols');
-        }
-        if (!empty($options['config']['query']) &&
-                strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
+
+            if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
                 strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
 
-            if ($options['config']['query']['guest']) {
-                $rules['guest']['Query_Model_Form'][] = 'plan';
-                $rules['guest']['Query_Model_Form'][] = 'mail';
-            } else {
                 $rules['user']['Query_Model_Form'][] = 'plan';
                 $rules['user']['Query_Model_Form'][] = 'mail';
             }
+
+            $rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote','createJobId', 'getPendingJob', 'getQuote', 'setDestructTime','setDestructTimeImpl', 'setExecutionDuration', 'setParameters','deleteJob', 'abortJob', 'runJob');
+        }
+        if ($options['config']['data']) {
+            $rules['user']['Data_Model_Viewer'] = array('rows', 'cols');
         }
         if (!empty($options['config']['files'])) {
             $rules['user']['Files_Model_Files'] = array('index', 'single', 'singleSize', 'multi', 'multiSize', 'row', 'rowSize');
         }
-        $rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote',
-            'createJobId', 'getPendingJob', 'getQuote', 'setDestructTime',
-            'setDestructTimeImpl', 'setExecutionDuration', 'setParameters',
-            'deleteJob', 'abortJob', 'runJob');
-
+        
         // add options for paqu parallel query
         if (!empty($options['config']['query']) &&
                 strtolower($options['config']['query']['processor']['name'] === 'paqu')) {
@@ -179,6 +180,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Auth_Model_Password' => array('set'),
             'Auth_Model_Details' => array('show', 'create', 'update', 'delete'),
             'Config_Model_Entries' => array('index', 'create', 'update', 'delete'),
+            'Config_Model_Messages' => array('index', 'create', 'update', 'delete'),
             'Config_Model_Templates' => array('index', 'create', 'update', 'delete'),
             'Auth_Model_Sessions' => array('rows', 'cols', 'destroy')
         );
@@ -193,13 +195,14 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                     array('index', 'show', 'create', 'update', 'delete');
         }
         if ($options['config']['data']) {
+            $rules['admin']['Data_Model_Viewer'] = array('rows', 'cols');
+            $rules['admin']['Data_Model_Functions'] =
+                    array('index', 'create', 'show', 'update', 'delete');
             $rules['admin']['Data_Model_Databases'] =
                     array('index', 'create', 'show', 'update', 'delete');
             $rules['admin']['Data_Model_Tables'] =
                     array('create', 'show', 'update', 'delete');
             $rules['admin']['Data_Model_Columns'] =
-                    array('create', 'show', 'update', 'delete');
-            $rules['admin']['Data_Model_Functions'] =
                     array('create', 'show', 'update', 'delete');
         }
 
@@ -271,6 +274,12 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $user = $authUserModel->rows();
         if ($user['nrows'] == 0) {
             foreach ($options['auth']['user'] as $credentials) {
+                // get the corresponding role_id and status_id 
+                $credentials['role_id'] = $authRoleModel->getId($credentials['role']);
+                unset($credentials['role']);
+                $credentials['status_id'] = $authStatusModel->getId($credentials['status']);
+                unset($credentials['status']);
+
                 // pre-process password first
                 $credentials['newPassword'] = $credentials['password'];
                 $credentials['confirmPassword'] = $credentials['password'];

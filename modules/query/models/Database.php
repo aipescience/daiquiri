@@ -27,7 +27,24 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
     /**
      * @return array 
      */
-    public function show() {
+    public function index() {
+        // get databases from database model
+        $databasesModel = new Data_Model_Databases();
+        $databases = $databasesModel->index(true);
+
+        // check permissions
+        foreach ($databases as &$database) {
+            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($database['publication_role_id'])) {
+                foreach ($database['tables'] as $key => &$table) {
+                    if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($table['publication_role_id'])) {
+
+                    } else {
+                        unset($database['tables'][$key]);
+                    }
+                }
+            }
+        }
+
         // get current username and the user db
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $userDbName = Daiquiri_Config::getInstance()->getUserDbName($username);
@@ -85,7 +102,8 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
             $userdb['tables'][] = $table;
         }
 
-        return $userdb;
+        $databases[] = $userdb;
+        return $databases;
     }
 
     public function download($table, array $formParams = array()) {

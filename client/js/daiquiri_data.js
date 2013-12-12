@@ -90,53 +90,12 @@ daiquiri.data.Data.prototype.show = function (id, opt) {
 
                 // bind links to modals
                 $('a','#display','#data').click(function(){
-                    // remove any other old modal
-                    $('.daiquiri-modal').remove();
-
-                    var modal = new daiquiri.Modal({
+                    new daiquiri.Modal({
                         'url': this.href,
                         'width': 725,
                         'class': 'daiquiri-user-table-modal',
-                        'success': function () {
-                            $('input[type=submit]','form','.daiquiri-modal').click(function () {
-                                if ($(this).attr('name') == 'submit') {
-                                    var form = $('form','.daiquiri-modal');
-                                    var action = form.attr('action');
-                                    var values = form.serialize() + '&submit=' + $(this).attr('value');
-                                    $.ajax({
-                                        url: action,
-                                        type: 'POST',
-                                        dataType: 'json',
-                                        headers: {
-                                            'Accept': 'application/json'
-                                        },
-                                        data: values,
-                                        error: daiquiri.common.ajaxError,
-                                        success: function (json) {
-                                            if (json.status == 'ok') {
-                                                // remove modal
-                                                $('.daiquiri-modal').modal('hide');
-
-                                                // redisplay
-                                                daiquiri.data.item.show();
-                                            } else if (json.status == 'error') {
-                                                daiquiri.common.updateCsrf(form, json.csrf);
-                                                daiquiri.common.showFormErrors(form, json.errors);
-                                            } else {
-                                                daiquiri.common.jsonError(json);
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    // cancel was clicked
-                                    $('.daiquiri-modal').modal('hide');
-                                }
-                                return false;
-                            });
-                        }
+                        'success': daiquiri.data.item.show
                     });
-
-                    modal.show();
                     return false;
                 });
             }

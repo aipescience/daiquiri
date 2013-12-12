@@ -20,38 +20,31 @@
  */
 ?>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        // create the user table inside the div
-        $('#table').daiquiri_table({
-            "rowsurl": "<?php echo $this->baseUrl('/auth/sessions/rows') ?>",
-            "colsurl": "<?php echo $this->baseUrl('/auth/sessions/cols') ?>",
-            'params': {
-                'options': true
-            },
-            'success': function() {
-                $('a','tbody','#table').click(function(){
-                    new daiquiri.Modal({
-                        'url': this.href,
-                        'width': 700,
-                        'success': daiquiri.table.items['table'].rows
-                    });
-                    return false;
-                });
-            }
-        });
-    });  
-</script>
-
 <div class="main">
-    <h2>Session management</h2>
+    <h2>Examples</h2>
 
-    <div id="table"></div>
-
+    <pre>
+        <?php
+        echo PHP_EOL;
+        echo "'query' => array(" . PHP_EOL;
+        echo "    'examples' => array(" . PHP_EOL;
+        foreach ($this->examples as $example) {
+            echo "        array(" . PHP_EOL;
+            foreach ($example as $key => $value) {
+                if (!in_array($key, array('id', 'tables'))) {
+                    echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
+                }
+            }
+            echo "        )," . PHP_EOL;
+        }
+        echo "    )" . PHP_EOL;
+        echo ")" . PHP_EOL;
+        ?>
+    </pre>
     <?php
     echo $this->internalLink(array(
-        'href' => '/admin',
-        'text' => 'Back to Administration',
+        'text' => 'Back to query examples',
+        'href' => '/query/examples/',
         'prepend' => '<p>',
         'append' => '</p>'));
     ?>

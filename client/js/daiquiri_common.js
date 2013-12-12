@@ -88,21 +88,12 @@ daiquiri.common.ajaxError = function(jqXHR, textStatus, errorThrown) {
     console.log('Ajax error: ' + jqXHR.statusText + ' (' + jqXHR.status + ')');
 
     if (jqXHR.status == 403) {
-        var label = 'Session expired';
-        var body = '<p>Your session is expired. Please log in again.</p>';
-        var primary = 'Login';
-    
-        var modal = new daiquiri.Modal({
-            'label': label,
-            'body': body,
-            'primary': primary,
+        new daiquiri.Modal({
+            'html': '<h2>Session expired</h2><p>Your session is expired. Please log in again.</p><p><button class="btn btn-primary">Login</button></p>',
             'success': function () {
-                $('#daiquiri-modal-primary').click(function () {
-                    window.location.replace(window.location.pathname);
-                })
+                window.location.replace(window.location.pathname);
             }
         });
-        modal.show();
     }
 };
 
