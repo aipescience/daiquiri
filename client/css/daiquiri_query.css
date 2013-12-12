@@ -32,7 +32,8 @@
     margin-bottom: 10px;
 }
 #query #plot {
-    height: 438px;
+    /*height: 438px;*/
+    height: 330px; 
 }
 #query .CodeMirror {
     line-height: 1.3em;
