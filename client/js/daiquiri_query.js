@@ -196,7 +196,7 @@ daiquiri.query.Query.prototype.displayPlan = function(redirect){
 
     new daiquiri.Modal({
         'url': redirect,
-        'width': 700,
+        'width': 720,
         'success': function () {
             var form = $('form','.daiquiri-modal');
 
