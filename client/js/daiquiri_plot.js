@@ -147,9 +147,9 @@ daiquiri.plot.Plot.prototype.displayPlot = function (xCol, yCol, number) {
 
             // gather data for plot
             for (var i = 0; i < json.rows.length; i++) {
-                x = json.rows[i]['cell'][0];
+                x = json.rows[i]['cell'][1];
                 if (json.rows[i]['cell'].length > 1) {
-                    y = json.rows[i]['cell'][1];
+                    y = json.rows[i]['cell'][2];
                 } else {
                     y = x;
                 }
