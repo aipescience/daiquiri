@@ -130,7 +130,9 @@ daiquiri.Modal.prototype.display = function () {
 
     // ajaxify form
     $('.daiquiri-modal form input[type=submit]').on('click', function() {
-        if ($(this).attr('name') == 'submit') {
+
+        var name = $(this).attr('name');
+        if (name.indexOf('submit', name.length - 6) !== -1) { 
             var form = $('form','.daiquiri-modal');
             var action = form.attr('action');
             var values = form.serialize() + '&submit=' + $(this).attr('value');

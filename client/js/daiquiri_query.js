@@ -243,17 +243,7 @@ daiquiri.query.Query.prototype.submitPlan = function(form){
         data: values,
         error: daiquiri.common.ajaxError,
         success: function (json){
-            if (json.status == 'ok') {
-                // hide modal
-                $('.daiquiri-modal').modal('hide');
-                
-                // store new job and show modal for acknowledgement
-                // (short timeout to fade out the modal)
-                self.storeNewJob(json.job);
-            } else {
-                daiquiri.common.updateCsrf(form, json.csrf);
-                daiquiri.common.showFormErrors(form, json.errors);
-            }   
+            self.storeNewJob(json.job);  
         }
     });
 };
