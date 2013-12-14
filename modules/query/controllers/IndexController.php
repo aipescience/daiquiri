@@ -87,6 +87,7 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     public function planAction() {
         // get form from request default is sql
         $form = $this->_getParam('form', 'sql');
+        $mail = $this->_getParam('mail');
 
         // get the model
         $model = Daiquiri_Proxy::factory('Query_Model_Form');
@@ -99,7 +100,7 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
                 $this->_redirect($baseurl . '/query/index/form?form=' . $form);
             } else {
                 // call the plan
-                $response = $model->plan($this->_request->getPost());
+                $response = $model->plan($mail, $this->_request->getPost());
             }
         } else {
             // just display the form

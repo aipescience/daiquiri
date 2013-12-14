@@ -219,10 +219,10 @@ daiquiri.query.Query.prototype.mailPlan = function(form){
 
     // get the action url and the values from the form
     var action = $(form).attr('action');
-    var values = $(form).serialize() + '&plan_mail=1';
+    var values = $(form).serialize();
 
     $.ajax({
-        url: action,
+        url: action + '?mail=1',
         type: 'POST',
         dataType: 'json',
         headers: {

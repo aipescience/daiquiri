@@ -179,7 +179,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
         );
     }
 
-    public function plan(array $formParams = array()) {
+    public function plan($mail = null, array $formParams = array()) {
         // get query, tablename and queue from session
         $ns = new Zend_Session_Namespace('query_plan');
 
@@ -237,7 +237,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                     $plan = false;
                 }
 
-                if (isset($values["plan_mail"]) && $values["plan_mail"] !== Null) {
+                if ($mail !== null) {
                     // store plan in session
                     if ($plan !== false) {
                         $ns->planString = $plan;
