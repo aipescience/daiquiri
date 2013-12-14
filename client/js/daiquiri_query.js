@@ -197,54 +197,16 @@ daiquiri.query.Query.prototype.displayPlan = function(redirect){
     new daiquiri.Modal({
         'url': redirect,
         'width': 720,
-        'success': function () {
-            var form = $('form','.daiquiri-modal');
-
-            $('#plan_query').daiquiri_codemirror();
-
-            $('#plan_submit').click(function () {
-                self.submitPlan(form);
-                return false;
-            });
-
-            $('#plan_cancel').click(function () {
-                $('.daiquiri-modal').modal('hide');
-                return false;
-            });
-
-            $('#plan_mail').click(function () {
-                self.mailPlan(form);
-                return false;
-            });
+        'success': function (json) {
+            if (typeof json === 'undefined') {
+                // the mail button was clicked!
+                console.log($('.daiquiri-modal form'));
+                self.mailPlan($('.daiquiri-modal form'));
+            } else {
+                // the form was submitted
+                self.storeNewJob(json.job);  
+            }
         }                    
-    });
-};
-
-/**
- * Overrides the submit button of the plan form with an ajax call.
- */
-daiquiri.query.Query.prototype.submitPlan = function(form){ 
-    var self = this;
-
-    // if the code mirror plugin is present, save its content to the form
-    $('#plan_query').daiquiri_codemirror_save();
-
-    // get the action url and the values from the form
-    var action = $(form).attr('action');
-    var values = $(form).serialize();
-
-    $.ajax({
-        url: action,
-        type: 'POST',
-        dataType: 'json',
-        headers: {
-            'Accept': 'application/json'
-        },
-        data: values,
-        error: daiquiri.common.ajaxError,
-        success: function (json){
-            self.storeNewJob(json.job);  
-        }
     });
 };
 
