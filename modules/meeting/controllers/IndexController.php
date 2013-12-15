@@ -20,16 +20,14 @@
  *  limitations under the License.
  */
 
-class Conference_IndexController extends Daiquiri_Controller_Abstract {
-
-    protected $_conference;
+class Meeting_IndexController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        $this->conference = $this->_getParam('title');
+        
     }
 
     public function indexAction() {
-        $this->view->title = $this->conference;
+        
     }
 
 }
