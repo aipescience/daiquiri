@@ -108,6 +108,11 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         return $this->_daiquiri->$key;
     }
 
+    public function getConfig() {
+        return $this->_daiquiri->toArray();
+    }
+
+
     public function isEmpty() {
         return ($this->_daiquiri->count() == 0);
     }

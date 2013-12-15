@@ -20,6 +20,28 @@
  *  limitations under the License.
  */
 
-class Conference_Bootstrap extends Zend_Application_Module_Bootstrap {
-    
+class Auth_Form_Resources extends Daiquiri_Form_Abstract {
+
+    public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
+        // add elements
+        $this->addElement('text', 'resource', array(
+            'label' => 'Resource',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
+
+        $this->addPrimaryButtonElement('submit', 'Create Resource');
+        $this->addButtonElement('cancel', 'Cancel');
+
+        // add groups
+        $this->addHorizontalGroup(array('resource'));
+        $this->addActionGroup(array('submit', 'cancel'));
+    }
+
 }

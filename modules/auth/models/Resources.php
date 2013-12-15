@@ -34,4 +34,32 @@ class Auth_Model_Resources extends Daiquiri_Model_SimpleTable {
         $this->setValueField('resource');
     }
 
+    /**
+     * Creates a resource for the ACLs.
+     * @param array $formParams
+     */
+    public function create(array $formParams = array()) {
+        // create the form object
+        $form = new Auth_Form_Resources();
+
+        // valiadate the form if POST
+        if (!empty($formParams) && $form->isValid($formParams)) {
+            // get the form values
+            $values = $form->getValues();
+
+            // check if resource is allready there
+            $resource = $this->getId($values['resource']);
+            if (empty($resource)) {
+                $this->getResource()->insertRow(array(
+                    'resource' => $values['resource']
+                ));
+            }
+
+            return array('status' => 'ok');
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+
 }

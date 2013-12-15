@@ -33,6 +33,11 @@ class Config_EntriesController extends Daiquiri_Controller_Abstract {
         $this->view->status = 'ok';
     }
 
+    public function exportAction() {
+        $this->view->data = Daiquiri_Config::getInstance()->getConfig();
+        $this->view->status = 'ok';
+    }
+
     public function createAction() {
         // get redirect url
         $redirect = $this->_getParam('redirect', '/config/');
