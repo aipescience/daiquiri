@@ -108,6 +108,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Data_Model_Databases',
             'Data_Model_Tables',
             'Data_Model_Columns',
+            // meeting
+            'Meeting_Model_Meetings',
             // files module
             'Files_Model_Files',
             // query module
@@ -208,6 +210,12 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 'create','show','update','delete'
             );
         }
+
+        // construct rules for meeting module
+        $rules['guest']['Meeting_Model_Meetings'] = array('index','show');
+        $rules['admin']['Meeting_Model_Meetings'] = array(
+            'index','create','show','update','delete'
+        );
 
         // construct rules for files module
         if (!empty($options['config']['files'])) {
