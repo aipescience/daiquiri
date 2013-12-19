@@ -60,7 +60,11 @@ class Auth_Model_Rules extends Daiquiri_Model_SimpleTable {
                 // check if it is an app
                 $roleId = $appsModel->getId($values['role']);
                 if ($roleId === null) {
-                    return array('form' => $form, 'status' => 'error', 'error' => 'role "' . $values['role'] . '" not found in database');
+                    return array(
+                        'form' => $form,
+                        'status' => 'error',
+                        'error' => 'role "' . $values['role'] . '" not found in database'
+                    );
                 } else {
                     $roleId = - $roleId;
                 }
@@ -70,9 +74,11 @@ class Auth_Model_Rules extends Daiquiri_Model_SimpleTable {
             } else {
                 $resourceId = $resourceModel->getId($values['resource']);
                 if ($resourceId === null) {
-                    // create resource
-                    $resourceModel->addValue($values['resource']);
-                    $resourceId = $resourceModel->getId($values['resource']);
+                    return array(
+                        'form' => $form,
+                        'status' => 'error',
+                        'error' => 'resource "' . $values['resource'] . '" not found in database'
+                    );
                 }
             }
             if ($values['permissions'] === '') {

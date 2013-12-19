@@ -62,9 +62,11 @@
         'href' => '/config/templates/create',
         'prepend' => '<p>',
         'append' => '</p>'));
-    ?>
-
-    <?php
+    echo $this->internalLink(array(
+        'text' => 'Export to init.php syntax',
+        'href' => '/config/templates/export',
+        'prepend' => '<p>',
+        'append' => '</p>'));
     echo $this->internalLink(array(
         'text' => 'Back to Administration',
         'href' => '/admin/',

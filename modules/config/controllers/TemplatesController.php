@@ -33,6 +33,11 @@ class Config_TemplatesController extends Daiquiri_Controller_Abstract {
         $this->view->status = 'ok';
     }
 
+    public function exportAction() {
+        $this->view->data = $this->_model->index();
+        $this->view->status = 'ok';
+    }
+
     public function createAction() {
         // get redirect url
         $redirect = $this->_getParam('redirect', '/config/templates');
