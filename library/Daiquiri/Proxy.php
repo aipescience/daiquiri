@@ -63,6 +63,10 @@ class Daiquiri_Proxy {
         }
     }
 
+    public function getClass() {
+        return get_class($this->_model);
+    }
+
     /**
      * Constructs the proxy and the model.
      * @return Daiquiri_Proxy

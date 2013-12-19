@@ -40,7 +40,7 @@ class Daiquiri_Init {
     protected $_init_models = array();
     protected $_opts = array();
     protected $_modules = array(
-        'admin', 'auth', 'cms', 'conference', 'config', 'contact', 'query', 'data', 'files', 'uws'
+        'admin', 'auth', 'config', 'contact', 'data', 'files', 'meeting', 'query', 'uws'
     );
     protected $_commandline_options = array(
         'h|help' => 'Displays usage information.',

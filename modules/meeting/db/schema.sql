@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `Meeting_Meetings` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(256) NOT NULL,
+  `title` VARCHAR(256) NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Meeting_MeetingsDetails` (

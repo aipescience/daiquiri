@@ -20,14 +20,11 @@
  *  limitations under the License.
  */
 
-/**
- * @class   Daiquiri_Controller_Abstract Abstract.php
- * @brief   Abstract class for daiquiri controllers
- * 
- * Abstract class for daiquiri controllers providing commonly used methods. This
- * class extends the default Zend Controller.
- * 
- */
-abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
+class Meeting_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
+
+    public function __construct() {
+        $this->setTable('Daiquiri_Model_DbTable_Simple');
+        $this->getTable()->setName('Meeting_Meetings');
+    }
 
 }
