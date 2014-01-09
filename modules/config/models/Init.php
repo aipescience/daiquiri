@@ -240,22 +240,24 @@ class Config_Model_Init extends Daiquiri_Model_Init {
         }
 
         // check download adapters
-        foreach ($output['query']['download']['adapter']['enabled'] as $key => $adapter) {
-            $config = $output['query']['download']['adapter']['config'][$adapter];
-            if ($config['compress'] === false || $config['compress'] === true) {
-                $this->_error("Unknown compression '{$config['compress']}' in query.download.adapter.{$key}. Only 'none', 'zip', 'gzip', 'bzip2', 'pbzip2' allowed.");
-            }
-
-            switch ($config['compress']) {
-                case 'none':
-                case 'zip':
-                case 'gzip':
-                case 'bzip2':
-                case 'pbzip2':
-                    break;
-                default:
+        if (!empty($output['query']['download']['adapter']['enabled'])) {
+            foreach ($output['query']['download']['adapter']['enabled'] as $key => $adapter) {
+                $config = $output['query']['download']['adapter']['config'][$adapter];
+                if ($config['compress'] === false || $config['compress'] === true) {
                     $this->_error("Unknown compression '{$config['compress']}' in query.download.adapter.{$key}. Only 'none', 'zip', 'gzip', 'bzip2', 'pbzip2' allowed.");
-                    break;
+                }
+
+                switch ($config['compress']) {
+                    case 'none':
+                    case 'zip':
+                    case 'gzip':
+                    case 'bzip2':
+                    case 'pbzip2':
+                        break;
+                    default:
+                        $this->_error("Unknown compression '{$config['compress']}' in query.download.adapter.{$key}. Only 'none', 'zip', 'gzip', 'bzip2', 'pbzip2' allowed.");
+                        break;
+                }
             }
         }
 
