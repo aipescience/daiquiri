@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Meetings_Form_ContributionTypes extends Daiquiri_Form_Abstract {
+class Meetings_Form_ParticipantDetailKey extends Daiquiri_Form_Abstract {
 
     private $_submit;
     private $_entry;
@@ -38,8 +38,8 @@ class Meetings_Form_ContributionTypes extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'contribution_type', array(
-            'label' => 'Contribution type',
+        $this->addElement('text', 'key', array(
+            'label' => 'Participant detail key',
             'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -52,11 +52,11 @@ class Meetings_Form_ContributionTypes extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('contribution_type'));
+        $this->addHorizontalGroup(array('key'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('contribution_type') as $element) {
+        foreach (array('key') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

@@ -38,7 +38,7 @@ class Meetings_Model_Meetings extends Daiquiri_Model_CRUD {
         $participantDetailKeysModel = new Meetings_Model_ParticipantDetailKeys();
 
         // create the form object
-        $form = new Meetings_Form_Meetings(array(
+        $form = new Meetings_Form_Meeting(array(
             'submit'=> 'Create meeting',
             'contributionTypes' => $contributionTypeModel->getResource()->fetchValues('contribution_type'),
             'participantDetailKeys' => $participantDetailKeysModel->getResource()->fetchValues('key')
@@ -79,7 +79,7 @@ class Meetings_Model_Meetings extends Daiquiri_Model_CRUD {
         $participantDetailKeysModel = new Meetings_Model_ParticipantDetailKeys();
 
         // create the form object
-        $form = new Meetings_Form_Meetings(array(
+        $form = new Meetings_Form_Meeting(array(
             'submit'=> 'Update meeting',
             'contributionTypes' => $contributionTypeModel->getResource()->fetchValues('contribution_type'),
             'participantDetailKeys' => $participantDetailKeysModel->getResource()->fetchValues('key'),

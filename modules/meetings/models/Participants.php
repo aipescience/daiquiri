@@ -40,13 +40,12 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
 
     public function create($meetingId, array $formParams = array()) {
         // get models
-        $meetingTypeModel = new Meetings_Model_Meetings();
-        $meeting = $meetingTypeModel->getResource()->fetchRow($meetingId);
+        $meetingsModel = new Meetings_Model_Meetings();
 
         // create the form object
-        $form = new Meetings_Form_Participants(array(
+        $form = new Meetings_Form_Participant(array(
             'submit'=> 'Create participant',
-            'meeting' => $meeting
+            'meeting' => $meetingsModel->getResource()->fetchRow($meetingId)
         ));
 
         // valiadate the form if POST
@@ -99,11 +98,11 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         }
 
         // get the meeting
-        $meetingTypeModel = new Meetings_Model_Meetings();
-        $meeting = $meetingTypeModel->getResource()->fetchRow($entry['meeting_id']);
+        $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($entry['meeting_id']);
 
         // create the form object
-        $form = new Meetings_Form_Participants(array(
+        $form = new Meetings_Form_Participant(array(
             'submit'=> 'Update participant',
             'meeting' => $meeting,
             'entry' => $entry

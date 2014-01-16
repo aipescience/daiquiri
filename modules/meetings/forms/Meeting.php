@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Meetings_Form_Meetings extends Daiquiri_Form_Abstract {
+class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
 
     private $_submit;
     private $_entry;

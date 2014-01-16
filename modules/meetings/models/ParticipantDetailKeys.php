@@ -34,11 +34,11 @@ class Meetings_Model_ParticipantDetailKeys extends Daiquiri_Model_CRUD {
 
         $this->_options = array(
             'create' => array(
-                'form' => 'Meetings_Form_ParticipantDetailKeys',
+                'form' => 'Meetings_Form_ParticipantDetailKey',
                 'submit' => 'Create participant detail key'
             ),
             'update' => array(
-                'form' => 'Meetings_Form_ParticipantDetailKeys',
+                'form' => 'Meetings_Form_ParticipantDetailKey',
                 'submit' => 'Update participant detail key'
             ),
             'delete' => array(

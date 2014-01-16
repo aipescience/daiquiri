@@ -28,17 +28,21 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Email</th>
+                <th>Title</th>
+                <th>Type</th>
                 <th>Meeting</th>
+                <th>Participant</th>
                 <th>Options</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($this->data as $row): ?>
                 <tr>
-                    <?php foreach ($row as $element): ?>
-                    <td><?php echo $this->escape($element); ?></td>
-                    <?php endforeach; ?>
+                    <td><?php echo $this->escape($row['id']); ?></td>
+                    <td><?php echo $this->escape($row['title']); ?></td>
+                    <td><?php echo $this->escape($row['contribution_type']); ?></td>
+                    <td><?php echo $this->escape($row['meeting_title']); ?></td>
+                    <td><?php echo $this->escape($row['participant_email']); ?></td>
                     <td>
                         <?php 
                         echo $this->internalLink(array(

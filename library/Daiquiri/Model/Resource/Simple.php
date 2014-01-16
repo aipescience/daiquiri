@@ -133,10 +133,6 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      * @return array
      */
     public function fetchCols($format = 'plain') {
-        if (empty($tablename)){
-            $tablename = $this->getTablename();
-        }
-
         $desc = $this->getAdapter()->describeTable($this->getTablename());
         $cols = array_keys($desc);
 
@@ -152,8 +148,22 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
-     * Fetches one row specified by its id from the previously set database table.
-     * @param int $id
+     * Fetches the primary key of the previously set database table.
+     * @param string $format format of the output (plain or db)
+     * @return array
+     */
+    public function fetchPrimary() {
+        $desc = $this->getAdapter()->describeTable($this->getTablename());
+        foreach ($desc as $colname => $col) {
+            if ($col['PRIMARY'] === true) {
+                return $colname;
+            }
+        }
+    }
+
+    /**
+     * Fetches one row specified by its primary key from the previously set database table.
+     * @param int $id primary key of the row
      * @throws Exception
      * @return Zend_Db_Table_Row_Abstract
      */
@@ -162,11 +172,11 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
             throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
         }
 
-        // TODO get primary key
+        $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
 
         $select = $this->getAdapter()->select();
         $select->from($this->getTablename());
-        $select->where('id = ?', $id);
+        $select->where($identifier, $id);
 
         // query database
         $row = $this->getAdapter()->fetchRow($select);
@@ -178,7 +188,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
-     * Fetches the id of one row specified by SQL keywords from the previously set database table.
+     * Fetches the of one row specified by SQL keywords from the previously set database table.
      * @param array $sqloptions array of sqloptions (start,limit,order,where,from)
      * @return int
      */
@@ -192,7 +202,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
             throw new Exception('id not found in ' . get_class($this) . '::fetchId()');
         }
 
-        return (int) $row['id'];
+        return (int) $row[$this->fetchPrimary()];
     }
 
     /**
@@ -211,7 +221,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
-     * Fetches one field and the id as a flat array from the previously set database table.
+     * Fetches primary key and one specified field as a flat array from the previously set database table.
      * @param string $field name of the field
      * @return array
      */
@@ -220,14 +230,17 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
             throw new Exception('$fieldname not provided in ' . get_class($this) . '::insertRow()');
         }
 
+        // get the name of the primary key
+        $primary = $this->fetchPrimary();
+
         // get select object
         $select = $this->getAdapter()->select();
-        $select->from($this->getTablename(), array('id', $fieldname));
+        $select->from($this->getTablename(), array($primary, $fieldname));
 
         // query database, construct array, and return
         $data = array();
         foreach($this->getAdapter()->fetchAll($select) as $row) {
-            $data[$row['id']] = $row[$fieldname];
+            $data[$row[$primary]] = $row[$fieldname];
         }
         return $data;
     }
@@ -261,9 +274,10 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
-     * Inserts a row in the previously set database table according to the array $data.
+     * Inserts a row in the previously set database table according to the array $data
+     * and returns the primary key of the new row.
      * @param array $data row data
-     * @return int $id primary key (id) of the inserted row
+     * @return int
      * @throws Exception
      */
     public function insertRow($data = array()) {
@@ -276,9 +290,9 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
-     * Updates a row specified by its id in the previously set database table.
+     * Updates a row specified by its primary key in the previously set database table.
      * according to the array $data.
-     * @param int $id id of the row
+     * @param int $id primary key of the row
      * @param array $data row data
      * @throws Exception
      */
@@ -286,22 +300,20 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         if (empty($id) || empty($data)) {
             throw new Exception('$id or $data not provided in ' . get_class($this) . '::insertRow()');
         }
-
-        $this->getAdapter()->update($this->getTablename(), $data, array('id = ?' => $id));
+        $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
+        $this->getAdapter()->update($this->getTablename(), $data, array($identifier => $id));
     }
 
     /**
-     * Deletes a row specified by its id from the previously set database table.
-     * @param int $id id of the row
-     * @param string $tablename the name of the database table
+     * Deletes a row specified by its primary key from the previously set database table.
+     * @param int $id primary key of the row
      * @throws Exception
      */
-    public function deleteRow($id, $tablename = null) {
+    public function deleteRow($id) {
         if (empty($id)) {
             throw new Exception('$id not provided in ' . get_class($this) . '::deleteRow()');
         }
-
-        $this->getAdapter()->delete($this->getTablename(), array('id = ?' => $id));
+        $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
+        $this->getAdapter()->delete($this->getTablename(), array($identifier => $id));
     }
-
 }

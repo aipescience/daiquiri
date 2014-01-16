@@ -28,6 +28,7 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
         $request = $this->getRequest();
         $module  = $request->module;
         $controller = $request->controller; 
+        $name    = substr(str_replace('-', ' ', $controller), 0, -1);;
 
         $this->_options = array(
             'index' => array(
@@ -35,19 +36,19 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
                 'url' => '/' . $module . '/' . $controller . '/'
             ),
             'show' => array(
-                'title' => 'Show ' . $controller,
+                'title' => 'Show ' . $name,
                 'url' => '/' . $module . '/' . $controller . '/show/'
             ),
             'create' => array(
-                'title' => 'Create ' . $controller,
+                'title' => 'Create ' . $name,
                 'url' => '/' . $module . '/' . $controller . '/create/'
             ),
             'update' => array(
-                'title' => 'Update ' . $controller,
+                'title' => 'Update ' . $name,
                 'url' => '/' . $module . '/' . $controller . '/update/'
             ),
             'delete' => array(
-                'title' => 'Delete ' . $controller,
+                'title' => 'Delete ' . $name,
                 'url' => '/' . $module . '/' . $controller . '/delete/'
             )
         );

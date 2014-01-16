@@ -21,32 +21,20 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->data['title']); ?></h2>
+    <h2><?php echo $this->escape($this->title); ?></h2>
+
     <table class="table table-bordered">
         <tbody>
             <?php foreach ($this->data as $key => $value): ?>
                 <tr>
                     <td class="onehundredeighty"><?php echo ucfirst($this->escape($key)); ?></td>
-                    <td>
-                        <?php 
-                        if (is_array($value)) {
-                            echo $this->escape(implode(',',$value)); 
-                        } else {
-                            echo $this->escape($value);
-                        }
-                        ?>
-                    </td>
+                    <td><?php echo $this->escape($value); ?></td>
                 </tr>
             <?php endforeach; ?>  
         </tbody>
     </table>
 
     <?php
-    echo $this->internalLink(array(
-        'text' => 'Create participant for this meeting',
-        'href' => '/meetings/participants/create?meetingId='. $this->data['id'],
-        'prepend' => '<p>',
-        'append' => '</p>'));
     echo $this->internalLink(array(
         'text' => 'Back',
         'href' => $this->redirect,

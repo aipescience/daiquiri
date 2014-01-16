@@ -52,6 +52,24 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
         );
     }
 
+    public function fetchValues($fieldname, $meetingId) {
+        if (empty($fieldname) || empty($meetingId)) {
+            throw new Exception('$fieldname or $meetingId not provided in ' . get_class($this) . '::insertRow()');
+        }
+
+        // get select object
+        $select = $this->getAdapter()->select();
+        $select->from('Meetings_Participants', array('id', $fieldname));
+        $select->where('meeting_id = ?', $meetingId);
+
+        // query database, construct array, and return
+        $data = array();
+        foreach($this->getAdapter()->fetchAll($select) as $row) {
+            $data[$row['id']] = $row[$fieldname];
+        }
+        return $data;
+    }
+
     public function insertRow(array $data) {
         if (empty($data)) {
             throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
