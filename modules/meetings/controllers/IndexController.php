@@ -20,22 +20,17 @@
  *  limitations under the License.
  */
 
-/**
- * Base class for simple DbTable objects.
- */
-class Daiquiri_Model_DbTable_Simple extends Daiquiri_Model_DbTable_Abstract {
-    
-    public function __construct($tablename = null, $dbname = null) {
-        parent::__construct();
-        
-        if (empty($tablename)) {
-            // throw new Exception('$tablename not provided in ' . get_class($this) . '::__construct()');
-        } else {
-            $this->setName($tablename);
-        }
-        if (!empty($dbname)) {
-            $this->setDb($dbname);
-        }
+class Meetings_IndexController extends Daiquiri_Controller_Abstract {
+
+    public function init() {
+
     }
 
+    public function indexAction() {
+        if (Daiquiri_Auth::getInstance()->checkAcl('Meetings_Model_Meetings', 'index')) {
+            $this->view->status = 'ok';
+        } else {
+            throw new Daiquiri_Exception_AuthError();
+        }
+    }
 }

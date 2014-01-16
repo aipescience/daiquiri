@@ -1,6 +1,6 @@
 <?php
 
-/*
+/*  
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
@@ -20,22 +20,25 @@
  *  limitations under the License.
  */
 
-/**
- * Base class for simple DbTable objects.
- */
-class Daiquiri_Model_DbTable_Simple extends Daiquiri_Model_DbTable_Abstract {
-    
-    public function __construct($tablename = null, $dbname = null) {
-        parent::__construct();
-        
-        if (empty($tablename)) {
-            // throw new Exception('$tablename not provided in ' . get_class($this) . '::__construct()');
-        } else {
-            $this->setName($tablename);
-        }
-        if (!empty($dbname)) {
-            $this->setDb($dbname);
-        }
-    }
+class Meetings_Model_ContributionTypes extends Daiquiri_Model_CRUD {
 
+    public function __construct() {
+        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->getResource()->setTablename('Meetings_ContributionTypes');
+
+        $this->_options = array(
+            'create' => array(
+                'form' => 'Meetings_Form_ContributionTypes',
+                'submit' => 'Create contribution type'
+            ),
+            'update' => array(
+                'form' => 'Meetings_Form_ContributionTypes',
+                'submit' => 'Update contribution type'
+            ),
+            'delete' => array(
+                'form' => 'Meetings_Form_Delete',
+                'submit' => 'Delete contribution type'
+            ),
+        );
+    }
 }

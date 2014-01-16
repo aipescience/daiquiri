@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -19,23 +18,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-/**
- * Base class for simple DbTable objects.
- */
-class Daiquiri_Model_DbTable_Simple extends Daiquiri_Model_DbTable_Abstract {
-    
-    public function __construct($tablename = null, $dbname = null) {
-        parent::__construct();
-        
-        if (empty($tablename)) {
-            // throw new Exception('$tablename not provided in ' . get_class($this) . '::__construct()');
-        } else {
-            $this->setName($tablename);
-        }
-        if (!empty($dbname)) {
-            $this->setDb($dbname);
-        }
-    }
-
-}
+<div class="main">
+    <h2><?php echo $this->escape($this->title) ?></h2>
+    <?php if ($this->status === 'ok'): ?>
+        <p>Creation successful.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

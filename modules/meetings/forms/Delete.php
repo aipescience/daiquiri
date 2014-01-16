@@ -20,22 +20,24 @@
  *  limitations under the License.
  */
 
-/**
- * Base class for simple DbTable objects.
- */
-class Daiquiri_Model_DbTable_Simple extends Daiquiri_Model_DbTable_Abstract {
-    
-    public function __construct($tablename = null, $dbname = null) {
-        parent::__construct();
+class Meetings_Form_Delete extends Daiquiri_Form_Abstract {
+
+    protected $_submit;
+
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
+    }
+
+    public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
         
-        if (empty($tablename)) {
-            // throw new Exception('$tablename not provided in ' . get_class($this) . '::__construct()');
-        } else {
-            $this->setName($tablename);
-        }
-        if (!empty($dbname)) {
-            $this->setDb($dbname);
-        }
+        // add fields
+        $this->addDangerButtonElement('submit', $this->_submit);
+        $this->addButtonElement('cancel', 'Cancel');
+
+        // add groups
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

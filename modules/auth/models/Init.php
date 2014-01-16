@@ -109,7 +109,12 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Data_Model_Tables',
             'Data_Model_Columns',
             // meeting
-            'Meeting_Model_Meetings',
+            'Meetings_Model_Meetings',
+            'Meetings_Model_Participants',
+            'Meetings_Model_ParticipantDetails',
+            'Meetings_Model_ParticipantDetailKeys',
+            'Meetings_Model_Contributions',
+            'Meetings_Model_ContributionTypes',
             // files module
             'Files_Model_Files',
             // query module
@@ -212,21 +217,32 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
 
         // construct rules for meeting module
-        $rules['guest']['Meeting_Model_Meetings'] = array('index','show');
-        $rules['admin']['Meeting_Model_Meetings'] = array(
-            'index','create','show','update','delete'
-        );
+        if (!empty($options['config']['meetings'])) {
+            $rules['admin']['Meetings_Model_Meetings'] = array(
+                'index','create','show','update','delete'
+            );
+            $rules['admin']['Meetings_Model_Participants'] = array(
+                'index','create','show','update','delete'
+            );
+            $rules['admin']['Meetings_Model_ParticipantDetails'] = array(
+                'index','create','show','update','delete'
+            );
+            $rules['admin']['Meetings_Model_ParticipantDetailKeys'] = array(
+                'index','create','show','update','delete'
+            );
+            $rules['admin']['Meetings_Model_Contributions'] = array(
+                'index','create','show','update','delete'
+            );
+            $rules['admin']['Meetings_Model_ContributionTypes'] = array(
+                'index','create','show','update','delete'
+            );
+        }
 
         // construct rules for files module
         if (!empty($options['config']['files'])) {
             $rules['user']['Files_Model_Files'] = array(
                 'index', 'single', 'singleSize', 'multi', 'multiSize', 'row', 'rowSize'
             );
-        }
-
-        // construct rules for meeting module
-        if (!empty($options['config']['meeting'])) {
-
         }
 
         // construct rules for query module

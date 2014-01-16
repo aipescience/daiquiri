@@ -20,22 +20,6 @@
  *  limitations under the License.
  */
 
-/**
- * Base class for simple DbTable objects.
- */
-class Daiquiri_Model_DbTable_Simple extends Daiquiri_Model_DbTable_Abstract {
+class Meetings_Bootstrap extends Zend_Application_Module_Bootstrap {
     
-    public function __construct($tablename = null, $dbname = null) {
-        parent::__construct();
-        
-        if (empty($tablename)) {
-            // throw new Exception('$tablename not provided in ' . get_class($this) . '::__construct()');
-        } else {
-            $this->setName($tablename);
-        }
-        if (!empty($dbname)) {
-            $this->setDb($dbname);
-        }
-    }
-
 }

@@ -54,8 +54,10 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $this->view->data = $this->_model->index();
-        $this->view->status = 'ok';
+        $response = $this->_model->index();
+        foreach ($response as $key => $value) {
+            $this->view->$key = $value;
+        }
 
         $this->view->options = $this->_options;
         $this->view->model = $this->_model->getClass();
@@ -64,14 +66,14 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
     public function showAction() {
         // get params
         $id = $this->_getParam('id'); 
-        $redirect = $this->_getParam('redirect', $this->_redirectUrl);
+        $redirect = $this->_getParam('redirect', $this->_options['index']['url']);
 
         // get the data from the model
         $response = $this->_model->show($id);
 
         // assign to view
         $this->view->redirect = $redirect;
-
+        $this->view->title = $this->_options['show']['title'];
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
@@ -79,8 +81,7 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
 
     public function createAction() {
         // get params
-        $id = $this->_getParam('id'); 
-        $redirect = $this->_getParam('redirect', $this->_redirectUrl);
+        $redirect = $this->_getParam('redirect', $this->_options['index']['url']);
 
         // check if POST or GET
         if ($this->_request->isPost()) {
@@ -97,15 +98,15 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
         }
 
         // set action for form
-        if ($this->_createUrl !== null && array_key_exists('form', $response)) {
+        if ($this->_options['create']['url'] !== null && array_key_exists('form', $response)) {
             $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $this->_createUrl;
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $this->_options['create']['url'];
             $form->setAction($action);
         }
 
         // assign to view
         $this->view->redirect = $redirect;
-        $this->view->createTitle = $this->_createTitle;
+        $this->view->title = $this->_options['create']['title'];
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
@@ -114,7 +115,7 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
     public function updateAction() {
         // get params
         $id = $this->_getParam('id'); 
-        $redirect = $this->_getParam('redirect', $this->_redirectUrl);
+        $redirect = $this->_getParam('redirect', $this->_options['index']['url']);
 
         // check if POST or GET
         if ($this->_request->isPost()) {
@@ -131,14 +132,15 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
         }
 
         // set action for form
-        if ($this->_updateUrl !== null && array_key_exists('form',$response)) {
+        if ($this->_options['update']['url'] !== null && array_key_exists('form',$response)) {
             $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $this->_updateUrl + '?id=' . $id;
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $this->_options['update']['url'] . '?id=' . $id;
             $form->setAction($action);
         }
 
         // assign to view
         $this->view->redirect = $redirect;
+        $this->view->title = $this->_options['update']['title'];
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
@@ -147,7 +149,7 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
     public function deleteAction() {
         // get params
         $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', $this->_redirectUrl);
+        $redirect = $this->_getParam('redirect', $this->_options['index']['url']);
 
         // check if POST or GET
         if ($this->_request->isPost()) {
@@ -164,14 +166,15 @@ abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
         }
 
         // set action for form
-        if ($this->_deleteUrl !== null && array_key_exists('form',$response)) {
+        if ($this->_options['delete']['url'] !== null && array_key_exists('form',$response)) {
             $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $this->_deleteUrl + '?id=' . $id;
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $this->_options['delete']['url'] . '?id=' . $id;
             $form->setAction($action);
         }
 
         // assign to view
         $this->view->redirect = $redirect;
+        $this->view->title = $this->_options['delete']['title'];
         foreach ($response as $key => $value) {
             $this->view->$key = $value;
         }
