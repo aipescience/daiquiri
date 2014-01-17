@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-abstract class Daiquiri_Controller_CRUD extends Daiquiri_Controller_Abstract {
+abstract class Daiquiri_Controller_AbstractCRUD extends Daiquiri_Controller_Abstract {
 
     protected $_options = null;
 

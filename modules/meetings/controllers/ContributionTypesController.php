@@ -20,10 +20,12 @@
  *  limitations under the License.
  */
 
-class Meetings_ContributionTypesController extends Daiquiri_Controller_CRUD {
+class Meetings_ContributionTypesController extends Daiquiri_Controller_AbstractCRUD {
 
     public function init() {
         parent::init();
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_ContributionTypes');
     }
+
+    
 }

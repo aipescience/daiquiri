@@ -20,13 +20,13 @@
  *  limitations under the License.
  */
 
-class Meetings_IndexController extends Daiquiri_Controller_Abstract {
+class Meetings_IndexController extends Daiquiri_Controller_AbstractCRUD {
 
     public function init() {
 
     }
 
-    public function indexAction() {
+    public function participantsAction() {
         if (Daiquiri_Auth::getInstance()->checkAcl('Meetings_Model_Meetings', 'index')) {
             $this->view->status = 'ok';
         } else {

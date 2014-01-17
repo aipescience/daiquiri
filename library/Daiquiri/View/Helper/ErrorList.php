@@ -21,29 +21,31 @@
  */
 
 /**
- * @class   Daiquiri_Controller_Abstract Abstract.php
- * @brief   Abstract class for daiquiri controllers
+ * @class   Daiquiri_View_Helper_Cols Cols.php
+ * @brief   Daiquiri View helper for displaying key value paired information
  * 
- * Abstract class for daiquiri controllers providing commonly used methods. This
- * class extends the default Zend Controller.
+ * Class implementing a Zend view helper for displaying key value paired information
+ * as a table where the keys are output in bold face and the value besides it as columns:
+ * *key*: value 
  * 
  */
-abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
+class Daiquiri_View_Helper_ErrorList extends Zend_View_Helper_Abstract {
 
-    public function setViewElements($response, $redirect = null) {
-        if (!empty($redirect)) {
-            $this->view->redirect = $redirect;
-        }
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+    public $view;
+
+    public function setView(Zend_View_Interface $view) {
+        $this->view = $view;
     }
 
-    public function setFormAction($response, $url) {
-        if (array_key_exists('form', $response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $url;
-            $form->setAction($action);
+    public function errorList($errors) {
+        $s = '<h4 class="text-error">Error</h4>';
+        $s .= '<ul class="text-error">';
+        foreach($errors as $error) {
+            $s .= '<li>' . $this->view->escape($error) . '</li>';
         }
+        $s .= '</div>';
+
+        return $s;
     }
+
 }

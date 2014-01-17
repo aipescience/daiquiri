@@ -19,31 +19,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-/**
- * @class   Daiquiri_Controller_Abstract Abstract.php
- * @brief   Abstract class for daiquiri controllers
- * 
- * Abstract class for daiquiri controllers providing commonly used methods. This
- * class extends the default Zend Controller.
- * 
- */
-abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
+<div class="main">
+    <h2>Registration</h2>
+    
+    <?php if ($this->status === 'ok'): ?>
+        <p>Your successfully validated your registration.</p>
+    <?php else: ?>
+        <p>Your registration could not been validated. The provided code is not valid.</p>
+    <?php endif; ?>
 
-    public function setViewElements($response, $redirect = null) {
-        if (!empty($redirect)) {
-            $this->view->redirect = $redirect;
-        }
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-    }
-
-    public function setFormAction($response, $url) {
-        if (array_key_exists('form', $response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $url;
-            $form->setAction($action);
-        }
-    }
-}
+</div>

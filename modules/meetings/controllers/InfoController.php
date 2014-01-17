@@ -20,30 +20,20 @@
  *  limitations under the License.
  */
 
-/**
- * @class   Daiquiri_Controller_Abstract Abstract.php
- * @brief   Abstract class for daiquiri controllers
- * 
- * Abstract class for daiquiri controllers providing commonly used methods. This
- * class extends the default Zend Controller.
- * 
- */
-abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
+class Meetings_InfoController extends Daiquiri_Controller_AbstractCRUD {
 
-    public function setViewElements($response, $redirect = null) {
-        if (!empty($redirect)) {
-            $this->view->redirect = $redirect;
-        }
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+    public function init() {
+        $this->_meetingId = $this->_getParam('meetingId');
+        if ($this->_meetingId === null) {
+            throw new Exception('$meetingId not provided in ' . get_class($this) . '::init()');
         }
     }
 
-    public function setFormAction($response, $url) {
-        if (array_key_exists('form', $response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $url;
-            $form->setAction($action);
-        }
+    public function participantsAction() {
+        $model = Daiquiri_Proxy::factory('Meetings_Model_Participants');
+        $response = $model->info($this->_meetingId);
+
+        // assign to view
+        $this->setViewElements($response);
     }
 }

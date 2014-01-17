@@ -110,15 +110,15 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
 
         // set where statement
         if (!empty($sqloptions['where'])) {
-            foreach ($sqloptions['where'] as $w) {
-                $select = $select->where($w);
+            foreach ($sqloptions['where'] as $key => $value) {
+                $select = $select->where($this->getAdapter()->quoteInto($key, $value));
             }
         }
         
         // set or where statement
         if (!empty($sqloptions['orWhere'])) {
             foreach ($sqloptions['orWhere'] as $w) {
-                $select = $select->orWhere($w);
+                $select = $select->orWhere($this->getAdapter()->quoteInto($key, $value));
             }
         }
 
@@ -176,7 +176,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
 
         $select = $this->getAdapter()->select();
         $select->from($this->getTablename());
-        $select->where($identifier, $id);
+        $select->where($identifier . '= ?', $id);
 
         // query database
         $row = $this->getAdapter()->fetchRow($select);

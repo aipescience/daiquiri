@@ -42,8 +42,17 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
         $this->setFormDecorators();
         $this->addCsrfElement();
         
-        // add elements
-        $elements = array('email');
+        foreach (array('firstname','lastname','affiliation') as $key) {
+            $this->addElement('text', $key, array(
+                'label' => ucfirst($key),
+                'class' => 'input-xxlarge',
+                'required' => true,
+                'filters' => array('StringTrim'),
+                'validators' => array(
+                    array('validator' => new Daiquiri_Form_Validator_Text()),
+                )
+            ));
+        }
         $validators = array(array('validator' => new Zend_Validate_EmailAddress()));
         $this->addElement('text', 'email', array(
             'label' => 'Email',
@@ -53,6 +62,7 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
             'validators' => $validators
         ));
 
+        // add elements
         foreach ($this->_meeting['participant_detail_keys'] as $id => $key) {
             $this->addElement('text', $key, array(
                 'label' => ucfirst($key),
@@ -66,6 +76,7 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
             $elements[] = $key;
         }
 
+        $elements = array();
         foreach ($this->_meeting['contribution_types'] as $id => $contribution_type) {
             $this->addElement('checkbox', $contribution_type . '_bool', array(
                 'label' => ucfirst($contribution_type),
@@ -98,20 +109,22 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup($elements);
+        $this->addHorizontalGroup(array_merge(array('firstname','lastname','affiliation','email'), $this->_meeting['participant_detail_keys']),'personal', 'Personal data');
+        $this->addHorizontalGroup($elements,'contributions', 'Contributions');
+
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array_merge(array('email'),$this->_meeting['participant_detail_keys']) as $element) {
+        foreach (array_merge(array('firstname','lastname','affiliation','email'),$this->_meeting['participant_detail_keys']) as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }
         }
         if (isset($this->_entry['contributions'])) {
             foreach ($this->_entry['contributions'] as $contribution) {
-                $this->setDefault($contribution_type . '_bool', 1);
-                $this->setDefault($contribution_type . '_title', $contribution['title']);
-                $this->setDefault($contribution_type . '_abstract', $contribution['abstract']);
+                $this->setDefault($contribution['contribution_type'] . '_bool', 1);
+                $this->setDefault($contribution['contribution_type'] . '_title', $contribution['title']);
+                $this->setDefault($contribution['contribution_type'] . '_abstract', $contribution['abstract']);
             }
         }
     }

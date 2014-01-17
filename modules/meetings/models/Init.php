@@ -39,50 +39,61 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
     public function init(array $options) {
         if ($options['config']['meetings'] && !empty($options['meetings'])) {
             // create contribution types
+
             $meetingsContributionTypeModel = new Meetings_Model_ContributionTypes();
-            $response = $meetingsContributionTypeModel->index();
-            if (empty($response['data'])) {
-                foreach ($options['meetings']['contributionTypes'] as $contributionType) {
-                    $a = array('contribution_type' => $contributionType);
-                    $r = $meetingsContributionTypeModel->create($a);
-                    $this->_check($r, $a);
+            if (!empty($options['meetings']['contributionTypes'])) {
+                $response = $meetingsContributionTypeModel->index();
+                if (empty($response['data'])) {
+                    foreach ($options['meetings']['contributionTypes'] as $contributionType) {
+                        $a = array('contribution_type' => $contributionType);
+                        $r = $meetingsContributionTypeModel->create($a);
+                        $this->_check($r, $a);
+                    }
                 }
             }
 
             // create participant detail keys
             $meetingsParticipantDetailKeyModel = new Meetings_Model_ParticipantDetailKeys();
-            $response = $meetingsParticipantDetailKeyModel->index();
-            if (empty($response['data'])) {
-                foreach ($options['meetings']['participantDetailKeys'] as $participantDetailKey) {
-                    $a = array('key' => $participantDetailKey);
-                    $r = $meetingsParticipantDetailKeyModel->create($a);
-                    $this->_check($r, $a);
+            if (!empty($options['meetings']['participantDetailKeys'])) {
+                $response = $meetingsParticipantDetailKeyModel->index();
+                if (empty($response['data'])) {
+                    foreach ($options['meetings']['participantDetailKeys'] as $participantDetailKey) {
+                        $a = array('key' => $participantDetailKey);
+                        $r = $meetingsParticipantDetailKeyModel->create($a);
+                        $this->_check($r, $a);
+                    }
                 }
-            } 
+            }
 
             // create meetings
             $meetingsMeetingModel = new Meetings_Model_Meetings();
-            $response = $meetingsMeetingModel->index();
-            if (empty($response['data'])) {
-                foreach ($options['meetings']['meetings'] as $a) {
-                    $a['contribution_type_id'] = array();
-                    foreach($a['contribution_types'] as $participant_detail_key) {
-                        $id = $meetingsContributionTypeModel->getResource()->fetchId($participant_detail_key);
-                        $a['contribution_type_id'][] = $id;
-                    }
-                    unset($a['contribution_types']);
+            if (!empty($options['meetings']['meetings'])) {
+                $response = $meetingsMeetingModel->index();
+                if (empty($response['data'])) {
+                    foreach ($options['meetings']['meetings'] as $a) {
+                        $a['contribution_type_id'] = array();
+                        foreach($a['contribution_types'] as $contribution_type) {
+                            $id = $meetingsContributionTypeModel->getResource()->fetchId(
+                                array('where' => array('`contribution_type` = ?' => $contribution_type))
+                            );
+                            $a['contribution_type_id'][] = $id;
+                        }
+                        unset($a['contribution_types']);
 
-                    $a['participant_detail_key_id'] = array();
-                    foreach($a['participant_detail_keys'] as $participant_detail_key) {
-                        $id = $meetingsParticipantDetailKeyModel->getResource()->fetchId($participant_detail_key);
-                        $a['participant_detail_key_id'][] = $id;
-                    }
-                    unset($a['participant_detail_keys']);
+                        $a['participant_detail_key_id'] = array();
+                        foreach($a['participant_detail_keys'] as $participant_detail_key) {
+                            $id = $meetingsParticipantDetailKeyModel->getResource()->fetchId(
+                                array('where' => array('`key` = ?' => $participant_detail_key))
+                            );
+                            $a['participant_detail_key_id'][] = $id;
+                        }
+                        unset($a['participant_detail_keys']);
 
-                    $r = $meetingsMeetingModel->create($a);
-                    $this->_check($r, $a);
+                        $r = $meetingsMeetingModel->create($a);
+                        $this->_check($r, $a);
+                    }
                 }
-            }           
+            }       
         }
     }
 

@@ -115,6 +115,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Meetings_Model_ParticipantDetailKeys',
             'Meetings_Model_Contributions',
             'Meetings_Model_ContributionTypes',
+            'Meetings_Model_Registration',
             // files module
             'Files_Model_Files',
             // query module
@@ -218,6 +219,11 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
 
         // construct rules for meeting module
         if (!empty($options['config']['meetings'])) {
+            // guest
+            $rules['guest']['Meetings_Model_Participants'] = array('info');
+            $rules['guest']['Meetings_Model_Registration'] = array('register','validate');
+
+            // admin
             $rules['admin']['Meetings_Model_Meetings'] = array(
                 'index','create','show','update','delete'
             );

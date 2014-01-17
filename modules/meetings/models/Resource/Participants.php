@@ -24,8 +24,9 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
 
     public function fetchRows() {
         $select = $this->getAdapter()->select();
-        $select->from('Meetings_Participants', array('id', 'email'));
-        $select->join('Meetings_Meetings', 'Meetings_Meetings.id = Meetings_Participants.meeting_id', array('title'));
+        $select->from('Meetings_Participants');
+        $select->join('Meetings_Meetings', 'Meetings_Meetings.id = Meetings_Participants.meeting_id', array('meeting_title' => 'title'));
+        $select->order('lastname ASC');
         
         return $this->getAdapter()->fetchAll($select);
     }
@@ -36,7 +37,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
         }
 
         $select = $this->getAdapter()->select();
-        $select->from('Meetings_Participants', array('id', 'email', 'meeting_id'));
+        $select->from('Meetings_Participants');
         $select->where('Meetings_Participants.id = ?', $id);
 
         $row = $this->getAdapter()->fetchRow($select);

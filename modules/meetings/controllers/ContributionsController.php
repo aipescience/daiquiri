@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Meetings_ContributionsController extends Daiquiri_Controller_CRUD {
+class Meetings_ContributionsController extends Daiquiri_Controller_AbstractCRUD {
 
     public function init() {
         parent::init();

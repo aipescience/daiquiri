@@ -38,6 +38,14 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         );
     }
 
+    public function info($meetingId = null) {
+        return array(
+            'status' => 'ok',
+            'data' => $this->getResource()->fetchRows(
+                array('where' => array('`meeting_id` = ?' => $meetingId)))
+        );
+    }
+
     public function create($meetingId, array $formParams = array()) {
         // get models
         $meetingsModel = new Meetings_Model_Meetings();
