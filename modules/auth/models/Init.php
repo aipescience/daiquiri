@@ -221,6 +221,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         if (!empty($options['config']['meetings'])) {
             // guest
             $rules['guest']['Meetings_Model_Participants'] = array('info');
+            $rules['guest']['Meetings_Model_Contributions'] = array('info');
             $rules['guest']['Meetings_Model_Registration'] = array('register','validate');
 
             // admin

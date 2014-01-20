@@ -25,7 +25,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Simple {
     public function fetchRows() {
         // get select object
         $select = $this->getAdapter()->select();
-        $select->from('Meetings_Meetings', array('id', 'title'));
+        $select->from('Meetings_Meetings');
 
         // get result convert to array and return
         return $this->getAdapter()->fetchAll($select);
@@ -37,7 +37,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Simple {
         }
 
         $select = $this->getAdapter()->select();
-        $select->from('Meetings_Meetings', array('id', 'title','description','begin','end'));
+        $select->from('Meetings_Meetings');
         $select->where('Meetings_Meetings.id = ?', $id);
 
         $row = $this->getAdapter()->fetchRow($select);

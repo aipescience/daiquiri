@@ -22,29 +22,18 @@
 ?>
 
 <div class="main">
-    <h2>Registration</h2>
-    
-    <?php if ($this->status === 'ok'): ?>
-        <p>Your registration was successful and a validation mail was send to the provided address.</p>
-        <p>Please follow the instructions in the mail to validate your registration.</p>
+    <?php if ($this->status != 'ok'): ?>
+        <h2>Contributions</h2>
+        <p>The list of contributions for this meeting is not available right now.</p>
     <?php else: ?>
-        <?php if (empty($this->form)): ?>
-            <?php echo $this->errorList($this->errors); ?>
-        <?php else: ?>
-            <p>
-                In order to register for the meeting, we kindly ask you to fill out the following form.
-            </p>
-            <?php echo $this->form; ?>
-        <?php endif; ?>
+        <?php foreach ($this->data as $contributionType => $contributions): ?>
+            <h2><?php echo $contributionType; ?></h2>
+
+            <?php foreach ($contributions as $contribution): ?>
+                <h4><?php echo $contribution['title']; ?></h4>
+                <h6><?php echo $contribution['participant_firstname'] . ' ' . $contribution['participant_lastname']; ?></h6>
+                <p><?php echo $contribution['abstract']; ?></p>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
     <?php endif; ?>
-
 </div>
-
-<script type="text/javascript">
-    $('#arrival').datepicker({
-        format: 'yyyy-mm-dd'
-    });
-    $('#departure').datepicker({
-        format: 'yyyy-mm-dd'
-    });
-</script>

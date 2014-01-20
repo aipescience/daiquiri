@@ -35,9 +35,8 @@
         <tbody>
             <?php foreach ($this->data as $row): ?>
                 <tr>
-                    <?php foreach ($row as $element): ?>
-                    <td><?php echo $this->escape($element); ?></td>
-                    <?php endforeach; ?>
+                    <td><?php echo $this->escape($row['id']); ?></td>
+                    <td><?php echo $this->escape($row['title']); ?></td>
                     <td>
                         <?php 
                         echo $this->internalLink(array(

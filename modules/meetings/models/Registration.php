@@ -38,6 +38,12 @@ class Meetings_Model_Registration extends Daiquiri_Model_Abstract {
         $meetingsModel = new Meetings_Model_Meetings();
         $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
 
+        if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['registration_publication_role_id'])) {
+            return array(
+                'status' => 'error'
+            );
+        }
+
         // create the form object
         $form = new Meetings_Form_Participant(array(
             'submit'=> 'Register for this meeting',

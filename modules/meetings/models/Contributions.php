@@ -41,7 +41,38 @@ class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
         );
     }
 
-public function create($meetingId, array $formParams = array()) {
+    public function info($meetingId) {
+        // get model
+        $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+
+        if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['contributions_publication_role_id'])) {
+            return array(
+                'status' => 'error'
+            );
+        } else {
+            // get contribution types for this meeting
+            $contributionTypesModel = new Meetings_Model_ContributionTypes();
+            $contributionTypes = $contributionTypesModel->getResource()->fetchRows();
+
+            $data = array();
+            foreach($contributionTypes as $contributionType) {
+                $data[$contributionType['contribution_type']] = $this->getResource()->fetchRows(array(
+                    'where' => array(
+                        '`meeting_id` = ?' => $meetingId,
+                        '`contribution_type_id` = ?' => $contributionType['id']
+                    )
+                ));
+            }
+
+            return array(
+                'status' => 'ok',
+                'data' => $data
+            );
+        }
+    }
+
+    public function create($meetingId, array $formParams = array()) {
         // get models
         $meetingsModel = new Meetings_Model_Meetings();
         $participantsModel = new Meetings_Model_Participants();

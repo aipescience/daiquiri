@@ -38,22 +38,33 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         );
     }
 
-    public function info($meetingId = null) {
-        return array(
-            'status' => 'ok',
-            'data' => $this->getResource()->fetchRows(
-                array('where' => array('`meeting_id` = ?' => $meetingId)))
-        );
+    public function info($meetingId) {
+        // get model
+        $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+
+        if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['participants_publication_role_id'])) {
+            return array(
+                'status' => 'error'
+            );
+        } else {
+            return array(
+                'status' => 'ok',
+                'data' => $this->getResource()->fetchRows(
+                    array('where' => array('`meeting_id` = ?' => $meetingId)))
+            );
+        }
     }
 
     public function create($meetingId, array $formParams = array()) {
-        // get models
+        // get model
         $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
 
         // create the form object
         $form = new Meetings_Form_Participant(array(
             'submit'=> 'Create participant',
-            'meeting' => $meetingsModel->getResource()->fetchRow($meetingId)
+            'meeting' => $meeting
         ));
 
         // valiadate the form if POST

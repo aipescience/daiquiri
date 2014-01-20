@@ -26,6 +26,7 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
     private $_entry;
     private $_contributionTypes = array();
     private $_participantDetailKeys = array();
+    private $_roles = array();
 
     public function setSubmit($submit) {
         $this->_submit = $submit;
@@ -44,6 +45,16 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
     public function setParticipantDetailKeys($participantDetailKeys) {
         foreach($participantDetailKeys as $key => $value) {
             $this->_participantDetailKeys[$key] = ucfirst($value);
+        }
+    }
+
+    public function setRoles($roles) {
+        foreach($roles as $key => $value) {
+            if ($key > 0) {
+                $this->_roles[$key] = 'published for ' . $value;
+            } else {
+                $this->_roles[$key] = $value;
+            }
         }
     }
 
@@ -95,16 +106,31 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
             'label' => 'Requested details from participlants',
             'multiOptions' => $this->_participantDetailKeys
         ));
+        $this->addElement('select', 'registration_publication_role_id', array(
+            'label' => 'Registration form',
+            'required' => true,
+            'multiOptions' => $this->_roles
+        ));
+        $this->addElement('select', 'participants_publication_role_id', array(
+            'label' => 'Participants list',
+            'required' => true,
+            'multiOptions' => $this->_roles
+        ));
+        $this->addElement('select', 'contributions_publication_role_id', array(
+            'label' => 'Contributions list',
+            'required' => true,
+            'multiOptions' => $this->_roles
+        ));
 
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('title','description','begin','end','contribution_type_id','participant_detail_key_id'));
+        $this->addHorizontalGroup(array('title','description','begin','end','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id','contribution_type_id','participant_detail_key_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('title','description','begin','end') as $element) {
+        foreach (array('title','description','begin','end','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

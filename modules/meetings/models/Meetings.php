@@ -37,11 +37,15 @@ class Meetings_Model_Meetings extends Daiquiri_Model_CRUD {
         $contributionTypeModel = new Meetings_Model_ContributionTypes();
         $participantDetailKeysModel = new Meetings_Model_ParticipantDetailKeys();
 
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
+        
         // create the form object
         $form = new Meetings_Form_Meeting(array(
             'submit'=> 'Create meeting',
             'contributionTypes' => $contributionTypeModel->getResource()->fetchValues('contribution_type'),
-            'participantDetailKeys' => $participantDetailKeysModel->getResource()->fetchValues('key')
+            'participantDetailKeys' => $participantDetailKeysModel->getResource()->fetchValues('key'),
+            'roles' => $roles
         ));
 
         // valiadate the form if POST
@@ -78,11 +82,15 @@ class Meetings_Model_Meetings extends Daiquiri_Model_CRUD {
         $contributionTypeModel = new Meetings_Model_ContributionTypes();
         $participantDetailKeysModel = new Meetings_Model_ParticipantDetailKeys();
 
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
+
         // create the form object
         $form = new Meetings_Form_Meeting(array(
             'submit'=> 'Update meeting',
             'contributionTypes' => $contributionTypeModel->getResource()->fetchValues('contribution_type'),
             'participantDetailKeys' => $participantDetailKeysModel->getResource()->fetchValues('key'),
+            'roles' => $roles,
             'entry' => $entry
         ));
 

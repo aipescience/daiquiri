@@ -54,10 +54,7 @@ class Meetings_ContributionsController extends Daiquiri_Controller_AbstractCRUD 
         }
 
         // assign to view
-        $this->view->redirect = $redirect;
         $this->view->title = $this->_options['create']['title'];
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->setViewElements($response, $redirect);
     }
 }

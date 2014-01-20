@@ -73,11 +73,8 @@ abstract class Daiquiri_Controller_AbstractCRUD extends Daiquiri_Controller_Abst
         $response = $this->_model->show($id);
 
         // assign to view
-        $this->view->redirect = $redirect;
         $this->view->title = $this->_options['show']['title'];
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->setViewElements($response, $redirect);
     }
 
     public function createAction() {
@@ -106,11 +103,8 @@ abstract class Daiquiri_Controller_AbstractCRUD extends Daiquiri_Controller_Abst
         }
 
         // assign to view
-        $this->view->redirect = $redirect;
         $this->view->title = $this->_options['create']['title'];
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->setViewElements($response, $redirect);
     }
 
     public function updateAction() {
@@ -140,11 +134,8 @@ abstract class Daiquiri_Controller_AbstractCRUD extends Daiquiri_Controller_Abst
         }
 
         // assign to view
-        $this->view->redirect = $redirect;
         $this->view->title = $this->_options['update']['title'];
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->setViewElements($response, $redirect);
     }
 
     public function deleteAction() {
@@ -174,11 +165,8 @@ abstract class Daiquiri_Controller_AbstractCRUD extends Daiquiri_Controller_Abst
         }
 
         // assign to view
-        $this->view->redirect = $redirect;
         $this->view->title = $this->_options['delete']['title'];
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->setViewElements($response, $redirect);
     }
 
 }

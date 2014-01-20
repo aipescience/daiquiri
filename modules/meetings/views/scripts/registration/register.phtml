@@ -19,29 +19,32 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-class Meetings_InfoController extends Daiquiri_Controller_AbstractCRUD {
+<div class="main">
+    <h2>Registration</h2>
+    
+    <?php if ($this->status === 'ok'): ?>
+        <p>Your registration was successful and a validation mail was send to the provided address.</p>
+        <p>Please follow the instructions in the mail to validate your registration.</p>
+    <?php else: ?>
+        <?php if (empty($this->form)): ?>
+            <p>The registration for this meeting is currently closed.</p>
+        <?php else: ?>
+            <p>
+                In order to register for the meeting, we kindly ask you to fill out the following form.
+            </p>
+            <?php echo $this->form; ?>
+        <?php endif; ?>
+    <?php endif; ?>
 
-    public function init() {
-        $this->_meetingId = $this->_getParam('meetingId');
-        if ($this->_meetingId === null) {
-            throw new Exception('$meetingId not provided in ' . get_class($this) . '::init()');
-        }
-    }
+</div>
 
-    public function participantsAction() {
-        $model = Daiquiri_Proxy::factory('Meetings_Model_Participants');
-        $response = $model->info($this->_meetingId);
-
-        // assign to view
-        $this->setViewElements($response);
-    }
-
-    public function contributionsAction() {
-        $model = Daiquiri_Proxy::factory('Meetings_Model_Contributions');
-        $response = $model->info($this->_meetingId);
-
-        // assign to view
-        $this->setViewElements($response);
-    }
-}
+<script type="text/javascript">
+    $('#arrival').datepicker({
+        format: 'yyyy-mm-dd'
+    });
+    $('#departure').datepicker({
+        format: 'yyyy-mm-dd'
+    });
+</script>

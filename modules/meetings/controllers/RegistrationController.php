@@ -27,7 +27,7 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_Registration');
     }
 
-    public function indexAction() {
+    public function registerAction() {
         // get params
         $redirect = $this->_getParam('redirect', '/');
         $meetingId = $this->_getParam('meetingId');

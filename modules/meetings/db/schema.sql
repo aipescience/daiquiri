@@ -3,9 +3,11 @@ CREATE TABLE IF NOT EXISTS `Meetings_Meetings` (
   `title` VARCHAR(256) NOT NULL,
   `description` TEXT,
   `begin` DATE NOT NULL,
-  `end` DATE NOT NULL
+  `end` DATE NOT NULL,
+  `registration_publication_role_id` INTEGER,
+  `participants_publication_role_id` INTEGER,
+  `contributions_publication_role_id` INTEGER 
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
-
 
 CREATE TABLE IF NOT EXISTS `Meetings_Contributions` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -25,7 +27,6 @@ CREATE TABLE IF NOT EXISTS `Meetings_Meetings_ContributionTypes` (
   `meeting_id` INTEGER NOT NULL,
   `contribution_type_id` INTEGER NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
-
 
 CREATE TABLE IF NOT EXISTS `Meetings_Participants` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,

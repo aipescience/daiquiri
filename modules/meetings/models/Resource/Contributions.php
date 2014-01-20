@@ -26,10 +26,9 @@ class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Simp
         $this->setTablename('Meetings_Contributions');
     }
 
-    public function fetchRows() {
-        $select = $this->getAdapter()->select();
-        $select->from('Meetings_Contributions');
-        $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array('participant_email' => 'email'));
+    public function fetchRows($sqloptions) {
+        $select = $this->getSelect($sqloptions);
+        $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array('participant_firstname' => 'firstname','participant_lastname' => 'lastname','participant_email' => 'email',));
         $select->join('Meetings_Meetings', 'Meetings_Participants.meeting_id = Meetings_Meetings.id', array('meeting_title' => 'title'));
         $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id', array('contribution_type_id' => 'id', 'contribution_type' => 'contribution_type'));
 
