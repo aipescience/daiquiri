@@ -71,6 +71,22 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
+        $this->addElement('text', 'begin', array(
+            'label' => 'First day of the meeting',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
+        $this->addElement('text', 'end', array(
+            'label' => 'Last day of the meeting',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
         $this->addElement('multiCheckbox', 'contribution_type_id', array(
             'label' => 'Contribution types',
             'multiOptions' => $this->_contributionTypes
@@ -84,11 +100,11 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('title','description','contribution_type_id','participant_detail_key_id'));
+        $this->addHorizontalGroup(array('title','description','begin','end','contribution_type_id','participant_detail_key_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('title','description') as $element) {
+        foreach (array('title','description','begin','end') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

@@ -37,7 +37,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Simple {
         }
 
         $select = $this->getAdapter()->select();
-        $select->from('Meetings_Meetings', array('id', 'title', 'description'));
+        $select->from('Meetings_Meetings', array('id', 'title','description','begin','end'));
         $select->where('Meetings_Meetings.id = ?', $id);
 
         $row = $this->getAdapter()->fetchRow($select);

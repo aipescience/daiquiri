@@ -26,7 +26,7 @@ class Meetings_IndexController extends Daiquiri_Controller_AbstractCRUD {
 
     }
 
-    public function participantsAction() {
+    public function indexAction() {
         if (Daiquiri_Auth::getInstance()->checkAcl('Meetings_Model_Meetings', 'index')) {
             $this->view->status = 'ok';
         } else {

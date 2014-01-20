@@ -76,6 +76,23 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
             $elements[] = $key;
         }
 
+        $this->addElement('text', 'arrival', array(
+            'label' => 'Arrival',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
+        $this->addElement('text', 'departure', array(
+            'label' => 'Departure',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
+
         $elements = array();
         foreach ($this->_meeting['contribution_types'] as $id => $contribution_type) {
             $this->addElement('checkbox', $contribution_type . '_bool', array(
@@ -110,15 +127,26 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array_merge(array('firstname','lastname','affiliation','email'), $this->_meeting['participant_detail_keys']),'personal', 'Personal data');
+        $this->addHorizontalGroup(array('arrival','departure'),'attendance', 'Attendance');
         $this->addHorizontalGroup($elements,'contributions', 'Contributions');
 
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array_merge(array('firstname','lastname','affiliation','email'),$this->_meeting['participant_detail_keys']) as $element) {
+        foreach (array_merge(array('firstname','lastname','affiliation','email','arrival','departure'),$this->_meeting['participant_detail_keys']) as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }
+        }
+        if (isset($this->_entry['arrival'])) {
+            $this->setDefault('arrival', $this->_entry['arrival']);
+        } else {
+            $this->setDefault('arrival', $this->_meeting['begin']);
+        }
+        if (isset($this->_entry['departure'])) {
+            $this->setDefault('departure', $this->_entry['departure']);
+        } else {
+            $this->setDefault('departure', $this->_meeting['end']);
         }
         if (isset($this->_entry['contributions'])) {
             foreach ($this->_entry['contributions'] as $contribution) {
