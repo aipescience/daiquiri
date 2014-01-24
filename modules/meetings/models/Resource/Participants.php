@@ -22,10 +22,19 @@
 
 class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simple {
 
-    public function fetchRows() {
-        $select = $this->getAdapter()->select();
-        $select->from('Meetings_Participants');
+    public function __construct() {
+        $this->setTablename('Meetings_Participants');
+    }
+
+    public function fetchRows($sqloptions = array()) {
+        // basic sql query including where conditions from $sqloptions
+        $select = $this->getSelect($sqloptions);
+
+        // join with meetings and status tables
         $select->join('Meetings_Meetings', 'Meetings_Meetings.id = Meetings_Participants.meeting_id', array('meeting_title' => 'title'));
+        $select->join('Meetings_ParticipantStatus', 'Meetings_ParticipantStatus.id = Meetings_Participants.status_id', array('status' => 'status'));
+
+        // order by name
         $select->order('lastname ASC');
         
         return $this->getAdapter()->fetchAll($select);
@@ -36,12 +45,16 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
             throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
         }
 
+        // basic sql query including where conditions from $sqloptions
         $select = $this->getAdapter()->select();
         $select->from('Meetings_Participants');
         $select->where('Meetings_Participants.id = ?', $id);
 
-        $row = $this->getAdapter()->fetchRow($select);
+        // join with meetings and status tables
+        $select->join('Meetings_ParticipantStatus', 'Meetings_ParticipantStatus.id = Meetings_Participants.status_id', array('status'));
 
+        // fetch the data
+        $row = $this->getAdapter()->fetchRow($select);
         if (empty($row)) {
             throw new Exception($id . ' not found in ' . get_class($this) . '::fetchRow()');
         }
@@ -102,22 +115,28 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
             throw new Exception('$id or $data not provided in ' . get_class($this) . '::insertRow()');
         }
 
-        $details = $data['details'];
-        unset($data['details']);
+        if (isset($data['details'])) {
+            $details = $data['details'];
+            unset($data['details']);
 
-        $contributions = $data['contributions'];
-        unset($data['contributions']);
+            // delete old and create new details for this participant
+            $this->_deleteParticipantDetails($id);
+            $this->_insertParticipantDetails($id, $details);
+        }
+
+
+        if (isset($data['contributions'])) {
+            $contributions = $data['contributions'];
+            unset($data['contributions']);
+
+            // delete old and create new contributions for this participant
+            $this->_deleteContributions($id);
+            $this->_insertContributions($id, $contributions);
+
+        }
 
         // update the row in the database
         $this->getAdapter()->update('Meetings_Participants', $data, array('id = ?' => $id));
-
-        // delete old and create new details for this participant
-        $this->_deleteParticipantDetails($id);
-        $this->_insertParticipantDetails($id, $details);
-
-        // delete old and create new contributions for this participant
-        $this->_deleteContributions($id);
-        $this->_insertContributions($id, $contributions);
 
         return $id;
     }

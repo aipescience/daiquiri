@@ -1,4 +1,5 @@
 <?php
+
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -21,25 +22,38 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->title); ?></h2>
+    <h2>Registration</h4>
 
-    <table class="table table-bordered">
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Values</th>
+                <th>Options</th>
+            </tr>
+        </thead>
         <tbody>
-            <?php foreach ($this->data as $key => $value): ?>
-                <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
+            <?php foreach ($this->rows as $row): ?>
                 <tr>
-                    <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
-                    <td><?php echo $this->escape($value); ?></td>
+                    <td><?php echo $this->escape($row['email']); ?></td>
+                    <td><?php echo $this->escape($row['values']); ?></td>
+                    <td>
+                        <?php 
+                        $link = '/meetings/registration/validate/id/' . $row['id'] . '/code/' . $row['code'];
+                        echo $this->internalLink(array(
+                            'text' => 'Validate',
+                            'href' => $link));
+                        ?>
+                    </td>
                 </tr>
-                <?php endif; ?>
-            <?php endforeach; ?>  
+            <?php endforeach; ?>
         </tbody>
     </table>
 
     <?php
     echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
+        'text' => 'Back to meetings management',
+        'href' => '/meetings',
         'prepend' => '<p>',
         'append' => '</p>'));
     ?>

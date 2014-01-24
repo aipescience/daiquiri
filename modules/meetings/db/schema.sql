@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `Meetings_Contributions` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(256) NOT NULL,
   `abstract` TEXT NOT NULL,
+  `accepted` BOOL NOT NULL,
   `participant_id` INTEGER NOT NULL,
   `contribution_type_id` INTEGER NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
@@ -36,7 +37,13 @@ CREATE TABLE IF NOT EXISTS `Meetings_Participants` (
   `arrival` DATE NOT NULL,
   `departure` DATE NOT NULL,
   `email` VARCHAR(256) NOT NULL,
-  `meeting_id` INTEGER NOT NULL
+  `meeting_id` INTEGER NOT NULL,
+  `status_id` INTEGER NOT NULL
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Meetings_ParticipantStatus` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `status` VARCHAR(256) NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Meetings_ParticipantDetails` (
@@ -61,5 +68,6 @@ CREATE TABLE IF NOT EXISTS `Meetings_Registration` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(256) NOT NULL,
   `code`  VARCHAR(256) NOT NULL,
-  `values` TEXT
+  `values` TEXT,
+  `meeting_id` INTEGER NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';

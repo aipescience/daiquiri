@@ -20,13 +20,24 @@
  *  limitations under the License.
  */
 
-class Meetings_IndexController extends Daiquiri_Controller_AbstractCRUD {
+class Meetings_Form_AcceptReject extends Daiquiri_Form_Abstract {
+
+    protected $_submit;
+
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
+    }
 
     public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
+        // add fields
+        $this->addPrimaryButtonElement('submit', $this->_submit);
+        $this->addButtonElement('cancel', 'Cancel');
 
+        // add groups
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
-    public function indexAction() {
-        $this->redirect('/meetings/meetings/');
-    }
 }

@@ -111,14 +111,24 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         // set where statement
         if (!empty($sqloptions['where'])) {
             foreach ($sqloptions['where'] as $key => $value) {
-                $select = $select->where($this->getAdapter()->quoteInto($key, $value));
+                if (is_string($key)) {
+                    $where = $this->getAdapter()->quoteInto($key, $value);
+                } else {
+                    $where = $value;
+                }
+                $select = $select->where($where);
             }
         }
         
         // set or where statement
         if (!empty($sqloptions['orWhere'])) {
-            foreach ($sqloptions['orWhere'] as $w) {
-                $select = $select->orWhere($this->getAdapter()->quoteInto($key, $value));
+            foreach ($sqloptions['orWhere'] as $key => $value) {
+                if (is_string($key)) {
+                    $where = $this->getAdapter()->quoteInto($key, $value);
+                } else {
+                    $where = $value;
+                }
+                $select = $select->orWhere($where);
             }
         }
 
@@ -301,7 +311,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
             throw new Exception('$id or $data not provided in ' . get_class($this) . '::insertRow()');
         }
         $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
-        $this->getAdapter()->update($this->getTablename(), $data, array($identifier => $id));
+        $this->getAdapter()->update($this->getTablename(), $data, array($identifier . '= ?' => $id));
     }
 
     /**
@@ -314,6 +324,6 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
             throw new Exception('$id not provided in ' . get_class($this) . '::deleteRow()');
         }
         $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
-        $this->getAdapter()->delete($this->getTablename(), array($identifier => $id));
+        $this->getAdapter()->delete($this->getTablename(), array($identifier . '= ?' => $id));
     }
 }

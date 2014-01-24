@@ -31,7 +31,28 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
             $input = $this->_input_options['meetings'];
         }
 
-        $output = $input;
+        $defaults = array(
+            'contributionTypes' => array('Poster','Talk'),
+            'participantDetailKeys' => array(),
+            'participantStatus' => array('organizer', 'invited', 'registered', 'accepted', 'rejected'),
+            'meetings' => array()
+        );
+        $output = array();
+
+        if (!empty($options['config']['meetings'])) {
+            foreach ($defaults as $key => $value) {
+                if (array_key_exists($key, $input)) {
+                    if (is_array($input[$key])) {
+                        $output[$key] = $input[$key];
+                    } else {
+                        $this->_error("Contact option 'contact.$key' needs to be an array.");
+                    }
+                } else {
+                    $output[$key] = $value;
+                }
+            }
+        }
+
         $options['meetings'] = $output;
         return $options;
     }
@@ -39,7 +60,6 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
     public function init(array $options) {
         if ($options['config']['meetings'] && !empty($options['meetings'])) {
             // create contribution types
-
             $meetingsContributionTypeModel = new Meetings_Model_ContributionTypes();
             if (!empty($options['meetings']['contributionTypes'])) {
                 $response = $meetingsContributionTypeModel->index();
@@ -60,6 +80,19 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
                     foreach ($options['meetings']['participantDetailKeys'] as $participantDetailKey) {
                         $a = array('key' => $participantDetailKey);
                         $r = $meetingsParticipantDetailKeyModel->create($a);
+                        $this->_check($r, $a);
+                    }
+                }
+            }
+
+            // create participant status
+            $meetingsParticipantStatusModel = new Meetings_Model_ParticipantStatus();
+            if (!empty($options['meetings']['participantStatus'])) {
+                $response = $meetingsParticipantStatusModel->index();
+                if (empty($response['data'])) {
+                    foreach ($options['meetings']['participantStatus'] as $participantStatus) {
+                        $a = array('status' => $participantStatus);
+                        $r = $meetingsParticipantStatusModel->create($a);
                         $this->_check($r, $a);
                     }
                 }

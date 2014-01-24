@@ -38,6 +38,24 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         );
     }
 
+    public function index($meetingId) {
+        if ($meetingId === null) {
+            return array(
+                'status' => 'ok',
+                'rows' => $this->getResource()->fetchRows(),
+                'meeting' => null
+            );
+        } else {
+            $meetingsModel = new Meetings_Model_Meetings();
+            return array(
+                'status' => 'ok',
+                'rows' => $this->getResource()->fetchRows(
+                    array('where' => array('`meeting_id` = ?' => $meetingId))),
+                'meeting' => $meetingsModel->getResource()->fetchRow($meetingId)
+            );
+        }
+    }
+
     public function info($meetingId) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
@@ -51,7 +69,13 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
             return array(
                 'status' => 'ok',
                 'data' => $this->getResource()->fetchRows(
-                    array('where' => array('`meeting_id` = ?' => $meetingId)))
+                    array(
+                        'where' => array(
+                            '`meeting_id` = ?' => $meetingId,
+                            '(`status` = "accepted") OR (`status` = "organizer") OR (`status` = "invited")'
+                        )
+                    )
+                )
             );
         }
     }
@@ -60,11 +84,14 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
         $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+        $participantStatusModel = new Meetings_Model_ParticipantStatus();
+        $participantStatus = $participantStatusModel->getResource()->fetchValues('status');
 
         // create the form object
         $form = new Meetings_Form_Participant(array(
             'submit'=> 'Create participant',
-            'meeting' => $meeting
+            'meeting' => $meeting,
+            'status' => $participantStatus
         ));
 
         // valiadate the form if POST
@@ -119,12 +146,15 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         // get the meeting
         $meetingsModel = new Meetings_Model_Meetings();
         $meeting = $meetingsModel->getResource()->fetchRow($entry['meeting_id']);
+        $participantStatusModel = new Meetings_Model_ParticipantStatus();
+        $participantStatus = $participantStatusModel->getResource()->fetchValues('status');
 
         // create the form object
         $form = new Meetings_Form_Participant(array(
             'submit'=> 'Update participant',
             'meeting' => $meeting,
-            'entry' => $entry
+            'entry' => $entry,
+            'status' => $participantStatus
         ));
 
         // valiadate the form if POST
@@ -167,5 +197,66 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
 
         return array('form' => $form, 'status' => 'form');
     }
+
+    public function accept($id, array $formParams = array()) {
+        // create the form object
+        $form = new Meetings_Form_AcceptReject(array(
+            'submit' => 'Accept the participant'
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the accepted status
+                $participantStatusModel = new Meetings_Model_ParticipantStatus();
+                $status_id = $participantStatusModel->getResource()->fetchId(array(
+                    'where' => array('`status` = "accepted"')
+                ));
+
+                // get the user credentials
+                $participant = $this->getResource()->updateRow($id, array('status_id' => $status_id));
+
+                return array('status' => 'ok');
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    public function reject($id, array $formParams = array()) {
+        // create the form object
+        $form = new Meetings_Form_AcceptReject(array(
+            'submit' => 'Reject the participant'
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the rejected status
+                $participantStatusModel = new Meetings_Model_ParticipantStatus();
+                $status_id = $participantStatusModel->getResource()->fetchId(array(
+                    'where' => array('`status` = "rejected"')
+                ));
+
+                // get the user credentials
+                $participant = $this->getResource()->updateRow($id, array('status_id' => $status_id));
+
+                return array('status' => 'ok');
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
 
 }

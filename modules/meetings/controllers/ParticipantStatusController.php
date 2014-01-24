@@ -20,13 +20,11 @@
  *  limitations under the License.
  */
 
-class Meetings_IndexController extends Daiquiri_Controller_AbstractCRUD {
+class Meetings_ParticipantStatusController extends Daiquiri_Controller_AbstractCRUD {
 
     public function init() {
-
+        parent::init();
+        $this->_model = Daiquiri_Proxy::factory('Meetings_Model_ParticipantStatus');
     }
 
-    public function indexAction() {
-        $this->redirect('/meetings/meetings/');
-    }
 }

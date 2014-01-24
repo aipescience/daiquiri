@@ -25,6 +25,7 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
     private $_submit;
     private $_entry;
     private $_meeting;
+    private $_status;
 
     public function setSubmit($submit) {
         $this->_submit = $submit;
@@ -36,6 +37,10 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
 
     public function setMeeting($meeting) {
         $this->_meeting = $meeting;
+    }
+
+    public function setStatus($status) {
+        $this->_status = $status;
     }
 
     public function init() {
@@ -53,14 +58,13 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
                 )
             ));
         }
-        $validators = array(array('validator' => new Zend_Validate_EmailAddress()));
-        $this->addElement('text', 'email', array(
-            'label' => 'Email',
+
+        $field = new Meetings_Form_Element_Email('email', array(
             'class' => 'input-xxlarge',
             'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => $validators
+            'meetingId' => $this->_meeting['id']
         ));
+        $this->addElement($field);
 
         // add elements
         foreach ($this->_meeting['participant_detail_keys'] as $id => $key) {
@@ -74,6 +78,14 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
                 )
             ));
             $elements[] = $key;
+        }
+
+        if (!empty($this->_status)) {
+            $this->addElement('select', 'status_id', array(
+                'label' => 'Status',
+                'required' => true,
+                'multiOptions' => $this->_status
+            ));
         }
 
         $this->addElement('text', 'arrival', array(
@@ -127,6 +139,9 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array_merge(array('firstname','lastname','affiliation','email'), $this->_meeting['participant_detail_keys']),'personal', 'Personal data');
+        if (!empty($this->_status)) {
+            $this->addHorizontalGroup(array('status_id'),'status', 'Status');
+        }
         $this->addHorizontalGroup(array('arrival','departure'),'attendance', 'Attendance');
         $this->addHorizontalGroup($elements,'contributions', 'Contributions');
 

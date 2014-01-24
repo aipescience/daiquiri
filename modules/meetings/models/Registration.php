@@ -33,6 +33,13 @@ class Meetings_Model_Registration extends Daiquiri_Model_Abstract {
         $this->getResource()->setTablename('Meetings_Registration');
     }
 
+    public function index() {
+        return array(
+            'status' => 'ok',
+            'rows' => $this->getResource()->fetchRows()
+        );
+    }
+
     public function register($meetingId, array $formParams = array()) {
         // get models
         $meetingsModel = new Meetings_Model_Meetings();
@@ -74,18 +81,23 @@ class Meetings_Model_Registration extends Daiquiri_Model_Abstract {
                     unset($values[$contributionType . '_abstract']);
                 }
 
+                // get the registered status
+                $participantStatusModel = new Meetings_Model_ParticipantStatus();
+                $values['status_id'] = $participantStatusModel->getResource()->fetchId(array(
+                    'where' => array('`status` = "registered"')
+                ));
+
                 $code = $this->createRandomString(32);
 
                 // store the values in the database
                 $id = $this->getResource()->insertRow(array(
                     'email' => $values['email'],
                     'code' => $code,
-                    'values' => Zend_Json::encode($values)
+                    'values' => Zend_Json::encode($values),
+                    'meeting_id' => $meetingId
                 ));
 
                 $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/meetings/registration/validate/id/' . $id . '/code/' . $code;
-
-                Zend_Debug::dump($link); // die(0);
 
                 return array('status' => 'ok');
             } else {
@@ -109,6 +121,9 @@ class Meetings_Model_Registration extends Daiquiri_Model_Abstract {
             // get the participant resource and store values in the database
             $participantResource = new Meetings_Model_Resource_Participants();
             $participantResource->insertRow($values);
+
+            // delete from registration table
+            $this->getResource()->deleteRow($id);
 
             return array('status' => 'ok');
         } else {

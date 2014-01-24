@@ -27,6 +27,9 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Simple {
         $select = $this->getAdapter()->select();
         $select->from('Meetings_Meetings');
 
+        // order by begin
+        $select->order('begin ASC');
+
         // get result convert to array and return
         return $this->getAdapter()->fetchAll($select);
     }

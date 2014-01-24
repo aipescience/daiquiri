@@ -22,7 +22,12 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->options['index']['title']); ?></h2>
+    <?php if ($this->meeting !== null): ?>
+    <h2><?php echo $this->escape($this->meeting['title']); ?></h2>
+    <h4>Contributions</h4>
+    <?php else: ?>
+    <h2>Contributions</h4>
+    <?php endif; ?>
 
     <table class="table table-condensed">
         <thead>
@@ -30,38 +35,62 @@
                 <th>Id</th>
                 <th>Title</th>
                 <th>Type</th>
-                <th>Meeting</th>
+                <th>Accepted</th>
+                <?php if ($this->meeting === null): ?>
+                    <th>Meeting</th>
+                <?php endif; ?>
                 <th>Participant</th>
                 <th>Options</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($this->data as $row): ?>
+            <?php foreach ($this->rows as $row): ?>
                 <tr>
                     <td><?php echo $this->escape($row['id']); ?></td>
                     <td><?php echo $this->escape($row['title']); ?></td>
                     <td><?php echo $this->escape($row['contribution_type']); ?></td>
-                    <td><?php echo $this->escape($row['meeting_title']); ?></td>
+                    <td><?php echo $row['accepted'] ? 'yes' : 'no' ?></td>
+                    <?php if ($this->meeting === null): ?>
+                        <td><?php echo $this->escape($row['meeting_title']); ?></td>
+                    <?php endif; ?>
                     <td><?php echo $this->escape($row['participant_email']); ?></td>
                     <td>
-                        <?php 
+                        <?php
+                        if ($this->meeting === null) {
+                            $redirect = '';
+                        } else {
+                            $redirect = '?redirect=/meetings/contributions/index/meetingId/' . $this->meeting['id'];
+                        }
+
                         echo $this->internalLink(array(
                             'text' => 'Show',
-                            'href' => $this->options['show']['url'] . '?id=' . $this->escape($row['id']),
+                            'href' => '/meetings/contributions/show/id/' . $this->escape($row['id']) . $redirect,
                             'resource' => $this->model,
                             'permission' => 'show'));
                         echo $this->internalLink(array(
                             'text' => 'Update',
-                            'href' => $this->options['update']['url'] . '?id=' . $this->escape($row['id']),
+                            'href' => '/meetings/contributions/update/id/' . $this->escape($row['id']) . $redirect,
                             'resource' => $this->model,
                             'permission' => 'update',
                             'prepend' => '&nbsp;'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
-                            'href' => $this->options['delete']['url'] . '?id=' . $this->escape($row['id']),
+                            'href' => '/meetings/contributions/delete/id/' . $this->escape($row['id']) . $redirect,
                             'resource' => $this->model,
                             'permission' => 'delete',
-                            'prepend' => '&nbsp;')); 
+                            'prepend' => '&nbsp;'));
+                        echo $this->internalLink(array(
+                            'text' => 'Accept',
+                            'href' => '/meetings/contributions/accept/id/' . $this->escape($row['id']) . $redirect,
+                            'resource' => $this->model,
+                            'permission' => 'accept',
+                            'prepend' => '&nbsp;'));
+                        echo $this->internalLink(array(
+                            'text' => 'Reject',
+                            'href' => '/meetings/contributions/reject/id/' . $this->escape($row['id']) . $redirect,
+                            'resource' => $this->model,
+                            'permission' => 'reject',
+                            'prepend' => '&nbsp;'));
                         ?>
                     </td>
                 </tr>

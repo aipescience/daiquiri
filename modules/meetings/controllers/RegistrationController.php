@@ -27,6 +27,13 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_Registration');
     }
 
+    public function indexAction() {
+        $response = $this->_model->index();
+
+        // assign to view
+        $this->setViewElements($response);
+    }
+
     public function registerAction() {
         // get params
         $redirect = $this->_getParam('redirect', '/');
@@ -49,7 +56,7 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
             }
 
             // set action for form
-            $this->setFormAction($response, '/meetings/registration/?meetingId=' . $meetingId);
+            $this->setFormAction($response, '/meetings/registration/register?meetingId=' . $meetingId);
         }
 
         // assign to view

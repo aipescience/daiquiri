@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -19,14 +18,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-class Meetings_IndexController extends Daiquiri_Controller_AbstractCRUD {
+<div class="main">
+    <h2><?php echo $this->escape($this->title) ?></h2>
+    <?php if ($this->status === 'ok'): ?>
+        <p>Deletion successful.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>
 
-    public function init() {
-
-    }
-
-    public function indexAction() {
-        $this->redirect('/meetings/meetings/');
-    }
-}
