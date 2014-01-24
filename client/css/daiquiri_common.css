@@ -30,6 +30,21 @@ form .captcha img {
 form fieldset {
     margin-bottom: 20px;
 }
+/*form .control-group input[type="checkbox"] {
+    margin-top: 9px;
+}*/
+form .control-group .controls > label {
+    padding-top: 5px;
+    margin-bottom: 5px;
+}
+form .control-group .controls > label > input[type="checkbox"]{
+    margin-top: 0;
+    margin-right: 10px;
+}
+form .control-group .controls > input[type="checkbox"]{
+    margin-top: 9px;
+}
+
 form p textarea, 
 form p input[type="text"], 
 form p input[type="password"], 
@@ -135,6 +150,9 @@ button::-moz-focus-inner {
     margin-bottom: 0;
 }
 .table .table {
+    margin-bottom: 10px;
+}
+.table .table:last-child {
     margin-bottom: 0;
 }
 .accordion-inner :last-child {

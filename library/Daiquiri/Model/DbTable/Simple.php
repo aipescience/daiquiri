@@ -25,4 +25,17 @@
  */
 class Daiquiri_Model_DbTable_Simple extends Daiquiri_Model_DbTable_Abstract {
     
+    public function __construct($tablename = null, $dbname = null) {
+        parent::__construct();
+        
+        if (empty($tablename)) {
+            // throw new Exception('$tablename not provided in ' . get_class($this) . '::__construct()');
+        } else {
+            $this->setName($tablename);
+        }
+        if (!empty($dbname)) {
+            $this->setDb($dbname);
+        }
+    }
+
 }

@@ -40,7 +40,7 @@ class Daiquiri_Init {
     protected $_init_models = array();
     protected $_opts = array();
     protected $_modules = array(
-        'admin', 'auth', 'config', 'contact', 'data', 'files', 'meeting', 'query', 'uws'
+        'admin', 'auth', 'config', 'contact', 'data', 'files', 'meetings', 'query', 'uws'
     );
     protected $_commandline_options = array(
         'h|help' => 'Displays usage information.',
@@ -84,6 +84,7 @@ class Daiquiri_Init {
             $this->_init_models['auth'] = new Auth_Model_Init($application_path, $daiquiri_path, $input_options);
             $this->_init_models['contact'] = new Contact_Model_Init($application_path, $daiquiri_path, $input_options);
             $this->_init_models['data'] = new Data_Model_Init($application_path, $daiquiri_path, $input_options);
+            $this->_init_models['meetings'] = new Meetings_Model_Init($application_path, $daiquiri_path, $input_options);
             $this->_init_models['query'] = new Query_Model_Init($application_path, $daiquiri_path, $input_options);
 
             // parse options in an incremental way, order is important

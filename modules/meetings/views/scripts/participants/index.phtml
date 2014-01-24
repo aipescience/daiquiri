@@ -1,0 +1,110 @@
+<?php
+
+/*
+ *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  See the NOTICE file distributed with this work for additional
+ *  information regarding copyright ownership. You may obtain a copy
+ *  of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+?>
+
+<div class="main">
+    <?php if ($this->meeting !== null): ?>
+    <h2><?php echo $this->escape($this->meeting['title']); ?></h2>
+    <h4>Participants</h4>
+    <?php else: ?>
+    <h2>Participants</h4>
+    <?php endif; ?>
+
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <?php if ($this->meeting === null): ?>
+                    <th>Meeting</th>
+                <?php endif; ?>
+                <th>Status</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($this->rows as $row): ?>
+                <tr>
+                    <td><?php echo $this->escape($row['lastname']); ?>, <?php echo $this->escape($row['firstname']); ?></td>
+                    <td><?php echo $this->escape($row['email']); ?></td>
+                    <?php if ($this->meetingId === null): ?>
+                        <td><?php echo $this->escape($row['meeting_title']); ?></td>
+                    <?php endif; ?>
+                    <td><?php echo $this->escape($row['status']); ?></td>
+                    <td>
+                        <?php 
+                        $redirect = '/meetings/participants/index/meetingId/' . $this->meeting['id'];
+                        echo $this->internalLink(array(
+                            'text' => 'Show',
+                            'href' => '/meetings/participants/show/id/' . $this->escape($row['id']) . '?redirect=' . $redirect,
+                            'resource' => $this->model,
+                            'permission' => 'show'));
+                        echo $this->internalLink(array(
+                            'text' => 'Update',
+                            'href' => '/meetings/participants/update/id/' . $this->escape($row['id']) . '?redirect=' . $redirect,
+                            'resource' => $this->model,
+                            'permission' => 'update',
+                            'prepend' => '&nbsp;'));
+                        echo $this->internalLink(array(
+                            'text' => 'Delete',
+                            'href' => '/meetings/participants/delete/id/' . $this->escape($row['id']) . '?redirect=' . $redirect,
+                            'resource' => $this->model,
+                            'permission' => 'delete',
+                            'prepend' => '&nbsp;'));
+                        if (in_array($row['status'], array('registered','rejected'))) {
+                            echo $this->internalLink(array(
+                                'text' => 'Accept',
+                                'href' => '/meetings/participants/accept/id/' . $this->escape($row['id']) . '?redirect=' . $redirect,
+                                'resource' => $this->model,
+                                'permission' => 'accept',
+                                'prepend' => '&nbsp;'));
+                        }
+                        if (in_array($row['status'], array('registered','accepted'))) {
+                            echo $this->internalLink(array(
+                                'text' => 'Reject',
+                                'href' => '/meetings/participants/reject/id/' . $this->escape($row['id']) . '?redirect=' . $redirect,
+                                'resource' => $this->model,
+                                'permission' => 'decline',
+                                'prepend' => '&nbsp;'));
+                        }
+                        ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <?php
+    if ($this->meetingId !== null) {
+        echo $this->internalLink(array(
+            'text' => 'Create new participant for this meeting',
+            'href' => '/meetings/participants/create/meetingId/' . $this->meetingId,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+    }
+    echo $this->internalLink(array(
+        'text' => 'Back to meetings management',
+        'href' => '/meetings',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
+</div>

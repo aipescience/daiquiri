@@ -30,4 +30,20 @@
  */
 abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
 
+    public function setViewElements($response, $redirect = null) {
+        if (!empty($redirect)) {
+            $this->view->redirect = $redirect;
+        }
+        foreach ($response as $key => $value) {
+            $this->view->$key = $value;
+        }
+    }
+
+    public function setFormAction($response, $url) {
+        if (array_key_exists('form', $response)) {
+            $form = $response['form'];
+            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $url;
+            $form->setAction($action);
+        }
+    }
 }

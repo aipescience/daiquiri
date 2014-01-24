@@ -320,9 +320,12 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
     }
 
     function checkPublicationRoleId($publication_role_id) {
+        if ($publication_role_id <= 0) {
+            return false;
+        }
+        
         $currRole = $this->getCurrentRole();
         $publication_role = $this->getRole($publication_role_id);
-
 
         if ($currRole === $publication_role) {
             return true;
