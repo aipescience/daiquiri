@@ -83,7 +83,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
 
         // contstruct resources array
-        $output['resources'] = array(
+        $output['resources'] = array_merge(array(
             // admin module
             'Admin_IndexController',
             // auth module
@@ -118,7 +118,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Query_Model_Examples',
             // uws module
             'Query_Model_Uws',
-        );
+        ), $input['resources']);
 
         // construct rules array ??
         // $rules = array();
@@ -236,7 +236,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
                     strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
 
-                    $rules['guest']['Query_Model_Form'] = array('plan','mail');
+                    $rules['guest']['Query_Model_Form'][] = 'plan';
+                    $rules['guest']['Query_Model_Form'][] = 'mail';
                 }
             } else {
                 // user
@@ -251,7 +252,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
                     strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
 
-                    $rules['user']['Query_Model_Form'] = array('plan','mail');
+                    $rules['user']['Query_Model_Form'][] = 'plan';
+                    $rules['user']['Query_Model_Form'][] = 'mail';
                 }
             }
 
