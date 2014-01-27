@@ -63,7 +63,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
     public function cols() {
         $cols = array();
 
-        foreach($this->_cols as $colname) {
+        foreach($this->getCols() as $colname) {
             $col = array('name' => ucfirst($colname));
             $cols[] = $col;
         }

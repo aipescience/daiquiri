@@ -57,8 +57,11 @@
                 $('a','tbody','#table').click(function(){
                     new daiquiri.Modal({
                         'url': this.href,
-                        'width': 700,
-                        'success': daiquiri.table.items['table'].rows
+                        'width': 800,
+                        'height': 600,
+                        'success': function () {
+                            daiquiri.table.items['table'].rows();
+                        }
                     });
                     return false;
                 });

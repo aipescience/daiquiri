@@ -59,11 +59,20 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
             ));
         }
 
-        $field = new Meetings_Form_Element_Email('email', array(
-            'class' => 'input-xxlarge',
-            'required' => true,
-            'meetingId' => $this->_meeting['id']
-        ));
+        if (empty($this->_entry)) {
+            $field = new Meetings_Form_Element_Email('email', array(
+                'class' => 'input-xxlarge',
+                'required' => true,
+                'unique' => true,
+                'meetingId' => $this->_meeting['id']
+            ));
+        } else {
+            $field = new Meetings_Form_Element_Email('email', array(
+                'class' => 'input-xxlarge',
+                'required' => true,
+                'meetingId' => $this->_meeting['id']
+            ));
+        }
         $this->addElement($field);
 
         // add elements
@@ -148,7 +157,7 @@ class Meetings_Form_Participant extends Daiquiri_Form_Abstract {
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array_merge(array('firstname','lastname','affiliation','email','arrival','departure'),$this->_meeting['participant_detail_keys']) as $element) {
+        foreach (array_merge(array('firstname','lastname','affiliation','email','status_id','arrival','departure'),$this->_meeting['participant_detail_keys']) as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

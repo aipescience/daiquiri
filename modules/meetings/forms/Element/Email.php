@@ -22,10 +22,15 @@
 
 class Meetings_Form_Element_Email extends Zend_Form_Element_Text {
 
+    private $_unique = null;
     private $_meetingId = null;
 
     public function setMeetingId($meetingId) {
         $this->_meetingId = $meetingId;
+    }
+
+    public function setUnique($unique) {
+        $this->_unique = $unique;
     }
 
     function init() {
@@ -36,20 +41,22 @@ class Meetings_Form_Element_Email extends Zend_Form_Element_Text {
         // add stuff
         $this->addFilter('StringTrim');
         $this->addValidator('emailAddress');
+        
+        if ($this->_unique) {
+            $val = new Zend_Validate();
+            $msg = 'The email is already in the database, please check if you are already registered.';
 
-        $val = new Zend_Validate();
-        $msg = 'The email is already in the database, please check if you are already registered.';
+            $val1 = new Meetings_Form_Validate_Email('Meetings_Participants', 'email');
+            $val1->setMessage($msg);
+            $val1->setMeetingId($this->_meetingId);
 
-        $val1 = new Meetings_Form_Validate_Email('Meetings_Participants', 'email');
-        $val1->setMessage($msg);
-        $val1->setMeetingId($this->_meetingId);
+            $val2 = new Meetings_Form_Validate_Email('Meetings_Registration', 'email');
+            $val2->setMessage($msg);
+            $val2->setMeetingId($this->_meetingId);
 
-        $val2 = new Meetings_Form_Validate_Email('Meetings_Registration', 'email');
-        $val2->setMessage($msg);
-        $val2->setMeetingId($this->_meetingId);
-
-        // chainvalidators and add to field
-        $val->addValidator($val1)->addValidator($val2);
-        $this->addValidator($val);
+            // chainvalidators and add to field
+            $val->addValidator($val1)->addValidator($val2);
+            $this->addValidator($val);
+        }
     }
 }
