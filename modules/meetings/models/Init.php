@@ -58,7 +58,9 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
     }
 
     public function init(array $options) {
-        if ($options['config']['meetings'] && !empty($options['meetings'])) {
+        if (isset($options['config']['meetings'])
+            && $options['config']['meetings']
+            && !empty($options['meetings'])) {
             // create contribution types
             $meetingsContributionTypeModel = new Meetings_Model_ContributionTypes();
             if (!empty($options['meetings']['contributionTypes'])) {

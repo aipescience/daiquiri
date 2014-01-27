@@ -48,11 +48,11 @@ class Daiquiri_View_Helper_Cols extends Zend_View_Helper_Abstract {
      * column in the table. 
      * 
      */
-    public function cols($data) {
+    public function cols($cols) {
         $s = '';
 
         // loop over cols
-        foreach ($data as $col) {
+        foreach ($cols as $col) {
             $s .= '<table class="table table-bordered">';
 
             // loop over keys in col

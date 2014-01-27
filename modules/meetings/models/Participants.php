@@ -38,6 +38,10 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         );
     }
 
+    public function getCols() {
+        return array('firstname','lastname','email','status');
+    }
+
     public function index($meetingId) {
         if ($meetingId === null) {
             return array(
@@ -54,6 +58,72 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
                 'meeting' => $meetingsModel->getResource()->fetchRow($meetingId)
             );
         }
+    }
+
+    public function cols() {
+        $cols = array();
+
+        foreach($this->_cols as $colname) {
+            $col = array('name' => ucfirst($colname));
+            $cols[] = $col;
+        }
+
+        $cols[] = array(
+            'name' => 'Options',
+            'sortable' => 'false'
+        );
+
+        return array(
+            'status' => 'ok',
+            'cols' => $cols
+        );
+    }
+
+    public function rows(array $params = array()) {
+        $pagination = new Daiquiri_Model_Pagination($this);
+        $sqloptions = $pagination->sqloptions($params);
+
+        // get the data from the database
+        $dbRows = $this->getResource()->fetchRows($sqloptions);
+
+        $rows = array();
+        foreach ($dbRows as $dbRow) {
+            $row = array();
+            foreach ($this->getCols() as $col) {
+                $row[] = $dbRow[$col];
+            }
+
+            $options = array();
+            foreach (array('show','update','delete') as $option) {
+                $options[] = $this->internalLink(array(
+                    'text' => ucfirst($option),
+                    'href' => '/meetings/participants/' . $option . '/id/' . $dbRow['id'],
+                    'resource' => 'Meetings_Model_Participants',
+                    'permission' => $option
+                ));
+            }
+            if (in_array($dbRow['status'], array('registered','rejected'))) {
+                $options[] = $this->internalLink(array(
+                    'text' => 'Accept',
+                    'href' => '/meetings/participants/accept/id/' . $dbRow['id'],
+                    'resource' => 'Meetings_Model_Participants',
+                    'permission' => 'accept'
+                ));
+            }
+            if (in_array($dbRow['status'], array('registered','accepted'))) {
+                $options[] = $this->internalLink(array(
+                    'text' => 'Reject',
+                    'href' => '/meetings/participants/reject/id/' . $dbRow['id'],
+                    'resource' => 'Meetings_Model_Participants',
+                    'permission' => 'reject'
+                ));
+            }
+
+            // merge to table row
+            $rows[] = array_merge($row, array(implode('&nbsp;',$options)));
+        }
+
+        return $pagination->response($rows, $sqloptions);
     }
 
     public function info($meetingId) {

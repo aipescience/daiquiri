@@ -46,4 +46,9 @@ abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
             $form->setAction($action);
         }
     }
+
+    public function initHelper($helper) {
+        $classname = 'Daiquiri_Controller_Helper_' . ucfirst($helper);
+        Zend_Controller_Action_HelperBroker::addHelper(new $classname());
+    }
 }

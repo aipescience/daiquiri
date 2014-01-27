@@ -25,6 +25,9 @@ class Meetings_ParticipantsController extends Daiquiri_Controller_AbstractCRUD {
     public function init() {
         parent::init();
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_Participants');
+
+        $this->initHelper('cols');
+        $this->initHelper('rows');
     }
 
     public function indexAction() {
@@ -40,6 +43,14 @@ class Meetings_ParticipantsController extends Daiquiri_Controller_AbstractCRUD {
         $this->view->options = $this->_options;
         $this->view->model = $this->_model->getClass();
         $this->setViewElements($response, $redirect);
+    }
+
+    public function colsAction() {
+        $this->_helper->cols();
+    }
+
+    public function rowsAction() {
+        $this->_helper->rows();
     }
 
     public function createAction() {

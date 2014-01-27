@@ -20,12 +20,6 @@
  *  limitations under the License.
  */
 
-/*
- * Placeholder for future conference model development. Only initial implementation
- * provided...
- *
- */
-
 class Meetings_Model_Registration extends Daiquiri_Model_Abstract {
 
     public function __construct() {
@@ -133,6 +127,4 @@ class Meetings_Model_Registration extends Daiquiri_Model_Abstract {
             );
         }
     }
-
-
 }

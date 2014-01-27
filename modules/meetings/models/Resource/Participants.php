@@ -36,7 +36,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
 
         // order by name
         $select->order('lastname ASC');
-        
+
         return $this->getAdapter()->fetchAll($select);
     }
 
@@ -207,7 +207,8 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
                     'participant_id' => $id,
                     'contribution_type_id' =>  $contribution_type_id,
                     'title' => $contribution['title'],
-                    'abstract' => $contribution['abstract']
+                    'abstract' => $contribution['abstract'],
+                    'accepted' => 0
                 ));
             }
         }

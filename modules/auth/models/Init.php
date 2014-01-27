@@ -230,7 +230,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 'index','create','show','update','delete'
             );
             $rules['admin']['Meetings_Model_Participants'] = array(
-                'index','create','show','update','delete','accept','reject'
+                'index','cols','rows','create','show','update','delete','accept','reject'
             );
             $rules['admin']['Meetings_Model_ParticipantDetails'] = array(
                 'index','create','show','update','delete'
@@ -242,7 +242,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 'index','create','show','update','delete'
             );
             $rules['admin']['Meetings_Model_Contributions'] = array(
-                'index','create','show','update','delete','accept','reject'
+                'index','cols','rows','create','show','update','delete','accept','reject'
             );
             $rules['admin']['Meetings_Model_ContributionTypes'] = array(
                 'index','create','show','update','delete'
