@@ -53,7 +53,10 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
     public function create($databaseId = null, array $formParams = array()) {
         // get databases model
         $databasesModel = new Data_Model_Databases();
-        $databases = $databasesModel->index();
+        $databases = array();
+        foreach($databasesModel->index() as $row) {
+            $databases[$row['id']] = $row['name'];
+        };
 
         // get roles
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
