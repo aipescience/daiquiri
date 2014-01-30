@@ -38,13 +38,6 @@ class Daiquiri_Model_Pagination extends Daiquiri_Model_Abstract {
         $this->_model = $model;
     }
 
-    public function rows($params) {
-        // get the table from the resource
-        $sqloptions = $this->sqloptions($params);
-        $rows = $this->_model->getResource()->fetchRows($sqloptions);
-        return $this->response($rows, $sqloptions);
-    }
-
     /**
      * @brief   Maps options from daiquiri_table to SQL query options
      * @param   array $tableParams
@@ -57,11 +50,6 @@ class Daiquiri_Model_Pagination extends Daiquiri_Model_Abstract {
     public function sqloptions(array $queryParams = array()) {
         // parse options
         $sqloptions = array();
-        if (isset($queryParams['cols'])) {
-            $sqloptions['from'] = $queryParams['cols'];
-        } else {
-            $sqloptions['from'] = array();
-        }
         
         if (isset($queryParams['nrows'])) {
             $sqloptions['limit'] = $queryParams['nrows'];
@@ -97,15 +85,24 @@ class Daiquiri_Model_Pagination extends Daiquiri_Model_Abstract {
 
         $sqloptions['orWhere'] = array();
         if (isset($queryParams['search']) && !empty($queryParams['search'])) {
-            $cols = $this->_model->getCols();
-            $adapter = $this->_model->getResource()->getAdapter();
+            $dbCols = $this->_model->getResource()->fetchCols();
+            $modelCols = $this->_model->getCols();
+            if (empty($modelCols)) {
+                $cols = $dbCols;
+            } else {
+                $cols = array();
+                foreach ($modelCols as $col) {
+                    $cols[] = $dbCols[$col];
+                }
+            }
 
             foreach ($cols as $col) {
-                $quotedString = $adapter->quoteInto('?', $queryParams['search']);
-                $string = substr($quotedString, 1, strlen($quotedString) - 2);
-                $sqloptions['orWhere'][] = $adapter->quoteIdentifier($col) . " LIKE '%" . $string . "%'";
+                $quotedSearch = $this->_model->getResource()->getAdapter()->quoteInto('?', $queryParams['search']);
+                $search = substr($quotedSearch, 1, strlen($quotedSearch) - 2);
+                $sqloptions['orWhere'][] = $col . " LIKE '%" . $search . "%'";
             }
         }
+
         return $sqloptions;
     }
 

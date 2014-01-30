@@ -49,11 +49,30 @@ daiquiri.Modal.prototype.show = function() {
             },
             error: daiquiri.common.ajaxError,
             success: function (html) {
-                self.html = html;
+                // remove main div
+                var main = html.indexOf('<div class="main">')
+                if (main != -1) {
+                    html = html.substring(main + '<div class="main">'.length ,html.lastIndexOf('</div>'));
+                }
+
+                // get title
+                var match = html.match(/\<h2\>(.*?)\<\/h2\>/g);
+                if (match.length) {
+                    self.title = match[0];
+
+                    // remove title
+                    html = html.substring(html.indexOf(self.title) + self.title.length);
+                } else {
+                    self.title = '';
+                }
+
+                self.html = html
+
                 self.display();
             }
         });
     } else if (typeof this.opt.html !== 'undefined') {
+        self.title = this.opt.title;
         self.html = this.opt.html;
         self.display();
     }
@@ -70,7 +89,7 @@ daiquiri.Modal.prototype.display = function () {
 
     // create diolog
     this.modal = $('<div />',{
-        'html': '<div class="daiquiri-modal-dialog"><div class="daiquiri-modal-close-container"><a class="daiquiri-modal-close" href="#">x</a></div><div class="daiquiri-modal-body">' + this.html + '</div></div>',
+        'html': '<div class="daiquiri-modal-dialog"><div class="daiquiri-modal-close-container"><a class="daiquiri-modal-close" href="#">x</a></div><div class="daiquiri-modal-title">' + this.title + '</div><div class="daiquiri-modal-body">' + this.html + '</div></div>',
         'class': 'daiquiri-modal'
     }).appendTo('body');
 

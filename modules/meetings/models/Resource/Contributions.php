@@ -27,12 +27,26 @@ class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Simp
     }
 
     public function fetchRows($sqloptions = array()) {
-        $select = $this->getSelect($sqloptions);
-        $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array('participant_firstname' => 'firstname','participant_lastname' => 'lastname','participant_email' => 'email',));
+        $select = $this->select($sqloptions);
+        $select->from('Meetings_Contributions');
+        $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array('participant_firstname' => 'firstname','participant_lastname' => 'lastname','participant_email' => 'email'));
         $select->join('Meetings_Meetings', 'Meetings_Participants.meeting_id = Meetings_Meetings.id', array('meeting_title' => 'title'));
         $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id', array('contribution_type_id' => 'id', 'contribution_type' => 'contribution_type'));
 
         return $this->getAdapter()->fetchAll($select);
+    }
+
+    public function countRows(array $sqloptions = null) {
+        // get select object
+        $select = $this->select($sqloptions);
+        $select->from('Meetings_Contributions', 'COUNT(*) as count');
+        $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array());
+        $select->join('Meetings_Meetings', 'Meetings_Participants.meeting_id = Meetings_Meetings.id', array());
+        $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id', array());
+
+        // query database
+        $row = $this->getAdapter()->fetchRow($select);
+        return (int) $row['count'];
     }
 
     public function fetchRow($id) {

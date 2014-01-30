@@ -26,7 +26,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      * The name of the database table used for the generic functions in this class. 
      * @var string
      */
-    protected $tablename = null;
+    private $_tablename = null;
 
     /**
      * Database adapter to be used with this resource. If null the default adapter will be used.
@@ -77,84 +77,27 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
-     * Constructs a Zend select object from a given array with sql options,
-     * using the previously set database table.
+     * Returns a Daiquiri select object from a given array with sql options.
      * @param Array $sqloptions array of sqloptions (start,limit,order,where,from)
-     * @return Zend_Db_Select
+     * @return Daiquiri_Db_Select
      */
-    public function getSelect($sqloptions = array()) {
-        // get select object
-        $select = $this->getAdapter()->select();
-
-        // set from
-        $cols = $this->fetchCols();
-        if (!empty($sqloptions['from'])) {
-            $cols = array_intersect($sqloptions['from'], $cols);
-        }
-        $select->from($this->getTablename(), $cols);
-
-        // set limit
-        if (!empty($sqloptions['limit'])) {
-            if (!empty($sqloptions['start'])) {
-                $start = $sqloptions['start'];
-            } else {
-                $start = 0;
-            }
-            $select->limit($sqloptions['limit'], $start);
-        }
-
-        // set order
-        if (!empty($sqloptions['order'])) {
-            $select = $select->order($sqloptions['order']);
-        }
-
-        // set where statement
-        if (!empty($sqloptions['where'])) {
-            foreach ($sqloptions['where'] as $key => $value) {
-                if (is_string($key)) {
-                    $where = $this->getAdapter()->quoteInto($key, $value);
-                } else {
-                    $where = $value;
-                }
-                $select = $select->where($where);
-            }
-        }
-        
-        // set or where statement
-        if (!empty($sqloptions['orWhere'])) {
-            foreach ($sqloptions['orWhere'] as $key => $value) {
-                if (is_string($key)) {
-                    $where = $this->getAdapter()->quoteInto($key, $value);
-                } else {
-                    $where = $value;
-                }
-                $select = $select->orWhere($where);
-            }
-        }
-
-        // Zend_Debug::dump($select->__toString()); // die(0);
-        
-        return $select;
+    public function select($sqloptions = array()) {
+        return new Daiquiri_Db_Select($this->getAdapter(), $sqloptions);
     }
 
     /**
      * Fetches the columns of the previously set database table.
-     * @param string $format format of the output (plain or db)
+     * @param string $db
      * @return array
      */
-    public function fetchCols($format = 'plain') {
+    public function fetchCols() {
         $desc = $this->getAdapter()->describeTable($this->getTablename());
-        $cols = array_keys($desc);
 
-        if ($format == 'db') {
-            $dbCols = array();
-            foreach ($cols as $col) {
-                $dbCols[$col] = '`' . $this->getTablename() . '`.`' . $col . '`';
-            }
-            return $dbCols;
-        } else {
-            return $cols;
+        $cols = array();
+        foreach(array_keys($desc) as $col) {
+            $cols[$col] = $this->quoteIdentifier($this->getTablename(),$col);
         }
+        return $cols;
     }
 
     /**
@@ -204,8 +147,9 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function fetchId($sqloptions = array()) {
         // get select object
-        $select = $this->getSelect($sqloptions);
-
+        $select = $this->select($sqloptions);
+        $select->from($this->getTablename());
+        
         // query database
         $row = $this->getAdapter()->fetchRow($select);
         if (empty($row)) {
@@ -222,7 +166,8 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function fetchRows($sqloptions = array()) {
         // get select object
-        $select = $this->getSelect($sqloptions);
+        $select = $this->select($sqloptions);
+        $select->from($this->getTablename());
 
         // query database
         $rows = $this->getAdapter()->fetchAll($select);
@@ -325,5 +270,17 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         }
         $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
         $this->getAdapter()->delete($this->getTablename(), array($identifier . '= ?' => $id));
+    }
+
+    public function quoteIdentifier() {
+        // get the arguments
+        $arguments = func_get_args();
+
+        $identifier = array();
+        foreach($arguments as $argument) {
+            $identifier[] = $this->getAdapter()->quoteIdentifier($argument);
+        }
+
+        return implode('.', $identifier);
     }
 }

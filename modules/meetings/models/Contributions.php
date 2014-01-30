@@ -24,7 +24,6 @@ class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
 
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Contributions');
-
         $this->_options = array(
             'create' => array(
                 'form' => 'Meetings_Form_Contribution',
@@ -39,24 +38,8 @@ class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
                 'submit' => 'Delete contribution'
             ),
         );
-    }
-
-    public function index($meetingId) {
-        if ($meetingId === null) {
-            return array(
-                'status' => 'ok',
-                'rows' => $this->getResource()->fetchRows(),
-                'meeting' => null
-            );
-        } else {
-            $meetingsModel = new Meetings_Model_Meetings();
-            return array(
-                'status' => 'ok',
-                'rows' => $this->getResource()->fetchRows(
-                    array('where' => array('`meeting_id` = ?' => $meetingId))),
-                'meeting' => $meetingsModel->getResource()->fetchRow($meetingId)
-            );
-        }
+        $this->_cols = array('title','type','participant_firstname','participant_lastname','accepted');
+        // 'title','type','participant','accepted' are visible
     }
 
     public function info($meetingId) {
@@ -89,6 +72,81 @@ class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
                 'data' => $data
             );
         }
+    }
+
+    public function cols(array $params = array()) {
+        if (empty($params['meetingId'])) {
+            $this->_cols[] = 'meeting_title';
+        }
+
+        $cols = array();
+        foreach(array('title','type','participant','accepted') as $col) {
+            $cols[] = array('name' => ucfirst(str_replace('_',' ',$col)));
+        }
+
+        $cols[] = array('name' => 'Options', 'sortable' => 'false');
+        return array(
+            'status' => 'ok',
+            'cols' => $cols
+        );
+    }
+
+    public function rows(array $params = array()) {
+        if (empty($params['meetingId'])) {
+            $this->_cols[] = 'meeting_title';
+        }
+
+        $pagination = new Daiquiri_Model_Pagination($this);
+        $sqloptions = $pagination->sqloptions($params);
+
+        if (!empty($params['meetingId'])) {
+            $sqloptions['where'] = array('`meeting_id` = ?' => $params['meetingId']);
+        }
+
+        // get the data from the database
+        $dbRows = $this->getResource()->fetchRows($sqloptions);
+
+        $rows = array();
+        foreach ($dbRows as $dbRow) {
+            $row = array();
+
+            // rows create manually: Title, Type, Participant, Accepted
+            $row[] = $dbRow['title'];
+            $row[] = $dbRow['contribution_type'];
+            $row[] = $dbRow['participant_lastname'] . ', ' . $dbRow['participant_firstname'];
+            $row[] = (bool) $dbRow['accepted'];
+
+            $options = array();
+            foreach (array('show','update','delete') as $option) {
+                $options[] = $this->internalLink(array(
+                    'text' => ucfirst($option),
+                    'href' => '/meetings/contributions/' . $option . '/id/' . $dbRow['id'],
+                    'resource' => 'Meetings_Model_Contributions',
+                    'permission' => $option
+                ));
+            }
+            if ($dbRow['accepted'] == '0') {
+                $options[] = $this->internalLink(array(
+                    'text' => 'Accept',
+                    'href' => '/meetings/contributions/accept/id/' . $dbRow['id'],
+                    'resource' => 'Meetings_Model_Contributions',
+                    'permission' => 'accept'
+                ));
+            }
+            if ($dbRow['accepted'] == '1') {
+                $options[] = $this->internalLink(array(
+                    'text' => 'Reject',
+                    'href' => '/meetings/contributions/reject/id/' . $dbRow['id'],
+                    'resource' => 'Meetings_Model_Contributions',
+                    'permission' => 'reject'
+                ));
+            }
+
+            // merge to table row
+            $rows[] = array_merge($row, array(implode('&nbsp;',$options)));
+        }
+
+        return $pagination->response($rows, $sqloptions);
     }
 
     public function create($meetingId, array $formParams = array()) {

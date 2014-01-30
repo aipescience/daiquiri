@@ -25,32 +25,25 @@ class Meetings_ParticipantsController extends Daiquiri_Controller_AbstractCRUD {
     public function init() {
         parent::init();
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_Participants');
-
-        $this->initHelper('cols');
-        $this->initHelper('rows');
     }
 
     public function indexAction() {
         // get params
         $meetingId = $this->_getParam('meetingId'); 
-        $redirect = $this->_getParam('redirect','/meetings/');
-
-        // get the data
-        $response = $this->_model->index($meetingId);
 
         // assign to view
         $this->view->meetingId = $meetingId;
-        $this->view->options = $this->_options;
         $this->view->model = $this->_model->getClass();
-        $this->setViewElements($response, $redirect);
     }
 
     public function colsAction() {
+        $this->initHelper('cols');
         $this->_helper->cols();
     }
 
     public function rowsAction() {
-        $this->_helper->rows();
+        $this->initHelper('rows');
+        $this->_helper->rows($meetingId);
     }
 
     public function createAction() {

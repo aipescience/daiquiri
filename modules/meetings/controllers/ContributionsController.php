@@ -41,6 +41,16 @@ class Meetings_ContributionsController extends Daiquiri_Controller_AbstractCRUD 
         $this->setViewElements($response);
     }
 
+    public function colsAction() {
+        $this->initHelper('cols');
+        $this->_helper->cols();
+    }
+
+    public function rowsAction() {
+        $this->initHelper('rows');
+        $this->_helper->rows();
+    }
+
     public function createAction() {
         // get params
         $meetingId = $this->_getParam('meetingId'); 

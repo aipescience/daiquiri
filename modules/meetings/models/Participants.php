@@ -36,43 +36,20 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
                 'submit' => 'Delete Participant'
             ),
         );
+        $this->_cols = array('firstname','lastname','email','status');
     }
 
-    public function getCols() {
-        return array('firstname','lastname','email','status');
-    }
-
-    public function index($meetingId) {
-        if ($meetingId === null) {
-            return array(
-                'status' => 'ok',
-                'rows' => $this->getResource()->fetchRows(),
-                'meeting' => null
-            );
-        } else {
-            $meetingsModel = new Meetings_Model_Meetings();
-            return array(
-                'status' => 'ok',
-                'rows' => $this->getResource()->fetchRows(
-                    array('where' => array('`meeting_id` = ?' => $meetingId))),
-                'meeting' => $meetingsModel->getResource()->fetchRow($meetingId)
-            );
+    public function cols(array $params = array()) {
+        if (empty($params['meetingId'])) {
+            $this->_cols[] = 'meeting_title';
         }
-    }
 
-    public function cols() {
         $cols = array();
-
-        foreach($this->getCols() as $colname) {
-            $col = array('name' => ucfirst($colname));
-            $cols[] = $col;
+        foreach($this->_cols as $col) {
+            $cols[] = array('name' => ucfirst(str_replace('_',' ',$col)));
         }
 
-        $cols[] = array(
-            'name' => 'Options',
-            'sortable' => 'false'
-        );
-
+        $cols[] = array('name' => 'Options', 'sortable' => 'false');
         return array(
             'status' => 'ok',
             'cols' => $cols
@@ -80,8 +57,16 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
     }
 
     public function rows(array $params = array()) {
+        if (empty($params['meetingId'])) {
+            $this->_cols[] = 'meeting_title';
+        }
+
         $pagination = new Daiquiri_Model_Pagination($this);
         $sqloptions = $pagination->sqloptions($params);
+
+        if (!empty($params['meetingId'])) {
+            $sqloptions['where'] = array('meeting_id=?' => $params['meetingId']);
+        }
 
         // get the data from the database
         $dbRows = $this->getResource()->fetchRows($sqloptions);
@@ -89,7 +74,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         $rows = array();
         foreach ($dbRows as $dbRow) {
             $row = array();
-            foreach ($this->getCols() as $col) {
+            foreach ($this->_cols as $col) {
                 $row[] = $dbRow[$col];
             }
 
@@ -327,6 +312,4 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
 
         return array('form' => $form, 'status' => 'form');
     }
-
-
 }

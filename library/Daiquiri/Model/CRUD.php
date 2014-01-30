@@ -22,7 +22,16 @@
 
 class Daiquiri_Model_CRUD extends Daiquiri_Model_Abstract {
 
+    protected $_cols = array();
     protected $_options = array();
+
+    public function setCols($cols) {
+        $this->_cols = $cols;
+    }
+
+    public function getCols() {
+        return $this->_cols;
+    }
 
     public function index() {
         return array(

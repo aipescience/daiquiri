@@ -22,8 +22,11 @@
 class Daiquiri_Controller_Helper_Cols extends Zend_Controller_Action_Helper_Abstract {
 
     public function direct() {
+        // get query parameters
+        $queryParams = $this->getRequest()->getQuery();
+        
         // call model functions
-        $response = $this->getActionController()->_model->cols();
+        $response = $this->getActionController()->_model->cols($queryParams);
 
         // assign to view
         $this->getActionController()->setViewElements($response);

@@ -49,16 +49,21 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        // create the user table inside the div
+        <?php if ($this->meetingId !== null): ?>
+            var params = {'meetingId': <?php echo $this->meetingId; ?>};
+        <?php else: ?>
+            var params = {};
+        <?php endif; ?>
+
         $('#table').daiquiri_table({
-            "rowsurl": "<?php echo $this->baseUrl('/meetings/participants/rows') ?>",
-            "colsurl": "<?php echo $this->baseUrl('/meetings/participants/cols') ?>",
+            'rowsurl': "<?php echo $this->baseUrl('/meetings/participants/rows') ?>",
+            'colsurl': "<?php echo $this->baseUrl('/meetings/participants/cols') ?>",
+            'params': params,
             'success': function() {
                 $('a','tbody','#table').click(function(){
                     new daiquiri.Modal({
                         'url': this.href,
                         'width': 800,
-                        'height': 600,
                         'success': function () {
                             daiquiri.table.items['table'].rows();
                         }

@@ -26,18 +26,32 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
         $this->setTablename('Meetings_Participants');
     }
 
+    public function fetchCols() {
+        $cols = parent::fetchCols();
+        $cols['meeting_title'] = $this->quoteIdentifier('Meetings_Meetings','title');
+        $cols['status'] = $this->quoteIdentifier('Meetings_ParticipantStatus','status');
+        return $cols;
+    }
+
     public function fetchRows($sqloptions = array()) {
-        // basic sql query including where conditions from $sqloptions
-        $select = $this->getSelect($sqloptions);
-
-        // join with meetings and status tables
-        $select->join('Meetings_Meetings', 'Meetings_Meetings.id = Meetings_Participants.meeting_id', array('meeting_title' => 'title'));
-        $select->join('Meetings_ParticipantStatus', 'Meetings_ParticipantStatus.id = Meetings_Participants.status_id', array('status' => 'status'));
-
-        // order by name
-        $select->order('lastname ASC');
+        $select = $this->select($sqloptions);
+        $select->from($this->getTablename());
+        $select->join('Meetings_Meetings','Meetings_Meetings.id = Meetings_Participants.meeting_id',array('meeting_title' => 'title'));
+        $select->join('Meetings_ParticipantStatus','Meetings_ParticipantStatus.id = Meetings_Participants.status_id',array('status' => 'status'));
 
         return $this->getAdapter()->fetchAll($select);
+    }
+
+    public function countRows(array $sqloptions = null) {
+        // get select object
+        $select = $this->select($sqloptions);
+        $select->from($this->getTablename(), 'COUNT(*) as count');
+        $select->join('Meetings_Meetings','Meetings_Meetings.id = Meetings_Participants.meeting_id',array());
+        $select->join('Meetings_ParticipantStatus','Meetings_ParticipantStatus.id = Meetings_Participants.status_id', array());
+
+        // query database
+        $row = $this->getAdapter()->fetchRow($select);
+        return (int) $row['count'];
     }
 
     public function fetchRow($id) {
@@ -46,11 +60,9 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
         }
 
         // basic sql query including where conditions from $sqloptions
-        $select = $this->getAdapter()->select();
+        $select = $this->select();
         $select->from('Meetings_Participants');
         $select->where('Meetings_Participants.id = ?', $id);
-
-        // join with meetings and status tables
         $select->join('Meetings_ParticipantStatus', 'Meetings_ParticipantStatus.id = Meetings_Participants.status_id', array('status'));
 
         // fetch the data
@@ -72,7 +84,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
         }
 
         // get select object
-        $select = $this->getAdapter()->select();
+        $select = $this->select();
         $select->from('Meetings_Participants', array('id', $fieldname));
         $select->where('meeting_id = ?', $meetingId);
 
@@ -155,7 +167,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
     }
 
     private function _fetchParticipantDetails($id) {
-        $select = $this->getAdapter()->select();
+        $select = $this->select();
         $select->from('Meetings_ParticipantDetails', array('value'));
         $select->where('Meetings_ParticipantDetails.participant_id = ?', $id);
         $select->join('Meetings_ParticipantDetailKeys', 'Meetings_ParticipantDetailKeys.id = Meetings_ParticipantDetails.key_id', array('key'));

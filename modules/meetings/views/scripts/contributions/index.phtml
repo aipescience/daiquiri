@@ -29,76 +29,16 @@
     <h2>Contributions</h4>
     <?php endif; ?>
 
-    <table class="table table-condensed">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Accepted</th>
-                <?php if ($this->meeting === null): ?>
-                    <th>Meeting</th>
-                <?php endif; ?>
-                <th>Participant</th>
-                <th>Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($this->rows as $row): ?>
-                <tr>
-                    <td><?php echo $this->escape($row['id']); ?></td>
-                    <td><?php echo $this->escape($row['title']); ?></td>
-                    <td><?php echo $this->escape($row['contribution_type']); ?></td>
-                    <td><?php echo $row['accepted'] ? 'yes' : 'no' ?></td>
-                    <?php if ($this->meeting === null): ?>
-                        <td><?php echo $this->escape($row['meeting_title']); ?></td>
-                    <?php endif; ?>
-                    <td><?php echo $this->escape($row['participant_email']); ?></td>
-                    <td>
-                        <?php
-                        if ($this->meeting === null) {
-                            $redirect = '';
-                        } else {
-                            $redirect = '?redirect=/meetings/contributions/index/meetingId/' . $this->meeting['id'];
-                        }
-
-                        echo $this->internalLink(array(
-                            'text' => 'Show',
-                            'href' => '/meetings/contributions/show/id/' . $this->escape($row['id']) . $redirect,
-                            'resource' => $this->model,
-                            'permission' => 'show'));
-                        echo $this->internalLink(array(
-                            'text' => 'Update',
-                            'href' => '/meetings/contributions/update/id/' . $this->escape($row['id']) . $redirect,
-                            'resource' => $this->model,
-                            'permission' => 'update',
-                            'prepend' => '&nbsp;'));
-                        echo $this->internalLink(array(
-                            'text' => 'Delete',
-                            'href' => '/meetings/contributions/delete/id/' . $this->escape($row['id']) . $redirect,
-                            'resource' => $this->model,
-                            'permission' => 'delete',
-                            'prepend' => '&nbsp;'));
-                        echo $this->internalLink(array(
-                            'text' => 'Accept',
-                            'href' => '/meetings/contributions/accept/id/' . $this->escape($row['id']) . $redirect,
-                            'resource' => $this->model,
-                            'permission' => 'accept',
-                            'prepend' => '&nbsp;'));
-                        echo $this->internalLink(array(
-                            'text' => 'Reject',
-                            'href' => '/meetings/contributions/reject/id/' . $this->escape($row['id']) . $redirect,
-                            'resource' => $this->model,
-                            'permission' => 'reject',
-                            'prepend' => '&nbsp;'));
-                        ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+    <div id="table"></div>
 
     <?php
+    if ($this->meetingId !== null) {
+        echo $this->internalLink(array(
+            'text' => 'Create new contribution for this meeting',
+            'href' => '/meetings/contributions/create/meetingId/' . $this->meetingId,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+    }
     echo $this->internalLink(array(
         'text' => 'Back to meetings management',
         'href' => '/meetings',
@@ -106,3 +46,31 @@
         'append' => '</p>'));
     ?>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        <?php if ($this->meeting !== null): ?>
+            var params = {'meetingId': <?php echo $this->escape($this->meeting['id']); ?>};
+        <?php else: ?>
+            var params = {};
+        <?php endif; ?>
+
+        $('#table').daiquiri_table({
+            'rowsurl': "<?php echo $this->baseUrl('/meetings/contributions/rows') ?>",
+            'colsurl': "<?php echo $this->baseUrl('/meetings/contributions/cols') ?>",
+            'params': params,
+            'success': function() {
+                $('a','tbody','#table').click(function(){
+                    new daiquiri.Modal({
+                        'url': this.href,
+                        'width': 800,
+                        'success': function () {
+                            daiquiri.table.items['table'].rows();
+                        }
+                    });
+                    return false;
+                });
+            }
+        });
+    });
+</script>
