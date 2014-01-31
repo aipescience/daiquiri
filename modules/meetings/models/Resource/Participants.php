@@ -38,7 +38,6 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
         $select->from($this->getTablename());
         $select->join('Meetings_Meetings','Meetings_Meetings.id = Meetings_Participants.meeting_id',array('meeting_title' => 'title'));
         $select->join('Meetings_ParticipantStatus','Meetings_ParticipantStatus.id = Meetings_Participants.status_id',array('status' => 'status'));
-
         return $this->getAdapter()->fetchAll($select);
     }
 

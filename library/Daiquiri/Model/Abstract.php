@@ -36,13 +36,25 @@ abstract class Daiquiri_Model_Abstract {
      * @var Daiquiri_Auth_Model_Resource_Abstract $_resource
      * Ressource object for the model
      */
-    protected $_resource = null;
+    private $_resource = null;
+
+    private $_model_helper = array();
+
 
     /**
      * @brief   Empty default constructor.
      */
     public function __construct() {
         
+    }
+
+    public function getModelHelper($helper, array $options = array()) {
+        if (empty($this->_model_helper[$helper])) {
+            $helperclass = 'Daiquiri_Model_Helper_' . ucfirst($helper);
+            $this->_model_helper[$helper] = new $helperclass($this, $options);
+        }
+
+        return $this->_model_helper[$helper];
     }
 
     /**

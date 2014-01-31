@@ -30,7 +30,7 @@
  * It further handles basic functionality of daiquiri_table.js such as sorting, filters and
  * editing of elements.
  */
-class Daiquiri_Model_Pagination extends Daiquiri_Model_Abstract {
+class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
 
     private $_model;
 

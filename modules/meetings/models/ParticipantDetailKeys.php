@@ -20,31 +20,30 @@
  *  limitations under the License.
  */
 
-/*
- * Placeholder for future conference model development. Only initial implementation
- * provided...
- *
- */
-
-class Meetings_Model_ParticipantDetailKeys extends Daiquiri_Model_CRUD {
+class Meetings_Model_ParticipantDetailKeys extends Daiquiri_Model_Table {
 
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Simple');
         $this->getResource()->setTablename('Meetings_ParticipantDetailKeys');
+    }
 
-        $this->_options = array(
-            'create' => array(
-                'form' => 'Meetings_Form_ParticipantDetailKey',
-                'submit' => 'Create participant detail key'
-            ),
-            'update' => array(
-                'form' => 'Meetings_Form_ParticipantDetailKey',
-                'submit' => 'Update participant detail key'
-            ),
-            'delete' => array(
-                'form' => 'Meetings_Form_Delete',
-                'submit' => 'Delete participant detail key'
-            ),
-        );
+    public function index() {
+        return $this->getModelHelper('CRUD')->index();
+    }
+
+    public function show($id) {
+        return $this->getModelHelper('CRUD')->show($id);
+    }
+
+    public function create(array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->create($formParams);
+    }
+
+    public function update($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->update($id, $formParams);
+    }
+
+    public function delete($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 }

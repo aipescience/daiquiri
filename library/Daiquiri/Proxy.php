@@ -49,7 +49,7 @@ class Daiquiri_Proxy {
     public function __call($methodname, array $arguments) {
         // check if method exists
         if (!method_exists($this->_model, $methodname)) {
-            throw new Exception('Method ' . $methodname . ' not found model in ' . get_class($this->_model));
+            throw new Exception('Method ' . $methodname . ' not found in ' . get_class($this->_model));
         }
 
         // check the acl

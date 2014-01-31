@@ -20,26 +20,12 @@
  *  limitations under the License.
  */
 
-class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
+class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Contributions');
-        $this->_options = array(
-            'create' => array(
-                'form' => 'Meetings_Form_Contribution',
-                'submit' => 'Create contribution'
-            ),
-            'update' => array(
-                'form' => 'Meetings_Form_Contribution',
-                'submit' => 'Update contribution'
-            ),
-            'delete' => array(
-                'form' => 'Meetings_Form_Delete',
-                'submit' => 'Delete contribution'
-            ),
-        );
-        $this->_cols = array('title','type','participant_firstname','participant_lastname','accepted');
-        // 'title','type','participant','accepted' are visible
+        $this->_cols = array('title','contribution_type','participant_firstname','participant_lastname','accepted');
+        // Note: only 'title','type','participant','accepted' are actually visible
     }
 
     public function info($meetingId) {
@@ -49,7 +35,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
 
         if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['contributions_publication_role_id'])) {
             return array(
-                'status' => 'error'
+                'status' => 'forbidden'
             );
         } else {
             // get contribution types for this meeting
@@ -96,8 +82,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
             $this->_cols[] = 'meeting_title';
         }
 
-        $pagination = new Daiquiri_Model_Pagination($this);
-        $sqloptions = $pagination->sqloptions($params);
+        $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
         if (!empty($params['meetingId'])) {
             $sqloptions['where'] = array('`meeting_id` = ?' => $params['meetingId']);
@@ -146,7 +131,11 @@ class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
             $rows[] = array_merge($row, array(implode('&nbsp;',$options)));
         }
 
-        return $pagination->response($rows, $sqloptions);
+        return $this->getModelHelper('pagination')->response($rows, $sqloptions);
+    }
+
+    public function show($id) {
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
     public function create($meetingId, array $formParams = array()) {
@@ -224,6 +213,10 @@ class Meetings_Model_Contributions extends Daiquiri_Model_CRUD {
         return array('form' => $form, 'status' => 'form');
     }
     
+    public function delete($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->delete($id, $formParams);
+    }
+
     public function accept($id, array $formParams = array()) {
         // create the form object
         $form = new Meetings_Form_AcceptReject(array(

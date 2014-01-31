@@ -1,5 +1,6 @@
 <?php
-/*
+
+/*  
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
@@ -19,17 +20,15 @@
  *  limitations under the License.
  */
 
-class Daiquiri_Controller_Helper_Cols extends Zend_Controller_Action_Helper_Abstract {
+class Daiquiri_Model_Table extends Daiquiri_Model_Abstract {
 
-    public function direct() {
-        // get query parameters
-        $queryParams = $this->getRequest()->getQuery();
-        
-        // call model functions
-        $response = $this->getActionController()->_model->cols($queryParams);
+    protected $_cols = array();
 
-        // assign to view
-        $this->getActionController()->setViewElements($response);
-    }    
+    public function setCols($cols) {
+        $this->_cols = $cols;
+    }
 
+    public function getCols() {
+        return $this->_cols;
+    }
 }

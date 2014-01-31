@@ -20,25 +20,30 @@
  *  limitations under the License.
  */
 
-class Meetings_Model_ContributionTypes extends Daiquiri_Model_CRUD {
+class Meetings_Model_ContributionTypes extends Daiquiri_Model_Table {
 
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Simple');
         $this->getResource()->setTablename('Meetings_ContributionTypes');
+    }
 
-        $this->_options = array(
-            'create' => array(
-                'form' => 'Meetings_Form_ContributionType',
-                'submit' => 'Create contribution type'
-            ),
-            'update' => array(
-                'form' => 'Meetings_Form_ContributionType',
-                'submit' => 'Update contribution type'
-            ),
-            'delete' => array(
-                'form' => 'Meetings_Form_Delete',
-                'submit' => 'Delete contribution type'
-            ),
-        );
+    public function index() {
+        return $this->getModelHelper('CRUD')->index();
+    }
+
+    public function show($id) {
+        return $this->getModelHelper('CRUD')->show($id);
+    }
+
+    public function create(array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->create($formParams);
+    }
+
+    public function update($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->update($id, $formParams);
+    }
+
+    public function delete($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 }

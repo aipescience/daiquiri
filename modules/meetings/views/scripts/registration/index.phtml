@@ -28,7 +28,6 @@
         <thead>
             <tr>
                 <th>Email</th>
-                <th>Values</th>
                 <th>Options</th>
             </tr>
         </thead>
@@ -36,10 +35,21 @@
             <?php foreach ($this->rows as $row): ?>
                 <tr>
                     <td><?php echo $this->escape($row['email']); ?></td>
-                    <td><?php echo $this->escape($row['values']); ?></td>
                     <td>
                         <?php 
                         $link = '/meetings/registration/validate/id/' . $row['id'] . '/code/' . $row['code'];
+                        echo $this->internalLink(array(
+                            'text' => 'Show',
+                            'href' => '/meetings/registration/show/id/' . $row['id'],
+                            'resource' => 'Meetings_Model_Registration',
+                            'permission' => 'show',
+                            'append' => '&nbsp;'));
+                        echo $this->internalLink(array(
+                            'text' => 'Delete',
+                            'href' => '/meetings/registration/delete/id/' . $row['id'],
+                            'resource' => 'Meetings_Model_Registration',
+                            'permission' => 'delete',
+                            'append' => '&nbsp;'));
                         echo $this->internalLink(array(
                             'text' => 'Validate',
                             'href' => $link));

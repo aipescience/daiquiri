@@ -22,8 +22,8 @@
 ?>
 
 <div class="main">
-    <?php if ($this->meeting !== null): ?>
-    <h2><?php echo $this->escape($this->meeting['title']); ?></h2>
+    <?php if ($this->meetingId !== null): ?>
+    <h2><?php echo $this->escape($this->meetingTitle); ?></h2>
     <h4>Participants</h4>
     <?php else: ?>
     <h2>Participants</h4>
@@ -50,7 +50,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         <?php if ($this->meetingId !== null): ?>
-            var params = {'meetingId': <?php echo $this->meetingId; ?>};
+            var params = {'meetingId': <?php echo $this->escape($this->meetingId); ?>};
         <?php else: ?>
             var params = {};
         <?php endif; ?>

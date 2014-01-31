@@ -20,37 +20,33 @@
  *  limitations under the License.
  */
 
-class Daiquiri_Model_CRUD extends Daiquiri_Model_Abstract {
-
-    protected $_cols = array();
-    protected $_options = array();
-
-    public function setCols($cols) {
-        $this->_cols = $cols;
-    }
-
-    public function getCols() {
-        return $this->_cols;
-    }
+class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
 
     public function index() {
         return array(
             'status' => 'ok',
-            'data' => $this->getResource()->fetchRows()
+            'rows' => $this->getResource()->fetchRows()
         );
     }
 
     public function show($id) {
         return array(
             'status' => 'ok',
-            'data' => $this->getResource()->fetchRow($id)
+            'row' => $this->getResource()->fetchRow($id)
         );
     }
 
-    public function create(array $formParams = array()) {
+    public function create(array $formParams = array(), $submit = null, $formclass = null) {
+        if ($submit === null) {
+            $submit = $this->_getSubject('Create');
+        }
+        if ($formclass === null) {
+            $formclass = $this->_getFormclass();
+        }
+
         // create the form object
-        $form = new $this->_options['create']['form'](array(
-            'submit'=> $this->_options['create']['submit']
+        $form = new $formclass(array(
+            'submit'=> $submit
         ));
 
         // valiadate the form if POST
@@ -67,6 +63,7 @@ class Daiquiri_Model_CRUD extends Daiquiri_Model_Abstract {
             } else {
                 return array(
                     'status' => 'error',
+                    'form' => $form,
                     'errors' => $form->getMessages()
                 );
             }
@@ -75,7 +72,14 @@ class Daiquiri_Model_CRUD extends Daiquiri_Model_Abstract {
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function update($id , array $formParams = array()) {
+    public function update($id, array $formParams = array(), $submit = null, $formclass = null) {
+        if ($submit === null) {
+            $submit = $this->_getSubject('Update');
+        }
+        if ($formclass === null) {
+            $formclass = $this->_getFormclass();
+        }
+
         // get meeting from teh database
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
@@ -83,8 +87,8 @@ class Daiquiri_Model_CRUD extends Daiquiri_Model_Abstract {
         }
 
         // create the form object
-        $form = new $this->_options['update']['form'](array(
-            'submit'=> $this->_options['update']['submit'],
+        $form = new $formclass(array(
+            'submit'=> $submit,
             'entry' => $entry
         ));
 
@@ -109,20 +113,28 @@ class Daiquiri_Model_CRUD extends Daiquiri_Model_Abstract {
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function delete($id, array $formParams = array()) {
-        // get meeting from teh database
+    public function delete($id, array $formParams = array(), $submit = null, $formclass = null) {
+        if ($submit === null) {
+            $submit = $this->_getSubject('Delete');
+        }
+        if ($formclass === null) {
+            $formclass = $this->_getFormclass('Delete');
+        }
+
+        // get meeting from the database
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
             throw new Exception('$id ' . $id . ' not found.');
         }
 
         // create the form object
-        $form = new $this->_options['delete']['form'](array(
-            'submit'=> $this->_options['delete']['submit']
+        $form = new $formclass(array(
+            'submit'=> $submit
         ));
 
         // valiadate the form if POST
         if (!empty($formParams)){
+
             if ($form->isValid($formParams)) {
                 $this->getResource()->deleteRow($id);
                 return array('status' => 'ok');
@@ -135,5 +147,22 @@ class Daiquiri_Model_CRUD extends Daiquiri_Model_Abstract {
         }
 
         return array('form' => $form, 'status' => 'form');
+    }
+ 
+    private function _getSubject($action) {
+        $class = get_class($this->getModel());
+        $words = preg_split('/(?=[A-Z])/',lcfirst(substr($class, strrpos($class,'_') + 1,-1)));
+        return ucfirst($action) . ' ' . strtolower(implode(' ',$words));
+    }
+
+    private function _getFormclass($formname = null) {
+        $class = get_class($this->getModel());
+
+        if ($formname === null) {
+            $formname = substr($class, strrpos($class,'_') + 1,-1);
+        }
+
+        $module = substr($class, 0, strpos($class,'_'));
+        return $module . '_Form_' . ucfirst($formname);
     }
 }

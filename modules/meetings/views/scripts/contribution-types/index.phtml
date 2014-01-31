@@ -22,7 +22,7 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->options['index']['title']); ?></h2>
+    <h2><?php echo ucfirst($this->escape($this->objects)); ?></h2>
 
     <table class="table table-condensed">
         <thead>
@@ -33,7 +33,7 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($this->data as $row): ?>
+            <?php foreach ($this->rows as $row): ?>
                 <tr>
                     <?php foreach ($row as $element): ?>
                     <td><?php echo $this->escape($element); ?></td>
@@ -42,18 +42,18 @@
                         <?php 
                         echo $this->internalLink(array(
                             'text' => 'Show',
-                            'href' => $this->options['show']['url'] . '?id=' . $this->escape($row['id']),
+                            'href' => $this->base . 'show/id/' . $this->escape($row['id']),
                             'resource' => $this->model,
                             'permission' => 'show'));
                         echo $this->internalLink(array(
                             'text' => 'Update',
-                            'href' => $this->options['update']['url'] . '?id=' . $this->escape($row['id']),
+                            'href' => $this->base . 'update/id/' . $this->escape($row['id']),
                             'resource' => $this->model,
                             'permission' => 'update',
                             'prepend' => '&nbsp;'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
-                            'href' => $this->options['delete']['url'] . '?id=' . $this->escape($row['id']),
+                            'href' => $this->base . 'delete/id/' . $this->escape($row['id']),
                             'resource' => $this->model,
                             'permission' => 'delete',
                             'prepend' => '&nbsp;')); 
@@ -66,13 +66,13 @@
 
     <?php
     echo $this->internalLink(array(
-        'text' => $this->options['create']['title'],
-        'href' => $this->options['create']['url'],
+        'text' => 'Create ' . $this->object,
+        'href' => $this->base . 'create',
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->internalLink(array(
         'text' => 'Back to meetings management',
-        'href' => '/meetings',
+        'href' => $this->redirect,
         'prepend' => '<p>',
         'append' => '</p>'));
     ?>

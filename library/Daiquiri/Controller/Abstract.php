@@ -30,6 +30,17 @@
  */
 abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
 
+    private $_controller_helper = array();
+
+    public function getControllerHelper($helper, array $options = array()) {
+        if (empty($this->_controller_helper[$helper])) {
+            $helperclass = 'Daiquiri_Controller_Helper_' . ucfirst($helper);
+            $this->_controller_helper[$helper] = new $helperclass($this, $options);
+        }
+
+        return $this->_controller_helper[$helper];
+    }
+
     public function setViewElements($response, $redirect = null) {
         if (!empty($redirect)) {
             $this->view->redirect = $redirect;
@@ -39,16 +50,16 @@ abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
         }
     }
 
-    public function setFormAction($response, $url) {
+    public function setFormAction($response, $url = null) {
         if (array_key_exists('form', $response)) {
+            if ($url === null) {
+                $action = $this->getRequest()->getRequestUri();
+            } else {
+                $action = Daiquiri_Config::getInstance()->getBaseUrl() . $url;
+            }
+
             $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $url;
             $form->setAction($action);
         }
-    }
-
-    public function initHelper($helper) {
-        $classname = 'Daiquiri_Controller_Helper_' . ucfirst($helper);
-        Zend_Controller_Action_HelperBroker::addHelper(new $classname());
     }
 }

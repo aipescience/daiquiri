@@ -20,16 +20,18 @@
  *  limitations under the License.
  */
 
-class Meetings_Model_Meetings extends Daiquiri_Model_CRUD {
+class Meetings_Model_Meetings extends Daiquiri_Model_Table {
 
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Meetings');
-        $this->_options = array(
-            'delete' => array(
-                'form' => 'Meetings_Form_Delete',
-                'submit' => 'Delete meeting'
-            ),
-        );
+    }
+
+    public function index() {
+        return $this->getModelHelper('CRUD')->index();
+    }
+
+    public function show($id) {
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
     public function create(array $formParams = array()) {
@@ -114,5 +116,9 @@ class Meetings_Model_Meetings extends Daiquiri_Model_CRUD {
         }
 
         return array('form' => $form, 'status' => 'form');
+    }
+
+    public function delete($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 }

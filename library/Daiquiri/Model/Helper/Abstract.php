@@ -20,28 +20,19 @@
  *  limitations under the License.
  */
 
-class Meetings_InfoController extends Daiquiri_Controller_Abstract {
+class Daiquiri_Model_Helper_Abstract {
 
-    public function init() {
-        $this->_meetingId = $this->_getParam('meetingId');
-        if ($this->_meetingId === null) {
-            throw new Exception('$meetingId not provided in ' . get_class($this) . '::init()');
-        }
+    private $_model;
+
+    public function __construct($model) {
+        $this->_model = $model;
     }
 
-    public function participantsAction() {
-        $model = Daiquiri_Proxy::factory('Meetings_Model_Participants');
-        $response = $model->info($this->_meetingId);
-
-        // assign to view
-        $this->setViewElements($response);
+    public function getModel() {
+        return $this->_model;
     }
 
-    public function contributionsAction() {
-        $model = Daiquiri_Proxy::factory('Meetings_Model_Contributions');
-        $response = $model->info($this->_meetingId);
-
-        // assign to view
-        $this->setViewElements($response);
+    public function getResource() {
+        return $this->_model->getResource();
     }
 }

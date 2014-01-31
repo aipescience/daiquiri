@@ -21,13 +21,13 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->title); ?></h2>
+    <h2><?php echo $this->escape($this->row['key']); ?></h2>
 
     <table class="table table-bordered">
         <tbody>
-            <?php foreach ($this->data as $key => $value): ?>
+            <?php foreach ($this->row as $key => $value): ?>
                 <tr>
-                    <td class="onehundredeighty"><?php echo ucfirst($this->escape($key)); ?></td>
+                    <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
                     <td><?php echo $this->escape($value); ?></td>
                 </tr>
             <?php endforeach; ?>  

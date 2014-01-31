@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Meetings_IndexController extends Daiquiri_Controller_AbstractCRUD {
+class Meetings_IndexController extends Daiquiri_Controller_Abstract {
 
     public function init() {
 

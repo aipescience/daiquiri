@@ -18,18 +18,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-class Daiquiri_Controller_Helper_Rows extends Zend_Controller_Action_Helper_Abstract {
+<div class="main">
+    <h2><?php echo $this->escape($this->title) ?></h2>
+    <?php if ($this->status === 'ok'): ?>
+        <p>Deletion successful.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>
 
-    public function direct() {
-        // get query parameters
-        $queryParams = $this->getRequest()->getQuery();
-
-        // call model functions
-        $response = $this->getActionController()->_model->rows($queryParams);
-
-        // assign to view
-        $this->getActionController()->setViewElements($response);
-    }    
-
-}

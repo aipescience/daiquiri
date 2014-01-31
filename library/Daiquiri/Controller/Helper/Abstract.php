@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -20,28 +19,35 @@
  *  limitations under the License.
  */
 
-class Meetings_InfoController extends Daiquiri_Controller_Abstract {
+class Daiquiri_Controller_Helper_Abstract {
+
+    protected $_controller;
+    protected $_model;
+
+    public function __construct($controller) {
+        $this->_controller = $controller;
+        $this->_model = $controller->_model;
+
+        $this->init();
+    }
 
     public function init() {
-        $this->_meetingId = $this->_getParam('meetingId');
-        if ($this->_meetingId === null) {
-            throw new Exception('$meetingId not provided in ' . get_class($this) . '::init()');
-        }
+        // does nothing so far
     }
 
-    public function participantsAction() {
-        $model = Daiquiri_Proxy::factory('Meetings_Model_Participants');
-        $response = $model->info($this->_meetingId);
-
-        // assign to view
-        $this->setViewElements($response);
+    public function getController() {
+        return $this->_controller;
     }
 
-    public function contributionsAction() {
-        $model = Daiquiri_Proxy::factory('Meetings_Model_Contributions');
-        $response = $model->info($this->_meetingId);
+    public function getParam($paramName, $default = null) {
+        return $this->_controller->getParam($paramName, $default);
+    }
 
-        // assign to view
-        $this->setViewElements($response);
+    public function getRequest() {
+        return $this->_controller->getRequest();
+    }
+
+    public function getModel() {
+        return $this->_model;
     }
 }

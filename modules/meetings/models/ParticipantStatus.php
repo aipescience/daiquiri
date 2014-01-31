@@ -20,31 +20,30 @@
  *  limitations under the License.
  */
 
-/*
- * Placeholder for future conference model development. Only initial implementation
- * provided...
- *
- */
-
-class Meetings_Model_ParticipantStatus extends Daiquiri_Model_CRUD {
+class Meetings_Model_ParticipantStatus extends Daiquiri_Model_Table {
 
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Simple');
         $this->getResource()->setTablename('Meetings_ParticipantStatus');
+    }
 
-        $this->_options = array(
-            'create' => array(
-                'form' => 'Meetings_Form_ParticipantStatus',
-                'submit' => 'Create participant status'
-            ),
-            'update' => array(
-                'form' => 'Meetings_Form_ParticipantStatus',
-                'submit' => 'Update participant status'
-            ),
-            'delete' => array(
-                'form' => 'Meetings_Form_Delete',
-                'submit' => 'Delete participant status'
-            ),
-        );
+    public function index() {
+        return $this->getModelHelper('CRUD')->index();
+    }
+
+    public function show($id) {
+        return $this->getModelHelper('CRUD')->show($id);
+    }
+
+    public function create(array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->create($formParams, 'Create participant status','Meetings_Form_ParticipantStatus');
+    }
+
+    public function update($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update participant status','Meetings_Form_ParticipantStatus');
+    }
+
+    public function delete($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete participant status');
     }
 }

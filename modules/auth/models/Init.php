@@ -247,7 +247,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             $rules['admin']['Meetings_Model_ContributionTypes'] = array(
                 'index','create','show','update','delete'
             );
-            $rules['admin']['Meetings_Model_Registration'] = array('index');
+            $rules['admin']['Meetings_Model_Registration'] = array('index','show','delete');
         }
 
         // construct rules for files module

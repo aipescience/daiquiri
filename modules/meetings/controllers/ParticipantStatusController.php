@@ -20,11 +20,33 @@
  *  limitations under the License.
  */
 
-class Meetings_ParticipantStatusController extends Daiquiri_Controller_AbstractCRUD {
+class Meetings_ParticipantStatusController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        parent::init();
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_ParticipantStatus');
+    }
+
+    public function indexAction() {
+        $this->getControllerHelper('table', array('object' => 'participant status'))->index();
+    }
+
+    public function showAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('table')->show($id);
+    }
+
+    public function createAction() {
+        $this->getControllerHelper('form', array('title' => 'Create participant status'))->create();
+    }
+
+    public function updateAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('form', array('title' => 'Update participant status'))->update($id);
+    }
+
+    public function deleteAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('form', array('title' => 'Delete participant status'))->delete($id);
     }
 
 }

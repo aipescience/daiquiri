@@ -20,10 +20,32 @@
  *  limitations under the License.
  */
 
-class Meetings_MeetingsController extends Daiquiri_Controller_AbstractCRUD {
+class Meetings_MeetingsController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        parent::init();
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_Meetings');
+    }
+
+    public function indexAction() {
+        $this->getControllerHelper('table')->index();
+    }
+
+    public function showAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('table')->show($id);
+    }
+
+    public function createAction() {
+        $this->getControllerHelper('form')->create();
+    }
+
+    public function updateAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('form')->update($id);
+    }
+
+    public function deleteAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('form')->delete($id);
     }
 }

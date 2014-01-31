@@ -21,7 +21,7 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->row['title']); ?></h2>
+    <h2><?php echo $this->escape($this->row['email']); ?></h2>
 
     <table class="table table-bordered">
         <tbody>
@@ -32,11 +32,15 @@
                     <td><?php echo $this->escape($value); ?></td>
                 </tr>
                 <?php endif; ?>
-            <?php endforeach; ?>  
+            <?php endforeach; ?>
         </tbody>
     </table>
 
     <?php
+    $link = '/meetings/registration/validate/id/' . $this->row['id'] . '/code/' . $this->row['code'];
+    echo $this->internalLink(array(
+        'text' => 'Validate this user',
+        'href' => $link));
     echo $this->internalLink(array(
         'text' => 'Back',
         'class' => 'daiquiri-modal-close',

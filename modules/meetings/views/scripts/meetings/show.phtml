@@ -21,10 +21,10 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->data['title']); ?></h2>
+    <h2><?php echo $this->escape($this->row['title']); ?></h2>
     <table class="table table-bordered">
         <tbody>
-            <?php foreach ($this->data as $key => $value): ?>
+            <?php foreach ($this->row as $key => $value): ?>
                 <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
                 <tr>
                     <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
@@ -46,7 +46,7 @@
     <?php
     echo $this->internalLink(array(
         'text' => 'Show participants for this meeting',
-        'href' => '/meetings/participants/?meetingId=' . $this->data['id'] . '&redirect='.$this->redirect ,
+        'href' => '/meetings/participants/?meetingId=' . $this->row['id'],
         'resource' => 'Meetings_Model_Participants',
         'permission' => 'index',
         'prepend' => '<p>',

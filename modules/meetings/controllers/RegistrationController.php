@@ -23,15 +23,21 @@
 class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        parent::init();
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_Registration');
     }
 
     public function indexAction() {
-        $response = $this->_model->index();
+        $this->getControllerHelper('table')->index();
+    }
 
-        // assign to view
-        $this->setViewElements($response);
+    public function showAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('table')->show($id);
+    }
+
+    public function deleteAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('form', array('title' => 'Delete registration'))->delete($id);
     }
 
     public function registerAction() {

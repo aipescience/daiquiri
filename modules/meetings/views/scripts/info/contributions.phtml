@@ -22,8 +22,14 @@
 ?>
 
 <div class="main">
-    <?php if ($this->status != 'ok'): ?>
-        <h2>Contributions</h2>
+    <h2>Contributions</h2>
+
+    <?php 
+    // this is nasty...
+    $flatArray = call_user_func_array('array_merge',$this->data);
+    ?>
+
+    <?php if (empty($flatArray)): ?>
         <p>The list of contributions for this meeting is not available right now.</p>
     <?php else: ?>
         <?php foreach ($this->data as $contributionType => $contributions): ?>

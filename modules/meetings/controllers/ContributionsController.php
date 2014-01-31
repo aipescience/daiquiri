@@ -20,115 +20,57 @@
  *  limitations under the License.
  */
 
-class Meetings_ContributionsController extends Daiquiri_Controller_AbstractCRUD {
+class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        parent::init();
         $this->_model = Daiquiri_Proxy::factory('Meetings_Model_Contributions');
     }
 
     public function indexAction() {
-        // get params
-        $meetingId = $this->_getParam('meetingId'); 
-
-        // get the data
-        $response = $this->_model->index($meetingId);
-
-        // assign to view
+        $meetingId = $this->_getParam('meetingId');
+        if ($meetingId !== null) {
+            $model = Daiquiri_Proxy::factory('Meetings_Model_Meetings');
+            $response = $model->show($meetingId);
+            $this->view->meetingTitle = $response['row']['title'];
+        }
         $this->view->meetingId = $meetingId;
-        $this->view->options = $this->_options;
-        $this->view->model = $this->_model->getClass();
-        $this->setViewElements($response);
     }
 
     public function colsAction() {
-        $this->initHelper('cols');
-        $this->_helper->cols();
+        $this->getControllerHelper('pagination')->cols();
     }
 
     public function rowsAction() {
-        $this->initHelper('rows');
-        $this->_helper->rows();
+        $this->getControllerHelper('pagination')->rows();
+    }
+
+    public function showAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('table')->show($id);
     }
 
     public function createAction() {
-        // get params
-        $meetingId = $this->_getParam('meetingId'); 
-        $redirect = $this->_getParam('redirect','/meetings/contributions/');
+        $meetingId = $this->_getParam('meetingId');
+        $this->getControllerHelper('form',array('redirect' => '/meetings/contributions/?meetingId=' . $meetingId))->create($meetingId);
+    }
 
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->create($meetingId, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->create($meetingId);
-        }
+    public function updateAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->update($id);
+    }
 
-        // set action for form
-        if ($this->_options['create']['url'] !== null && array_key_exists('form', $response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . $this->_options['create']['url'] . '?meetingId=' . $meetingId;
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->title = $this->_options['create']['title'];
-        $this->setViewElements($response, $redirect);
+    public function deleteAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->delete($id);
     }
 
     public function acceptAction() {
-        // get params from request
         $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect','/meetings/contributions/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->accept($id, $this->_request->getPost());
-            }
-        }  else {
-            // just display the form
-            $response = $this->_model->accept($id);
-        }
-
-        // set action for form
-        $this->setFormAction($response, '/meetings/contributions/accept?id=' . $id);
-
-        // assign to view
-        $this->setViewElements($response, $redirect);
+        $this->getControllerHelper('form')->accept($id);
     }
 
     public function rejectAction() {
-        // get params from request
         $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect','/meetings/contributions/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->reject($id, $this->_request->getPost());
-            }
-        }  else {
-            // just display the form
-            $response = $this->_model->reject($id);
-        }
-
-        // set action for form
-        $this->setFormAction($response, '/meetings/contributions/reject?id=' . $id);
-        
-        // assign to view
-        $this->setViewElements($response, $redirect);
+        $this->getControllerHelper('form')->reject($id);
     }
 }

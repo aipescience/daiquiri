@@ -26,17 +26,35 @@
  *
  */
 
-class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
+class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Participants');
-        $this->_options = array(
-            'delete' => array(
-                'form' => 'Meetings_Form_Delete',
-                'submit' => 'Delete Participant'
-            ),
-        );
         $this->_cols = array('firstname','lastname','email','status');
+    }
+
+    public function info($meetingId) {
+        // get model
+        $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+
+        if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['participants_publication_role_id'])) {
+            return array(
+                'status' => 'forbidden'
+            );
+        } else {
+            return array(
+                'status' => 'ok',
+                'data' => $this->getResource()->fetchRows(
+                    array(
+                        'where' => array(
+                            '`meeting_id` = ?' => $meetingId,
+                            '(`status` = "accepted") OR (`status` = "organizer") OR (`status` = "invited")'
+                        )
+                    )
+                )
+            );
+        }
     }
 
     public function cols(array $params = array()) {
@@ -61,8 +79,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
             $this->_cols[] = 'meeting_title';
         }
 
-        $pagination = new Daiquiri_Model_Pagination($this);
-        $sqloptions = $pagination->sqloptions($params);
+        $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
         if (!empty($params['meetingId'])) {
             $sqloptions['where'] = array('meeting_id=?' => $params['meetingId']);
@@ -108,31 +125,11 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
             $rows[] = array_merge($row, array(implode('&nbsp;',$options)));
         }
 
-        return $pagination->response($rows, $sqloptions);
+        return $this->getModelHelper('pagination')->response($rows, $sqloptions);
     }
 
-    public function info($meetingId) {
-        // get model
-        $meetingsModel = new Meetings_Model_Meetings();
-        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
-
-        if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['participants_publication_role_id'])) {
-            return array(
-                'status' => 'error'
-            );
-        } else {
-            return array(
-                'status' => 'ok',
-                'data' => $this->getResource()->fetchRows(
-                    array(
-                        'where' => array(
-                            '`meeting_id` = ?' => $meetingId,
-                            '(`status` = "accepted") OR (`status` = "organizer") OR (`status` = "invited")'
-                        )
-                    )
-                )
-            );
-        }
+    public function show($id) {
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
     public function create($meetingId, array $formParams = array()) {
@@ -251,6 +248,10 @@ class Meetings_Model_Participants extends Daiquiri_Model_CRUD {
         }
 
         return array('form' => $form, 'status' => 'form');
+    }
+
+    public function delete($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 
     public function accept($id, array $formParams = array()) {
