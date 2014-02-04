@@ -48,4 +48,10 @@ class Meetings_MeetingsController extends Daiquiri_Controller_Abstract {
         $id = $this->getParam('id');
         $this->getControllerHelper('form')->delete($id);
     }
+
+    public function mailsAction() {
+        $id = $this->getParam('id');
+        $this->getControllerHelper('form')->mails($id);
+    }
+
 }

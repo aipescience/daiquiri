@@ -96,7 +96,19 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                     'meeting_id' => $meetingId
                 ));
 
+                // prepare and send mail
                 $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/meetings/registration/validate/id/' . $id . '/code/' . $code;
+
+                $this->getModelHelper('mail')->send('meetings.register', 
+                    array(
+                        'to' => $values['email']
+                    ),
+                    array(
+                        'firstname' => $values['firstname'],
+                        'lastname' => $values['lastname'],
+                        'link' => $link
+                    )
+                );
 
                 return array('status' => 'ok');
             } else {

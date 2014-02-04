@@ -38,29 +38,29 @@ class Config_TemplatesController extends Daiquiri_Controller_Abstract {
         $this->view->status = 'ok';
     }
 
-    public function createAction() {
-        // get redirect url
-        $redirect = $this->_getParam('redirect', '/config/templates');
+    // public function createAction() {
+    //     // get redirect url
+    //     $redirect = $this->_getParam('redirect', '/config/templates');
 
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and create new user
-                $response = $this->_model->create($this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->create();
-        }
+    //     // check if POST or GET
+    //     if ($this->_request->isPost()) {
+    //         if ($this->_getParam('cancel')) {
+    //             // user clicked cancel
+    //             $this->_redirect($redirect);
+    //         } else {
+    //             // validate form and create new user
+    //             $response = $this->_model->create($this->_request->getPost());
+    //         }
+    //     } else {
+    //         // just display the form
+    //         $response = $this->_model->create();
+    //     }
 
-        // assign to view
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-    }
+    //     // assign to view
+    //     foreach ($response as $key => $value) {
+    //         $this->view->$key = $value;
+    //     }
+    // }
 
     public function updateAction() {
         // get redirect url

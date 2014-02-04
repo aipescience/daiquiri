@@ -227,7 +227,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
 
             // admin
             $rules['admin']['Meetings_Model_Meetings'] = array(
-                'index','create','show','update','delete'
+                'index','create','show','update','delete','mails'
             );
             $rules['admin']['Meetings_Model_Participants'] = array(
                 'index','cols','rows','create','show','update','delete','accept','reject'

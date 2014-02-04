@@ -458,6 +458,34 @@ _message_
 ---
 
 Best Regards'
+            ),
+            'meetings.register' => array(
+                'subject' => '_meeting_',
+                'body' => 'Dear _firstname_ _lastname_,
+
+Thank you for registering for the meeting. 
+
+Please click on the following link to validate your registration:
+
+_link_
+
+Best Regards'
+            ),
+            'meetings.accept' => array(
+                'subject' => '_meeting_',
+                'body' => 'Dear _firstname_ _lastname_,
+
+Yes!
+
+Best Regards'
+            ),
+            'meetings.reject' => array(
+                'subject' => '_meeting_',
+                'body' => 'Dear _firstname_ _lastname_,
+
+No!
+
+Best Regards'
             )
         );
 

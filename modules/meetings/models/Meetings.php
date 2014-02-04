@@ -121,4 +121,78 @@ class Meetings_Model_Meetings extends Daiquiri_Model_Table {
     public function delete($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
+
+    public function mails($id, array $formParams = array()) {
+        // get meeting from the database
+        $meeting = $this->getResource()->fetchRow($id);
+        if (empty($meeting)) {
+            throw new Exception('$id ' . $id . ' not found.');
+        }
+
+        // get all accepted and all rejected participants
+        $participantModel = new Meetings_Model_Participants();
+        $accepted = $participantModel->getResource()->fetchRows(array(
+            'where' => array('status = "accepted"')
+        ));
+        $rejected = $participantModel->getResource()->fetchRows(array(
+            'where' => array('status = "rejected"')
+        ));
+
+        // get mail templates
+        $templateModel = new Config_Model_Templates();
+        $acceptTemplate = $templateModel->getResource()->fetchRow('meetings.accept');
+        $rejectTemplate = $templateModel->getResource()->fetchRow('meetings.reject');
+
+        // create the form object
+        $form = new Meetings_Form_Mails(array(
+            'accepted' => $accepted,
+            'rejected' => $rejected,
+            'acceptTemplate' => $acceptTemplate,
+            'rejectTemplate' => $rejectTemplate
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                foreach($accepted as $participant) {
+                    if (in_array($participant['id'],$values['accepted_id'])) {
+                        $this->getModelHelper('mail')->send('meetings.accept', array(
+                            'to' => $participant['email'],
+                            'meeting' => $meeting['title'],
+                            'firstname' => $participant['firstname'],
+                            'lastname' => $participant['lastname']
+                        ));
+                    }
+                }
+                foreach($rejected as $participant) {
+                    if (in_array($participant['id'],$values['rejected_id'])) {
+                        $this->getModelHelper('mail')->send('meetings.reject', array(
+                            'to' => $participant['email'],
+                            'meeting' => $meeting['title'],
+                            'firstname' => $participant['firstname'],
+                            'lastname' => $participant['lastname']
+                        ));
+                    }
+                }
+
+                return array('status' => 'ok');
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
+        }
+
+        return array(
+            'status' => 'form',
+            'form' => $form,
+            'accpted' => $accepted
+        );
+    }
+
+
 }

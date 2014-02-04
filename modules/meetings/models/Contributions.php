@@ -219,7 +219,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
     public function accept($id, array $formParams = array()) {
         // create the form object
-        $form = new Meetings_Form_AcceptReject(array(
+        $form = new Daiquiri_Form_Confirm(array(
             'submit' => 'Accept the contribution'
         ));
 
@@ -248,7 +248,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
     public function reject($id, array $formParams = array()) {
         // create the form object
-        $form = new Meetings_Form_AcceptReject(array(
+        $form = new Daiquiri_Form_Confirm(array(
             'submit' => 'Reject the contribution'
         ));
 

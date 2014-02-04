@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Meetings_Form_Delete extends Daiquiri_Form_Abstract {
+class Daiquiri_Form_Confirm extends Daiquiri_Form_Abstract {
 
     protected $_submit;
 
@@ -33,7 +33,7 @@ class Meetings_Form_Delete extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add fields
-        $this->addDangerButtonElement('submit', $this->_submit);
+        $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

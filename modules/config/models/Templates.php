@@ -35,7 +35,10 @@ class Config_Model_Templates extends Daiquiri_Model_SimpleTable {
         'contact.submit_support' => array('firstname', 'lastname', 'username', 'email',
             'category', 'subject', 'message', 'link'),
         'contact.respond' => array('firstname', 'lastname', 'username', 'subject'),
-        'query.plan' => array('firstname', 'lastname', 'email', 'sql', 'plan', 'message')
+        'query.plan' => array('firstname', 'lastname', 'email', 'sql', 'plan', 'message'),
+        'meetings.register' => array('meeting', 'firstname', 'lastname', 'link'),
+        'meetings.accept' => array('meeting', 'firstname', 'lastname'),
+        'meetings.reject' => array('meeting', 'firstname', 'lastname'),
     );
 
     public function __construct() {

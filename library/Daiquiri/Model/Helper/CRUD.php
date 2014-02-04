@@ -118,7 +118,7 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
             $submit = $this->_getSubject('Delete');
         }
         if ($formclass === null) {
-            $formclass = $this->_getFormclass('Delete');
+            $formclass = 'Daiquiri_Form_Danger';
         }
 
         // get meeting from the database
