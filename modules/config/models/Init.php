@@ -336,7 +336,7 @@ _link_
 Best Regards'
             ),
             'auth.resetPassword' => array(
-                'subject' => '[Daiquiri] password reset by user',
+                'subject' => '[Daiquiri] Password reset by user',
                 'body' => 'Dear Daiquiri-Test manager,
 
 _firstname_ _lastname_ has just reset his/her password. 
