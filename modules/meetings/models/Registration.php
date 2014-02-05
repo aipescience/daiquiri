@@ -102,6 +102,7 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                 $this->getModelHelper('mail')->send('meetings.register', 
                     array(
                         'to' => $values['email'],
+                        'meeting' => $meeting['title'],
                         'firstname' => $values['firstname'],
                         'lastname' => $values['lastname'],
                         'link' => $link
