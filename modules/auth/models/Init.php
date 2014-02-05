@@ -83,7 +83,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
 
         // contstruct resources array
-        $output['resources'] = array_merge(array(
+        $output['resources'] = array(
             // admin module
             'Admin_IndexController',
             // auth module
@@ -118,17 +118,15 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Query_Model_Examples',
             // uws module
             'Query_Model_Uws',
-        ), $input['resources']);
+        );
 
-        // construct rules array ??
-        // $rules = array();
-        // if (isset($input['rules'])) {
-        //     if (is_array($input['rules'])) {
-        //         //$output['rules'] = $input['rules'];
-        //     } else {
-        //         $this->_error("Auth option 'rules' needs to be an array.");
-        //     }
-        // }
+        if (isset($input['resources'])) {
+            if (is_array($input['resources'])) {
+                $output['resources'] = array_merge($output['resources'], $input['resources']);
+            } else {
+                $this->_error("Auth option 'apps' needs to be an array.");
+            }
+        }
 
         // prepare rules array
         $rules = array();
