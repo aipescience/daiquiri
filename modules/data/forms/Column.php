@@ -75,7 +75,7 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Sql()),
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
         $this->addElement('text', 'type', array(
@@ -84,7 +84,7 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
         $this->addElement('text', 'unit', array(
@@ -93,7 +93,7 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
         $this->addElement('text', 'ucd', array(
@@ -102,7 +102,7 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
 
@@ -130,7 +130,7 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Textarea()),
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
 

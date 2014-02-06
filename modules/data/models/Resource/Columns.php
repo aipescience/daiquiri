@@ -49,7 +49,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
         $select->where("`$c`.`name` = ?", trim($column));
         $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name'));
         $select->where("`$t`.`name` = ?", trim($table));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
+        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name','database_id' => 'id'));
         $select->where("`$d`.`name` = ?", trim($db));
 
         // get the rowset and return
@@ -81,7 +81,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
         // add inner joins for the category, the status and the user
         $select->setIntegrityCheck(false);
         $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name'));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
+        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name','database_id' => 'id'));
 
         // get the rowset and return
         $row = $this->getTable()->fetchAll($select)->current();
