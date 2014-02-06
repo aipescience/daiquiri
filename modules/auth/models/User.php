@@ -241,7 +241,10 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
 
                 return array('status' => 'ok');
             } else {
-                return array('form' => $form, 'status' => 'validation failed');
+                return array(
+                    'status' => 'error',
+                    'form' => $form,
+                    'errors' => $form->getMessages());
             }
         }
         return array('form' => $form, 'status' => 'form');
