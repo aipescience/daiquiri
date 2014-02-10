@@ -240,7 +240,6 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
         // write metadata into comment field of the column (if supported)
         $descResource = new Data_Model_Resource_Description();
-        $databasesModel = new Data_Model_Databases();
 
         if ($oldComment === false) {
             $comment = $descResource->getColumnComment($db, $table, $column);
