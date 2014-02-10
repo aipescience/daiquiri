@@ -232,7 +232,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
     private function _writeColumnComment($db, $table, $column, $values, $oldComment = false) {
         //check sanity of input
-        for($values as $key => $value) {
+        foreach ($values as $key => $value) {
         	if(is_string($value) && (strpos($value, "{") !== false || strpos($value, "}") !== false)) {
         		throw new Exception("Unsupported character {} in " . $key . ": " . $value);
         	}
