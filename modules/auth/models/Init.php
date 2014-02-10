@@ -193,7 +193,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             $rules['guest']['Data_Model_Viewer'] = array('rows','cols');
 
             // admin
-            $rules['admin']['Data_Model_Functions'] =array(
+            $rules['admin']['Data_Model_Functions'] = array(
                 'index','create','show','update','delete'
             );
             $rules['admin']['Data_Model_Databases'] = array(

@@ -49,10 +49,9 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         // get the acl class, this could be more general
         $this->_acl = new Daiquiri_Acl();
 
-        // store roles in auth object
-        foreach($this->_acl->getRoles() as $key => $value) {
-            $this->_roles[$key + 1] = $value;
-        }
+        // get the roles
+        $roleModel = new Auth_Model_Roles();
+        $this->_roles = $roleModel->getValues();
 
         // store status in auth object
         $statusModel = new Auth_Model_Status();
