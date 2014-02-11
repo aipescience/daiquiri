@@ -84,8 +84,12 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
                 return array('status' => 'ok');
             } else {
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (empty($csrf)) {
+                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
+                } else {
+                    $csrf->initCsrfToken();
+                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                }
             }
         }
 
@@ -159,8 +163,12 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
                 return array('status' => 'ok');
             } else {
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (empty($csrf)) {
+                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
+                } else {
+                    $csrf->initCsrfToken();
+                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                }
             }
         }
 
@@ -193,8 +201,12 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
                 return array('status' => 'ok');
             } else {
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (empty($csrf)) {
+                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
+                } else {
+                    $csrf->initCsrfToken();
+                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                }
             }
         }
 
