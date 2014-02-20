@@ -64,7 +64,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 }
 
                 // check if the order needs to be set to NULL
-                if ($values['order'] === '0' || $values['order'] === '') {
+                if ($values['order'] === '') {
                     $values['order'] = NULL;
                 }
 
@@ -150,7 +150,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 unset($values['ucd_list']);
 
                 // check if the order needs to be set to NULL
-                if ($values['order'] === '0' || $values['order'] === '') {
+                if ($values['order'] === '') {
                     $values['order'] = NULL;
                 }
 

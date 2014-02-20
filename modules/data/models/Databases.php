@@ -97,7 +97,7 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
                 }
 
                 // check if the order needs to be set to NULL
-                if ($values['order'] === '0' || $values['order'] === '') {
+                if ($values['order'] === '') {
                     $values['order'] = NULL;
                 }
 
@@ -209,7 +209,7 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
                 $values['adapter'] = $adapter[$values['adapter']];
 
                 // check if the order needs to be set to NULL
-                if ($values['order'] === '0' || $values['order'] === '') {
+                if ($values['order'] === '') {
                     $values['order'] = NULL;
                 }
 

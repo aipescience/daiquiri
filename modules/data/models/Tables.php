@@ -81,7 +81,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                 }
 
                 // check if the order needs to be set to NULL
-                if ($values['order'] === '0' || $values['order'] === '') {
+                if ($values['order'] === '') {
                     $values['order'] = NULL;
                 }
 
@@ -167,7 +167,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                 $values = $form->getValues();
 
                 // check if the order needs to be set to NULL
-                if ($values['order'] === '0' || $values['order'] === '') {
+                if ($values['order'] === '') {
                     $values['order'] = NULL;
                 }
 
