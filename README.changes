@@ -1,7 +1,7 @@
 2014/02/20
 ==========
 
-Order parameter for databases, table, columns, and function in the data model introduced.
+Order parameter for databases, table, columns, and function in data module introduced.
 
 Re-Init or manual fix needed:
 
