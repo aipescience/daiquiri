@@ -74,6 +74,8 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
         $select = $this->getTable()->getSelect();
         $select->setIntegrityCheck(false);
         $select->where("`$t`.`id` = ?", $id);
+        $select->order('order ASC');
+        $select->order('name ASC');
         $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
 
         // get the rowset and return

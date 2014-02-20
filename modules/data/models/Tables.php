@@ -74,10 +74,15 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
             if ($form->isValid($formParams)) {
                 $values = $form->getValues();
 
-                //check if entry is already there
+                // check if entry is already there
                 $database = $databases[$values['database_id']];
                 if ($this->getResource()->fetchId($database, $values['name']) !== false) {
                     throw new Exception("Table entry already exists.");
+                }
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '0' || $values['order'] === '') {
+                    $values['order'] = NULL;
                 }
 
                 $this->store($values);
@@ -160,6 +165,11 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '0' || $values['order'] === '') {
+                    $values['order'] = NULL;
+                }
 
                 $this->getResource()->updateRow($id, $values);
 

@@ -61,16 +61,8 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             'required' => true,
             'multiOptions' => $this->_tables
         ));
-        $this->addElement('text', 'position', array(
-            'label' => 'Position of column:',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => 'int'),
-            )
-        ));
         $this->addElement('text', 'name', array(
-            'label' => 'Column name:',
+            'label' => 'Column name',
             'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -78,8 +70,15 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
+        $this->addElement('text', 'order', array(
+            'label' => 'Order of column',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => 'int'),
+            )
+        ));
         $this->addElement('text', 'type', array(
-            'label' => 'Column type:',
+            'label' => 'Column type',
             'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -88,7 +87,7 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             )
         ));
         $this->addElement('text', 'unit', array(
-            'label' => 'Column unit:',
+            'label' => 'Column unit',
             'class' => 'input-xxlarge',
             'required' => false,
             'filters' => array('StringTrim'),
@@ -97,7 +96,7 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             )
         ));
         $this->addElement('text', 'ucd', array(
-            'label' => 'Column UCD:',
+            'label' => 'Column UCD',
             'class' => 'input-xxlarge',
             'required' => false,
             'filters' => array('StringTrim'),
@@ -138,11 +137,11 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('table_id', 'position', 'name', 'type', 'unit', 'ucd', 'ucd_list', 'description'));
+        $this->addHorizontalGroup(array('table_id', 'name', 'order', 'type', 'unit', 'ucd', 'ucd_list', 'description'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('table_id', 'position', 'name', 'type', 'unit', 'ucd', 'description') as $element) {
+        foreach (array('table_id', 'order', 'name', 'type', 'unit', 'ucd', 'description') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

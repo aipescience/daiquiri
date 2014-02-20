@@ -78,6 +78,11 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
                     unset($values['autofill']);
                 }
 
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '0' || $values['order'] === '') {
+                    $values['order'] = NULL;
+                }
+
                 // store the values in the database
                 $function_id = $this->getResource()->insertRow($values);
 
@@ -159,6 +164,12 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '0' || $values['order'] === '') {
+                    $values['order'] = NULL;
+                }
+
                 $this->getResource()->updateRow($id, $values);
                 return array('status' => 'ok');
             } else {

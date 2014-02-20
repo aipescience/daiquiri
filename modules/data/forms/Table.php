@@ -83,6 +83,13 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
+        $this->addElement('text', 'order', array(
+            'label' => 'Order',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => 'int'),
+            )
+        ));
         $this->addElement('select', 'publication_role_id', array(
             'label' => 'Published for: ',
             'required' => true,
@@ -115,7 +122,7 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $inputelements = array('database_id', 'name', 'description', 'publication_role_id', 'publication_select',
+        $inputelements = array('database_id', 'name', 'description', 'order', 'publication_role_id', 'publication_select',
             'publication_update', 'publication_insert');
         if (empty($this->_entry)) {
             $inputelements[] = 'autofill';
@@ -124,7 +131,7 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('name', 'description', 'publication_role_id', 'publication_select',
+        foreach (array('order', 'name', 'description', 'publication_role_id', 'publication_select',
     'publication_update', 'publication_insert') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);

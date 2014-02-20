@@ -63,6 +63,11 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                     throw new Exception("Column entry already exists.");
                 }
 
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '0' || $values['order'] === '') {
+                    $values['order'] = NULL;
+                }
+
                 $this->store($values);
 
                 return array('status' => 'ok');
@@ -143,6 +148,11 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 $values = $form->getValues();
 
                 unset($values['ucd_list']);
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '0' || $values['order'] === '') {
+                    $values['order'] = NULL;
+                }
 
                 $this->getResource()->updateRow($id, $values);
 
@@ -257,7 +267,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
         }
 
         unset($values['table_id']);
-        unset($values['position']);
+        unset($values['order']);
 
         $json = Zend_Json::encode($values);
 
