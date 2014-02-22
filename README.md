@@ -69,7 +69,7 @@ interface makes use of jQuery, bootstrap, CodeMirror and flot.
 More
 ----
 
-More information about Daiquiri and the documentation can be found on 
+For more information about Daiquiri and the documentation, please visit 
 [escience.aip.de/daiquiri](https://escience.aip.de/daiquiri).
 
 Credits
