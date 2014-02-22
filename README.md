@@ -1,8 +1,7 @@
 Daiquiri
 ========
 
-A framework for the publication of scientific databases
--------------------------------------------------------
+**A framework for the publication of scientific databases**
 
 Today, the publication of research data plays an important role in astronomy and 
 astrophysics. On the one hand, dedicated programs, such as surveys like SDSS and 
