@@ -66,6 +66,12 @@ built for use with Daiquiri. These are the MySQL query queue, PaQu, and the IVOA
 MySQL VOTable dumper. The asynchronous data export relies on Gearman. The user 
 interface makes use of jQuery, bootstrap, CodeMirror and flot.
 
+More
+----
+
+More information about Daiquiri and the documentation can be found on 
+[escience.aip.de/daiquiri](https://escience.aip.de/daiquiri).
+
 Credits
 -------
 
