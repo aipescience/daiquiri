@@ -74,7 +74,7 @@ class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
         } else {
             Zend_Debug::dump($mail->getRecipients());
             Zend_Debug::dump($mail->getSubject());
-            Zend_Debug::dump($mail->getBodyText()->getContent());
+            Zend_Debug::dump($mail->getBodyText());
         }
     }
 }

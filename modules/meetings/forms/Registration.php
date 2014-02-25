@@ -115,17 +115,14 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
                 'class' => 'input-xxlarge daiquiri-hide-control-group',
                 'rows' => 6,
                 'required' => false,
-                'filters' => array('StringTrim'),
-                'validators' => array(
-                    array('validator' => new Daiquiri_Form_Validator_Textarea()),
-                )
+                'filters' => array('StringTrim')
             ));
             $contributionElements[] = $contribution_type . '_bool';
             $contributionElements[] = $contribution_type . '_title';
             $contributionElements[] = $contribution_type . '_abstract';
         }
 
-        $this->addElement(new Daiquiri_Form_Element_Captcha('captcha'));
+        //$this->addElement(new Daiquiri_Form_Element_Captcha('captcha'));
 
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
@@ -138,7 +135,7 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
         $this->addHorizontalGroup(array('arrival','departure'),'attendance', 'Attendance');
         $this->addHorizontalGroup($contributionElements,'contributions', 'Contributions');
 
-        $this->addCaptchaGroup('captcha');
+        //$this->addCaptchaGroup('captcha');
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields

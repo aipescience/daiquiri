@@ -486,17 +486,11 @@ We have stored the following information about your registration:
 Personal data
 -------------
 Firstname:   _firstname_
-lastname:    _lastename_
+lastname:    _lastname_
 Affiliation: _affiliation_
 Email:       _email_
-
-Attendance
-----------
 Arrival:     _arrival_
-Departure:   _depature_
-
-Contributions
--------------
+Departure:   _departure_
 
 Best Regards'
             ),

@@ -25,6 +25,8 @@
     <h2>Registration</h2>
     
     <?php if ($this->status === 'ok'): ?>
+        <p>Your registration was successful and a mail was send to the provided address.</p>
+    <?php elseif ($this->status === 'validate'): ?>
         <p>Your registration was successful and a validation mail was send to the provided address.</p>
         <p>Please follow the instructions in the mail to validate your registration.</p>
     <?php else: ?>
@@ -50,9 +52,11 @@
         });
 
         $('.daiquiri-toggle-control-group').each(function () {
-            var type = $(this).attr('id').match(/(\w+)_bool/)[1];
-            $('#' + type + '_title').parents('.control-group').hide();
-            $('#' + type + '_abstract').parents('.control-group').hide();
+            if (!this.checked) {
+                var type = $(this).attr('id').match(/(\w+)_bool/)[1];
+                $('#' + type + '_title').parents('.control-group').hide();
+                $('#' + type + '_abstract').parents('.control-group').hide();
+            }
         })
 
         $('.daiquiri-toggle-control-group').change(function(){
