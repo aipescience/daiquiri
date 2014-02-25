@@ -27,14 +27,18 @@
         <?php
         echo $this->internalLink(array(
             'text' => 'Help, I forgot my password!',
-            'href' => '/auth/password/forgot'));
+            'href' => '/auth/password/forgot',
+            'resource' => 'Auth_Model_Password',
+            'permission' => 'forgot'));
         ?>
     </p>
     <p class="align-form-horizontal">
         <?php
         echo $this->internalLink(array(
             'text' => 'Register as a new user.',
-            'href' => '/auth/registration'));
+            'href' => '/auth/registration',
+            'resource' => 'Auth_Model_Registration',
+            'permission' => 'register'));
         ?>
     </p>
 </div>
