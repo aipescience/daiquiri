@@ -163,6 +163,13 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                                 'binPath' => '/usr/bin/',
                                 'compress' => 'none',
                             ),
+                            'vodump-csv' => array(
+                                'name' => "Comma separated Values",
+                                'suffix' => ".csv",
+                                'adapter' => $this->_daiquiri_path . "/modules/query/scripts/download/adapter/vodump-csv.sh",
+                                'binPath' => '/usr/local/bin/',
+                                'compress' => 'none',
+                            ),
                             'votable' => array(
                                 'name' => "IVOA VOTable XML file - ASCII Format",
                                 'suffix' => ".xml",

@@ -36,6 +36,19 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
         ));
     }
   
+    public function fetchRows($sqloptions = array(), $tableclass = null) {
+        // get the primary table
+        $table = $this->getTable($tableclass);
+
+        // get select object
+        $select = $table->getSelect($sqloptions);
+        $select->order('order ASC');
+        $select->order('name ASC');
+
+        // get result convert to array and return
+        return $table->fetchAll($select)->toArray();
+    }
+
     public function fetchId($db) {
         // get the primary sql select object
         $select = $this->getTable()->select();
@@ -76,6 +89,8 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
                 // get the sql select object
                 $select = $tablesTable->select();
                 $select->where('database_id = ?', $data['id']);
+                $select->order('order ASC');
+                $select->order('name ASC');
                 $tables = $tablesTable->fetchAll($select)->toArray();
 
                 // get columns table
@@ -91,6 +106,8 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
                     // get colums for table
                     $select = $columnsTable->select();
                     $select->where('table_id = ?', $table['id']);
+                    $select->order('order ASC');
+                    $select->order('name ASC');
                     $cols = $columnsTable->fetchAll($select)->toArray();
 
                     for ($j = 0; $j < count($cols); $j++) {

@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS `Data_Databases` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `order` INTEGER,
   `name` VARCHAR(256) NOT NULL,
   `description` TEXT,
   `adapter` VARCHAR(256),
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `Data_Databases` (
 
 CREATE TABLE IF NOT EXISTS `Data_Functions` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `order` INTEGER,
   `name` VARCHAR(256) NOT NULL,
   `description` TEXT,
   `publication_role_id` INTEGER
@@ -20,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `Data_Functions` (
 CREATE TABLE IF NOT EXISTS `Data_Tables` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `database_id` INTEGER NOT NULL,
+  `order` INTEGER,
   `name` VARCHAR(256) NOT NULL,
   `description` TEXT,
   `publication_select` BOOLEAN,
@@ -31,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `Data_Tables` (
 CREATE TABLE IF NOT EXISTS `Data_Columns` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `table_id` INTEGER NOT NULL,
-  `position` INTEGER NOT NULL,
+  `order` INTEGER,
   `name` VARCHAR(256) NOT NULL,
   `type` VARCHAR(256) NOT NULL,
   `unit` VARCHAR(256),

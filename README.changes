@@ -1,3 +1,15 @@
+2014/02/20
+==========
+
+Order parameter for databases, table, columns, and function in data module introduced.
+
+Re-Init or manual fix needed:
+
+ALTER TABLE `Data_Databases` ADD COLUMN `order` INTEGER;
+ALTER TABLE `Data_Tables` ADD COLUMN `order` INTEGER;
+ALTER TABLE `Data_Columns` CHANGE COLUMN `position` `order` INTEGER;
+ALTER TABLE `Data_Functions` ADD COLUMN `order` INTEGER;
+
 2013/12/10
 ==========
 

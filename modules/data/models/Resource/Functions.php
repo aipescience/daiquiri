@@ -71,6 +71,8 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
         // get the primary sql select object
         $select = $this->getTable()->getSelect();
         $select->where("`id` = ?", $id);
+        $select->order('order ASC');
+        $select->order('name ASC');
 
         $row = $this->getTable()->fetchAll($select)->current();
 

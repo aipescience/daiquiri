@@ -55,6 +55,16 @@ class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Table {
             'active' => 1
         ));
 
+        // create database for app
+        if (Daiquiri_Config::getInstance()->query
+                && Daiquiri_Config::getInstance()->query->userDb) {
+            $userDb = Daiquiri_Config::getInstance()->getUserDbName($credentials['appname']);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($credentials['appname'], '');
+
+            $sql = "CREATE DATABASE `{$userDb}`";
+            $adapter->query($sql)->closeCursor();
+        }
+
         // return the id of the newly created app
         return $table->getAdapter()->lastInsertId();
     }

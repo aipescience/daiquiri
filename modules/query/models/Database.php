@@ -30,18 +30,37 @@ class Query_Model_Database extends Daiquiri_Model_PaginatedTable {
     public function index() {
         // get databases from database model
         $databasesModel = new Data_Model_Databases();
-        $databases = $databasesModel->index(true);
+        $rows = $databasesModel->index(true);
 
         // check permissions
-        foreach ($databases as &$database) {
-            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($database['publication_role_id'])) {
-                foreach ($database['tables'] as $key => &$table) {
-                    if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($table['publication_role_id'])) {
+        $databases = array();
+        foreach ($rows as $row) {
 
-                    } else {
-                        unset($database['tables'][$key]);
+            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id'])) {
+                $db = array(
+                    'id' => $row['id'],
+                    'name' => $row['name'],
+                    'tables' => array()
+                );
+
+                foreach ($row['tables'] as $table) {
+                    if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($table['publication_role_id'])) {
+                        $t = array(
+                            'id' => $table['id'],
+                            'name' => $table['name'],
+                            'columns' => array(),
+                        );
+
+                        foreach ($table['columns'] as $column) {
+                            $t['columns'][] = array(
+                                'id' => $column['id'],
+                                'name' => $column['name']
+                            );
+                        }
+                        $db['tables'][] = $t;
                     }
                 }
+                $databases[] = $db;
             }
         }
 

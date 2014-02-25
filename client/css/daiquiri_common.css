@@ -17,7 +17,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
-
+p:last-child {
+    margin-bottom: 0;
+}
 form {
     /* margin-top matches the margin-bottom from bootstrap */
     margin-top: 20px;

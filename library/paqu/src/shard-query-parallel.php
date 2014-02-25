@@ -388,12 +388,31 @@ class ShardQuery {
 
 						//check if this table is only available on the head node
 						//if yes, donot execute the query in parallel
-						foreach($this->headNodeTables as $headNodeTable) {
-							if(strpos($fromNode['table'], $headNodeTable) !== false) {
-								$parallel = false;
-								break;
-							}
-						}
+						 //Quick fast check for this
+				 	 	 $found = false;
+				 	 	 $tableName = str_replace("`", "", $fromNode['table']);
+				 	 	 $posDot = strpos($tableName, ".");
+						 foreach($this->headNodeTables as $headNodeTable) {
+						 	$posTable = strpos($tableName, $headNodeTable);
+						 	if($posTable !== false) {
+						 		if($posDot === false) {
+						 			if(strlen($tableName) === strlen($headNodeTable)) {
+						 				$found = true;
+						 			}
+						 		} else {
+						 			if(strlen($tableName) - $posDot - 1 === strlen($headNodeTable)) {
+						 				$found = true;
+						 			} else if ($posTable == 0 && strlen($headNodeTable) == $posDot) {
+						 				$found = true;
+						 			}
+						 		}
+
+						 		if($found === true) {
+						            $parallel = false;
+									break;
+						 		}
+						 	}
+						 }
 				    }
 				}
 
@@ -771,8 +790,10 @@ function process_sql($sql, $recLevel = 0, $whereSubquery = false) {
 	    unset($this->parsed['SELECT']);
 
 	    if (empty($this->parsed['FROM'])) {
-			$this->errors = array('Unsupported query', 'Missing FROM clause');
-			return false;
+//			$this->errors = array('Unsupported query', 'Missing FROM clause');
+//			return false;
+			$this->table_name = "aggregation_tmp_" . mt_rand(1, 100000000);
+			$select['coord_sql'] .= "\nFROM `$this->table_name`";
 	    } else {
 			$select['shard_sql'] .= "\n" . $this->process_from($this->parsed['FROM'], $recLevel);
 			$this->table_name = "aggregation_tmp_" . mt_rand(1, 100000000);
@@ -899,7 +920,7 @@ function process_sql($sql, $recLevel = 0, $whereSubquery = false) {
 				}
 		    } else {
 				if($order_by === "")
-				    $queries[] = $select['shard_sql'] . $group_by . ' ORDER BY NULL' . ' ' . $limit;
+				    $queries[] = $select['shard_sql'] . $group_by . ' ' . $limit;
 				else 
 				    $queries[] = $select['shard_sql'] . $group_by . ' ' . $order_by . ' ' . $limit;
 		    }

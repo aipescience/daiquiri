@@ -51,7 +51,7 @@ class Daiquiri_Form_Validator_Sql extends Zend_Validate_Abstract {
 
         $isValid = true;
 
-        if (preg_match("/[^\-\_\+\:\-\<\>\!a-zA-Z0-9]/", $value)) {
+        if (preg_match("/[^\(\)\[\]\/\-\_\+\:\-\<\>\!a-zA-Z0-9]/", $value)) {
             $this->_error(self::CHARS);
             $isValid = false;
         }

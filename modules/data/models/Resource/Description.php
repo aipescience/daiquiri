@@ -89,7 +89,7 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
 
             $table['columns'][] = array(
                 'name' => $info['metadata'][$col]['COLUMN_NAME'],
-                'position' => $info['metadata'][$col]['COLUMN_POSITION'],
+                'order' => $info['metadata'][$col]['COLUMN_POSITION'],
                 'type' => $info['metadata'][$col]['DATA_TYPE'],
                 'unit' => $metadata['unit'],
                 'ucd' => $metadata['ucd'],
@@ -154,7 +154,7 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
             'name' => $info['metadata'][$column]['COLUMN_NAME'],
             'database' => $db,
             'table' => $table,
-            'position' => $info['metadata'][$column]['COLUMN_POSITION'],
+            'order' => $info['metadata'][$column]['COLUMN_POSITION'],
             'type' => $info['metadata'][$column]['DATA_TYPE'],
             'unit' => $metadata['unit'],
             'ucd' => $metadata['ucd'],
