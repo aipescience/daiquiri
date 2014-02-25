@@ -173,6 +173,33 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
             // delete from registration table
             $this->getResource()->deleteRow($id);
 
+            $meetingsModel = new Meetings_Model_Meetings();
+            $meeting = $meetingsModel->getResource()->fetchRow($values['meeting_id']);
+
+            $mailValues = array(
+                'to' => $values['email'],
+                'meeting' => $meeting['title'],
+                'firstname' => $values['firstname'],
+                'lastname' => $values['lastname'],
+                'affiliation' => $values['affiliation'],
+                'email' => $values['email'],
+                'arrival' => $values['arrival'],
+                'departure' => $values['departure']
+            );
+            foreach ($meeting['participant_detail_keys'] as $key => $value) {
+                $mailValues[$value] = $values['details'][$key];
+            }
+            foreach ($meeting['contribution_types'] as $key => $contribution_type) {
+                if (!empty($values['contributions'][$key])) {
+                    $mailValues[$contribution_type . '_title'] = $values['contributions'][$key]['title'];
+                    $mailValues[$contribution_type . '_abstract'] = $values['contributions'][$key]['abstract'];
+                } else {
+                    $mailValues[$contribution_type . '_title'] = '---';
+                }
+            }
+
+            $this->getModelHelper('mail')->send('meetings.register', $mailValues);
+
             return array('status' => 'ok');
         } else {
             return array(
