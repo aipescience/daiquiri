@@ -80,11 +80,17 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                     unset($values[$contributionType . '_abstract']);
                 }
 
+                // get the right status
                 $participantStatusModel = new Meetings_Model_ParticipantStatus();
-                // get the registered status
-                $values['status_id'] = $participantStatusModel->getResource()->fetchId(array(
-                    'where' => array('`status` = "registered"')
-                ));
+                if (empty(Daiquiri_Config::getInstance()->meetings->autoAccept)) {
+                    $values['status_id'] = $participantStatusModel->getResource()->fetchId(array(
+                        'where' => array('`status` = "registered"')
+                    ));
+                } else {
+                    $values['status_id'] = $participantStatusModel->getResource()->fetchId(array(
+                        'where' => array('`status` = "accepted"')
+                    ));
+                }
                     
                 if (Daiquiri_Config::getInstance()->meetings->validation) {
                     $code = $this->createRandomString(32);

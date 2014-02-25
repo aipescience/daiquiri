@@ -205,7 +205,8 @@ class Config_Model_Init extends Daiquiri_Model_Init {
             ),
             'meetings' => array(
                 'enabled' => false,
-                'validation' => true
+                'validation' => true,
+                'autoAccept' => false
             ),
             'files' => array(),
         );
