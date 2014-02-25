@@ -32,6 +32,8 @@
     <?php if (empty($flatArray)): ?>
         <p>The list of contributions for this meeting is not available right now.</p>
     <?php else: ?>
+        <?php echo $this->message; ?>
+
         <?php foreach ($this->data as $contributionType => $contributions): ?>
             <?php if (!empty($contributions)): ?>
                 <h2><?php echo $contributionType; ?></h2>

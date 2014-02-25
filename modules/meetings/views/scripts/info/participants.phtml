@@ -27,6 +27,8 @@
     <?php if (empty($this->data)): ?>
         <p>The list of participants for this meeting is not available right now.</p>
     <?php else: ?>
+        <?php echo $this->message; ?>
+
         <table class="table table-condensed">
             <thead>
                 <tr>

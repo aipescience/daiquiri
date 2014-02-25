@@ -74,13 +74,9 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'description', array(
             'label' => 'Description',
-            'rows' => 6,
+            'rows' => 2,
             'class' => 'input-xxlarge',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Textarea()),
-            )
+            'filters' => array('StringTrim')
         ));
         $this->addElement('text', 'begin', array(
             'label' => 'First day of the meeting',
@@ -92,19 +88,28 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'end', array(
             'label' => 'Last day of the meeting',
-            'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('multiCheckbox', 'contribution_type_id', array(
-            'label' => 'Contribution types',
-            'multiOptions' => $this->_contributionTypes
+        $this->addElement('textarea', 'registration_message', array(
+            'label' => 'Registration messsage',
+            'rows' => 2,
+            'class' => 'input-xxlarge',
+            'filters' => array('StringTrim')
         ));
-        $this->addElement('multiCheckbox', 'participant_detail_key_id', array(
-            'label' => 'Requested details from participlants',
-            'multiOptions' => $this->_participantDetailKeys
+        $this->addElement('textarea', 'participants_message', array(
+            'label' => 'Participants messsage',
+            'rows' => 2,
+            'class' => 'input-xxlarge',
+            'filters' => array('StringTrim')
+        ));
+        $this->addElement('textarea', 'contributions_message', array(
+            'label' => 'Contributions messsage',
+            'rows' => 2,
+            'class' => 'input-xxlarge',
+            'filters' => array('StringTrim')
         ));
         $this->addElement('select', 'registration_publication_role_id', array(
             'label' => 'Registration form',
@@ -121,16 +126,24 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
             'required' => true,
             'multiOptions' => $this->_roles
         ));
+        $this->addElement('multiCheckbox', 'contribution_type_id', array(
+            'label' => 'Contribution types',
+            'multiOptions' => $this->_contributionTypes
+        ));
+        $this->addElement('multiCheckbox', 'participant_detail_key_id', array(
+            'label' => 'Requested details from participlants',
+            'multiOptions' => $this->_participantDetailKeys
+        ));
 
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('title','description','begin','end','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id','contribution_type_id','participant_detail_key_id'));
+        $this->addHorizontalGroup(array('title','description','begin','end','registration_message','participants_message','contributions_message','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id','contribution_type_id','participant_detail_key_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('title','description','begin','end','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id') as $element) {
+        foreach (array('title','description','begin','end','registration_message','participants_message','contributions_message','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

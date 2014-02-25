@@ -145,12 +145,13 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                 return array(
                     'status' => 'error',
                     'errors' => $form->getMessages(),
-                    'form' => $form
+                    'form' => $form, 
+                    'message' => $meeting['registration_message']
                 );
             }
         }
 
-        return array('form' => $form, 'status' => 'form');
+        return array('form' => $form, 'status' => 'form', 'message' => $meeting['registration_message']);
     }
 
     public function validate($id, $code) {

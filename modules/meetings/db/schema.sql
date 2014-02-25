@@ -4,6 +4,9 @@ CREATE TABLE IF NOT EXISTS `Meetings_Meetings` (
   `description` TEXT,
   `begin` DATE NOT NULL,
   `end` DATE NOT NULL,
+  `registration_message` TEXT,
+  `participants_message` TEXT,
+  `contributions_message` TEXT,
   `registration_publication_role_id` INTEGER,
   `participants_publication_role_id` INTEGER,
   `contributions_publication_role_id` INTEGER 

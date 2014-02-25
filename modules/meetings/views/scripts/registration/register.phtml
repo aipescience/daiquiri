@@ -33,9 +33,7 @@
         <?php if (empty($this->form)): ?>
             <p>The registration for this meeting is currently closed.</p>
         <?php else: ?>
-            <p>
-                In order to register for the meeting, we kindly ask you to fill out the following form.
-            </p>
+            <?php echo $this->message; ?>
             <?php echo $this->form; ?>
         <?php endif; ?>
     <?php endif; ?>

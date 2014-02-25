@@ -55,6 +55,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
             return array(
                 'status' => 'ok',
+                'message' => $meeting['contributions_message'],
                 'data' => $data
             );
         }

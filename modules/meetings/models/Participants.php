@@ -45,6 +45,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         } else {
             return array(
                 'status' => 'ok',
+                'message' => $meeting['participants_message'],
                 'data' => $this->getResource()->fetchRows(
                     array(
                         'where' => array(
