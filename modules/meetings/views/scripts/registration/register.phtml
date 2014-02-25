@@ -41,10 +41,29 @@
 </div>
 
 <script type="text/javascript">
-    $('#arrival').datepicker({
-        format: 'yyyy-mm-dd'
-    });
-    $('#departure').datepicker({
-        format: 'yyyy-mm-dd'
-    });
+    $(document).ready(function () {
+        $('#arrival').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+        $('#departure').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+
+        $('.daiquiri-toggle-control-group').each(function () {
+            var type = $(this).attr('id').match(/(\w+)_bool/)[1];
+            $('#' + type + '_title').parents('.control-group').hide();
+            $('#' + type + '_abstract').parents('.control-group').hide();
+        })
+
+        $('.daiquiri-toggle-control-group').change(function(){
+            var type = $(this).attr('id').match(/(\w+)_bool/)[1];
+            if (this.checked) {
+                $('#' + type + '_title').parents('.control-group').show();
+                $('#' + type + '_abstract').parents('.control-group').show();
+            } else {
+                $('#' + type + '_title').parents('.control-group').hide();
+                $('#' + type + '_abstract').parents('.control-group').hide();
+            }
+        });
+    })
 </script>

@@ -51,7 +51,7 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
         }
 
         // create the form object
-        $form = new Meetings_Form_Participant(array(
+        $form = new Meetings_Form_Registration(array(
             'submit'=> 'Register for this meeting',
             'meeting' => $meeting
         ));
@@ -80,34 +80,48 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                     unset($values[$contributionType . '_abstract']);
                 }
 
-                // get the registered status
                 $participantStatusModel = new Meetings_Model_ParticipantStatus();
+                // get the registered status
                 $values['status_id'] = $participantStatusModel->getResource()->fetchId(array(
                     'where' => array('`status` = "registered"')
                 ));
+                    
+                if (Daiquiri_Config::getInstance()->meetings->validation) {
+                    $code = $this->createRandomString(32);
 
-                $code = $this->createRandomString(32);
+                    // store the values in the database
+                    $id = $this->getResource()->insertRow(array(
+                        'email' => $values['email'],
+                        'code' => $code,
+                        'values' => Zend_Json::encode($values),
+                        'meeting_id' => $meetingId
+                    ));
 
-                // store the values in the database
-                $id = $this->getResource()->insertRow(array(
-                    'email' => $values['email'],
-                    'code' => $code,
-                    'values' => Zend_Json::encode($values),
-                    'meeting_id' => $meetingId
-                ));
+                    // prepare and send mail
+                    $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/meetings/registration/validate/id/' . $id . '/code/' . $code;
 
-                // prepare and send mail
-                $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/meetings/registration/validate/id/' . $id . '/code/' . $code;
+                    $this->getModelHelper('mail')->send('meetings.validate', 
+                        array(
+                            'to' => $values['email'],
+                            'meeting' => $meeting['title'],
+                            'firstname' => $values['firstname'],
+                            'lastname' => $values['lastname'],
+                            'link' => $link
+                        )
+                    );
+                } else {
+                    $participantModel = new Meetings_Model_Participants();
+                    $participantModel->getResource()->insertRow($values);
 
-                $this->getModelHelper('mail')->send('meetings.register', 
-                    array(
-                        'to' => $values['email'],
-                        'meeting' => $meeting['title'],
-                        'firstname' => $values['firstname'],
-                        'lastname' => $values['lastname'],
-                        'link' => $link
-                    )
-                );
+                    $this->getModelHelper('mail')->send('meetings.register', 
+                        array(
+                            'to' => $values['email'],
+                            'meeting' => $meeting['title'],
+                            'firstname' => $values['firstname'],
+                            'lastname' => $values['lastname']
+                        )
+                    );
+                }
 
                 return array('status' => 'ok');
             } else {

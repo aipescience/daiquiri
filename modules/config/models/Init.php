@@ -196,6 +196,10 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                     'columnWidth' => '12em'
                 )
             ),
+            'meetings' => array(
+                'enabled' => false,
+                'validation' => true
+            ),
             'files' => array(),
         );
 
@@ -459,7 +463,7 @@ _message_
 
 Best Regards'
             ),
-            'meetings.register' => array(
+            'meetings.validate' => array(
                 'subject' => '_meeting_',
                 'body' => 'Dear _firstname_ _lastname_,
 
@@ -468,6 +472,31 @@ Thank you for registering for the meeting.
 Please click on the following link to validate your registration:
 
 _link_
+
+Best Regards'
+            ),
+            'meetings.register' => array(
+                'subject' => '_meeting_',
+                'body' => 'Dear _firstname_ _lastname_,
+
+Thank you for registering for the meeting. 
+
+We have stored the following information about your registration:
+
+Personal data
+-------------
+Firstname:   _firstname_
+lastname:    _lastename_
+Affiliation: _affiliation_
+Email:       _email_
+
+Attendance
+----------
+Arrival:     _arrival_
+Departure:   _depature_
+
+Contributions
+-------------
 
 Best Regards'
             ),
