@@ -139,14 +139,20 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      * @param array &$error       return array for error output
      * @return array multiline parse tree 
      */
-    function multilineProcessQueryWildcard($multilineSqlTree, array &$error) {
+    function multilineProcessQueryWildcard($multilineSqlTree, array &$error, $multiLineUsedDBs = false) {
         // get the resource
         $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
         $adapter = $resource->getTable()->getAdapter();
 
         foreach ($multilineSqlTree as $key => $currSqlTree) {
+            if($multiLineUsedDBs !== false) {
+                $currDB = $multiLineUsedDBs[$key];
+            } else {
+                $currDB = false;
+            }
+
             try {
-                $tmpParseObj = processQueryWildcard($currSqlTree, false, $adapter);
+                $tmpParseObj = processQueryWildcard($currSqlTree, false, $adapter, $currDB);
             } catch (UnsupportedFeatureException $e) {
                 $error['parseError'] = $e->getMessage();
                 return false;
@@ -527,6 +533,36 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         }
 
         return false;
+    }
+
+    /**
+     * Takes the "USE" databases as resolved by multilineProcessQueryWildcard, get rid of the resolved Wildcards
+     * though, since we use this only for PaQu, and produce new SQL queries
+     * @param array $multiLines multiline SQL
+     * @param array $resolvedMultiLineParseTrees multiline SQL parse trees as produced by multilineProcessQueryWildcard
+     * @param array $multiLineParseTrees multiline SQL parse trees
+     * @return array $multiLineQueries
+     */
+    public function pushUseStatementToFROM(&$multiLines, &$multilineProcessQueryWildcard, &$multiLineParseTrees) {
+        $outMultiLineSQL = array();
+
+        foreach ($multilineProcessQueryWildcard as $key => $currTree) {
+            if(!empty($currTree['FROM'])) {
+                $multiLineParseTrees[$key]['FROM'] = $currTree['FROM'];
+            }
+
+            $sqlCreator = new PHPSQLCreator();
+
+            try {
+                $outMultiLineSQL[$key] = $sqlCreator->create($multiLineParseTrees[$key]);
+            } catch (UnsupportedFeatureException $e) {
+                $outMultiLineSQL[$key] = $multiLines[$key];
+            } catch (UnableToCreateSQLException $e) {
+                $outMultiLineSQL[$key] = $multiLines[$key];
+            }
+        }
+
+        return $outMultiLineSQL;
     }
 
     /**

@@ -52,14 +52,14 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
 
         $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
 
-        $multiLineParseTrees = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+        $multiLineParseTreesNoWildcards = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors, $multiLineUsedDBs);
 
         if (!empty($errors)) {
             return false;
         }
 
         //check ACLs
-        if ($this->permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
+        if ($this->permissions->check($multiLineParseTreesNoWildcards, $multiLineUsedDBs, $errors) === false) {
             return false;
         }
 
@@ -69,8 +69,11 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             return false;
         }
 
+        //retain the "USE" database resolution by multilineProcessQueryWildcard, but get rid of the wildcard resolution
+        $newMultiLines = $this->processing->pushUseStatementToFROM($multiLines, &$multiLineParseTreesNoWildcards, &$multiLineParseTrees);
+
         //combine multiline queries into one
-        $combinedQuery = $this->processing->combineMultiLine($multiLines);
+        $combinedQuery = $this->processing->combineMultiLine($newMultiLines);
 
         //validate sql on server
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
@@ -127,16 +130,19 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
 
         $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
 
-        $multiLineParseTrees = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+        $multiLineParseTreesNoWildcards = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors, $multiLineUsedDBs);
 
         if (!empty($errors)) {
             return false;
         }
 
+        //retain the "USE" database resolution by multilineProcessQueryWildcard, but get rid of the wildcard resolution
+        $newMultiLines = $this->processing->pushUseStatementToFROM($multiLines, &$multiLineParseTreesNoWildcards, &$multiLineUsedDBs);
+
         //rewrite show statements
         $showRewrittenMultiLine = false;
         $showRewrittenMultiLineParseTrees = false;
-        if ($this->processing->rewriteShow($multiLines, $multiLineParseTrees, $multiLineUsedDBs, $showRewrittenMultiLine, $showRewrittenMultiLineParseTrees, $errors) !== true) {
+        if ($this->processing->rewriteShow($newMultiLines, $multiLineParseTreesNoWildcards, $multiLineUsedDBs, $showRewrittenMultiLine, $showRewrittenMultiLineParseTrees, $errors) !== true) {
             return false;
         }
 
@@ -205,13 +211,18 @@ class Query_Model_Resource_MySQLProcessor extends Query_Model_Resource_AbstractP
             return false;
         }
 
-        $multiLineParseTrees = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+        $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
+
+        $multiLineParseTreesNoWildcards = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors, $multiLineUsedDBs);
 
         if (!empty($errors)) {
             return false;
         }
 
-        $explainSQL = $this->_addExplain($multiLines);
+        //retain the "USE" database resolution by multilineProcessQueryWildcard, but get rid of the wildcard resolution
+        $newMultiLines = $this->processing->pushUseStatementToFROM($multiLines, &$multiLineParseTreesNoWildcards, &$multiLineParseTrees);
+
+        $explainSQL = $this->_addExplain($newMultiLines);
 
         //loop through queries and obtain results
         $queryResult = array();
