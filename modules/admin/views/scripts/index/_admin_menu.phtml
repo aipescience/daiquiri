@@ -73,7 +73,7 @@ $items = array(
         'resource' => 'Query_Model_Jobs',
         'permission' => 'rows')
 );
-if (!empty(Daiquiri_Config::getInstance()->cms) && Daiquiri_Config::getInstance()->cms->enabled) {
+if (Daiquiri_Config::getInstance()->cms && Daiquiri_Config::getInstance()->cms->enabled) {
     $items['wordpress'] = array(
         'text' => 'CMS Admin Interface',
         'href' => Daiquiri_Config::getInstance()->cms->url . 'wp-admin/');
