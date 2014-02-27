@@ -68,15 +68,19 @@ daiquiri.samp.SAMP = function (container, opt) {
 
     // try to get favicon
     var icon = $('link[rel="icon"]');
+    var iconUrl;
     if (typeof icon !== 'undefined') {
-        this.opt.meta["samp.icon.url"] = icon.attr('href');
-
+        iconUrl = icon.attr('href');
     } else {
         icon = $('link[rel="shortcut icon"]');
         if (typeof icon !== 'undefined') {
-            this.opt.meta["samp.icon.url"] = icon.attr('href');
+            iconUrl = icon.attr('href');
         }
     }
+    if (iconUrl.toLowerCase().indexOf('http://') !== 0 && iconUrl.toLowerCase().indexOf('https://') !== 0) {
+        iconUrl = window.location.origin + '/' + iconUrl;
+    }
+    this.opt.meta["samp.icon.url"] = iconUrl;
 
     // store object globally, kind of a poor mans singleton.
     daiquiri.samp.item = this;
