@@ -69,12 +69,14 @@ daiquiri.samp.SAMP = function (container, opt) {
     // try to get favicon
     var icon = $('link[rel="icon"]');
     var iconUrl;
-    if (typeof icon !== 'undefined') {
+    if (icon.length != 0) {
         iconUrl = icon.attr('href');
     } else {
         icon = $('link[rel="shortcut icon"]');
-        if (typeof icon !== 'undefined') {
+        if (icon.length != 0) {
             iconUrl = icon.attr('href');
+        } else {
+            console.log('Error: Favicon not found.');
         }
     }
     if (iconUrl.toLowerCase().indexOf('http://') !== 0 && iconUrl.toLowerCase().indexOf('https://') !== 0) {
