@@ -104,3 +104,19 @@ daiquiri.common.jsonError = function(json) {
     //alert('Error with ajax request. (Status: ' + json.status + ').');
     console.log(json);
 };
+
+daiquiri.common.clicked = false;
+
+daiquiri.common.singleDoubleClick = function(e, singleClk, doubleClk) {
+    if (daiquiri.common.clicked == true) {
+        clearTimeout(daiquiri.common.timeout);
+        doubleClk(e);
+        daiquiri.common.clicked = false;
+    } else {
+        daiquiri.common.clicked = true;
+        daiquiri.common.timeout = setTimeout(function() {
+            daiquiri.common.clicked = false;
+            singleClk(e);
+        }, 300);
+    }
+};
