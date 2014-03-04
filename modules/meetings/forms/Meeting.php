@@ -74,7 +74,7 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'description', array(
             'label' => 'Description',
-            'rows' => 2,
+            'rows' => 4,
             'class' => 'input-xxlarge',
             'filters' => array('StringTrim')
         ));
@@ -95,20 +95,20 @@ class Meetings_Form_Meeting extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'registration_message', array(
             'label' => 'Registration messsage',
-            'rows' => 2,
-            'class' => 'input-xxlarge',
+            'rows' => 6,
+            'class' => 'input-xxlarge mono',
             'filters' => array('StringTrim')
         ));
         $this->addElement('textarea', 'participants_message', array(
             'label' => 'Participants messsage',
-            'rows' => 2,
-            'class' => 'input-xxlarge',
+            'rows' => 6,
+            'class' => 'input-xxlarge mono',
             'filters' => array('StringTrim')
         ));
         $this->addElement('textarea', 'contributions_message', array(
             'label' => 'Contributions messsage',
-            'rows' => 2,
-            'class' => 'input-xxlarge',
+            'rows' => 6,
+            'class' => 'input-xxlarge mono',
             'filters' => array('StringTrim')
         ));
         $this->addElement('select', 'registration_publication_role_id', array(
