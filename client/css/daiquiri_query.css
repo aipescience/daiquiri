@@ -94,3 +94,7 @@
     width: 20px;
     height: 20px;
 }
+#query .help-block {
+    margin-top: 10px;
+    font-size: smaller;
+}

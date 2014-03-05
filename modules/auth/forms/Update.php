@@ -39,10 +39,10 @@ class Auth_Form_Update extends Auth_Form_Abstract {
             $elements[] = $this->addDetailElement($detail, true);
         }
         if ($this->_changeUsername) {
-            $elements[] = $this->addUsernameElement(true, true, $this->_user['id']);
+            $elements[] = $this->addUsernameElement(true, false, $this->_user['id']);
         }
         if ($this->_changeEmail) {
-            $elements[] = $this->addEmailElement(true, true, $this->_user['id']);
+            $elements[] = $this->addEmailElement(true, false, $this->_user['id']);
         }
         $elements[] = $this->addRoleIdElement(true);
         $elements[] = $this->addStatusIdElement(true);

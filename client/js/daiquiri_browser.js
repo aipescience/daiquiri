@@ -56,6 +56,12 @@ daiquiri.browser.opt = {
     'columns': []
 };
 
+
+/**
+ * Switch for double click functionality.
+ */
+daiquiri.browser.clicked = false;
+
 /**
  * Constructor-like function for the Browser class. 
  */
@@ -159,10 +165,10 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
     $('.daiquiri-browser-left .nav-item', self.container).remove();
     $('.daiquiri-browser-center .nav-item', self.container).remove();
     $('.daiquiri-browser-right .nav-item', self.container).remove();
-    
+
     // left column (databases)
     leftData = self.json[self.opt.columns[0]];
-    if (leftData != undefined) {
+    if (typeof leftData != 'undefined' && leftData.length > 0) {
         for (i = 0; i < leftData.length; i++){
             if (i == iActive) {
                 cl = "nav-item active";
@@ -174,19 +180,32 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
                 'html': '<a href="#daiquiri-browser-left-' + i + '">' + leftData[i].name + '</a>'
             }).appendTo($('.daiquiri-browser-left .daiquiri-browser-body', self.container));
 
-            $('a',li).click(function() {
+
+            $('a',li).click(function (e) {
+                var id = $(e.target).parents('.daiquiri-browser').attr('id');
+                daiquiri.browser.clicked = daiquiri.browser.items[id];
+
                 self.displayColumns($(this).attr('href').split("-").pop(),0);
-                if (self.opt.action) self.opt.action({
-                    'left': $(this).text(),
-                    'same': $(this).parent().hasClass('active')
-                });
+
+                daiquiri.common.singleDoubleClick(e, function (e) {
+                    // single click
+                    if (daiquiri.browser.clicked.opt.click) daiquiri.browser.clicked.opt.click({
+                        'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
+                    });
+                }, function (e) {
+                    // double click
+                    if (daiquiri.browser.clicked.opt.dblclick) daiquiri.browser.clicked.opt.dblclick({
+                        'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
+                    });
+                }); 
+
                 return false;
             });
         }
-        
+
         // center column (tables)
         centerData = leftData[iActive][self.opt.columns[1]];
-        if (centerData != undefined) {
+        if (typeof centerData != 'undefined' && centerData.length > 0) {
             for (j = 0; j < centerData.length; j++){
                 if (j == jActive) {
                     cl = 'nav-item active';
@@ -199,38 +218,64 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
                     'html': '<a href="#daiquiri-browser-center-' + j + '">' + centerData[j].name + '</a>'
                 }).appendTo($('.daiquiri-browser-center .daiquiri-browser-body', self.container));
 
-                $('a',li).click(function() {
+                $('a',li).click(function (e) {
+                    var id = $(e.target).parents('.daiquiri-browser').attr('id');
+                    daiquiri.browser.clicked = daiquiri.browser.items[id];
+
                     self.displayColumns(iActive,$(this).attr('href').split("-").pop());
-                    if (self.opt.action) self.opt.action({
-                        'left': $('.daiquiri-browser-left .active', self.container).text(),
-                        'center': $(this).text(),
-                        'same': $(this).parent().hasClass('active')
-                    });
+
+                    daiquiri.common.singleDoubleClick(e, function (e) {
+                        // single click
+                        if (daiquiri.browser.clicked.opt.click) daiquiri.browser.clicked.opt.click({
+                            'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
+                            'center': $('.daiquiri-browser-center .active', daiquiri.browser.clicked.container).text()
+                        });
+                    }, function (e) {
+                        // double click
+                        if (daiquiri.browser.clicked.opt.dblclick) daiquiri.browser.clicked.opt.dblclick({
+                            'left': $('.daiquiri-browser-left .active', daiquiri.browser.clickedcontainer).text(),
+                            'center': $('.daiquiri-browser-center .active', daiquiri.browser.clicked.container).text()
+                        });
+                    }); 
+
                     return false;
                 });
             }
     
             // right column (columns)
             rightData = centerData[jActive][self.opt.columns[2]];
-            if (rightData != undefined) {
+            if (typeof rightData != 'undefined' && rightData.length > 0) {
                 for (k = 0; k < rightData.length; k++){
                     li = $('<li/>',{
                         'class': 'nav-item',
                         'html': '<a href="#daiquiri-browser-right-' + k + '">' + rightData[k].name + '</a>'
                     }).appendTo($('.daiquiri-browser-right .daiquiri-browser-body', self.container));
         
-                    $('a',li).click(function() {
-                        var same = $(this).parent().hasClass('active');
+                    $('a',li).click(function (e) {
+                        var id = $(e.target).parents('.daiquiri-browser').attr('id');
+                        daiquiri.browser.clicked = daiquiri.browser.items[id];
+
                         $('.daiquiri-browser-right .active').removeClass('active');
                         $(this).parent().addClass('active');
-                        if (self.opt.action) self.opt.action({
-                            'left': $('.daiquiri-browser-left .active', self.container).text(),
-                            'center': $('.daiquiri-browser-center .active', self.container).text(),
-                            'right': $(this).text(),
-                            'same': same
-                        });
+
+                        daiquiri.common.singleDoubleClick(e, function (e) {
+                            // single click
+                            if (daiquiri.browser.clicked.opt.click) daiquiri.browser.clicked.opt.click({
+                                'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
+                                'center': $('.daiquiri-browser-center .active', daiquiri.browser.clicked.container).text(),
+                                'right': $('.daiquiri-browser-right .active', daiquiri.browser.clicked.container).text()
+                            });
+                        }, function (e) {
+                            // double click
+                            if (daiquiri.browser.clicked.opt.dblclick) daiquiri.browser.clicked.opt.dblclick({
+                                'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
+                                'center': $('.daiquiri-browser-center .active', daiquiri.browser.clicked.container).text(),
+                                'right': $('.daiquiri-browser-right .active', daiquiri.browser.clicked.container).text()
+                            });
+                        }); 
+
                         return false;
-                    })
+                    });
                 }
             }
         }
