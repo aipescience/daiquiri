@@ -46,6 +46,7 @@ class Daiquiri_Init {
         'h|help' => 'Displays usage information.',
         'a|application' => 'Creates the application.ini file (must be invoked first).',
         'l|links' => 'Creates the neccessary softlinks.',
+        'm|minify' => 'Minifies the static js and css files.',
         'u|user' => 'Displays the commands to create the database user.',
         'c|clean' => 'Displays the commands to clean the database.',
         'v|vhost' => 'Displays the virtual host configuration.',
@@ -367,26 +368,85 @@ class Daiquiri_Init {
      * Creates the necessary softlinks
      */
     private function _links() {
-        // create an array of all the targets and links
-        $links = array();
-        $links[$this->_daiquiri_path . '/client'] = $this->_application_path . '/public/daiquiri';
-        $links[$this->_options['config']['core']['captcha']['dir']] = $this->_application_path . '/public' . $this->_options['config']['core']['captcha']['url'];
-        if (!empty($this->_options['config']['cms']) && $this->_options['config']['cms']['enabled']) {
-            $links[$this->_options['config']['cms']['path']] = $this->_application_path . '/public' . $this->_options['config']['cms']['url'];
+        // captcha directory
+        $captcha = $this->_application_path . '/public/captcha';
+        $links[$captcha] = $this->_options['config']['core']['captcha']['dir'];
+
+        // client js and css directory
+        $client = $this->_application_path . '/public/daiquiri';
+        if (!empty($this->_options['config']['core']['minify'])
+            && $this->_options['config']['core']['minify']['enabled'] == true) {
+
+            $links[$client] = null;
+        } else {
+            $links[$client] = $this->_daiquiri_path . '/client';
+        }
+
+        // cms (word press directory)
+        $cms = $this->_application_path . '/public' . $this->_options['config']['cms']['url'];
+        if (!empty($this->_options['config']['cms']) 
+            && $this->_options['config']['cms']['enabled']) {
+            $links[$cms] = $this->_options['config']['cms']['path'];
+        } else {
+            $links[$cms] = null;
         }
 
         // loop over array, delete the old links and create new links
-        foreach ($links as $target => $rawlink) {
-            if (!file_exists($target)) {
-                echo 'Error: ' . $target . ' does not exist.' . PHP_EOL;
-                die();
-            }
+        foreach ($links as $rawlink => $target) {
             $link = rtrim($rawlink, '/');
             if (is_link($link)) {
                 unlink($link);
             }
-            echo "creating symlink " . $target . ' -> ' . $link . PHP_EOL;
-            symlink($target, $link);
+            if (!empty($target)) {
+                if (!file_exists($target)) {
+                    echo 'Error: ' . $target . ' does not exist.' . PHP_EOL;
+                    die(0);
+                } else {
+                    echo "creating symlink " . $target . ' -> ' . $link . PHP_EOL;
+                    symlink($target, $link);
+                }
+            }
+        }
+    }
+
+    /**
+     * Minifies the static js and css files.
+     */
+    private function _minify() {
+        $client = $this->_daiquiri_path . '/client/';
+
+        if (!file_exists('public/min')) {
+            mkdir('public/min');
+        }
+
+        echo "minifing js and css files.";
+
+        exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/daiquiri.js" );
+        exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/daiquiri.css");
+
+        foreach (Daiquiri_View_Helper_HeadDaiquiri::$files as $file) {
+            $ext = pathinfo($file, PATHINFO_EXTENSION);
+            if ($ext === 'js') {
+                exec("yui-compressor " . $client . "/" . $file . " >> public/min/daiquiri.js");
+            } else if ($ext === 'css') {
+                exec("yui-compressor " . $client . "/" . $file . " >> public/min/daiquiri.css");
+            }
+        }
+
+        // take care of images
+        foreach (Daiquiri_View_Helper_HeadDaiquiri::$img as $img) {
+            $target = $client . $img;
+            $link = $this->_application_path . '/public/img/' . basename($file);
+            if (is_link($link)) {
+                unlink($link);
+            }
+            if (!file_exists($target)) {
+                echo 'Error: ' . $target . ' does not exist.' . PHP_EOL;
+                die(0);
+            } else {
+                echo "creating symlink " . $target . ' -> ' . $link . PHP_EOL;
+                symlink($target, $link);
+            }
         }
     }
 
