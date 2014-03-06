@@ -64,8 +64,11 @@ class Config_Model_Templates extends Daiquiri_Model_SimpleTable {
         return $this->getResource()->fetchRows();
     }
 
-    public function show($template, array $values = array()) {
-        $data = $this->getResource()->fetchRow($template);
+    public function show($template,  array $values = array(), array $data = array()) {
+        // get the template data from the database
+        if (empty($data)) {
+            $data = $this->getResource()->fetchRow($template);
+        }
 
         // search replace the placeholders
         foreach ($this->templates[$template] as $key) {
@@ -75,10 +78,12 @@ class Config_Model_Templates extends Daiquiri_Model_SimpleTable {
             }
         }
 
-        // get rid of the remaining placeholders
-        foreach ($this->templates[$template] as $key) {
-            $data['subject'] = str_replace('_' . $key . '_','', $data['subject']);
-            $data['body'] = str_replace('_' . $key . '_','', $data['body']);
+        // get rid of the remaining placeholders, only if a value array was provided
+        if ($values != false) {
+            foreach ($this->templates[$template] as $key) {
+                $data['subject'] = str_replace('_' . $key . '_','', $data['subject']);
+                $data['body'] = str_replace('_' . $key . '_','', $data['body']);
+            }
         }
         return $data;
     }

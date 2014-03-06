@@ -20,36 +20,15 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the contact form categories.
- */
-class Contact_Model_Categories extends Daiquiri_Model_SimpleTable {
+class Contact_Model_Categories extends Daiquiri_Model_Table {
 
-    /**
-     * Constructor. Sets resource object and primary field.
-     */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Table');
-        $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
-        $this->getResource()->getTable()->setName('Contact_Categories');
-        $this->setValueField('category');
+        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->getResource()->setTablename('Contact_Categories');
     }
 
     public function create(array $formParams = array()) {
-        // create the form object
-        $form = new Contact_Form_Categories();
-
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
-
-            $this->addValue($values['category']);
-
-            return array('status' => 'ok');
-        }
-
-        return array('form' => $form, 'status' => 'form');
+        return $this->getModelHelper('CRUD')->create($formParams,'Create message category','Contact_Form_Category');
     }
 
 }

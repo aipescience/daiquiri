@@ -22,15 +22,20 @@
 
 class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
 
-    public function send($template, array $values) {
+    public function template($template) {
+        // get the template
+        $templateModel = new Config_Model_Templates();
+        return $templateModel->show($template);
+    }
+
+    public function send($template, array $values = array(), array $templateData = array()) {
         // create a new mail
         $mail = new Zend_Mail('UTF-8');
 
         // get the template
         $templateModel = new Config_Model_Templates();
-        $data = $templateModel->show($template, $values);
+        $data = $templateModel->show($template, $values, $templateData);
 
-        // set to
         if (isset($values['to'])) {
             if (is_array($values['to'])) {
                 foreach ($values['to'] as $address) {

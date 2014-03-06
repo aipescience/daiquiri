@@ -20,35 +20,15 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the contact form Status.
- */
-class Contact_Model_Status extends Daiquiri_Model_SimpleTable {
+class Contact_Model_Status extends Daiquiri_Model_Table {
 
-    /**
-     * Constructor. Sets resource object and primary field.
-     */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Table');
-        $this->getResource()->setTable('Contact_Model_DbTable_Status');
-        $this->setValueField('status');
+        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->getResource()->setTablename('Contact_Status');
     }
 
     public function create(array $formParams = array()) {
-        // create the form object
-        $form = new Contact_Form_Status();
-
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
-
-            $this->addValue($values['status']);
-
-            return array('status' => 'ok');
-        }
-
-        return array('form' => $form, 'status' => 'form');
+        return $this->getModelHelper('CRUD')->create($formParams,'Create message status','Contact_Form_Status');
     }
 
 }

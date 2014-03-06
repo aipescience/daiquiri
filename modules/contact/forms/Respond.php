@@ -20,9 +20,6 @@
  *  limitations under the License.
  */
 
-/**
- * Displays the form used to respond to a contact message.
- */
 class Contact_Form_Respond extends Daiquiri_Form_Abstract {
 
     protected $_subject;
@@ -36,9 +33,6 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
         $this->_body = $body;
     }
 
-    /**
-     * @brief Initializes the contact form.
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
@@ -53,12 +47,12 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-
         $this->addElement('textarea', 'body', array(
             'label' => 'Message:',
             'class' => 'input-xxlarge',
             'rows' => '10',
             'required' => true,
+            'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Textarea())
             )

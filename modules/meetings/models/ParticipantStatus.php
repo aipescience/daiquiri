@@ -36,7 +36,7 @@ class Meetings_Model_ParticipantStatus extends Daiquiri_Model_Table {
     }
 
     public function create(array $formParams = array()) {
-        return $this->getModelHelper('CRUD')->create($formParams, 'Create participant status','Meetings_Form_ParticipantStatus');
+        return $this->getModelHelper('CRUD')->create($formParams, 'Create participant status', 'Meetings_Form_ParticipantStatus');
     }
 
     public function update($id, array $formParams = array()) {

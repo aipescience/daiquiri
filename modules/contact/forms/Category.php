@@ -20,12 +20,28 @@
  *  limitations under the License.
  */
 
-class Contact_Model_DbTable_Messages extends Daiquiri_Model_DbTable_Abstract {
+class Contact_Form_Category extends Daiquiri_Form_Abstract {
 
-    /**
-     * Name of the database table.
-     * @var string
-     */
-    protected $_name = 'Contact_Messages';
+    public function init() {
+        $this->setFormDecorators();
+        $this->addCsrfElement();
+        
+        // add elements
+        $this->addElement('text', 'category', array(
+            'label' => 'Category',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => 'alnum'),
+            )
+        ));
+
+        $this->addPrimaryButtonElement('submit', 'Create user status');
+        $this->addButtonElement('cancel', 'Cancel');
+
+        // add groups
+        $this->addHorizontalGroup(array('category'));
+        $this->addActionGroup(array('submit', 'cancel'));
+    }
 
 }

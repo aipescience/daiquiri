@@ -20,12 +20,6 @@
  *  limitations under the License.
  */
 
-/**
- * Display the contact form.
- * 
- * @TODO: add captcha and csrf hash
- * @TODO: enable/disable fields as required? Add more fields like institution, city, ...?
- */
 class Contact_Form_Submit extends Daiquiri_Form_Abstract {
 
     protected $_categories = array();
@@ -39,9 +33,6 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
         $this->_user = $user;
     }
 
-    /**
-     * @brief Initializes the contact form.
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
@@ -58,7 +49,6 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'lastname', array(
             'label' => 'Your last name',
-            //'description' => 'Please enter your last name',
             'size' => '30',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -68,7 +58,6 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'email', array(
             'label' => 'Your email address',
-            //'description' => 'Example: user@example.com',
             'size' => '30',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -86,27 +75,26 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
             'label' => 'Subject',
             'class' => 'input-xxlarge',
             'required' => true,
-            'filters' => array('StringTrim', 'HtmlEntities'), //,'addslashes'), -- addslashes is unknown??
+            'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => 'StringLength',
-                    'options' => array(0, 100)),
+                array('validator' => 'StringLength', 'options' => array(0, 128)),
                 array('validator' => new Daiquiri_Form_Validator_Text())
             )
         ));
         $this->addElement('textarea', 'message', array(
-            'label' => 'Message<br/><span class="hint">(max. 1000<br>characters)<br/>',
+            'label' => 'Message<br/><span class="hint">(max. 2048<br/>characters)',
             'class' => 'input-xxlarge',
             'rows' => '10',
             'required' => true,
+            'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => 'StringLength',
-                    'options' => array(0, 1000)),
+                array('validator' => 'StringLength', 'options' => array(0, 2048)),
                 array('validator' => new Daiquiri_Form_Validator_Textarea())
             )
         ));
         if (empty($this->_user)) {
             // display captcha if no user is logged in
-            $this->addCaptchaElement();
+            $this->addElement(new Daiquiri_Form_Element_Captcha('captcha'));
         }
         $this->addPrimaryButtonElement('submit', 'Send message');
         $this->addButtonElement('cancel', 'Cancel');
@@ -118,7 +106,6 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
             $this->addCaptchaGroup('captcha');
         }
         $this->addActionGroup(array('submit', 'cancel'));
-
 
         // set fields if user is logged in.
         foreach (array('firstname', 'lastname', 'email') as $key) {

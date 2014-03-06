@@ -26,7 +26,7 @@ class Daiquiri_Controller_Helper_Abstract {
 
     public function __construct($controller) {
         $this->_controller = $controller;
-        $this->_model = $controller->_model;
+        $this->_model = $controller->getModel();
 
         $this->init();
     }

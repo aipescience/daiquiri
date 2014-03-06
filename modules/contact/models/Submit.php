@@ -20,33 +20,23 @@
  *  limitations under the License.
  */
 
-/**
- * Provides methods for everything related to contact form
- */
 class Contact_Model_Submit extends Daiquiri_Model_Abstract {
 
-    /**
-     * Constructor. Sets resource object and primary field.
-     */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Table');
-        $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
-        $this->getResource()->getTable()->setName('Contact_Messages');
+        $this->setResource('Contact_Model_Resource_Messages');
     }
 
-    /**
-     * Displaying and processes the contact form.
-     * @return array
-     */
     public function contact(array $formParams = array()) {
 
-        // get categories and user model
+        // get categories
         $categoriesModel = new Contact_Model_Categories();
-        $userModel = new Auth_Model_User();
+        $categories = $categoriesModel->getResource()->fetchValues('category');
 
+        // get user if one is logged in
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
         if ($userId > 0) {
             // get the user model for getting user details
+            $userModel = new Auth_Model_User();
             $user = $userModel->show($userId);
         } else {
             $user = array();
@@ -54,39 +44,68 @@ class Contact_Model_Submit extends Daiquiri_Model_Abstract {
 
         // create the form object
         $form = new Contact_Form_Submit(array(
-                    'categories' => $categoriesModel->getValues(),
-                    'user' => $user)
+            'categories' => $categories,
+            'user' => $user)
         );
 
-        if (!empty($formParams) && $form->isValid($formParams)) {
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // form is valid, get values
+                $values = $form->getValues();
+                unset($values['submit']);
 
-            // form is valid, get values
-            $values = $form->getValues();
-            unset($values['submit']);
+                // set the user_id
+                $values['user_id'] = $userId;
 
-            // get username of current user
-            $values['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
+                // set timestamp
+                $values['datetime'] = date("Y-m-d H:i:s");
 
-            // set status of new message to active
-            $statusModel = new Contact_Model_Status();
-            $values['status_id'] = $statusModel->getId('active');
+                // set status of new message to active
+                $statusModel = new Contact_Model_Status();
+                $values['status_id'] = $statusModel->getResource()->fetchId(array(
+                    'where' => array('`status` = "active"')
+                ));
 
-            // store in database (if enabled)
-            $this->getResource()->insertRow($values);
+                // store in database (if enabled)
+                $this->getResource()->insertRow($values);
 
-            // get the category
-            $values['category'] = $categoriesModel->getValue($values['category_id']);
+                // get the category
+                $row = $categoriesModel->getResource()->fetchRow($values['category_id']);
+                $values['category'] = $row['category'];
 
-            // send mail to user who used the contact form
-            $mailResourceUser = new Contact_Model_Resource_Mail();
-            $mailResourceUser->sendSubmitMailToUser($values);
+                // send mail to user who used the contact form
+                $this->getModelHelper('mail')->send('contact.submit_user', array(
+                    'to' => $values['email'],
+                    'firstname' => $values['firstname'],
+                    'lastname' => $values['lastname']
+                ));
 
-            // send mail to support
-            $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/contact/messages';
-            $mailResourceSupport = new Contact_Model_Resource_Mail();
-            $mailResourceSupport->sendSubmitMailToSupport($values, array('link' => $link));
+                // send mail to support
+                $userMailModel = new Auth_Model_Mail();
+                $this->getModelHelper('mail')->send('contact.submit_support', array(
+                    'to' => array_merge(
+                        $userMailModel->show('support'),
+                        $userMailModel->show('manager'),
+                        $userMailModel->show('admin')
+                    ),
+                    'reply_to' => $values['email'],
+                    'firstname' => $values['firstname'],
+                    'lastname' => $values['lastname'],
+                    'email' => $values['email'],
+                    'category' => $values['category'],
+                    'subject' => $values['subject'],
+                    'message' => $values['message'],
+                    'link' => Daiquiri_Config::getInstance()->getSiteUrl() . '/contact/messages'
+                ));
 
-            return array('form' => null, 'status' => 'ok');
+                return array('status' => 'ok');
+            } else {
+                return array(
+                    'status' => 'error',
+                    'errors' => $form->getMessages(),
+                    'form' => $form
+                );
+            }
         }
 
         return array('form' => $form, 'status' => 'form');

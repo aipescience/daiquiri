@@ -23,7 +23,6 @@
 class Contact_Model_Init extends Daiquiri_Model_Init {
 
     public function parseOptions(array $options) {
-
         if (!isset($this->_input_options['contact'])) {
             $input = array();
         } else if (!is_array($this->_input_options['contact'])) {
@@ -60,7 +59,7 @@ class Contact_Model_Init extends Daiquiri_Model_Init {
         if ($options['config']['contact']) {
             // create status entries for the contact module
             $contactStatusModel = new Contact_Model_Status();
-            if (count($contactStatusModel->getValues()) == 0) {
+            if ($contactStatusModel->getResource()->countRows() == 0) {
                 foreach ($options['contact']['status'] as $status) {
                     $a = array('status' => $status);
                     $r = $contactStatusModel->create($a);
@@ -70,7 +69,7 @@ class Contact_Model_Init extends Daiquiri_Model_Init {
 
             // create category entries for the contact module
             $contactCategoriesModel = new Contact_Model_Categories();
-            if (count($contactCategoriesModel->getValues()) == 0) {
+            if ($contactCategoriesModel->getResource()->countRows() == 0) {
                 foreach ($options['contact']['categories'] as $category) {
                     $a = array('category' => $category);
                     $r = $contactCategoriesModel->create($a);

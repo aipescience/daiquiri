@@ -26,30 +26,10 @@
 class Contact_IndexController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        
+        $this->_model = Daiquiri_Proxy::factory('Contact_Model_Submit');
     }
 
     public function indexAction() {
-
-        $model = Daiquiri_Proxy::factory('Contact_Model_Submit');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_helper->redirector('index', 'index', 'default');
-            } else {
-                // validate form
-                $response = $model->contact($this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $model->contact();
-        }
-
-        // assign to view
-        $this->view->status = $response['status'];
-        $this->view->form = $response['form'];
+        $this->getControllerHelper('form')->contact();
     }
-
 }

@@ -32,6 +32,10 @@ abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
 
     private $_controller_helper = array();
 
+    public function getModel() {
+        return $this->_model;
+    }
+
     public function getControllerHelper($helper, array $options = array()) {
         if (empty($this->_controller_helper[$helper])) {
             $helperclass = 'Daiquiri_Controller_Helper_' . ucfirst($helper);
