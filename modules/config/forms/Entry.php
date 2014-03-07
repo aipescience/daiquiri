@@ -20,7 +20,17 @@
  *  limitations under the License.
  */
 
-class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
+class Config_Form_Entry extends Daiquiri_Form_Abstract {
+
+    private $_submit = null;
+    private $_entry = null;
+
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
+    }
+    public function setEntry($entry) {
+        $this->_entry = $entry;
+    }
 
     public function init() {
         $this->setFormDecorators();
@@ -33,7 +43,6 @@ class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
                 array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
@@ -44,7 +53,6 @@ class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
                 array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
@@ -54,6 +62,14 @@ class Config_Form_CreateEntries extends Daiquiri_Form_Abstract {
         // add groups
         $this->addHorizontalGroup(array('key', 'value'));
         $this->addActionGroup(array('submit', 'cancel'));
+
+        // set fields
+        if (isset($this->_entry['key'])) {
+            $this->setDefault('key', $this->_entry['key']);
+        }
+        if (isset($this->_entry['value'])) {
+            $this->setDefault('value', $this->_entry['value']);
+        }
     }
 
 }

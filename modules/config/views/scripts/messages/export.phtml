@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -19,19 +18,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-class Config_Form_DeleteEntries extends Daiquiri_Form_Abstract {
+<pre>
 
-    public function init() {
-        $this->setFormDecorators();
-        $this->addCsrfElement();
-        
-        // add fields
-        $this->addDangerButtonElement('submit', 'Delete config entry');
-        $this->addButtonElement('cancel', 'Cancel');
+<?php var_export($this->data); ?>
 
-        // add groups
-        $this->addActionGroup(array('submit', 'cancel'));
-    }
 
-}
+</pre>

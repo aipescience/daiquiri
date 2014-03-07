@@ -32,20 +32,20 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($this->data as $mail): ?>
+            <?php foreach ($this->rows as $row): ?>
                 <tr>
-                    <td style="width: 30%"><?php echo $this->escape($mail['template']); ?></td>
-                    <td style="width: 65%"><?php echo $this->escape($mail['subject']); ?></td>
+                    <td style="width: 30%"><?php echo $this->escape($row['template']); ?></td>
+                    <td style="width: 65%"><?php echo $this->escape($row['subject']); ?></td>
                     <td style="width: 5%">
                         <?php
                         echo $this->internalLink(array(
-                            'text' => 'Edit',
-                            'href' => '/config/templates/update/template/' . $this->escape($mail['template']),
+                            'text' => 'Update',
+                            'href' => '/config/templates/update/id/' . $this->escape($row['id']),
                             'resource' => 'Config_Model_Templates',
                             'permission' => 'update'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
-                            'href' => '/config/templates/delete/template/' . $this->escape($mail['template']),
+                            'href' => '/config/templates/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Config_Model_Templates',
                             'permission' => 'delete',
                             'prepend' => '&nbsp;'));
@@ -57,14 +57,18 @@
     </table>
 
     <?php
-    // echo $this->internalLink(array(
-    //     'text' => 'Create new mail template',
-    //     'href' => '/config/templates/create',
-    //     'prepend' => '<p>',
-    //     'append' => '</p>'));
+        echo $this->internalLink(array(
+        'text' => 'Create new mail template',
+        'href' => '/config/templates/create',
+        'resource' => 'Config_Model_Templates',
+        'permission' => 'create',
+        'prepend' => '<p>',
+        'append' => '</p>'));
     echo $this->internalLink(array(
         'text' => 'Export to init.php syntax',
         'href' => '/config/templates/export',
+        'resource' => 'Config_Model_Templates',
+        'permission' => 'export',
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->internalLink(array(

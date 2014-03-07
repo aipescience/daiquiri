@@ -53,9 +53,8 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     public function init() {
         // init the databases resource
         try {
-            $resource = new Daiquiri_Model_Resource_KeyValue();
-            $resource->setTable('Daiquiri_Model_DbTable_Simple');
-            $resource->getTable()->setName('Config_Entries');
+            $resource = new Daiquiri_Model_Resource_Simple();
+            $resource->setTablename('Config_Entries');
 
             $config = array();
             foreach ($resource->fetchRows() as $row) {

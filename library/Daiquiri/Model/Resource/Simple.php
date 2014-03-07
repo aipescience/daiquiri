@@ -116,28 +116,36 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
 
     /**
      * Fetches one row specified by its primary key from the previously set database table.
-     * @param int $id primary key of the row
+     * @param mixed $input primary key of the row OR array of sqloptions
      * @throws Exception
      * @return Zend_Db_Table_Row_Abstract
      */
-    public function fetchRow($id) {
-        if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+    public function fetchRow($input) {
+        if (empty($input)) {
+            throw new Exception('$id or $sqloptions not provided in ' . get_class($this) . '::fetchRow()');
         }
 
-        $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
-
-        $select = $this->getAdapter()->select();
-        $select->from($this->getTablename());
-        $select->where($identifier . '= ?', $id);
-
-        // query database
-        $row = $this->getAdapter()->fetchRow($select);
-        if (empty($row)) {
-            throw new Exception($id . ' not found in ' . get_class($this) . '::fetchRow()');
+        if (is_array($input)) {
+            $select = $this->select($input);
+            $select->from($this->getTablename());
+        } else {
+            $select = $this->getAdapter()->select();
+            $select->from($this->getTablename());
+            $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
+            $select->where($identifier . '= ?', $input);
         }
 
-        return $row;
+        // get the rows an chach that its one and only one
+        $rows = $this->getAdapter()->fetchAll($select);
+        if (empty($rows)) {
+            return array();
+        } else if (count($rows) > 1) {
+            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
+        } else {
+            // return the first and only row
+            return $rows[0];
+        }
+
     }
 
     /**

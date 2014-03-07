@@ -183,9 +183,9 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
 
         // construct rules for config module
-        $rules['admin']['Config_Model_Entries'] = array('index', 'create', 'update', 'delete');
-        $rules['admin']['Config_Model_Messages'] = array('index', 'create', 'update', 'delete');
-        $rules['admin']['Config_Model_Templates'] = array('index', 'create', 'update', 'delete');
+        $rules['admin']['Config_Model_Entries'] = array('index', 'create', 'update', 'delete', 'export');
+        $rules['admin']['Config_Model_Messages'] = array('index', 'create', 'update', 'delete', 'export');
+        $rules['admin']['Config_Model_Templates'] = array('index', 'create', 'update', 'delete', 'export');
         
         // construct rules for contact module
         if (!empty($options['config']['contact'])) {

@@ -20,21 +20,9 @@
  */
 ?>
 
-<div class="main">
-    <h2>Configuration</h2>
+<pre>
 
-    <pre>
-        <?php
-            echo PHP_EOL;
-            echo "'config' => array(" . PHP_EOL;
-            echo ");"
-        ?>
-    </pre>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to config entries',
-        'href' => '/config/entries/',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-</div>
+<?php var_export($this->data); ?>
+
+
+</pre>

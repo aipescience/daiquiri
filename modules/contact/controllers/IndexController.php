@@ -25,6 +25,8 @@
  */
 class Contact_IndexController extends Daiquiri_Controller_Abstract {
 
+    protected $_model;
+
     public function init() {
         $this->_model = Daiquiri_Proxy::factory('Contact_Model_Submit');
     }

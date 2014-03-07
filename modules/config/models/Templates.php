@@ -20,13 +20,16 @@
  *  limitations under the License.
  */
 
-class Config_Model_Templates extends Daiquiri_Model_SimpleTable {
+class Config_Model_Templates extends Daiquiri_Model_Table {
 
     public $templates;
 
+    /**
+     * Constructor. Sets resource object and the database table. Also sets a list of use templates with fields.
+     */
     public function __construct() {
-        $this->setResource('Config_Model_Resource_Templates');
-        $this->setValueField('subject');
+        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->getResource()->setTablename('Config_Templates');
 
         $this->templates = array(
             'auth.register' => array('firstname', 'lastname', 'username', 'link'),
@@ -60,94 +63,174 @@ class Config_Model_Templates extends Daiquiri_Model_SimpleTable {
 
     }
 
+    /**
+     * Returns all mail templates.
+     * @return array $response
+     */
     public function index() {
-        return $this->getResource()->fetchRows();
+        return $this->getModelHelper('CRUD')->index();
     }
 
+    /**
+     * Returns a mail template given by its template name
+     * @param string $template template name
+     * @return array $response
+     */
     public function show($template,  array $values = array(), array $data = array()) {
         // get the template data from the database
         if (empty($data)) {
-            $data = $this->getResource()->fetchRow($template);
+            $data = $this->getResource()->fetchRow(array(
+                'where' => array('`template` = ?' => $template)
+            ));
         }
 
         // search replace the placeholders
-        foreach ($this->templates[$template] as $key) {
-            if (!empty($values[$key])) {
-                $data['subject'] = str_replace('_' . $key . '_', $values[$key], $data['subject']);
-                $data['body'] = str_replace('_' . $key . '_', $values[$key], $data['body']);
+        if (!empty($values)) {
+            foreach ($this->templates[$template] as $key) {
+                if (!empty($values[$key])) {
+                    $data['subject'] = str_replace('_' . $key . '_', $values[$key], $data['subject']);
+                    $data['body'] = str_replace('_' . $key . '_', $values[$key], $data['body']);
+                }
             }
-        }
 
-        // get rid of the remaining placeholders, only if a value array was provided
-        if ($values != false) {
+            // get rid of the remaining placeholders, only if a value array was provided
             foreach ($this->templates[$template] as $key) {
                 $data['subject'] = str_replace('_' . $key . '_','', $data['subject']);
                 $data['body'] = str_replace('_' . $key . '_','', $data['body']);
             }
         }
+
         return $data;
     }
 
+    /**
+     * Creates a mail template.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create(array $formParams = array()) {
-
         // create the form object
-        $form = new Config_Form_CreateTemplates();
+        $form = new Config_Form_Template(array(
+            'submit' => 'Create new mail template'
+        ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
 
-            $this->getResource()->insertRow($values);
-            return array('status' => 'ok');
+                // get the form values
+                $values = $form->getValues();
+
+                // check if the entry is already there
+                $rows = $this->getResource()->fetchRows(array(
+                    'where' => array('`template` = ?' => $values['template'])
+                ));
+
+                if (empty($rows)) {
+                    // store the details
+                    $this->getResource()->insertRow($values);
+                    return array('status' => 'ok');
+                } else {
+                    $form->setDescription('Template already stored');
+                    return array(
+                        'form' => $form,
+                        'status' => 'error',
+                        'error' => 'Template already stored'
+                    );
+                }
+            } else {
+                return array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+            }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function update($template, array $formParams = array()) {
-        $resource = $this->getResource();
+    /**
+     * Updates a mail template.
+     * @param int $id
+     * @param array $formParams
+     * @return array $response
+     */
+    public function update($id, array $formParams = array()) {
+        $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Exception('$id ' . $id . ' not found.');
+        }
 
         // produce variables string
         $tmp = array();
-        foreach ($this->templates[$template] as $value) {
+        foreach ($this->templates[$entry['template']] as $value) {
             $tmp[] = '_' . $value . '_';
         }
-        $variables = implode(' ', $tmp);
+        $variables  = implode(' ', $tmp);
 
         // create the form object
-        $form = new Config_Form_EditTemplates(array(
-                    'template' => $resource->fetchRow($template)
-                ));
+        $form = new Config_Form_Template(array(
+            'submit'=> 'Update mail template',
+            'entry' => $entry
+        ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            $resource->updateRow($template, $values);
-            return array('status' => 'ok');
+                // update the row in the database
+                $this->getResource()->updateRow($id, $values);
+                
+                return array('status' => 'ok');
+            } else {
+                return array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages(),
+                    'variables' => $variables
+                );
+            }
         }
 
         return array(
             'form' => $form,
             'status' => 'form',
-            'variables' => $variables,
-            'template' => $template
+            'variables' => $variables
         );
     }
 
+    /**
+     * Deletes a mail template.
+     * @param int $id
+     * @param array $formParams
+     * @return array $response
+     */
     public function delete($id, array $formParams = array()) {
-        // create the form object
-        $form = new Config_Form_DeleteTemplates();
-
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $this->getResource()->deleteRow($id);
-            return array('status' => 'ok');
-        }
-
-        return array('form' => $form, 'status' => 'form');
+        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete entry');
     }
 
+    /**
+     * Returns all mail templates for export.
+     * @return array $response
+     */
+    public function export() {
+        $dbRows = $this->getResource()->fetchRows();
+
+        $data = array();
+        foreach ($dbRows as $dbRow) {
+            $data[] = array(
+                'template' => $dbRow['template'],
+                'subject' => $dbRow['subject'],
+                'body' => $dbRow['body']
+            );
+        }
+
+        return array(
+            'data' => $data,
+            'status' => 'ok'
+        );
+    }
 }

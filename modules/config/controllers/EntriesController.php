@@ -22,99 +22,37 @@
 
 class Config_EntriesController extends Daiquiri_Controller_Abstract {
 
-    private $_model;
+    protected $_model;
 
     public function init() {
         $this->_model = Daiquiri_Proxy::factory('Config_Model_Entries');
     }
 
     public function indexAction() {
-        $this->view->data = $this->_model->index();
-        $this->view->status = 'ok';
-    }
-
-    public function exportAction() {
-        $this->view->data = Daiquiri_Config::getInstance()->getConfig();
-        $this->view->status = 'ok';
+        $this->getControllerHelper('table')->index();
     }
 
     public function createAction() {
-        // get redirect url
-        $redirect = $this->_getParam('redirect', '/config/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and create new user
-                $response = $this->_model->create($this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->create();
-        }
-
-        // assign to view
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->getControllerHelper('form')->create();
     }
 
     public function updateAction() {
-        // get redirect url
-        $redirect = $this->_getParam('redirect', '/config/');
-        $key = $this->_getParam('key');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and edit user
-                $response = $this->_model->update($key, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->update($key);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->update($id);
     }
 
-    /**
-     * Deletes a user.
-     */
     public function deleteAction() {
-        // get the id of the user to be deleted
-        $key = $this->_getParam('key');
-        $redirect = $this->_getParam('redirect', '/config/');
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->delete($id);
+    }
 
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and delete user
-                $response = $this->_model->delete($key, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->delete($key);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+    public function exportAction() {
+        $response = $this->_model->export();
+        $this->view->data = $response['data'];
+        $this->view->status = $response['status'];
+        
+        // disable layout
+        $this->_helper->layout->disableLayout();
     }
 
 }

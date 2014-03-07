@@ -23,40 +23,44 @@
 class Config_Model_Messages extends Daiquiri_Model_Abstract {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource object and the database table.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_KeyValue');
-        $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
-        $this->getResource()->getTable()->setName('Config_Messages');
+        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->getResource()->setTablename('Config_Messages');
     }
 
     /**
-     * Returns all status messages as an array.
-     * @return array
+     * Returns all status messages.
+     * @return array $response
      */
     public function index() {
-        return $this->getResource()->fetchRows();
+        return $this->getModelHelper('CRUD')->index();
     }
 
     /**
-     * Returns a particular status message.
-     * @return array
+     * Returns a status message.
+     * @param mixed $input id (int) or key (string) of the stautus message
+     * @return array $response
      */
-    public function show($key) {
-        return $this->getResource()->fetchValue($key);
+    public function show($input) {
+        if (!is_int($input)) {
+            $id = $this->getResource()->fetchId(array(
+                'where' => array('`key` = ?' => $input)
+            ));
+        }
+
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
     /**
      * Creates a status message.
-     * @param string $key
-     * @param string $value
-     * @return array
+     * @param array $formParams
+     * @return array $response
      */
     public function create(array $formParams = array()) {
-
         // create the form object
-        $form = new Config_Form_CreateMessages();
+        $form = new Config_Form_Message();
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -66,16 +70,28 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
                 $values = $form->getValues();
 
                 // check if the entry is already there
-                if ($this->getResource()->fetchValue($values['key']) !== null) {
-                    $form->setDescription('Key already stored');
-                    return array('status' => 'error', 'error' => 'key already stored');
-                } else {
+                $rows = $this->getResource()->fetchRows(array(
+                    'where' => array('`key` = ?' => $values['key'])
+                ));
+
+                if (empty($rows)) {
                     // store the details
-                    $this->getResource()->storeValue($values['key'], $values['value']);
+                    $this->getResource()->insertRow($values);
                     return array('status' => 'ok');
+                } else {
+                    $form->setDescription('Key already stored');
+                    return array(
+                        'form' => $form,
+                        'status' => 'error',
+                        'error' => 'Key already stored'
+                    );
                 }
             } else {
-                return array('form' => $form, 'status' => 'error', 'errors' => $form->getMessages());
+                return array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
             }
         }
 
@@ -83,53 +99,41 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Edit an status message.
+     * Updates a status message.
+     * @param int $id
      * @param array $formParams
-     * @return array
+     * @return array $response
      */
-    public function update($key, array $formParams = array()) {
-        $value = $this->getResource()->fetchValue($key);
-
-        if ($value === null) {
-            return array('status' => 'error', 'error' => 'key not found');
-        }
-
-        // create the form object
-        $form = new Config_Form_EditMessages(array(
-                    'key' => $key,
-                    'value' => $value
-                ));
-
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-
-            // get the form values
-            $values = $form->getValues();
-
-            $this->getResource()->updateValue($key, $values['value']);
-            return array('status' => 'ok');
-        }
-
-        return array('form' => $form, 'status' => 'form');
+    public function update($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update entry', 'Config_Form_Message');
     }
 
     /**
-     * Deletes an status message.
-     * @param string $key
+     * Deletes a status message.
+     * @param int $id
      * @param array $formParams
-     * @return Array 
+     * @return array $response
      */
-    public function delete($key, array $formParams = array()) {
-        // create the form object
-        $form = new Config_Form_DeleteMessages();
+    public function delete($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete entry');
+    }
 
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $this->getResource()->deleteValue($key);
-            return array('status' => 'ok');
+    /**
+     * Returns all status messages for export.
+     * @return array $response
+     */
+    public function export() {
+        $dbRows = $this->getResource()->fetchRows();
+
+        $data = array();
+        foreach ($dbRows as $dbRow) {
+            $data[$dbRow['key']] = $dbRow['value'];
         }
 
-        return array('form' => $form, 'status' => 'form');
+        return array(
+            'data' => $data,
+            'status' => 'ok'
+        );
     }
 
 }

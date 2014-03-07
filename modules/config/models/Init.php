@@ -25,13 +25,13 @@ class Config_Model_Init extends Daiquiri_Model_Init {
     public function parseOptions(array $options) {
         $options = $this->_parseConfigOptions($options);
         $options = $this->_parseTemplatesOptions($options);
+        $options = $this->_parseStatusOptions($options);
         return $options;
     }
 
     private function _parseConfigOptions($options) {
-
         if (!isset($this->_input_options['config'])) {
-            $this->_error("No config options provided.");
+            $input = array();
         } else if (!is_array($this->_input_options['config'])) {
             $this->_error('Config options needs to be an array.');
         } else {
@@ -538,10 +538,38 @@ Best Regards'
         return $options;
     }
 
+    private function _parseStatusOptions($options) {
+        if (!isset($this->_input_options['messages'])) {
+            $input = array();
+        } else if (!is_array($this->_input_options['messages'])) {
+            $this->_error('Message options needs to be an array.');
+        } else {
+            $input = $this->_input_options['messages'];
+        }
+
+        // create default config
+        $defaults = array(
+            'query' => ''
+        );
+
+        $output = array();
+
+        foreach ($defaults as $key => $value) {
+            if (array_key_exists($key, $input)) {
+                $output[$key] = $input[$key];
+            } else {
+                $output[$key] = $value;
+            }
+        }
+
+        $options['messages'] = $output;
+        return $options;
+    }
+
     public function init(array $options) {
         // create config entries
-        $configEntryModel = new Config_Model_Entries();
-        if (count($configEntryModel->index()) == 0) {
+        $entriesModel = new Config_Model_Entries();
+        if ($entriesModel->getResource()->countRows() == 0) {
             $entries = array();
             $this->_buildConfigEntries_r($entries, $options['config'], array());
             foreach ($entries as $key => $value) {
@@ -549,7 +577,7 @@ Best Regards'
                     'key' => $key,
                     'value' => $value
                 );
-                $r = $configEntryModel->create($a);
+                $r = $entriesModel->create($a);
                 $this->_check($r, $a);
             }
         }
@@ -557,7 +585,7 @@ Best Regards'
         // create templates
         if (!empty($options['templates'])) {
             $templatesModel = new Config_Model_Templates();
-            if (count($templatesModel->getValues()) == 0) {
+            if ($templatesModel->getResource()->countRows() == 0) {
                 foreach ($options['templates'] as $key => $value) {
                     $a = array(
                         'template' => $key,
@@ -565,6 +593,21 @@ Best Regards'
                         'body' => $value['body']
                     );
                     $r = $templatesModel->create($a);
+                    $this->_check($r, $a);
+                }
+            }
+        }
+
+        // create messages
+        if (!empty($options['messages'])) {
+            $messagesModel = new Config_Model_Messages();
+            if ($messagesModel->getResource()->countRows() == 0) {
+                foreach ($options['messages'] as $key => $value) {
+                    $a = array(
+                        'key' => $key,
+                        'value' => $value
+                    );
+                    $r = $messagesModel->create($a);
                     $this->_check($r, $a);
                 }
             }

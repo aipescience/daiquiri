@@ -20,7 +20,17 @@
  *  limitations under the License.
  */
 
-class Config_Form_CreateMessages extends Daiquiri_Form_Abstract {
+class Config_Form_Message extends Daiquiri_Form_Abstract {
+
+    private $_submit = null;
+    private $_entry = null;
+
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
+    }
+    public function setEntry($entry) {
+        $this->_entry = $entry;
+    }
 
     public function init() {
         $this->setFormDecorators();
@@ -33,27 +43,33 @@ class Config_Form_CreateMessages extends Daiquiri_Form_Abstract {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
                 array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
         $this->addElement('textarea', 'value', array(
-            'label' => 'Message',
+            'label' => 'Value',
             'class' => 'input-xxlarge',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
                 array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
-        $this->addPrimaryButtonElement('submit', 'Create status message');
+        $this->addPrimaryButtonElement('submit', 'Create config entry');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('key', 'value'));
         $this->addActionGroup(array('submit', 'cancel'));
+
+        // set fields
+        if (isset($this->_entry['key'])) {
+            $this->setDefault('key', $this->_entry['key']);
+        }
+        if (isset($this->_entry['value'])) {
+            $this->setDefault('value', $this->_entry['value']);
+        }
     }
 
 }

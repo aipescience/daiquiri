@@ -32,20 +32,20 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($this->data as $config): ?>
+            <?php foreach ($this->rows as $row): ?>
                 <tr>
-                    <td><?php echo $this->escape($config['key']); ?></td>
-                    <td><?php echo $this->escape($config['value']); ?></td>
+                    <td><?php echo $this->escape($row['key']); ?></td>
+                    <td><?php echo $this->escape($row['value']); ?></td>
                     <td>
                         <?php
                         echo $this->internalLink(array(
-                            'text' => 'Edit',
-                            'href' => '/config/messages/update/key/' . $this->escape($config['key']),
+                            'text' => 'Update',
+                            'href' => '/config/messages/update/id/' . $this->escape($row['id']),
                             'resource' => 'Config_Model_Messages',
                             'permission' => 'update'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
-                            'href' => '/config/messages/delete/key/' . $this->escape($config['key']),
+                            'href' => '/config/messages/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Config_Model_Messages',
                             'permission' => 'delete',
                             'prepend' => '&nbsp;'));
@@ -61,6 +61,13 @@
     echo $this->internalLink(array(
         'text' => 'Create new status message',
         'href' => '/config/messages/create',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Export to init.php syntax',
+        'href' => '/config/messages/export',
+        'resource' => 'Config_Model_Messages',
+        'permission' => 'export',
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->internalLink(array(

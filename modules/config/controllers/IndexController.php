@@ -22,8 +22,6 @@
 
 class Config_IndexController extends Daiquiri_Controller_Abstract {
 
-    private $_model;
-
     public function init() {
         
     }

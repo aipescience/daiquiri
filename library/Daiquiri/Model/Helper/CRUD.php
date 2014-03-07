@@ -80,7 +80,7 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
             $formclass = $this->_getFormclass();
         }
 
-        // get meeting from teh database
+        // get entry from teh database
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
             throw new Exception('$id ' . $id . ' not found.');
@@ -105,6 +105,7 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
             } else {
                 return array(
                     'status' => 'error',
+                    'form' => $form,
                     'errors' => $form->getMessages(),
                 );
             }
