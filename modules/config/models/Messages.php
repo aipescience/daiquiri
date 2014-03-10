@@ -44,10 +44,14 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function show($input) {
-        if (!is_int($input)) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_string($input)) {
             $id = $this->getResource()->fetchId(array(
                 'where' => array('`key` = ?' => $input)
             ));
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
         return $this->getModelHelper('CRUD')->show($id);

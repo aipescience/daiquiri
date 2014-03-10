@@ -20,123 +20,111 @@
  *  limitations under the License.
  */
 
-/**
- * Resource class ...
- */
-class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
+class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets tablename.
      */
     public function __construct() {
-        $this->addTables(array(
-            'Data_Model_DbTable_Tables',
-            'Data_Model_DbTable_Columns',
-            'Data_Model_DbTable_Databases'
-        ));
-    }
-
-    public function fetchId($db, $table) {
-        // get the names of the involved tables
-        $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
-        $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
-
-        // get the primary sql select object
-        $select = $this->getTable()->select();
-        $select = $select->from($this->getTable(),'id');
-        $select->setIntegrityCheck(false);
-        $select->where("`$t`.`name` = ?", trim($table));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
-        $select->where("`$d`.`name` = ?", trim($db));
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current();
-        
-        if ($row) {
-            return $row->id;
-        } else {
-            return false;
-        }
+        $this->setTablename('Data_Tables');
     }
 
     /**
-     * Returns a specific row from the (joined) Databases/Tables/Columns tables.
-     * @param type $id
-     * @throws Exception
-     * @return type 
+     * Fetches all table entries.
+     * @return array $rows
      */
-    public function fetchRow($id, $fullData = true) {
-        // get the names of the involved tables
-        $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
-        $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect();
-        $select->setIntegrityCheck(false);
-        $select->where("`$t`.`id` = ?", $id);
+    public function fetchRows() {
+        $select = $this->select();
+        $select->from('Data_Tables');
         $select->order('order ASC');
         $select->order('name ASC');
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name'));
 
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current();
-
-        if ($row) {
-            // get the columns for this table
-            $data = $row->toArray();
-            
-            $data['columns'] = array();
-            if ($fullData === true) {
-                // get the details table
-                $table = $this->getTable('Data_Model_DbTable_Columns');
-
-                // get the sql select object
-                $select = $table->select();
-                $select->where('table_id = ?', $data['id']);
-                $cols = $table->fetchAll($select)->toArray();
-
-                // convert rows to flat array
-                for ($j = 0; $j < count($cols); $j++) {
-                    $data['columns'][] = $cols[$j];
-                }
-            }
-
-            return $data;
-        } else {
-            return array();
-        }
+        return $this->getAdapter()->fetchAll($select);
     }
 
     /**
-     * Deletes a specific row from the (joined) Databases/Tables/Columns tables.
-     * @param type $id
+     * Fetches the id of one table entry specified database and the table name.
+     * @param string $db name of the database
+     * @param string $table name of the table
+     * @return int $id
+     */
+    public function fetchId($db, $table) {
+        $select = $this->select();
+        $select->from('Data_Tables');
+        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`');
+        $select->where("`Data_Databases`.`name` = ?", trim($db));
+        $select->where("`Data_Tables`.`name` = ?", trim($table));
+
+        // query database
+        $row = $this->getAdapter()->fetchRow($select);
+        if (empty($row)) {
+            throw new Exception('id not found in ' . get_class($this) . '::fetchId()');
+        }
+
+        return (int) $row['id'];
+    }
+
+    /**
+     * Fetches one table entry specified by its id.
+     * @param int $id id of the row
+     * @param bool $columns fetch colums information
+     * @throws Exception
+     * @return array $row
+     */
+    public function fetchRow($id, $columns = false) {
+        $select = $this->select();
+        $select->from('Data_Tables');
+        $select->where("`id` = ?", $id);
+        $select->order('order ASC');
+        $select->order('name ASC');
+
+        // get the rowset and check if its one and only one
+        $rows = $this->getAdapter()->fetchAll($select);
+        if (empty($rows)) {
+            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
+        } else if (count($rows) > 1) {
+            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
+        } else {
+            $row = $rows[0];
+        }
+
+        if ($columns === true) {
+            $select = $this->select();
+            $select->from('Data_Columns');
+            $select->where('table_id = ?', $row['id']);
+            $select->order('order ASC');
+            $select->order('name ASC');
+
+            $row['columns'] = $this->getAdapter()->fetchAll($select);
+        }
+            
+        return $row;
+    }
+
+    /**
+     * Deletes a table entry and all its columns.
+     * @param int $id id of the row
      * @throws Exception
      * @return type 
      */
-    public function deleteTable($id) {
-        // get the entry
-        $entry = $this->fetchRow($id);
-        if (empty($entry)) {
-            throw new Exception('$id ' . $id . ' not found.');
+    public function deleteRow($id) {
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::deleteRow()');
         }
 
-        // delete columns of this table
-        $resource = new Data_Model_Resource_Columns();
-        if(!empty($entry['columns'])) {
-            foreach ($entry['columns'] as $col) {
-                $resource->deleteRow($col['id']);
-            }
+        // get the row
+        $row = $this->fetchRow($id, true);
+
+        // delete tables and columns of this database
+        foreach ($table['columns'] as $column) {
+            $this->getAdapter()->delete('Data_Columns', array('`id` = ?' => $column['id']));
         }
-
-        // delete table row
-        $this->deleteRow($id);
-
-        return false;
+        $this->getAdapter()->delete('Data_Tables', array('`id` = ?' => $id));
     }
 
     /**
      * Checks whether the user can access this table
-     * @param int $id
+     * @param int $id id of the row
      * @param int $role
      * @param string $command SQL command
      * @return array

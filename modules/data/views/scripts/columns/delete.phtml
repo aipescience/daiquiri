@@ -21,17 +21,17 @@
 ?>
 
 <div class="main">
+    <h2>Delete column entry</h2>
     <?php if ($this->status === 'ok'): ?>
         <p>Column entry deleted.</p>
         <?php
         echo $this->internalLink(array(
             'text' => 'Back',
-            'href' => '/data/',
+            'href' => $this->redirect,
             'prepend' => '<p>',
             'append' => '</p>'));
         ?>
     <?php else: ?>
-        <h2>Delete column entry</h2>
         <?php echo $this->form; ?>
     <?php endif; ?>
 </div>

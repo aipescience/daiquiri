@@ -20,39 +20,36 @@
  *  limitations under the License.
  */
 
-class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
+class Data_Model_Databases extends Daiquiri_Model_Table {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource object.
      */
     public function __construct() {
         $this->setResource('Data_Model_Resource_Databases');
-        $this->setValueField('name');
     }
 
     /**
-     * Returns a lis of all database entries.
-     * @return array
+     * Returns all database entries.
+     * @return array $response
      */
-    public function index($fullData = false) {
+    public function index() {
         $databases = array();
-
         foreach($this->getResource()->fetchRows() as $row) {
-            $id = $row['id'];
-            $response = $this->show($id, false, $fullData);
-            if ($response['status'] == 'ok') {
-                $database = $response['data'];
+            $database = $this->getResource()->fetchRow($row['id'], true, true);
 
-                $database['publication_role'] = Daiquiri_Auth::getInstance()->getRole($database['publication_role_id']);
-
-                foreach ($database['tables'] as &$table) {
-                    $table['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
-                }
-
-                $databases[] = $database;
+            $database['publication_role'] = Daiquiri_Auth::getInstance()->getRole($database['publication_role_id']);
+            foreach ($database['tables'] as &$table) {
+                $table['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
             }
+
+            $databases[] = $database;
         }
-        return $databases;
+
+        return array(
+            'databases' => $databases,
+            'status' => 'ok'
+        );
     }
 
     /**
@@ -136,7 +133,13 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
 
                 return array('status' => 'ok');
             } else {
-                return array('status' => 'error', 'errors' => $form->getMessages());
+                $csrf = $form->getElement('csrf');
+                if (empty($csrf)) {
+                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
+                } else {
+                    $csrf->initCsrfToken();
+                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                }
             }
         }
 
@@ -145,39 +148,39 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
 
     /**
      * Returns a database entry.
-     * @param int $id
-     * @param string $db, the name of the database only used if $id === false
-     * @param bool $fullData if tables and columns should be retrieved as well
-     * @return array
+     * @param mixed $input int id or array with "db" key
+     * @return array $response
      */
-    public function show($id, $db = false, $fullData = false) {
-        if ($id === false) {
-            if ($db === false) {
-                throw new Exception('Either $id or $db must be provided.');
+    public function show($input, $fullData = false) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['db'])) {
+                throw new Exception('Either int id or array with "db" key must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($db);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
+            $id = $this->getResource()->fetchId($input['db']);
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
-        // get database from database
-        $database = $this->getResource()->fetchRow($id, $fullData);
-
-        return array('status' => 'ok', 'data' => $database);
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
-    public function update($id, $db, array $formParams = array()) {
-        if ($id === false) {
-            if ($db === false) {
-                throw new Exception('Either $id or $db must be provided.');
+    /**
+     * Updates a database entry.
+     * @param mixed $input int id or array with "db" key
+     * @return array $response
+     */
+    public function update($input, array $formParams = array()) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['db'])) {
+                throw new Exception('Either int id or array with "db" key must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($db);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
+            $id = $this->getResource()->fetchId($input['db']);
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
         // get the entry
@@ -225,46 +228,23 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function delete($id, $db, array $formParams = array()) {
-        if ($id === false) {
-            if ($db === false) {
-                throw new Exception('Either $id or $db must be provided.');
-            }
-            $id = $this->getResource()->fetchId($db);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
-        }
-
-        // create the form object
-        $form = new Data_Form_Delete(array(
-            'submit' => 'Delete database entry'
-        ));
-
-        // valiadate the form if POST
-        if (!empty($formParams)){
-            if ($form->isValid($formParams)) {
-                $this->getResource()->deleteDatabase($id);
-                return array('status' => 'ok');
-            } else {
-                $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-            } 
-        }
-
-        return array('form' => $form, 'status' => 'form');
-    }
-
     /**
-     * Checks whether the user can access this database
-     * @param int $id
-     * @param string $command SQL command
-     * @return array
+     * Deletes a database entry.
+     * @param mixed $input int id or array with "db" key
+     * @return array $response
      */
-    public function checkACL($id, $command) {
-        return $this->getResource()->checkACL($id, $command);
-    }
+    public function delete($input, array $formParams = array()) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['db'])) {
+                throw new Exception('Either int id or array with "db" key must be provided as $input');
+            }
+            $id = $this->getResource()->fetchId($input['db']);
+        } else {
+            throw new Exception('$input has wrong type.');
+        }
 
+        return $this->getModelHelper('CRUD')->delete($id, $formParams);
+    }
 }

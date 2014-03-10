@@ -20,14 +20,13 @@
  *  limitations under the License.
  */
 
-class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
+class Data_Model_Tables extends Daiquiri_Model_Table {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource object.
      */
     public function __construct() {
         $this->setResource('Data_Model_Resource_Tables');
-        $this->setValueField('name');
     }
 
     /**
@@ -48,7 +47,7 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
     /**
      * Creates table entry.
      * @param array $formParams
-     * @return array
+     * @return array $reponse
      */
     public function create($databaseId = null, array $formParams = array()) {
         // get databases model
@@ -90,8 +89,12 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
                 return array('status' => 'ok');
             } else {
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (empty($csrf)) {
+                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
+                } else {
+                    $csrf->initCsrfToken();
+                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                }
             }
         }
 
@@ -100,46 +103,41 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
 
     /**
      * Returns a table entry.
-     * @param int $id
-     * @param str $tablename if set, $id is assumed to be the table name
-     * @param bool $fullData if tables and columns should be retrieved as well...
-     * @return array
+     * @param mixed $input int id or array with "db" and "table" keys
+     * @return array $response
      */
-    public function show($id, $db = false, $table = false, $fullData = false) {
-        // process input
-        if ($id === false) {
-            if ($db === false || $table === false) {
-                throw new Exception('Either $id or $db and $table must be provided.');
+    public function show($input, $fullData = false) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['db']) || empty($input['table'])) {
+                throw new Exception('Either int id or array with "db" and "table" keys must be provided as $input');
             }
-
-            $id = $this->getResource()->fetchId($db, $table);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
+            $id = $this->getResource()->fetchId($input['db'],$input['table']);
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
         $data = $this->getResource()->fetchRow($id, $fullData);
 
-        if (empty($data)) {
-            return array('status' => 'error');
-        } else {
-            return array('status' => 'ok', 'data' => $data);
-        }
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
-    public function update($id, $db = false, $table = false, array $formParams = array()) {
-        // process input
-        if ($id === false) {
-            if ($db === false || $table === false) {
+    /**
+     * Updates a table entry.
+     * @param mixed $input int id or array with "db" and "table" keys
+     * @return array $response
+     */
+    public function update($input, array $formParams = array()) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['db']) || empty($input['table'])) {
                 throw new Exception('Either $id or $db and $table must be provided.');
             }
-
-            $id = $this->getResource()->fetchId($db, $table);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
+            $id = $this->getResource()->fetchId($input['db'],$input['table']);
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
         // get the entry
@@ -184,41 +182,29 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function delete($id, $db = false, $table = false, array $formParams = array()) {
-        // process input
-        if ($id === false) {
-            if ($db === false || $table === false) {
-                throw new Exception('Either $id or $db and $table must be provided.');
+    /**
+     * Deletes a table entry.
+     * @param mixed $input int id or array with "db" and "table" keys
+     * @return array $response
+     */
+    public function delete($input, array $formParams = array()) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['db']) || empty($input['table'])) {
+                throw new Exception('Either int id or array with "db" and "table" keys must be provided as $input');
             }
-
-            $id = $this->getResource()->fetchId($db, $table);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
+            $id = $this->getResource()->fetchId($input['db'],$input['table']);
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
-        // create the form object
-        $form = new Data_Form_Delete(array(
-                    'submit' => 'Delete table entry'
-                ));
-
-        // valiadate the form if POST
-        if (!empty($formParams)) {
-            if ($form->isValid($formParams)) {
-                $this->getResource()->deleteTable($id);
-
-                return array('status' => 'ok');
-            } else {
-                $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-            }
-        }
-
-        return array('form' => $form, 'status' => 'form');
+        return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 
+    /**
+     *
+     */
     public function store(array $values = array(), array $tableDescription = array()) {
         // get autofill flag
         $autofill = null;

@@ -20,72 +20,73 @@
  *  limitations under the License.
  */
 
-/**
- * Resource class ...
- */
-class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
+class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets tablename.
      */
     public function __construct() {
-        $this->setTable('Data_Model_DbTable_Functions');
+        $this->setTablename('Data_Functions');
     }
 
     /**
-     * Returns all functions that user has access permission
-     * @param type $id
-     * @throws Exception
-     * @return type 
+     * Fetches all function entries.
+     * @return array $rows
      */
-    public function fetchRows($sqloptions = array()) {
-        // roles starting at 1, therefore check for <=
-        $select = $this->getTable()->select();
-        $rows = $this->getTable()->fetchAll($select);
-
-        return $rows;
+    public function fetchRows() {
+        $select = $this->select();
+        $select->from('Data_Functions');
+        $select->order('order ASC');
+        $select->order('name ASC');
+        return $this->getAdapter()->fetchAll($select);
     }
 
+    /**
+     * Fetches the id of one function entry specified function name.
+     * @param string $function name of function
+     * @return int $id
+     */
     public function fetchId($function) {
-        // get the primary sql select object
-        $select = $this->getTable()->select();
+        $select = $this->select();
+        $select->from('Data_Functions');
         $select->where("`name` = ?", trim($function));
 
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current();
-
-        if ($row) {
-            return $row->id;
-        } else {
-            return false;
+        $row = $this->getAdapter()->fetchRow($select);
+        if (empty($row)) {
+            throw new Exception('id not found in ' . get_class($this) . '::fetchId()');
         }
+
+        return (int) $row['id'];
     }
 
     /**
-     * Returns a specific row from the (joined) Databases/Tables/Columns tables.
-     * @param type $id
+     * Fetches one function entry specified by its id.
+     * @param int $id id of the row
+     * @param bool $columns fetch colums information
      * @throws Exception
-     * @return type 
+     * @return array $row
      */
-    public function fetchRow($id) {
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect();
+    public function fetchRow($id, $columns = false) {
+        $select = $this->select();
+        $select->from('Data_Functions');
         $select->where("`id` = ?", $id);
         $select->order('order ASC');
         $select->order('name ASC');
 
-        $row = $this->getTable()->fetchAll($select)->current();
-
-        if ($row) {
-            return $row->toArray();
+        // get the rowset and check if its one and only one
+        $rows = $this->getAdapter()->fetchAll($select);
+        if (empty($rows)) {
+            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
+        } else if (count($rows) > 1) {
+            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
         } else {
-            return array();
+            return $rows[0];
         }
     }
 
     /**
      * Checks whether the user can access this function
-     * @param int $id
+     * @param int $id id of the row
      * @param int $role
      * @param string $command SQL command
      * @return array

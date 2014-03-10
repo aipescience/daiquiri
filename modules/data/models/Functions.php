@@ -20,33 +20,33 @@
  *  limitations under the License.
  */
 
-class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
+class Data_Model_Functions extends Daiquiri_Model_Table {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource object.
      */
     public function __construct() {
         $this->setResource('Data_Model_Resource_Functions');
-        $this->setValueField('name');
     }
 
     /**
-     * Returns a lis of all database entries.
-     * @return array
+     * Returns all function entries.
+     * @return array $response
      */
     public function index() {
         $functions = array();
-        foreach(array_keys($this->getValues()) as $id) {
-            $response = $this->show($id);
-            if ($response['status'] == 'ok') {
-                $function = $response['data'];
 
-                $function['publication_role'] = Daiquiri_Auth::getInstance()->getRole($function['publication_role_id']);
+        foreach($this->getResource()->fetchRows() as $row) {
+            $function = $this->getResource()->fetchRow($row['id']);
+            $function['publication_role'] = Daiquiri_Auth::getInstance()->getRole($function['publication_role_id']);
 
-                $functions[] = $function;
-            }
+            $functions[] = $function;
         }
-        return $functions;
+
+        return array(
+            'functions' => $functions,
+            'status' => 'ok'
+        );
     }
 
     /**
@@ -103,44 +103,42 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
 
     /**
      * Returns a function entry.
-     * @param int $id
+     * @param mixed $input int id or array with "function" key
      * @return array
      */
-    public function show($id, $function = false) {
-        // process input
-        if ($id === false) {
-            if ($function === false) {
-                throw new Exception('Either $id or $db must be provided.');
+    public function show($input) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['function'])) {
+                throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($function);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
+            $id = $this->getResource()->fetchId($input['function']);
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
         $data = $this->getResource()->fetchRow($id);
         
-
-
-        if (empty($data)) {
-            return array('status' => 'error');
-        } else {
-            return array('status' => 'ok', 'data' => $data);
-        }
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
-    public function update($id, $function = false, array $formParams = array()) {
-        // process input
-        if ($id === false) {
-            if ($function === false) {
-                throw new Exception('Either $id or $db must be provided.');
+    /**
+     * Updates a function entry.
+     * @param mixed $input int id or array with "db","table" and "column" keys
+     * @param array $formParams
+     * @return array $response
+     */
+    public function update($input, array $formParams = array()) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['function'])) {
+                throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($function);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
+            $id = $this->getResource()->fetchId($input['function']);
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
         // get the entry
@@ -186,42 +184,25 @@ class Data_Model_Functions extends Daiquiri_Model_SimpleTable {
         return array('form' => $form, 'status' => 'form');
     }
 
-    public function delete($id, $function = false, array $formParams = array()) {
-        // process input
-        if ($id === false) {
-            if ($function === false) {
-                throw new Exception('Either $id or $db must be provided.');
+    /**
+     * Deletes a function entry.
+     * @param mixed $input int id or array with "db","table" and "column" keys
+     * @param array $formParams
+     * @return array $response
+     */
+    public function delete($input, array $formParams = array()) {
+        if (is_int($input)) {
+            $id = $input;
+        } elseif (is_array($input)) {
+            if (empty($input['function'])) {
+                throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($function);
-
-            if (empty($id)) {
-                return array('status' => 'error');
-            }
+            $id = $this->getResource()->fetchId($input['function']);
+        } else {
+            throw new Exception('$input has wrong type.');
         }
 
-        // create the form object
-        $form = new Data_Form_Delete(array(
-                    'submit' => 'Delete function entry'
-                ));
-
-        // valiadate the form if POST
-        if (!empty($formParams)) {
-            if ($form->isValid($formParams)) {
-                // delete table row
-                $this->getResource()->deleteRow($id);
-                return array('status' => 'ok');
-            } else {
-                $csrf = $form->getElement('csrf');
-                if (empty($csrf)) {
-                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
-                } else {
-                    $csrf->initCsrfToken();
-                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-                }
-            }
-        }
-
-        return array('form' => $form, 'status' => 'form');
+        return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 
     /**

@@ -118,7 +118,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      * Fetches one row specified by its primary key from the previously set database table.
      * @param mixed $input primary key of the row OR array of sqloptions
      * @throws Exception
-     * @return Zend_Db_Table_Row_Abstract
+     * @return array $row
      */
     public function fetchRow($input) {
         if (empty($input)) {
@@ -138,18 +138,17 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         // get the rows an chach that its one and only one
         $rows = $this->getAdapter()->fetchAll($select);
         if (empty($rows)) {
-            return array();
+            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
         } else if (count($rows) > 1) {
             throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
         } else {
             // return the first and only row
             return $rows[0];
         }
-
     }
 
     /**
-     * Fetches the of one row specified by SQL keywords from the previously set database table.
+     * Fetches the id of one row specified by SQL keywords from the previously set database table.
      * @param array $sqloptions array of sqloptions (start,limit,order,where,from)
      * @return int
      */
@@ -160,11 +159,13 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         
         // query database
         $row = $this->getAdapter()->fetchRow($select);
-        if (empty($row)) {
-            throw new Exception('id not found in ' . get_class($this) . '::fetchId()');
+        if (empty($rows)) {
+            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
+        } else if (count($rows) > 1) {
+            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
+        } else {
+            return (int) $row[$this->fetchPrimary()];
         }
-
-        return (int) $row[$this->fetchPrimary()];
     }
 
     /**

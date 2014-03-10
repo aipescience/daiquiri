@@ -22,157 +22,49 @@
 
 class Data_DatabasesController extends Daiquiri_Controller_Abstract {
 
+    protected $_model;
+
     public function init() {
         $this->_model = Daiquiri_Proxy::factory('Data_Model_Databases');
     }
 
     public function indexAction() {
-        $this->view->databases = $this->_model->index(true);
-        $this->view->status = 'ok';
+        $response = $this->_model->index(true);
+        $this->setViewElements($response);
     }
 
     public function createAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // try to prolongue PHP execution limits
-                set_time_limit(600);
-
-                // validate form and create new database
-                $response = $this->_model->create($this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->create();
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/databases/create';
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        set_time_limit(600);
+        $this->getControllerHelper('form')->create();
     }
 
     public function showAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $db = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->show($id);
         } else {
-            $id = false;
             $db = $this->_getParam('db');
-        }
-
-        $full = (boolean)(int) $this->_getParam('full');
-
-        $response = $this->_model->show($id, $db, $full);
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+            $this->getControllerHelper('form')->show(array('db' => $db));
         }
     }
     
     public function updateAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $db = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->update($id);
         } else {
-            $id = false;
             $db = $this->_getParam('db');
-        }
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->update($id, $db, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->update($id, $db);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/databases/update';
-            if ($id !== false) {
-                $action .= '?id=' . $id;
-            } else {
-                $action .= '?db=' . $db;
-            }
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+            $this->getControllerHelper('form')->update(array('db' => $db));
         }
     }
 
     public function deleteAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $db = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->delete($id);
         } else {
-            $id = false;
             $db = $this->_getParam('db');
-        }
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->delete($id, $db, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->delete($id, $db);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/databases/delete';
-            if ($id !== false) {
-                $action .= '?id=' . $id;
-            } else {
-                $action .= '?db=' . $db;
-            }
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+            $this->getControllerHelper('form')->delete(array('db' => $db));
         }
     }
 

@@ -20,78 +20,75 @@
  *  limitations under the License.
  */
 
-/**
- * Resource class ...
- */
-class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
+class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets tablename.
      */
     public function __construct() {
-        $this->addTables(array(
-            'Data_Model_DbTable_Columns',
-            'Data_Model_DbTable_Tables',
-            'Data_Model_DbTable_Databases'
-        ));
-    }
-
-    public function fetchId($db, $table, $column) {
-        // get the names of the involved tables
-        $c = $this->getTable('Data_Model_DbTable_Columns')->getName();
-        $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
-        $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
-
-        // get the primary sql select object
-        $select = $this->getTable()->select();
-        $select = $select->from($this->getTable(),'id');
-        $select->setIntegrityCheck(false);
-        $select->where("`$c`.`name` = ?", trim($column));
-        $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name'));
-        $select->where("`$t`.`name` = ?", trim($table));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name','database_id' => 'id'));
-        $select->where("`$d`.`name` = ?", trim($db));
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current();
-
-        if ($row) {
-            return $row->id;
-        } else {
-            return false;
-        }
+        $this->setTablename('Data_Columns');
     }
 
     /**
-     * Returns a specific row from the (joined) Databases/Tables/Columns tables.
-     * @param type $id
-     * @throws Exception
-     * @return type 
+     * Fetches all column entries.
+     * @return array $rows
      */
-    public function fetchRow($id) {
-        // get the names of the involved tables
-        $c = $this->getTable('Data_Model_DbTable_Columns')->getName();
-        $t = $this->getTable('Data_Model_DbTable_Tables')->getName();
-        $d = $this->getTable('Data_Model_DbTable_Databases')->getName();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect();
-        $select->where("`$c`.`id` = ?", $id);
+    public function fetchRows() {
+        $select = $this->select();
+        $select->from('Data_Columns');
         $select->order('order ASC');
         $select->order('name ASC');
 
-        // add inner joins for the category, the status and the user
-        $select->setIntegrityCheck(false);
-        $select->join($t, "`$c`.`table_id` = `$t`.`id`", array('table' => 'name'));
-        $select->join($d, "`$t`.`database_id` = `$d`.`id`", array('database' => 'name','database_id' => 'id'));
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current();
-        if ($row) {
-            return $row->toArray();
-        } else {
-            return array();
+        return $this->getAdapter()->fetchAll($select);
+    }
+
+    /**
+     * Fetches the id of one table entry specified database, the table and the column name.
+     * @param string $db name of the database
+     * @param string $table name of the table
+     * @param string $table name of the column
+     * @return int $id
+     */
+    public function fetchId($db, $table, $column) {
+        $select = $this->select();
+        $select->from('Data_Columns');
+        $select->join('Data_Tables','`Data_Tables`.`id` = `Data_Columns`.`table_id`');
+        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`');
+        $select->where("`Data_Databases`.`name` = ?", trim($db));
+        $select->where("`Data_Tables`.`name` = ?", trim($table));
+        $select->where("`Data_Columns`.`name` = ?", trim($column));
+
+        // query database
+        $row = $this->getAdapter()->fetchRow($select);
+        if (empty($row)) {
+            throw new Exception('id not found in ' . get_class($this) . '::fetchId()');
         }
 
-        return $data;
+        return (int) $row['id'];
+    }
+
+    /**
+     * Fetches one column entry specified by its id.
+     * @param int $id id of the row
+     * @param bool $columns fetch colums information
+     * @throws Exception
+     * @return array $row
+     */
+    public function fetchRow($id, $columns = false) {
+        $select = $this->select();
+        $select->from('Data_Columns');
+        $select->where("`id` = ?", $id);
+        $select->order('order ASC');
+        $select->order('name ASC');
+
+        // get the rowset and check if its one and only one
+        $rows = $this->getAdapter()->fetchAll($select);
+        if (empty($rows)) {
+            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
+        } else if (count($rows) > 1) {
+            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
+        } else {
+            return $rows[0];
+        }
     }
 }

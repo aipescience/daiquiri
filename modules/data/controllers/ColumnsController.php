@@ -22,6 +22,8 @@
 
 class Data_ColumnsController extends Daiquiri_Controller_Abstract {
 
+    protected $_model;
+    
     public function init() {
         $this->_model = Daiquiri_Proxy::factory('Data_Model_Columns');
     }
@@ -31,155 +33,43 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
     }
 
     public function createAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         $tableId = $this->_getParam('tableId');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->create($tableId, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->create($tableId);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/columns/create';
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->getControllerHelper('form')->create($tableId);
     }
 
     public function showAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $db = false;
-            $table = false;
-            $column = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->show($id);
         } else {
-            $id = false;
             $db = $this->_getParam('db');
             $table = $this->_getParam('table');
-            $column = $this->_getParam('column');;
-        }
-        
-        $response = $this->_model->show($id, $db, $table, $column);
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+            $column = $this->_getParam('column');
+            $this->getControllerHelper('form')->show(array('db' => $db, 'table' => $table, 'column' => $column));
         }
     }
 
     public function updateAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $db = false;
-            $table = false;
-            $column = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->update($id);
         } else {
-            $id = false;
             $db = $this->_getParam('db');
             $table = $this->_getParam('table');
-            $column = $this->_getParam('column');;
-        }
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->update($id, $db, $table, $column, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->update($id, $db, $table, $column);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/columns/update';
-            if ($id !== false) {
-                $action .= '?id=' . $id;
-            } else {
-                $action .= '?db=' . $db . '&table=' . $table . '&column=' . $column;
-            }
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+            $column = $this->_getParam('column');
+            $this->getControllerHelper('form')->update(array('db' => $db, 'table' => $table, 'column' => $column));
         }
     }
 
     public function deleteAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $db = false;
-            $table = false;
-            $column = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->delete($id);
         } else {
-            $id = false;
             $db = $this->_getParam('db');
             $table = $this->_getParam('table');
-            $column = $this->_getParam('column');;
-        }
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->delete($id, $db, $table, $column, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->delete($id, $db, $table, $column);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/columns/delete';
-            if ($id !== false) {
-                $action .= '?id=' . $id;
-            } else {
-                $action .= '?db=' . $db . '&table=' . $table . '&column=' . $column;
-            }
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+            $column = $this->_getParam('column');
+            $this->getControllerHelper('form')->delete(array('db' => $db, 'table' => $table, 'column' => $column));
         }
     }
 
