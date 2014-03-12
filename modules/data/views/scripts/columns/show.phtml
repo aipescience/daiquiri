@@ -68,12 +68,12 @@
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Create new table entry',
-                        'href' => '/data/tables/create?databaseId=' . $this->escape($this->data['databaseId']) . '&redirect=' . $redirect,
+                        'href' => '/data/tables/create?databaseId=' . $this->escape($this->data['database_id']) . '&redirect=' . $redirect,
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Create new column entry',
-                        'href' => '/data/columns/create?tableId=' . $this->escape($this->data['tableId']) . '&redirect=' . $redirect,
+                        'href' => '/data/columns/create?tableId=' . $this->escape($this->data['table_id']) . '&redirect=' . $redirect,
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(

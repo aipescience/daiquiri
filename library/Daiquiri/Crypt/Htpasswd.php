@@ -1,4 +1,5 @@
 <?php
+
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -18,27 +19,36 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-?>
 
-<div class="main">
-    <?php echo $this->form; ?>
+/**
+ * @class   Daiquiri_Crypt_Crypt Crypt.php
+ * @brief   Encryption class for unix crypt encryption
+ * 
+ * Encryption class for unix crypt encryption.
+ * 
+ */
+class Daiquiri_Crypt_Htpasswd extends Daiquiri_Crypt_Abstract {
 
-    <p class="align-form-horizontal">
-        <?php
-        echo $this->internalLink(array(
-            'text' => 'Help, I forgot my password!',
-            'href' => '/auth/password/forgot',
-            'resource' => 'Auth_Model_Password',
-            'permission' => 'forgot'));
-        ?>
-    </p>
-    <p class="align-form-horizontal">
-        <?php
-        echo $this->internalLink(array(
-            'text' => 'Register as a new user.',
-            'href' => '/auth/registration',
-            'resource' => 'Auth_Model_Registration',
-            'permission' => 'register'));
-        ?>
-    </p>
-</div>
+    /**
+     * @brief   implementation of htpasswd encryption
+     * @param   string $string: string to encrypt
+     * @return  string: the encrypted string 
+     * 
+     * Implementation of htpasswd encryption.
+     * 
+     */
+    public function encrypt($string) {
+        return crypt($string, base64_encode($string));
+    }
+
+    /**
+     * @brief   htpasswd encryption in SQL
+     * @return  string: SQL statement for encryption on the database
+     *  
+     * Returns SQL statement with equivalent to htpasswd.
+     */
+    public function getTreatment() {
+        return 'ENCRYPT(?,TO_BASE64(?))';
+    }
+
+}

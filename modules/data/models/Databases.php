@@ -36,7 +36,9 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
      */
     public function index($fullData = false) {
         $databases = array();
-        foreach(array_keys($this->getValues()) as $id) {
+
+        foreach($this->getResource()->fetchRows() as $row) {
+            $id = $row['id'];
             $response = $this->show($id, false, $fullData);
             if ($response['status'] == 'ok') {
                 $database = $response['data'];
@@ -92,6 +94,11 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
                 // check if entry is already there
                 if ($this->getResource()->fetchId($values['name']) !== false) {
                     throw new Exception("Database entry already exists.");
+                }
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
                 }
 
                 // store the values in the database
@@ -179,8 +186,6 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
             throw new Exception('$id ' . $id . ' not found.');
         }
 
-
-
         // create the form object
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
         $adapter = Daiquiri_Config::getInstance()->getDbAdapter();
@@ -202,6 +207,11 @@ class Data_Model_Databases extends Daiquiri_Model_SimpleTable {
 
                 // resolve database adapter index
                 $values['adapter'] = $adapter[$values['adapter']];
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
+                }
 
                 $this->getResource()->updateRow($id, $values);
                 return array('status' => 'ok');

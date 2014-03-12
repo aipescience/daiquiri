@@ -37,7 +37,7 @@ class Daiquiri_Form_Validator_Text extends Zend_Validate_Abstract {
      * Default error message produced by this validator.
      */
     protected $_messageTemplates = array(
-        self::CHARS => "Special Character like < > { } or newlines are not allowed"
+        self::CHARS => "Special Character like < > or newlines are not allowed"
     );
 
     /**

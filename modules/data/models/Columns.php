@@ -63,13 +63,22 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                     throw new Exception("Column entry already exists.");
                 }
 
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
+                }
+
                 $this->store($values);
 
                 return array('status' => 'ok');
             } else {
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (empty($csrf)) {
+                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
+                } else {
+                    $csrf->initCsrfToken();
+                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                }
             }
         }
 
@@ -140,6 +149,11 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
                 unset($values['ucd_list']);
 
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
+                }
+
                 $this->getResource()->updateRow($id, $values);
 
                 if (Daiquiri_Config::getInstance()->data->writeToDB) {
@@ -149,8 +163,12 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 return array('status' => 'ok');
             } else {
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (empty($csrf)) {
+                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
+                } else {
+                    $csrf->initCsrfToken();
+                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                }
             }
         }
 
@@ -183,8 +201,12 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
                 return array('status' => 'ok');
             } else {
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (empty($csrf)) {
+                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
+                } else {
+                    $csrf->initCsrfToken();
+                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                }
             } 
         }
 
@@ -228,7 +250,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
     private function _writeColumnComment($db, $table, $column, $values, $oldComment = false) {
         //check sanity of input
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
         	if(is_string($value) && (strpos($value, "{") !== false || strpos($value, "}") !== false)) {
         		throw new Exception("Unsupported character {} in " . $key . ": " . $value);
         	}
@@ -236,7 +258,6 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
 
         // write metadata into comment field of the column (if supported)
         $descResource = new Data_Model_Resource_Description();
-        $databasesModel = new Data_Model_Databases();
 
         if ($oldComment === false) {
             $comment = $descResource->getColumnComment($db, $table, $column);
@@ -246,7 +267,7 @@ class Data_Model_Columns extends Daiquiri_Model_SimpleTable {
         }
 
         unset($values['table_id']);
-        unset($values['position']);
+        unset($values['order']);
 
         $json = Zend_Json::encode($values);
 

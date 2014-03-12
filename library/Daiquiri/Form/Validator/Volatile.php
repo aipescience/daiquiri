@@ -65,7 +65,7 @@ class Daiquiri_Form_Validator_Volatile extends Zend_Validate_Abstract {
 
         $isValid = true;
 
-        if (preg_match("/[^ \<\>\s\/\,\;\.\'\"\-\=\?\!\@\#\$\%\^\&\*\(\)\]\[\_\+\:\`\p{L}0-9]/u", $value)) {
+        if (preg_match("/[^ \<\>\s\/\,\;\.\'\"\-\=\?\!\@\#\$\%\^\&\*\(\)\]\[\}\{\_\+\:\`\p{L}0-9]/u", $value)) {
             $this->_error(self::CHARS);
             $isValid = false;
         }

@@ -120,15 +120,13 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Query_Model_Uws',
         );
 
-        // construct rules array ??
-        // $rules = array();
-        // if (isset($input['rules'])) {
-        //     if (is_array($input['rules'])) {
-        //         //$output['rules'] = $input['rules'];
-        //     } else {
-        //         $this->_error("Auth option 'rules' needs to be an array.");
-        //     }
-        // }
+        if (isset($input['resources'])) {
+            if (is_array($input['resources'])) {
+                $output['resources'] = array_merge($output['resources'], $input['resources']);
+            } else {
+                $this->_error("Auth option 'apps' needs to be an array.");
+            }
+        }
 
         // prepare rules array
         $rules = array();
@@ -195,7 +193,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             $rules['guest']['Data_Model_Viewer'] = array('rows','cols');
 
             // admin
-            $rules['admin']['Data_Model_Functions'] =array(
+            $rules['admin']['Data_Model_Functions'] = array(
                 'index','create','show','update','delete'
             );
             $rules['admin']['Data_Model_Databases'] = array(
@@ -236,7 +234,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
                     strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
 
-                    $rules['guest']['Query_Model_Form'] = array('plan','mail');
+                    $rules['guest']['Query_Model_Form'][] = 'plan';
+                    $rules['guest']['Query_Model_Form'][] = 'mail';
                 }
             } else {
                 // user
@@ -251,7 +250,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
                     strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
 
-                    $rules['user']['Query_Model_Form'] = array('plan','mail');
+                    $rules['user']['Query_Model_Form'][] = 'plan';
+                    $rules['user']['Query_Model_Form'][] = 'mail';
                 }
             }
 

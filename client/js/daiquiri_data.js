@@ -34,14 +34,20 @@ daiquiri.data.Data = function (baseUrl) {
     $('#database-browser','#data').daiquiri_browser({
         'url': baseUrl + "/data/databases",
         'columns': ['databases','tables','columns'],
-        'action': function(opt) {
+        'click': function(opt) {
+            daiquiri.data.item.show('database-browser',opt);
+        },
+        'dblclick': function(opt) {
             daiquiri.data.item.show('database-browser',opt);
         },
     });
     $('#function-browser','#data').daiquiri_browser({
         'url': baseUrl + "/data/functions",
         'columns': ['functions'],
-        'action': function(opt) {
+        'click': function(opt) {
+            daiquiri.data.item.show('function-browser',opt);
+        },
+        'dblclick': function(opt) {
             daiquiri.data.item.show('function-browser',opt);
         },
     });

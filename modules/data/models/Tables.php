@@ -53,7 +53,10 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
     public function create($databaseId = null, array $formParams = array()) {
         // get databases model
         $databasesModel = new Data_Model_Databases();
-        $databases = $databasesModel->index();
+        $databases = array();
+        foreach($databasesModel->index() as $row) {
+            $databases[$row['id']] = $row['name'];
+        };
 
         // get roles
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
@@ -71,10 +74,15 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
             if ($form->isValid($formParams)) {
                 $values = $form->getValues();
 
-                //check if entry is already there
+                // check if entry is already there
                 $database = $databases[$values['database_id']];
                 if ($this->getResource()->fetchId($database, $values['name']) !== false) {
                     throw new Exception("Table entry already exists.");
+                }
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
                 }
 
                 $this->store($values);
@@ -157,6 +165,11 @@ class Data_Model_Tables extends Daiquiri_Model_SimpleTable {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
+                }
 
                 $this->getResource()->updateRow($id, $values);
 
