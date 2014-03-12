@@ -71,13 +71,16 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
+                $response = array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+
                 $csrf = $form->getElement('csrf');
-                if (empty($csrf)) {
-                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
-                } else {
-                    $csrf->initCsrfToken();
-                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-                }
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 
@@ -157,13 +160,16 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
+                $response = array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+
                 $csrf = $form->getElement('csrf');
-                if (empty($csrf)) {
-                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
-                } else {
-                    $csrf->initCsrfToken();
-                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-                }
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 

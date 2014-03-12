@@ -58,7 +58,6 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
      * @return array
      */
     public function create(array $formParams = array()) {
-
         // create the form object
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
         $adapter = Daiquiri_Config::getInstance()->getDbAdapter();
@@ -133,13 +132,16 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
+                $response = array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+
                 $csrf = $form->getElement('csrf');
-                if (empty($csrf)) {
-                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
-                } else {
-                    $csrf->initCsrfToken();
-                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-                }
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 
@@ -219,9 +221,16 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
                 $this->getResource()->updateRow($id, $values);
                 return array('status' => 'ok');
             } else {
+                $response = array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 

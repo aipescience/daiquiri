@@ -39,7 +39,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
         $select->order('order ASC');
         $select->order('name ASC');
 
-        return $this->getAdapter()->fetchAll($select);
+        return $this->fetchAll($select);
     }
 
     /**
@@ -55,13 +55,12 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
         $select->where("`Data_Databases`.`name` = ?", trim($db));
         $select->where("`Data_Tables`.`name` = ?", trim($table));
 
-        // query database
-        $row = $this->getAdapter()->fetchRow($select);
+        $row = $this->fetchOne($select);
         if (empty($row)) {
-            throw new Exception('id not found in ' . get_class($this) . '::fetchId()');
+            return false;
+        } else {v
+            return (int) $row['id'];
         }
-
-        return (int) $row['id'];
     }
 
     /**
@@ -78,15 +77,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
         $select->order('order ASC');
         $select->order('name ASC');
 
-        // get the rowset and check if its one and only one
-        $rows = $this->getAdapter()->fetchAll($select);
-        if (empty($rows)) {
-            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
-        } else if (count($rows) > 1) {
-            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
-        } else {
-            $row = $rows[0];
-        }
+        $row = $this->fetchOne($select);
 
         if ($columns === true) {
             $select = $this->select();
@@ -112,7 +103,6 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
             throw new Exception('$id not provided in ' . get_class($this) . '::deleteRow()');
         }
 
-        // get the row
         $row = $this->fetchRow($id, true);
 
         // delete tables and columns of this database

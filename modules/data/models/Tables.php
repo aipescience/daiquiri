@@ -52,10 +52,11 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
     public function create($databaseId = null, array $formParams = array()) {
         // get databases model
         $databasesModel = new Data_Model_Databases();
-        $databases = array();
-        foreach($databasesModel->index() as $row) {
-            $databases[$row['id']] = $row['name'];
-        };
+        $databases = $databasesModel->getResource()->fetchValues('name');
+
+        
+        Zend_Debug::dump($databases);  die(0);
+
 
         // get roles
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
@@ -88,13 +89,16 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
+                $response = array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+
                 $csrf = $form->getElement('csrf');
-                if (empty($csrf)) {
-                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
-                } else {
-                    $csrf->initCsrfToken();
-                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-                }
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 
@@ -173,9 +177,16 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
+                $response = array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+
                 $csrf = $form->getElement('csrf');
-                $csrf->initCsrfToken();
-                return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 
@@ -243,15 +254,5 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
                 throw $e;
             }
         }        
-    }
-
-    /**
-     * Checks whether the user can access this table
-     * @param int $id
-     * @param string $command SQL command
-     * @return array
-     */
-    public function checkACL($id, $command) {
-        return $this->getResource()->checkACL($id, $command);
     }
 }

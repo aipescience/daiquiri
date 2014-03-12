@@ -39,11 +39,11 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
         $select->order('order ASC');
         $select->order('name ASC');
 
-        return $this->getAdapter()->fetchAll($select);
+        return $this->fetchAll($select);
     }
 
     /**
-     * Fetches the id of one table entry specified database, the table and the column name.
+     * Fetches the id of one column entry specified database, the table and the column name.
      * @param string $db name of the database
      * @param string $table name of the table
      * @param string $table name of the column
@@ -58,13 +58,12 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
         $select->where("`Data_Tables`.`name` = ?", trim($table));
         $select->where("`Data_Columns`.`name` = ?", trim($column));
 
-        // query database
-        $row = $this->getAdapter()->fetchRow($select);
+        $row = $this->fetchOne($select);
         if (empty($row)) {
-            throw new Exception('id not found in ' . get_class($this) . '::fetchId()');
+            return false;
+        } else {
+            return (int) $row['id'];
         }
-
-        return (int) $row['id'];
     }
 
     /**
@@ -81,14 +80,6 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
         $select->order('order ASC');
         $select->order('name ASC');
 
-        // get the rowset and check if its one and only one
-        $rows = $this->getAdapter()->fetchAll($select);
-        if (empty($rows)) {
-            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
-        } else if (count($rows) > 1) {
-            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
-        } else {
-            return $rows[0];
-        }
+        return $this->fetchOne($select);
     }
 }

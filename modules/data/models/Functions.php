@@ -88,13 +88,16 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
+                $response = array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+
                 $csrf = $form->getElement('csrf');
-                if (empty($csrf)) {
-                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
-                } else {
-                    $csrf->initCsrfToken();
-                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-                }
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 
@@ -171,13 +174,16 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
                 $this->getResource()->updateRow($id, $values);
                 return array('status' => 'ok');
             } else {
+                $response = array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
+                );
+
                 $csrf = $form->getElement('csrf');
-                if (empty($csrf)) {
-                    return array('status' => 'error', 'form' => $form, 'errors' => $form->getMessages());
-                } else {
-                    $csrf->initCsrfToken();
-                    return array('status' => 'error', 'errors' => $form->getMessages(), 'csrf' => $csrf->getHash());
-                }
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 
@@ -204,14 +210,4 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
 
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
-
-    /**
-     * Checks whether the user can access this function
-     * @param int $id
-     * @return array
-     */
-    public function checkACL($id) {
-        return $this->getResource()->checkACL($id);
-    }
-
 }

@@ -39,7 +39,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
         $select->order('order ASC');
         $select->order('name ASC');
 
-        return $this->getAdapter()->fetchAll($select);
+        return $this->fetchAll($select);
     }
 
     /**
@@ -52,12 +52,12 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
         $select->from('Data_Databases');
         $select->where("`name` = ?", trim($db));
 
-        $row = $this->getAdapter()->fetchRow($select);
+        $row = $this->fetchOne($select);
         if (empty($row)) {
-            throw new Exception('id not found in ' . get_class($this) . '::fetchId()');
+            return false;
+        } else {
+            return (int) $row['id'];
         }
-
-        return (int) $row['id'];
     }
 
     /**
@@ -76,15 +76,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
         $select->order('order ASC');
         $select->order('name ASC');
 
-        // get the rowset and check if its one and only one
-        $rows = $this->getAdapter()->fetchAll($select);
-        if (empty($rows)) {
-            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
-        } else if (count($rows) > 1) {
-            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
-        } else {
-            $row = $rows[0];
-        }
+        $row = $this->fetchOne($select);
 
         if ($tables === true) {
             $select = $this->select();
@@ -93,7 +85,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
             $select->order('order ASC');
             $select->order('name ASC');
 
-            $tables = $this->getAdapter()->fetchAll($select);
+            $tables = $this->fetchAll($select);
 
             foreach ($tables as &$table) {
                 if ($columns === true) {
@@ -103,7 +95,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
                     $select->order('order ASC');
                     $select->order('name ASC');
 
-                    $table['columns'] = $this->getAdapter()->fetchAll($select);
+                    $table['columns'] = $this->fetchAll($select);
                 }
             }
 
@@ -124,7 +116,6 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
             throw new Exception('$id not provided in ' . get_class($this) . '::deleteRow()');
         }
 
-        // get the row
         $row = $this->fetchRow($id, true, true);
 
         // delete tables and columns of this database

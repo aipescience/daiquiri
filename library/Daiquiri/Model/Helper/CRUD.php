@@ -61,11 +61,16 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
+                $response = array(
                     'form' => $form,
+                    'status' => 'error',
                     'errors' => $form->getMessages()
                 );
+
+                $csrf = $form->getElement('csrf');
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 
@@ -103,11 +108,16 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
+                $response = array(
                     'form' => $form,
-                    'errors' => $form->getMessages(),
+                    'status' => 'error',
+                    'errors' => $form->getMessages()
                 );
+
+                $csrf = $form->getElement('csrf');
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             }
         }
 
@@ -135,15 +145,20 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
 
         // valiadate the form if POST
         if (!empty($formParams)){
-
             if ($form->isValid($formParams)) {
                 $this->getResource()->deleteRow($id);
                 return array('status' => 'ok');
             } else {
-                return array(
+                $response = array(
+                    'form' => $form,
                     'status' => 'error',
-                    'errors' => $form->getMessages(),
+                    'errors' => $form->getMessages()
                 );
+
+                $csrf = $form->getElement('csrf');
+                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+                return $response;
             } 
         }
 

@@ -23,7 +23,7 @@
 class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
 
     /**
-     * The name of the database table used for the generic functions in this class. 
+     * Name of the database table used for the generic functions in this class. 
      * @var string
      */
     private $_tablename = null;
@@ -86,9 +86,36 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
+     * Fetches all rows from the databases adapter specified by the select object.
+     * @param Daiquiri_Db_Select $select daiquiri select object
+     * @return array $rows
+     */
+    public function fetchAll(Daiquiri_Db_Select $select = null) {
+        return $this->getAdapter()->fetchAll($select);
+    }
+
+    /**
+     * Fetches one (and only one) row from the database specfied by the select object. 
+     * Raises an Exception when more than one row is found. Returns an empty arrau when 
+     * no rows are found
+     * @param Daiquiri_Db_Select $select daiquiri select object
+     * @throws Exception
+     * @return array $row
+     */
+    public function fetchOne(Daiquiri_Db_Select $select = null) {
+        $rows = $this->getAdapter()->fetchAll($select);
+        if (empty($rows)) {
+            return array();
+        } else if (count($rows) > 1) {
+            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
+        } else {
+            return $rows[0];
+        }
+    }
+
+    /**
      * Fetches the columns of the previously set database table.
-     * @param string $db
-     * @return array
+     * @return array $cols
      */
     public function fetchCols() {
         $desc = $this->getAdapter()->describeTable($this->getTablename());
@@ -102,8 +129,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
 
     /**
      * Fetches the primary key of the previously set database table.
-     * @param string $format format of the output (plain or db)
-     * @return array
+     * @return string $colname
      */
     public function fetchPrimary() {
         $desc = $this->getAdapter()->describeTable($this->getTablename());
@@ -136,21 +162,13 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         }
 
         // get the rows an chach that its one and only one
-        $rows = $this->getAdapter()->fetchAll($select);
-        if (empty($rows)) {
-            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
-        } else if (count($rows) > 1) {
-            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
-        } else {
-            // return the first and only row
-            return $rows[0];
-        }
+        return $this->fetchOne($select);
     }
 
     /**
      * Fetches the id of one row specified by SQL keywords from the previously set database table.
      * @param array $sqloptions array of sqloptions (start,limit,order,where,from)
-     * @return int
+     * @return int $rowId
      */
     public function fetchId($sqloptions = array()) {
         // get select object
@@ -158,11 +176,9 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         $select->from($this->getTablename());
         
         // query database
-        $row = $this->getAdapter()->fetchRow($select);
+        $row = $this->getAdapter()->fetchOne($select);
         if (empty($rows)) {
-            throw new Exception('Row not found in ' . get_class($this) . '::fetchRow()');
-        } else if (count($rows) > 1) {
-            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
+            return false;
         } else {
             return (int) $row[$this->fetchPrimary()];
         }
@@ -171,23 +187,22 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     /**
      * Fetches a set of rows specified by SQL keywords from the previously set database table.
      * @param array $sqloptions array of sqloptions (start,limit,order,where,from)
-     * @return array
+     * @return array $rows
      */
     public function fetchRows($sqloptions = array()) {
         // get select object
         $select = $this->select($sqloptions);
         $select->from($this->getTablename());
 
-        // query database
-        $rows = $this->getAdapter()->fetchAll($select);
-
-        return $rows;
+        // query database and return
+        return $this->fetchAll($select);
     }
 
     /**
-     * Fetches primary key and one specified field as a flat array from the previously set database table.
+     * Fetches primary key and one specified field from the previously set database table 
+     * as a flat array.
      * @param string $field name of the field
-     * @return array
+     * @return array $rows
      */
     public function fetchValues($fieldname) {
         if (empty($fieldname)) {
@@ -203,7 +218,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
 
         // query database, construct array, and return
         $data = array();
-        foreach($this->getAdapter()->fetchAll($select) as $row) {
+        foreach($this->fetchAll($select) as $row) {
             $data[$row[$primary]] = $row[$fieldname];
         }
         return $data;
@@ -233,7 +248,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         }
 
         // query database
-        $row = $this->getAdapter()->fetchRow($select);
+        $row = $this->fetchOne($select);
         return (int) $row['count'];
     }
 
@@ -280,6 +295,14 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
         $this->getAdapter()->delete($this->getTablename(), array($identifier . '= ?' => $id));
     }
+
+    /**
+     * Quotes a variable number of strings as databases idetifiers.
+     * @param string $argument string to be quoted
+     * @param string $argument string to be quoted
+     * @param string $argument string to be quoted
+     * @return string $identifier
+     */
 
     public function quoteIdentifier() {
         // get the arguments
