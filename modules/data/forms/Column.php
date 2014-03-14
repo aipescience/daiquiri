@@ -23,9 +23,10 @@
 class Data_Form_Column extends Daiquiri_Form_Abstract {
 
     protected $_tables = array();
-    protected $_table_id = null;
+    protected $_table_id;
+    protected $_ucds = array();
     protected $_entry = array();
-    protected $_submit = null;
+    protected $_submit;
     protected $_csrfActive = true;
 
     public function setTables($tables) {
@@ -34,6 +35,10 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
 
     public function setTableId($table_id) {
         $this->_table_id = $table_id;
+    }
+
+    public function setUcds($ucds) {
+        $this->_ucds = $ucds;
     }
 
     public function setEntry($entry) {
@@ -63,7 +68,6 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'name', array(
             'label' => 'Column name',
-            'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -79,7 +83,6 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'type', array(
             'label' => 'Column type',
-            'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -88,7 +91,6 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'unit', array(
             'label' => 'Column unit',
-            'class' => 'input-xxlarge',
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -97,7 +99,6 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'ucd', array(
             'label' => 'Column UCD',
-            'class' => 'input-xxlarge',
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -105,18 +106,13 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
             )
         ));
 
-        //obtain UCD data and provide a usable form (but only if called from a non scriptable context)
+        // obtain UCD data and provide a usable form (but only if called from a non scriptable context)
         $ucdStrings = array();
-
         if($this->_csrfActive === true) {
-            $ucdResource = new Data_Model_Resource_UCD;
-            $ucdData = $ucdResource->getTable()->fetchAll()->toArray();
-
-            foreach ($ucdData as $ucd) {
+            foreach ($this->_ucds as $ucd) {
                 $ucdStrings[$ucd['word']] = $ucd['word'] . " | " . $ucd['type'] . " | " . $ucd['description'];
             }
         }
-
         $this->addElement('select', 'ucd_list', array(
             'label' => 'List of UCDs: ',
             'required' => false,
@@ -124,7 +120,6 @@ class Data_Form_Column extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'description', array(
             'label' => 'Column description',
-            'class' => 'input-xxlarge',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),

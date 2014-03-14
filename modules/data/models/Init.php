@@ -41,32 +41,31 @@ class Data_Model_Init extends Daiquiri_Model_Init {
             // get role model
             $authRoleModel = new Auth_Model_Roles();
 
-            // create database entries in the tables module
-            if (isset($options['data']['databases'])
-                    && is_array($options['data']['databases'])) {
-                $dataDatabasesModel = new Data_Model_Databases();
-                if (count($dataDatabasesModel->getValues()) == 0) {
-                    foreach ($options['data']['databases'] as $a) {
-                        echo '    Generating metadata for database: ' . $a['name'] . PHP_EOL;
+            // create column entries in the data module
+            if (isset($options['data']['columns']) &&
+                    is_array($options['data']['columns'])) {
+                $dataColumnsModel = new Data_Model_Columns();
+                if ($dataColumnsModel->getResource()->countRows() == 0) {
+                    foreach ($options['data']['columns'] as $a) {
 
                         $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
                         unset($a['publication_role']);
 
                         try {
-                            $r = $dataDatabasesModel->create($a);
+                            $r = $dataColumnsModel->create(null, $a);
                         } catch (Exception $e) {
-                            $this->_error("Error in creating database metadata:\n" . $e->getMessage());
+                            $this->_error("Error in creating columns metadata:\n" . $e->getMessage());
                         }
                         $this->_check($r, $a);
                     }
                 }
             }
 
-            // create table entries in the tables module
+            // create table entries in the data module
             if (isset($options['data']['tables']) &&
                     is_array($options['data']['tables'])) {
                 $dataTablesModel = new Data_Model_Tables();
-                if (count($dataTablesModel->getValues()) == 0) {
+                if ($dataTablesModel->getResource()->countRows() == 0) {
                     foreach ($options['data']['tables'] as $a) {
                         echo '    Generating metadata for table: ' . $a['name'] . PHP_EOL;
 
@@ -83,20 +82,21 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                 }
             }
 
-            // create column entries in the tables module
-            if (isset($options['data']['columns']) &&
-                    is_array($options['data']['columns'])) {
-                $dataColumnsModel = new Data_Model_Columns();
-                if (count($dataColumnsModel->getValues()) == 0) {
-                    foreach ($options['data']['columns'] as $a) {
+            // create database entries in the data module
+            if (isset($options['data']['databases'])
+                    && is_array($options['data']['databases'])) {
+                $dataDatabasesModel = new Data_Model_Databases();
+                if ($dataDatabasesModel->getResource()->countRows() == 0) {
+                    foreach ($options['data']['databases'] as $a) {
+                        echo '    Generating metadata for database: ' . $a['name'] . PHP_EOL;
 
                         $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
                         unset($a['publication_role']);
 
                         try {
-                            $r = $dataColumnsModel->create(null, $a);
+                            $r = $dataDatabasesModel->create($a);
                         } catch (Exception $e) {
-                            $this->_error("Error in creating columns metadata:\n" . $e->getMessage());
+                            $this->_error("Error in creating database metadata:\n" . $e->getMessage());
                         }
                         $this->_check($r, $a);
                     }
@@ -107,7 +107,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
             if (isset($options['data']['functions']) &&
                     is_array($options['data']['functions'])) {
                 $dataFunctionsModel = new Data_Model_Functions();
-                if (count($dataFunctionsModel->getValues()) == 0) {
+                if ($dataFunctionsModel->getResource()->countRows() == 0) {
                     foreach ($options['data']['functions'] as $a) {
 
                         $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);

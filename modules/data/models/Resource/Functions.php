@@ -45,9 +45,14 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
     /**
      * Fetches the id of one function entry specified function name.
      * @param string $function name of function
+     * @throws Exception
      * @return int $id
      */
     public function fetchId($function) {
+        if (empty($function)) {
+            throw new Exception('$function not provided in ' . get_class($this) . '::fetchId()');
+        }
+
         $select = $this->select();
         $select->from('Data_Functions');
         $select->where("`name` = ?", trim($function));
@@ -63,11 +68,14 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
     /**
      * Fetches one function entry specified by its id.
      * @param int $id id of the row
-     * @param bool $columns fetch colums information
      * @throws Exception
      * @return array $row
      */
-    public function fetchRow($id, $columns = false) {
+    public function fetchRow($id) {
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+        }
+
         $select = $this->select();
         $select->from('Data_Functions');
         $select->where("`id` = ?", $id);
@@ -82,9 +90,14 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
      * @param int $id id of the row
      * @param int $role
      * @param string $command SQL command
+     * @throws Exception
      * @return array
      */
     public function checkACL($id) {
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::checkACL()');
+        }
+
         $row = $this->fetchRow($id);
         return Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id']);
     }

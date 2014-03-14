@@ -23,10 +23,10 @@
 class Data_Form_Table extends Daiquiri_Form_Abstract {
 
     protected $_databases = array();
-    protected $_database_id = null;
+    protected $_database_id;
     protected $_roles = array();
     protected $_entry = array();
-    protected $_submit = null;
+    protected $_submit;
     protected $_csrfActive = true;
 
     public function setDatabases($databases) {

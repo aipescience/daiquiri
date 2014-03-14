@@ -49,16 +49,20 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
      * @return int $id
      */
     public function fetchId($db, $table) {
+        if (empty($db) || empty($table)) {
+            throw new Exception('$db or $table not provided in ' . get_class($this) . '::fetchId()');
+        }
+
         $select = $this->select();
         $select->from('Data_Tables');
-        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`');
+        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`', array());
         $select->where("`Data_Databases`.`name` = ?", trim($db));
         $select->where("`Data_Tables`.`name` = ?", trim($table));
 
         $row = $this->fetchOne($select);
         if (empty($row)) {
             return false;
-        } else {v
+        } else {
             return (int) $row['id'];
         }
     }
@@ -71,9 +75,16 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
      * @return array $row
      */
     public function fetchRow($id, $columns = false) {
+        if (empty($id)) {
+            throw new Exception('$id or $table not provided in ' . get_class($this) . '::fetchRow()');
+        }
+
         $select = $this->select();
         $select->from('Data_Tables');
-        $select->where("`id` = ?", $id);
+        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`', array(
+            'database' => 'name', 'database_id' => 'id'
+        ));
+        $select->where("`Data_Tables`.`id` = ?", $id);
         $select->order('order ASC');
         $select->order('name ASC');
 
@@ -88,8 +99,84 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
 
             $row['columns'] = $this->getAdapter()->fetchAll($select);
         }
-            
+
         return $row;
+    }
+
+    /**
+     * Fetches primary key and table entry (including database)
+     * as a flat array.
+     * @return array $rows
+     */
+    public function fetchValues() {
+        // get the name of the primary key
+        $primary = $this->fetchPrimary();
+
+        // get select object
+        $select = $this->select();
+        $select->from('Data_Tables', array('id', 'name'));
+        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`', array(
+            'database' => 'name'
+        ));
+
+        // query database, construct array, and return
+        $rows = array();
+        foreach($this->fetchAll($select) as $row) {
+            $rows[$row['id']] = $row['database'] . '.' . $row['name'];
+        }
+        return $rows;
+    }
+
+    /**
+     * Inserts one table entry and, optionally, fills the columns with information from 
+     * the database or a provided array.
+     * Returns the primary key of the new row.
+     * @param array $data row data
+     * @param bool $autofill automatically fill the columns
+     * @param array $tableDescription information for the table
+     * @throws Exception
+     * @return int $id
+     */
+    public function insertRow(array $data = array(), $autofill = false, array $tableDescription = array()) {
+        if (empty($data)) {
+            throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
+        }
+
+        // store row in database and get id
+        $this->getAdapter()->insert('Data_Tables', $data);
+        $id = $this->getAdapter()->lastInsertId();
+
+        if ($autofill) {
+            // get the additional resources
+            $columnResource = new Data_Model_Resource_Columns();
+            $databaseResource = new Data_Model_Resource_Databases();
+
+            // auto create entries for all columns
+            $row = $databaseResource->fetchRow($data['database_id']);
+            $database = $row['name'];
+            $table = $data['name'];
+
+            try {
+                if(empty($tableDescription)) {
+                    $descResource = new Data_Model_Resource_Description();
+                    $descResource->init($database); 
+                    $tableDescription = $descResource->describeTable($table);
+                }
+
+                foreach ($tableDescription['columns'] as $column) {
+                    $column['table'] = $table;
+                    $column['table_id'] = $id;
+                    $column['database'] = $database;
+
+                    $columnResource->insertRow($column);
+                }
+            } catch (Exception $e) {
+                $this->getAdapter()->delete('Data_Tables', array('`id` = ?' => $id));
+                throw $e;
+            }
+        }
+
+        return $id;
     }
 
     /**
@@ -106,7 +193,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
         $row = $this->fetchRow($id, true);
 
         // delete tables and columns of this database
-        foreach ($table['columns'] as $column) {
+        foreach ($row['columns'] as $column) {
             $this->getAdapter()->delete('Data_Columns', array('`id` = ?' => $column['id']));
         }
         $this->getAdapter()->delete('Data_Tables', array('`id` = ?' => $id));
@@ -120,6 +207,10 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Simple {
      * @return array
      */
     public function checkACL($id, $command) {
+        if (empty($id) || empty($command)) {
+            throw new Exception('$id or $command not provided in ' . get_class($this) . '::checkACL()');
+        }
+
         $row = $this->fetchRow($id, false);
         $command = strtolower($command);
 

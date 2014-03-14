@@ -23,19 +23,19 @@
 class Data_Form_Database extends Daiquiri_Form_Abstract {
 
     protected $_roles = array();
-    protected $_adapter = array();
     protected $_entry = array();
+    protected $_submit;
 
     public function setRoles($roles) {
         $this->_roles = $roles;
     }
 
-    public function setAdapter($adapter) {
-        $this->_adapter = $adapter;
-    }
-
     public function setEntry($entry) {
         $this->_entry = $entry;
+    }
+
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
     }
 
     public function init() {
@@ -66,11 +66,6 @@ class Data_Form_Database extends Daiquiri_Form_Abstract {
             'validators' => array(
                 array('validator' => 'int'),
             )
-        ));
-        $this->addElement('select', 'adapter', array(
-            'label' => 'Zend database adapter',
-            'required' => true,
-            'multiOptions' => $this->_adapter,
         ));
         $this->addElement('select', 'publication_role_id', array(
             'label' => 'Published for',
@@ -105,11 +100,11 @@ class Data_Form_Database extends Daiquiri_Form_Abstract {
             ));
         }
 
-        $this->addPrimaryButtonElement('submit', 'Update database entry');
+        $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $inputelements = array('name', 'description', 'order', 'adapter', 'publication_role_id', 'publication_select',
+        $inputelements = array('name', 'description', 'order', 'publication_role_id', 'publication_select',
             'publication_update', 'publication_insert', 'publication_show');
         if (empty($this->_entry)) {
             $inputelements[] = 'autofill';

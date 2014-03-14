@@ -345,7 +345,7 @@ class Query_Model_Resource_PaquQQueue extends Query_Model_Resource_AbstractQueue
         // get the users private database
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $db = Daiquiri_Config::getInstance()->getUserDbName($username);
-        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapterConfig($username, '');
+        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapterConfig();
 
         $sqloptions = array();
 

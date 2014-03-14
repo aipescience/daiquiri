@@ -42,17 +42,13 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
 
             $functions[] = $function;
         }
-
-        return array(
-            'functions' => $functions,
-            'status' => 'ok'
-        );
+        return array('functions' => $functions, 'status' => 'ok');
     }
 
     /**
      * Creates function entry.
      * @param array $formParams
-     * @return array
+     * @return array $response
      */
     public function create(array $formParams = array()) {
         // get roles
@@ -60,9 +56,9 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
 
         // create the form object
         $form = new Data_Form_Function(array(
-                    'roles' => $roles,
-                    'submit' => 'Create function entry'
-                ));
+            'roles' => $roles,
+            'submit' => 'Create function entry'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -71,13 +67,6 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
                 // get the form values
                 $values = $form->getValues();
 
-                // get autofill flag
-                $autofill = null;
-                if (array_key_exists('autofill', $values)) {
-                    $autofill = $values['autofill'];
-                    unset($values['autofill']);
-                }
-
                 // check if the order needs to be set to NULL
                 if ($values['order'] === '') {
                     $values['order'] = NULL;
@@ -85,19 +74,9 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
 
                 // store the values in the database
                 $function_id = $this->getResource()->insertRow($values);
-
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -107,7 +86,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
     /**
      * Returns a function entry.
      * @param mixed $input int id or array with "function" key
-     * @return array
+     * @return array $response
      */
     public function show($input) {
         if (is_int($input)) {
@@ -155,10 +134,10 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
 
         // create the form object
         $form = new Data_Form_Function(array(
-                    'entry' => $entry,
-                    'roles' => $roles,
-                    'submit' => 'Update table entry'
-                ));
+            'entry' => $entry,
+            'roles' => $roles,
+            'submit' => 'Update table entry'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -174,16 +153,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
                 $this->getResource()->updateRow($id, $values);
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 

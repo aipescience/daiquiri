@@ -33,18 +33,20 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
      * Creates column entry.
      * @param int $tableId id of the parent table (only form default value)
      * @param array $formParams
-     * @return array
+     * @return array $response
      */
     public function create($tableId = null, array $formParams = array()) {
-        // create the form object
-        $tablesModel = new Data_Model_Tables();
-        $tables = $tablesModel->index();
+        // get tables and ucds
+        $tablesResource = new Data_Model_Resource_Tables();
+        $ucdsResource = new Daiquiri_Model_Resource_Simple();
+        $ucdsResource->setTablename('Data_UCD');
 
         $form = new Data_Form_Column(array(
-                    'tables' => $tables,
-                    'tableId' => $tableId,
-                    'submit' => 'Create column entry'
-                ));
+            'tables' => $tablesResource->fetchValues('name'),
+            'tableId' => $tableId,
+            'ucds' => $ucdsResource->fetchRows(),
+            'submit' => 'Create column entry'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -67,20 +69,11 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
-                $this->store($values);
+                $this->getResource()->insertRow($values);
 
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -126,18 +119,23 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
         }
 
         // get the entry
-        $tablesModel = new Data_Model_Tables();
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
             throw new Exception('$id ' . $id . ' not found.');
         }
 
+        // get tables and ucds
+        $tablesResource = new Data_Model_Resource_Tables();
+        $ucdsResource = new Daiquiri_Model_Resource_Simple();
+        $ucdsResource->setTablename('Data_UCD');
+        
         $form = new Data_Form_Column(array(
-                    'tableId' => $tablesModel->getId($entry['table']),
-                    'entry' => $entry,
-                    'tables' => $tablesModel->getValues(),
-                    'submit' => 'Update column entry'
-                ));
+            'tables' => $tablesResource->fetchValues('name'),
+            'tableId' => $entry['table_id'],
+            'ucds' => $ucdsResource->fetchRows(),
+            'submit' => 'Create column entry',
+            'entry' => $entry
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -152,24 +150,13 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
+                $values['database'] = $entry['database'];
+                $values['table'] = $entry['table'];
                 $this->getResource()->updateRow($id, $values);
-
-                if (Daiquiri_Config::getInstance()->data->writeToDB) {
-                    $this->_writeColumnComment($entry['database'], $entry['table'], $entry['name'], $values);
-                }
 
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -195,96 +182,6 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
         }
 
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
-    }
-
-
-    /**
-     *
-     */
-    public function store(array $values = array()) {
-        $cache = $values;
-
-        if(array_key_exists("comment", $values)) {
-            unset($values['comment']);
-        }
-
-        if(array_key_exists("database", $values)) {
-            unset($values['database']);
-        }
-
-        if(array_key_exists("table", $values)) {
-            unset($values['table']);
-        }
-
-        // store the values in the database
-        $this->getResource()->insertRow($values);
-
-        if (Daiquiri_Config::getInstance()->data->writeToDB) {
-            if(array_key_exists("database", $cache)) {
-                $tableData = array("database" => $cache['database'],
-                                "name" => $cache['table']);
-            } else {
-                $tablesModel = new Data_Model_Tables();
-                $tableData = $tablesModel->show($values['table_id']);
-            }
-
-            if(array_key_exists("comment", $cache)) {
-                $this->_writeColumnComment($tableData['database'], $tableData['name'], $values['name'], $values, $cache['comment']);
-            } else {
-                $this->_writeColumnComment($tableData['database'], $tableData['name'], $values['name'], $values);
-            }
-        }
-    }
-
-    private function _writeColumnComment($db, $table, $column, $values, $oldComment = false) {
-        //check sanity of input
-        foreach ($values as $key => $value) {
-        	if(is_string($value) && (strpos($value, "{") !== false || strpos($value, "}") !== false)) {
-        		throw new Exception("Unsupported character {} in " . $key . ": " . $value);
-        	}
-        }
-
-        // write metadata into comment field of the column (if supported)
-        $descResource = new Data_Model_Resource_Description();
-
-        if ($oldComment === false) {
-            $comment = $descResource->getColumnComment($db, $table, $column);
-            $oldComment = $comment;
-        } else {
-            $comment = $oldComment;
-        }
-
-        unset($values['table_id']);
-        unset($values['order']);
-
-        $json = Zend_Json::encode($values);
-
-        // check if there is already a comment present with our metadata
-        $charPos = strpos($comment, "DQIMETA=");
-
-        if ($charPos !== false) {
-            // find end of json
-            $endPos = $descResource->findJSONEnd($comment, $charPos);
-
-            if ($endPos === false) {
-                throw new Exception("Cannot update MySQL meta data due to corruped column comment.");
-            }
-
-            $comment = substr($comment, 0, $charPos) . "DQIMETA=" . $json . substr($comment, $endPos + 1);
-        } else {
-            if (strlen($comment) > 0) {
-                $comment .= ", DQIMETA=" . $json;
-            } else {
-                $comment = "DQIMETA=" . $json;
-            }
-        }
-
-        // only do something if there is a change...
-        if ($comment !== $oldComment) {
-            $descResource->setColumnComment($db, $table, $column, $comment);
-        }
-
-        return true;
     }
 
 }

@@ -347,10 +347,9 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         }
 
         // create database for user
-        if (Daiquiri_Config::getInstance()->query
-                && Daiquiri_Config::getInstance()->query->userDb) {
+        if (Daiquiri_Config::getInstance()->query) {
             $userDb = Daiquiri_Config::getInstance()->getUserDbName($username);
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username, '');
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $username);
 
             $sql = "CREATE DATABASE `{$userDb}`";
             $adapter->query($sql)->closeCursor();

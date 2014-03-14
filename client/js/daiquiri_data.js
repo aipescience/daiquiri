@@ -31,6 +31,16 @@ daiquiri.data.Data = function (baseUrl) {
     this.idle = true;
     this.baseUrl = baseUrl;
 
+    $('.daiquiri-modal-open').click(function(){
+        new daiquiri.Modal({
+            'url': this.href,
+            'width': 725,
+            'class': 'daiquiri-user-table-modal',
+            'success': daiquiri.data.item.show
+        });
+        return false;
+    });
+
     $('#database-browser','#data').daiquiri_browser({
         'url': baseUrl + "/data/databases",
         'columns': ['databases','tables','columns'],
@@ -95,7 +105,7 @@ daiquiri.data.Data.prototype.show = function (id, opt) {
                 self.idle = true;
 
                 // bind links to modals
-                $('a','#display','#data').click(function(){
+                $('.daiquiri-modal-open').click(function(){
                     new daiquiri.Modal({
                         'url': this.href,
                         'width': 725,

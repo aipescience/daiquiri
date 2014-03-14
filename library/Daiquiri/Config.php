@@ -166,18 +166,20 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     }
 
     /**
-     * Returns the adapter for the user database
-     * @param string $userName
+     * Returns the user database adapter
      * @return Zend_
      */
-    public function getUserDbAdapter($username, $db = null) {
+    public function getUserDbAdapter($db = null, $username = null) {
         // get adapter configuration
-        $preset = $this->_daiquiri->query->adapter;
-        $config = $this->_application->resources->multidb->$preset->toArray();
+        $config = $this->_application->resources->multidb->user->toArray();
 
         $adapter = $config['adapter'];
         unset($config['adapter']);
+
         if ($db === null) {
+            if ($username === null) {
+                $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+            }
             $config['dbname'] = $this->getUserDbName($username);
         } else {
             $config['dbname'] = $db;
@@ -201,26 +203,9 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
      * @param string $userName
      * @return Zend_
      */
-    public function getUserDbAdapterConfig($username, $db = null) {
+    public function getUserDbAdapterConfig() {
         // get adapter configuration
-        $preset = $this->_daiquiri->query->adapter;
-        return $this->_application->resources->multidb->$preset->toArray();
-    }
-
-    /**
-     * Returns the different database adapter
-     * @return Zend_
-     */
-    public function getDbAdapter() {
-        $adapter = array();
-        foreach (array_keys($this->_application->resources->multidb->toArray()) as $key) {
-            $adapter[] = $key;
-        }
-        return $adapter;
-    }
-
-    public function getDbAdapterConfig($adapter) {
-        return $this->_application->resources->multidb->$adapter->toArray();
+        return $this->_application->resources->multidb->user->toArray();
     }
 
 }

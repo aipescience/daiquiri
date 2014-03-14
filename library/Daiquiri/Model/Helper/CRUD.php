@@ -61,16 +61,7 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
 
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->validationErrorResponse($form);
             }
         }
 
@@ -108,16 +99,7 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
 
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->validationErrorResponse($form);
             }
         }
 
@@ -149,22 +131,26 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
                 $this->getResource()->deleteRow($id);
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->validationErrorResponse($form);
             } 
         }
 
         return array('form' => $form, 'status' => 'form');
     }
  
+    public function validationErrorResponse($form) {
+        $response = array(
+            'form' => $form,
+            'status' => 'error',
+            'errors' => $form->getMessages()
+        );
+
+        $csrf = $form->getElement('csrf');
+        if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+
+        return $response;
+    }
+
     private function _getSubject($action) {
         $class = get_class($this->getModel());
         $words = preg_split('/(?=[A-Z])/',lcfirst(substr($class, strrpos($class,'_') + 1,-1)));

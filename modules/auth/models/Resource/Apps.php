@@ -56,10 +56,9 @@ class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Table {
         ));
 
         // create database for app
-        if (Daiquiri_Config::getInstance()->query
-                && Daiquiri_Config::getInstance()->query->userDb) {
+        if (Daiquiri_Config::getInstance()->query) {
             $userDb = Daiquiri_Config::getInstance()->getUserDbName($credentials['appname']);
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($credentials['appname'], '');
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $credentials['appname']);
 
             $sql = "CREATE DATABASE `{$userDb}`";
             $adapter->query($sql)->closeCursor();

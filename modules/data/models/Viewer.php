@@ -20,10 +20,10 @@
  *  limitations under the License.
  */
 
-class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
+class Data_Model_Viewer extends Daiquiri_Model_Table {
 
     /**
-     * Construtor. Sets resource.
+     * Construtor. Sets resource and columns.
      */
     public function __construct() {
         $this->setResource('Data_Model_Resource_Viewer');
@@ -35,72 +35,78 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
      * @param string $table
      * @return array 
      */
-    public function cols($db, $table, array $params = array()) {
-        // init table
-        $this->getResource()->init($db, $table);
-        
-        // get the columns and the corresponding ids from the database
-        if (empty($params['cols'])) {
-            $params['cols'] = $this->getResource()->fetchCols();
-            $colsIds = array_combine(array_keys($params['cols']),array_keys($params['cols']));
+    public function cols(array $params = array()) {
+        // get db and table from params
+        if (empty($params['db']) || empty($params['table'])) {
+            return array('status' => 'error');
         } else {
-    	    // explode the input for the cols array
-    	    $params['cols'] = explode(',', $params['cols']);
-
-            $dbColsIds = array_flip($this->getResource()->fetchCols());
-            $colsIds = array();
-            foreach($params['cols'] as $key => $col) {
-                $colsIds[$key] = $dbColsIds[$col];
-            }
+            $db = $params['db'];
+            $table = $params['table'];
         }
 
-        // obtain column metadata (if this exists)
-        $tableModel = new Data_Model_Tables();
-        $response = $tableModel->show(false, $db, $table, true);
+        // init table
+        $this->getResource()->init($params['db'], $params['table']);
 
-        if ($response['status'] === 'ok') {
-            $tableMeta = $response['data'];
+        // get columns from params or from the database
+        if (empty($params['cols'])) {
+            $params['cols'] = array_keys($this->getResource()->fetchCols());
         } else {
+            $params['cols'] = explode(',', $params['cols']);
+        }
+
+        // obtain table metadata
+        $tablesResource = new Data_Model_Resource_Tables();
+        $tableId = $tablesResource->fetchId($db,$table);
+        if ($tableId === false) {
             // this table is not in the metadata table - let's see if we can get
             // further information from the table itself
-            $describeResource = new Data_Model_Resource_Description();
-            $tableMeta = $describeResource->describeTable($db, $table);
+            $descResource = new Data_Model_Resource_Description();
+            $descResource->init($database);
+            $tableMeta = $descResource->describeTable($table);
+        } else {
+            // get the metadata from the metadata tables
+            $tableMeta =  $tablesResource->fetchRow($tableId, true);
         } 
 
-        $params['colUcd'] = array();
-        foreach ($colsIds as $id => $colsId) {
-            $params['colUcd'][$id] = $tableMeta['columns'][$colsId]['ucd'];
+        // construct metadata array
+        $meta = array();
+        foreach ($tableMeta['columns'] as $key => $colMeta) {
+            $meta[$colMeta['name']] = array(
+                'id' => $key,
+                'ucd' => explode(';',$colMeta['ucd'])
+            );
+        }
+
+        // check if all colums are in the database
+        if (count(array_intersect($params['cols'],array_keys($meta))) != count($params['cols'])) {
+            throw new Exception('Some Columns are not in the database table');
         }
 
         // return columns ot this table
         $cols = array();
-        foreach ($params['cols'] as $key => $name) {
+        foreach ($params['cols'] as $colname) {
             $col = array(
-                'id' => $colsIds[$key],
-                'name' => $name,
+                'id' => $meta[$colname]['id'],
+                'name' => $colname,
                 'sortable' => true
             );
 
-            if ($name === 'row_id') {
+            if ($colname === 'row_id') {
                 $col['width'] = '4em';
                 $col['hidden'] = true;
 
-            } else if (strpos($params['colUcd'][$key], "meta.ref") !== false) {
+            } else if (in_array('meta.ref', $meta[$colname]['ucd'])) {
                 // this is a link, it needs more space
                 $col['width'] = '20em';
 
                 // is this a file daiquiri hosts or just a link?
-                if (strpos($params['colUcd'][$key], "meta.file") !== false ||
-                        strpos($params['colUcd'][$key], "meta.fits") !== false) {
+                if (in_array('meta.file', $meta[$colname]['ucd']) || in_array('meta.fits', $meta[$colname]['ucd'])) {
                     // this is a file we host and can be downloaded
                     $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
                     $col['format'] = array(
                         'type' => 'filelink',
                         'base' => $baseurl . '/files/index/single',
                     );
-                // TODO treat uri and ivorn different
-                // } else if (strpos($params['colUcd'][$key], "meta.ref. i") !== false) {
-                // } else if (strpos($params['colUcd'][$key], "meta.ref.ivorn") !== false) {
                 } else {
                     // we just show this as a link - meta.ref.url also ends up here
                     $col['format'] = array(
@@ -108,16 +114,17 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
                         'target' => 'blank'
                     );
                 }
+                // TODO treat uri and ivorn different
             } else {
                 // regular column, take the with from the config or a default one
                 $width = Daiquiri_Config::getInstance()->data->viewer->columnWidth;
-                if(empty($width)) {
+                if (empty($width)) {
                     $col['width'] = '12em';
                 } else {
                     $col['width'] = $width;
                 }
 
-                // all removenewline flag if this is set in the config
+                // add removenewline flag if this is set in the config
                 if (Daiquiri_Config::getInstance()->data->viewer->removeNewline) {
                     $col['format'] = array('removeNewline' => true);
                 }
@@ -137,23 +144,30 @@ class Data_Model_Viewer extends Daiquiri_Model_PaginatedTable {
      * @param array $params
      * @return array 
      */
-    public function rows($db, $table, array $params = array()) {
-         // set init table
+    public function rows(array $params = array()) {
+        // get db and table from params
+        if (empty($params['db']) || empty($params['table'])) {
+            return array('status' => 'error');
+        } else {
+            $db = $params['db'];
+            $table = $params['table'];
+        }
+
+        // set init table
         $this->getResource()->init($db, $table);
 
-        // set default columns
+        // get columns from params or from the database
         if (empty($params['cols'])) {
-            $params['cols'] = $this->getResource()->fetchCols();
+            $params['cols'] = array_keys($this->getResource()->fetchCols());
         } else {
             $params['cols'] = explode(',', $params['cols']);
         }
 
         // get the table from the resource
-        $sqloptions = $this->_sqloptions($params);
+        $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
         $rows = $this->getResource()->fetchRows($sqloptions);
-        $pk = array_values($this->getResource()->getTable()->getPrimary());
-        $pk = $pk[0];
-        return $this->_response($rows, $sqloptions, $pk);
+        $pk = $this->getResource()->fetchPrimary();
+        return $this->getModelHelper('pagination')->response($rows,$sqloptions,$pk);
     }
 
 }

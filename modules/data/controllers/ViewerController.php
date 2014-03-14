@@ -22,6 +22,8 @@
 
 class Data_ViewerController extends Daiquiri_Controller_Abstract {
 
+    protected $_model;
+
     public function init() {
         $this->_db = $this->_getParam('db');
         $this->_table = $this->_getParam('table');
@@ -38,30 +40,12 @@ class Data_ViewerController extends Daiquiri_Controller_Abstract {
         }
     }
 
-    public function rowsAction() {
-        // call model functions
-        $response = $this->_model->rows($this->_db, $this->_table, $this->_request->getQuery());
-
-        // assign to view
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-        $this->view->redirect = $this->_getParam('redirect', '/auth/user/');
-        $this->view->status = 'ok';
+    public function colsAction() {
+        $this->getControllerHelper('pagination')->cols();
     }
 
-    public function colsAction() {
-        // call model functions
-        $response = $this->_model->cols($this->_db, $this->_table, $this->_request->getQuery());
-        
-        // assign to view
-        if ($response['status'] === "ok") {
-            $this->view->cols = $response['cols'];
-            $this->view->status = 'ok';
-        } else {
-            $this->view->error = $response['error'];
-            $this->view->status = 'error';
-        }
+    public function rowsAction() {
+        $this->getControllerHelper('pagination')->rows();
     }
 
 }

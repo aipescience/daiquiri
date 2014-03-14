@@ -100,13 +100,13 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
 
     protected function _quoteInto($string, $value) {
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
+        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter();
         return $adapter->quoteInto($string, $value);
     }
 
     protected function _escape($string) {
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
+        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter();
         return trim($adapter->quote($string), "'");
     }
 

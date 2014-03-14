@@ -70,7 +70,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function getTablename() {
         if (empty($this->_tablename)) {
-            throw new Exception('No table was set.');
+            throw new Exception('No tablename was set.');
         } else {
             return $this->_tablename;
         }
@@ -155,9 +155,9 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
             $select = $this->select($input);
             $select->from($this->getTablename());
         } else {
-            $select = $this->getAdapter()->select();
+            $select = $this->select();
             $select->from($this->getTablename());
-            $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
+            $identifier = $this->quoteIdentifier($this->fetchPrimary());
             $select->where($identifier . '= ?', $input);
         }
 
@@ -176,8 +176,8 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         $select->from($this->getTablename());
         
         // query database
-        $row = $this->getAdapter()->fetchOne($select);
-        if (empty($rows)) {
+        $row = $this->fetchOne($select);
+        if (empty($row)) {
             return false;
         } else {
             return (int) $row[$this->fetchPrimary()];
@@ -213,15 +213,15 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         $primary = $this->fetchPrimary();
 
         // get select object
-        $select = $this->getAdapter()->select();
+        $select = $this->select();
         $select->from($this->getTablename(), array($primary, $fieldname));
 
         // query database, construct array, and return
-        $data = array();
+        $rows = array();
         foreach($this->fetchAll($select) as $row) {
-            $data[$row[$primary]] = $row[$fieldname];
+            $rows[$row[$primary]] = $row[$fieldname];
         }
-        return $data;
+        return $rows;
     }
 
     /**
@@ -231,7 +231,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function countRows(array $sqloptions = null) {
         // get select object
-        $select = $this->getAdapter()->select();
+        $select = $this->select();
         $select->from($this->getTablename(), 'COUNT(*) as count');
 
         if ($sqloptions) {
@@ -315,4 +315,5 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
 
         return implode('.', $identifier);
     }
+
 }

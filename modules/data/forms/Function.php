@@ -24,7 +24,7 @@ class Data_Form_Function extends Daiquiri_Form_Abstract {
 
     protected $_roles = array();
     protected $_entry = array();
-    protected $_submit = null;
+    protected $_submit;
 
     public function setRoles($roles) {
         $this->_roles = $roles;
@@ -43,13 +43,6 @@ class Data_Form_Function extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'order', array(
-            'label' => 'Order of function',
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => 'int'),
-            )
-        ));
         $this->addElement('text', 'name', array(
             'label' => 'Function name',
             'required' => true,
@@ -67,6 +60,13 @@ class Data_Form_Function extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
+        $this->addElement('text', 'order', array(
+            'label' => 'Order in list',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => 'int'),
+            )
+        ));
         $this->addElement('select', 'publication_role_id', array(
             'label' => 'Published for',
             'required' => true,
@@ -77,7 +77,7 @@ class Data_Form_Function extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('order', 'name', 'description', 'publication_role_id'));
+        $this->addHorizontalGroup(array('name','description','order','publication_role_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields

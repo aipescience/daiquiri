@@ -30,49 +30,37 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
     }
 
     /**
-     * Returns a list of all table entries.
-     * @return array
-     */
-    public function index() {
-        $data = array();
-        foreach(array_keys($this->getValues()) as $id) {
-            $response = $this->show($id);
-            if ($response['status'] == 'ok') {
-                $data[$response['data']['id']] = $response['data']['database'] . '.' . $response['data']['name'];
-            }
-        }
-        return $data;
-    }
-
-    /**
      * Creates table entry.
      * @param array $formParams
      * @return array $reponse
      */
     public function create($databaseId = null, array $formParams = array()) {
-        // get databases model
+        // get databases
         $databasesModel = new Data_Model_Databases();
         $databases = $databasesModel->getResource()->fetchValues('name');
-
-        
-        Zend_Debug::dump($databases);  die(0);
-
 
         // get roles
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         // create the form object
         $form = new Data_Form_Table(array(
-                    'databases' => $databases,
-                    'databaseId' => $databaseId,
-                    'roles' => $roles,
-                    'submit' => 'Create table entry'
-                ));
+            'databases' => $databases,
+            'databaseId' => $databaseId,
+            'roles' => $roles,
+            'submit' => 'Create table entry'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
                 $values = $form->getValues();
+
+                // get autofill flag
+                $autofill = null;
+                if (array_key_exists('autofill', $values)) {
+                    $autofill = $values['autofill'];
+                    unset($values['autofill']);
+                }
 
                 // check if entry is already there
                 $database = $databases[$values['database_id']];
@@ -85,20 +73,11 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
-                $this->store($values);
+                $this->getResource()->insertRow($values, $autofill);
 
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -150,17 +129,20 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
             throw new Exception('$id ' . $id . ' not found.');
         }
 
-        // create the form object
-        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
+        // get databases
         $databasesModel = new Data_Model_Databases();
+        $databases = $databasesModel->getResource()->fetchValues('name');
+
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         $form = new Data_Form_Table(array(
-                    'databases' => $databasesModel->getValues(),
-                    'databaseId' => $databasesModel->getId($entry['database']),
-                    'entry' => $entry,
-                    'roles' => $roles,
-                    'submit' => 'Update table entry'
-                ));
+            'databases' => $databases,
+            'databaseId' => $entry['database_id'],
+            'roles' => $roles,
+            'submit' => 'Update table entry',
+            'entry' => $entry
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -177,16 +159,7 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                $response = array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-
-                $csrf = $form->getElement('csrf');
-                if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
-
-                return $response;
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -211,48 +184,5 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
         }
 
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
-    }
-
-    /**
-     *
-     */
-    public function store(array $values = array(), array $tableDescription = array()) {
-        // get autofill flag
-        $autofill = null;
-        if (array_key_exists('autofill', $values)) {
-            $autofill = $values['autofill'];
-            unset($values['autofill']);
-        }
-
-        // store the values in the database
-        $table_id = $this->getResource()->insertRow($values);
-
-        if ($autofill) {
-            // get the additional resources
-            $descResource = new Data_Model_Resource_Description();
-            $columnModel = new Data_Model_Columns();
-
-            // auto create entries for all columns
-            $databasesModel = new Data_Model_Databases();
-            $db = $databasesModel->getValue($values['database_id']);
-            $table = $values['name'];
-
-            try {
-                if(empty($tableDescription)) {
-                    $tableDescription = $descResource->describeTable($db, $table);
-                }
-
-                foreach ($tableDescription['columns'] as $c) {
-                    $c['table_id'] = $table_id;
-                    $c['table'] = $table;
-                    $c['database'] = $db;
-
-                    $columnModel->store($c);
-                }
-            } catch (Exception $e) {
-                $this->getResource()->deleteTable($table_id);
-                throw $e;
-            }
-        }        
     }
 }

@@ -27,11 +27,11 @@
                 <div class="box">
                     <p>
                         <span class="meta">FUNCTION</span>
-                        <strong><?php echo $this->escape($this->data['name']); ?></strong>
+                        <strong><?php echo $this->escape($this->row['name']); ?></strong>
                     </p>
                 </div>
                 <table class='table table-bordered'>
-                    <?php foreach($this->data as $key => $value): ?>
+                    <?php foreach($this->row as $key => $value): ?>
                         <tr>
                             <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
                             <td>
@@ -44,15 +44,16 @@
             <div class="span3">
                 <div class="box">
                     <?php
-                    $redirect = '/data/functions/show?id=' . $this->escape($this->data['id']);
                     echo $this->internalLink(array(
                         'text' => 'Update this function entry',
-                        'href' => '/data/functions/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'href' => '/data/functions/update?id=' . $this->escape($this->row['id']),
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Delete this function entry',
-                        'href' => '/data/functions/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'href' => '/data/functions/delete?id=' . $this->escape($this->row['id']),
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     ?>
@@ -61,22 +62,26 @@
                     <?php
                     echo $this->internalLink(array(
                         'text' => 'Create new database entry',
-                        'href' => '/data/databases/create?redirect=' . $redirect,
+                        'href' => '/data/databases/create',
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Create new table entry',
-                        'href' => '/data/tables/create&redirect=' . $redirect,
+                        'href' => '/data/tables/create',
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Create new column entry',
-                        'href' => '/data/columns/create?redirect=' . $redirect,
+                        'href' => '/data/columns/create',
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Create new function entry',
-                        'href' => '/data/functions/create?redirect=' . $redirect,
+                        'href' => '/data/functions/create',
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     ?>

@@ -291,7 +291,7 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         // check in the data module first, if metadata exists and handle them
         // accordingly
         $databasesModel = new Data_Model_Databases();
-        $response = $databasesModel->show(false, $database);
+        $response = $databasesModel->show($database);
 
         if ($response['status'] === 'ok' && $databasesModel->checkACL($response['data']['id'], $permission)) {
             if ($table === false) {
@@ -487,7 +487,11 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
     }
 
     public function getRole($id) {
-        return $this->_roles[$id];
+        if (array_key_exists($id,$this->_roles)) {
+            return $this->_roles[$id];
+        } else {
+           return false;
+        }
     }
 
     public function getRoleId($role) {

@@ -29,8 +29,8 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $this->view->rows = $this->_model->index(true);
-        $this->view->status = 'ok';
+        $response = $this->_model->index();
+        $this->setViewElements($response);
     }
 
     public function createAction() {

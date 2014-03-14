@@ -45,9 +45,14 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
     /**
      * Fetches the id of one database entry specified database name.
      * @param string $db name of database
+     * @throws Exception
      * @return int $id
      */
     public function fetchId($db) {
+        if (empty($db)) {
+            throw new Exception('$db not provided in ' . get_class($this) . '::fetchId()');
+        }
+
         $select = $this->select();
         $select->from('Data_Databases');
         $select->where("`name` = ?", trim($db));
@@ -69,6 +74,10 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
      * @return array $row
      */
     public function fetchRow($id, $tables = false, $columns = false) {
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+        }
+
         // get the primary sql select object
         $select = $this->select();
         $select->from('Data_Databases');
@@ -106,6 +115,55 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
     }
 
     /**
+     * Inserts one database entry and, if set, the fills the columns and tables automatically.
+     * Returns the primary key of the new row.
+     * @param array $data row data
+     * @param bool $autofill automatically fill the columns and tables
+     * @throws Exception
+     * @return int $id
+     */
+    public function insertRow(array $data = array(), $autofill = false) {
+        if (empty($data)) {
+            throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
+        }
+
+        // store row in database and get id
+        $this->getAdapter()->insert('Data_Databases', $data);
+        $id = $this->getAdapter()->lastInsertId();
+
+        if ($autofill) {
+            // get the additional resources
+            $descResource = new Data_Model_Resource_Description();
+            $tableResource = new Data_Model_Resource_Tables();
+
+            // auto create entries for all tables
+            try {
+                $descResource->init($data['name']);
+                foreach ($descResource->fetchTables() as $table) {
+                    $t = $descResource->describeTable($table);
+
+                    $tableDescription = $t;
+                    $t['database_id'] = $id;
+                    $t['publication_role_id'] = $data['publication_role_id'];
+                    $t['publication_select'] = $data['publication_select'];
+                    $t['publication_update'] = $data['publication_update'];
+                    $t['publication_insert'] = $data['publication_insert'];
+                    unset($t['columns']);
+                    unset($t['database']);
+
+                    $tableResource->insertRow($t, true, $tableDescription);
+                }
+            } catch (Exception $e) {
+                // delete database entry again
+                $this->getAdapter()->delete('Data_Databases', array('`id` = ?' => $id));
+                throw $e;
+            }
+        }
+
+        return $id;
+    }
+
+    /**
      * Deletes a database entry and all its tables and columns.
      * @param int $id id of the row
      * @throws Exception
@@ -138,6 +196,10 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
      * @return array
      */
     public function checkACL($id, $command) {
+        if (empty($id) || empty($command)) {
+            throw new Exception('$id or $command not provided in ' . get_class($this) . '::checkACL()');
+        }
+
         $row = $this->fetchRow($id);
         $command = strtolower($command);
 

@@ -20,66 +20,74 @@
  *  limitations under the License.
  */
 
-class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
+class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Simple {
 
+    /**
+     * Sets the adapter and the tablename of the resource retroactively.
+     * @param string $db name of the database
+     * @param string $table name of the table
+     */
     public function init($db, $table = null) {
-        $this->setTable('Data_Model_DbTable_Viewer');
-
         // get the user adapter
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
 
         // check if this db is the user datasbase
         if ($db === Daiquiri_Config::getInstance()->getUserDbName($username)) {
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter();
         } else {
-            // get all databases which the user is allowed to accessed
-            $databasesModel = new Data_Model_Databases();
-            $response = $databasesModel->show(false, $db);
-            if ($response['status'] !== 'ok') {
-                throw new Exception("Requested table not available");
+            // get the database id and check permission on database
+            $databasesResource = new Data_Model_Resource_Databases();
+            $databaseId = $databasesResource->fetchId($db);
+            if ($databaseId === false) {
+                throw new Exception("Requested database not available");
+            }
+
+            $result = $databasesResource->checkACL($databaseId,'select');
+            if ($result !== true) {
+                throw new Exception("Requested database not available");
             }
 
             // check permission on table access
             if ($table) {
-                $tablesModel = new Data_Model_Tables();
-                $response = $tablesModel->show(false, $db, $table);
-                if ($response['status'] !== 'ok') {
+                $tablesResource = new Data_Model_Resource_Databases();
+                $tableId = $tablesResource->fetchId($db, $table);
+                if ($databaseId === false) {
+                    throw new Exception("Requested table not available");
+                }
+
+                $result = $tablesResource->checkACL($tableId,'select');
+                if ($result !== true) {
                     throw new Exception("Requested table not available");
                 }
             }
 
             // if everything went ok get adapter
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username, $db);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($db);
         }
 
-        // set adapter
-        $this->getTable()->setAdapter($adapter);
-
-        // set database
-        $this->getTable()->setDb($db);
-
+        // set adapter and table
+        $this->setAdapter($adapter);
         if ($table) {
-            // set table and primary key
-            try {
-                $this->getTable()->setName($table);
-                $this->getTable()->setPrimary();
-            } catch (Exception $e) {
-                throw new Exception("Requested table not available");
-            }
+            $this->setTablename($table);
         }
     }
 
     /**
      * Returns the list of tables from the database adapter.
-     * @return type 
+     * @return array $tables
      */
     public function fetchTables() {
-        return $this->getTable()->getAdapter()->listTables();
+        return $this->getAdapter()->listTables();
     }
 
+    /**
+     * Dumps the table in a given format on disk.
+     * @param string $format
+     * @param string $file
+     */
     public function dumpTable($format, $file) {
         // get the adapter config
-        $config = $this->getTable()->getAdapter()->getConfig();
+        $config = $this->getAdapter()->getConfig();
 
         $adapter = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->adapter;
         $binPath = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->binPath;
@@ -89,7 +97,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             'dbname=' . $config['dbname'],
             'username=' . $config['username'],
             'password=' . $config['password'],
-            'table=' . $this->getTable()->getName(),
+            'table=' . $this->getTablename(),
             'compress=' . $compress,
             'file=' . $file
         );
@@ -121,9 +129,14 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         }
     }
 
+    /**
+     * Dumps the table in a given format on disk using gearman.
+     * @param string $format
+     * @param string $file
+     */
     public function dumpTableGearman($format, $file) {
         // get the adapter config
-        $config = $this->getTable()->getAdapter()->getConfig();
+        $config = $this->getAdapter()->getConfig();
 
         $adapter = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->adapter;
         $binPath = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->binPath;
@@ -134,7 +147,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             "username" => $config['username'],
             "password" => $config['password'],
             "dbname" => $config['dbname'],
-            "table" => $this->getTable()->getName(),
+            "table" => $this->getTablename(),
             "file" => $file,
             "lockFile" => $file . ".lock",
             'compress' => $compress,
@@ -169,11 +182,18 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         $jobHandle = $gmclient->doBackground("dumpTableJob", json_encode($job));
     }
 
-    // at this stage, the HTML header is already set to download file - any errors thrown here
-    // are written to the file and are not shown in the browser!
+
+    /**
+     * Streams the table in a given format to the user.
+     * @param string $format
+     * @param string $file
+     */
     public function streamTable($format, $file, $script) {
+        // at this stage, the HTML header is already set to download file - any errors thrown here
+        // are written to the file and are not shown in the browser!
+
         // get the adapter config
-        $config = $this->getTable()->getAdapter()->getConfig();
+        $config = $this->getAdapter()->getConfig();
 
         $binPath = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->binPath;
         $args = array(
@@ -181,7 +201,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             'dbname=' . $config['dbname'],
             'username=' . $config['username'],
             'password=' . $config['password'],
-            'table=' . $this->getTable()->getName(),
+            'table=' . $this->getTablename(),
             'file=' . $file
         );
         if (isset($config['host']) && isset($config['port'])) {
