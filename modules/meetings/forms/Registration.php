@@ -133,8 +133,9 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
             $this->addHorizontalGroup(array('status_id'),'status', 'Status');
         }
         $this->addHorizontalGroup(array('arrival','departure'),'attendance', 'Attendance');
-        $this->addHorizontalGroup($contributionElements,'contributions', 'Contributions');
-
+        if (!empty($contributionElements)) {
+            $this->addHorizontalGroup($contributionElements,'contributions', 'Contributions');
+        }
         $this->addCaptchaGroup('captcha');
         $this->addActionGroup(array('submit', 'cancel'));
 
