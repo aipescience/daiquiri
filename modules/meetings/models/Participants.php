@@ -64,15 +64,12 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         }
 
         $cols = array();
-        foreach($this->_cols as $col) {
-            $cols[] = array('name' => ucfirst(str_replace('_',' ',$col)));
+        foreach($this->_cols as $colname) {
+            $cols[] = array('name' => ucfirst(str_replace('_',' ',$colname)));
         }
-
         $cols[] = array('name' => 'Options', 'sortable' => 'false');
-        return array(
-            'status' => 'ok',
-            'cols' => $cols
-        );
+
+        return array('status' => 'ok', 'cols' => $cols);
     }
 
     public function rows(array $params = array()) {
@@ -141,7 +138,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         $participantStatus = $participantStatusModel->getResource()->fetchValues('status');
 
         // create the form object
-        $form = new Meetings_Form_Participant(array(
+        $form = new Meetings_Form_Participants(array(
             'submit'=> 'Create participant',
             'meeting' => $meeting,
             'status' => $participantStatus
@@ -203,7 +200,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         $participantStatus = $participantStatusModel->getResource()->fetchValues('status');
 
         // create the form object
-        $form = new Meetings_Form_Participant(array(
+        $form = new Meetings_Form_Participants(array(
             'submit'=> 'Update participant',
             'meeting' => $meeting,
             'entry' => $entry,

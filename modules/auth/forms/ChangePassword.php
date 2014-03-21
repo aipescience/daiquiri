@@ -20,14 +20,8 @@
  *  limitations under the License.
  */
 
-/**
- * Class for the form which is used to change the own password to a new value. 
- */
 class Auth_Form_ChangePassword extends Auth_Form_Abstract {
 
-    /**
-     * Initializes the form. 
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();

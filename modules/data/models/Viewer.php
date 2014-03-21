@@ -31,8 +31,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
     /**
      * Returns the columns of a given table and database. 
-     * @param string $database
-     * @param string $table
+     * @param array $params get params of the request
      * @return array 
      */
     public function cols(array $params = array()) {
@@ -139,9 +138,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
     /**
      * Returns the rows of the given table and database.
-     * @param string $database
-     * @param string $table
-     * @param array $params
+     * @param array $params get params of the request
      * @return array 
      */
     public function rows(array $params = array()) {

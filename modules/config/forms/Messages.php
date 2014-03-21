@@ -20,15 +20,14 @@
  *  limitations under the License.
  */
 
-class Meetings_Form_ParticipantDetailKey extends Daiquiri_Form_Abstract {
+class Config_Form_Messages extends Daiquiri_Form_Abstract {
 
-    private $_submit;
-    private $_entry;
+    private $_submit = null;
+    private $_entry = null;
 
     public function setSubmit($submit) {
         $this->_submit = $submit;
     }
-
     public function setEntry($entry) {
         $this->_entry = $entry;
     }
@@ -39,27 +38,37 @@ class Meetings_Form_ParticipantDetailKey extends Daiquiri_Form_Abstract {
         
         // add elements
         $this->addElement('text', 'key', array(
-            'label' => 'Participant detail key',
+            'label' => 'Key',
             'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
-
-        $this->addPrimaryButtonElement('submit', $this->_submit);
+        $this->addElement('textarea', 'value', array(
+            'label' => 'Value',
+            'class' => 'input-xxlarge',
+            'rows' => '4',
+            'required' => false,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
+            )
+        ));
+        $this->addPrimaryButtonElement('submit', 'Create config entry');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('key'));
+        $this->addHorizontalGroup(array('key', 'value'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('key') as $element) {
-            if (isset($this->_entry[$element])) {
-                $this->setDefault($element, $this->_entry[$element]);
-            }
+        if (isset($this->_entry['key'])) {
+            $this->setDefault('key', $this->_entry['key']);
+        }
+        if (isset($this->_entry['value'])) {
+            $this->setDefault('value', $this->_entry['value']);
         }
     }
 

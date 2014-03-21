@@ -20,12 +20,7 @@
  *  limitations under the License.
  */
 
-/**
- * Model for registration of new users and other operations which involve a
- * change of the status of a user. This involves registration, validation, 
- * confirmation, rejection, activation, disabling, and reenabling.
- */
-class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
+class Auth_Model_Registration extends Daiquiri_Model_Abstract {
 
     /**
      * Construtor. Sets resource.
@@ -37,55 +32,62 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
     /**
      * Registers a new user.
      * @param array $formParams
-     * @return Object
+     * @return array $response
      */
     public function register(array $formParams = array()) {
         // create the form object
-        $form = new Auth_Form_Register(array(
-                    'details' => Daiquiri_Config::getInstance()->auth->details->toArray()
+        $form = new Auth_Form_Registration(array(
+            'details' => Daiquiri_Config::getInstance()->auth->details->toArray()
+        ));
+
+        // check if request is POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+                unset($values['confirmPassword']);
+
+                // produce random validation link
+                $values['code'] = $this->createRandomString(32);
+
+                // (pre-) log the event
+                $date = date("Y-m-d\TH:i:s");
+                $ip = Daiquiri_Auth::getInstance()->getRemoteAddr();
+                $user = Daiquiri_Auth::getInstance()->getCurrentUsername();
+                $values['register'] = 'date:' . $date . ',ip:' . $ip . ',user:' . $user;
+
+                // create the user and return
+                $userId = $this->getResource()->registerUser($values);
+            
+                // send mail
+                $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/registration/validate/id/' . $userId . '/code/' . $values['code'];
+                $this->getModelHelper('mail')->send('auth.register', array(
+                    'to' => $values['email'],
+                    'firstname' => $values['firstname'],
+                    'lastname' => $values['lastname'],
+                    'link' => $link
                 ));
 
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-
-            // get the form values
-            $values = $form->getValues();
-            unset($values['confirmPassword']);
-
-            // produce random validation link
-            $values['code'] = $this->createRandomString(32);
-
-            // (pre-) log the event
-            $date = date("Y-m-d\TH:i:s");
-            $ip = Daiquiri_Auth::getInstance()->getRemoteAddr();
-            $user = Daiquiri_Auth::getInstance()->getCurrentUsername();
-            $values['register'] = 'date:' . $date . ',ip:' . $ip . ',user:' . $user;
-
-            // create the user and return
-            $id = $this->getResource()->registerUser($values);
-            unset($values['newPassword']);
-
-            // send mail
-            $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/registration/validate/id/' . $id . '/code/' . $values['code'];
-            $mailResource = new Auth_Model_Resource_Mail();
-            $mailResource->sendRegisterMail($values, array('link' => $link));
-
-            return array('status' => 'ok');
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
         }
         return array('form' => $form, 'status' => 'form');
     }
 
     /**
      * Validates a new user via link.
-     * @param int $id
-     * @return Object
+     * @param int $userId id of the user
+     * @param string $code
+     * @return array $response
      */
-    public function validate($id, $code) {
+    public function validate($userId, $code) {
         // validate user by its code
-        $user = $this->getResource()->validateUser($id, $code);
+        $user = $this->getResource()->validateUser($userId, $code);
 
         // return with the apropriate string
-        if ($user) {
+        if ($user !== false) {
             // log the event
             $resource = new Auth_Model_Resource_Details();
             $resource->logEvent($user['id'], 'validate');
@@ -93,9 +95,16 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
             if (Daiquiri_Config::getInstance()->auth->activation) {
                 // send mail since the user needs to be activated/confirmed
                 $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/user';
-                $mailResource = new Auth_Model_Resource_Mail();
-                $mailResource->sendValidateMail($user, array('link' => $link));
-
+                $manager = array_merge(
+                    $this->getResource()->fetchEmailByRole('admin'),
+                    $this->getResource()->fetchEmailByRole('manager')
+                );
+                $this->getModelHelper('mail')->send('auth.validate', array(
+                    'to' => $manager,
+                    'firstname' => $user['firstname'],
+                    'lastname' => $user['lastname'],
+                    'link' => $link
+                ));
                 return array('status' => 'ok','pending' => true);
 
             } else {
@@ -103,7 +112,7 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
                 $statusId = Daiquiri_Auth::getInstance()->getStatusId('active');
 
                 // activate user in database
-                $this->getResource()->updateUser($user['id'], array('status_id' => $statusId));
+                $this->getResource()->updateRow($user['id'], array('status_id' => $statusId));
 
                 return array('status' => 'ok','pending' => false);
             }
@@ -117,46 +126,50 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
 
     /**
      * Sets the status of a registered user to 'confirmed'.
-     * @param int $id
+     * @param int $userId id of the user
+     * @param array $formParams
+     * @return array $response
      */
-    public function confirm($id, array $formParams = array()) {
+    public function confirm($userId, array $formParams = array()) {
         // create the form object
-        $form = new Auth_Form_Confirm();
+        $form = new Daiquiri_Form_Confirm(array(
+            'submit' => 'Confirm user'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
                 // get the user credentials
-                $user = $this->getResource()->fetchRow($id);
+                $user = $this->getResource()->fetchRow($userId);
 
                 // update the user
                 if ($user['status'] !== 'registered') {
-                    return array(
-                        'status' => 'error',
-                        'error' => 'user status is not "registered"'
-                    );
+                    $form->setDescription('User status is not "registered"');
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
                 } else {
                     // get the new status id
                     $statusId = Daiquiri_Auth::getInstance()->getStatusId('confirmed');
 
                     // confirm user in database
-                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                    $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
                     // log the event
                     $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($id, 'confirm');
+                    $detailResource->logEvent($userId, 'confirm');
 
                     // send mail
-                    $mailResource = new Auth_Model_Resource_Mail();
-                    $mailResource->sendConfirmMail($user);
+                    $this->getModelHelper('mail')->send('auth.confirm', array(
+                        'to' => $this->getResource()->fetchEmailByRole('admin'),
+                        'firstname' => $user['firstname'],
+                        'lastname' => $user['lastname'],
+                        'username' => $user['username'],
+                        'manager' => Daiquiri_Auth::getInstance()->getCurrentUsername()
+                    ));
 
                     return array('status' => 'ok');
                 }        
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -165,47 +178,55 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
 
     /**
      * Sets the status of a registrered user to 'disabled'.
-     * @param int $id
+     * @param int $userId id of the user
+     * @param array $formParams
+     * @return array $response
      */
-    public function reject($id, array $formParams = array()) {
+    public function reject($userId, array $formParams = array()) {
         // create the form object
-        $form = new Auth_Form_Reject();
+        $form = new Daiquiri_Form_Confirm(array(
+            'submit' => 'Reject user'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
 
                 // get the user credentials
-                $user = $this->getResource()->fetchRow($id);
+                $user = $this->getResource()->fetchRow($userId);
 
                 // update the user
                 if ($user['status'] !== 'registered') {
-                    return array(
-                        'status' => 'error',
-                        'error' => 'user status is not "registered"'
-                    );
+                    $form->setDescription('User status is not "registered"');
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
                 } else {
                     // get the new status id
                     $statusId = Daiquiri_Auth::getInstance()->getStatusId('disabled');
 
                     // disable user in database
-                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                    $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
                     // log the event
                     $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($id, 'reject');
+                    $detailResource->logEvent($userId, 'reject');
 
                     // send mail
-                    $mailResource = new Auth_Model_Resource_Mail();
-                    $mailResource->sendRejectMail($user);
+                    $manager = array_merge(
+                        $this->getResource()->fetchEmailByRole('admin'),
+                        $this->getResource()->fetchEmailByRole('manager')
+                    );
+                    $this->getModelHelper('mail')->send('auth.reject', array(
+                        'to' => $manager,
+                        'firstname' => $user['firstname'],
+                        'lastname' => $user['lastname'],
+                        'username' => $user['username'],
+                        'manager' => Daiquiri_Auth::getInstance()->getCurrentUsername()
+                    ));
 
                     return array('status' => 'ok');
                 }
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -214,46 +235,54 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
 
     /**
      * Sets the status of a given user from 'confirmed' to 'active'.
-     * @param int $id
+     * @param int $userId id of the user
+     * @param array $formParams
+     * @return array $response
      */
-    public function activate($id, array $formParams = array()) {
+    public function activate($userId, array $formParams = array()) {
         // create the form object
-        $form = new Auth_Form_Activate();
+        $form = new Daiquiri_Form_Confirm(array(
+            'submit' => 'Activate user'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
                 // get the user credentials
-                $user = $this->getResource()->fetchRow($id);
+                $user = $this->getResource()->fetchRow($userId);
 
                 // update the use
                 if ($user['status'] === 'active') {
-                    return array(
-                        'status' => 'error',
-                        'error' => 'user status is already "active"'
-                    );
+                    $form->setDescription('User status is already "active"');
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
                 } else {
                     // get the new status id
                     $statusId = Daiquiri_Auth::getInstance()->getStatusId('active');
 
                     // activate user in database
-                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                    $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
                     // log the event
                     $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($id, 'activate');
+                    $detailResource->logEvent($userId, 'activate');
 
                     // send mail
-                    $mailResource = new Auth_Model_Resource_Mail();
-                    $mailResource->sendActivateMail($user);
+                    $manager = array_merge(
+                        $this->getResource()->fetchEmailByRole('admin'),
+                        $this->getResource()->fetchEmailByRole('manager')
+                    );
+                    $this->getModelHelper('mail')->send('auth.activate', array(
+                        'to' => $user['email'],
+                        'bcc' => $manager,
+                        'firstname' => $user['firstname'],
+                        'lastname' => $user['lastname'],
+                        'username' => $user['username']
+                    ));
 
                     return array('status' => 'ok');
                 }
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -262,48 +291,47 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
 
     /**
      * Sets the status of a given user to 'disabled'.
-     * @param int $id
+     * @param int $userId id of the user
+     * @param array $formParams
+     * @return array $response
      */
-    public function disable($id, array $formParams = array()) {
+    public function disable($userId, array $formParams = array()) {
         // create the form object
-        $form = new Auth_Form_Disable();
+        $form = new Daiquiri_Form_Confirm(array(
+            'submit' => 'Disable user'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
                 // get the user credentials
-                $user = $this->getResource()->fetchRow($id);
+                $user = $this->getResource()->fetchRow($userId);
 
                 // update the user
                 if ($user['status'] === 'disabled') {
-                    return array(
-                        'status' => 'error',
-                        'error' => 'user status is already "disabled"'
-                    );
+                    $form->setDescription('User status is already "disabled"');
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
                 } else {
                     // get the new status id
                     $statusId = Daiquiri_Auth::getInstance()->getStatusId('disabled');
 
                     // disable user in database
-                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                    $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
                     // invalidate the session of the user
                     $sessionResource = new Auth_Model_Resource_Sessions();
-                    foreach ($sessionResource->fetchAuthSessionsByUserId($id) as $session) {
+                    foreach ($sessionResource->fetchAuthSessionsByUserId($userId) as $session) {
                         $sessionResource->deleteRow($session);
                     };
 
                     // log the event
                     $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($id, 'disable');
+                    $detailResource->logEvent($userId, 'disable');
 
                     return array('status' => 'ok');
                 }
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
@@ -312,46 +340,49 @@ class Auth_Model_Registration extends Daiquiri_Model_PaginatedTable {
 
     /**
      * Sets the status of a given user from 'disabled' to 'active'.
-     * @param int $id
+     * @param int $userId id of the user
+     * @param array $formParams
+     * @return array $response
      */
-    public function reenable($id, array $formParams = array()) {
+    public function reenable($userId, array $formParams = array()) {
         // create the form object
-        $form = new Auth_Form_Reenable();
+        $form = new Daiquiri_Form_Confirm(array(
+            'submit' => 'Reenable user'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
                 // get the user credentials
-                $user = $this->getResource()->fetchRow($id);
+                $user = $this->getResource()->fetchRow($userId);
 
                 // update the use
                 if ($user['status'] === 'active') {
-                    return array(
-                        'status' => 'error',
-                        'error' => 'user status is already "active"'
-                    );
+                    $form->setDescription('User status is already "active"');
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
                 } else {
                     // get the new status id
                     $statusId = Daiquiri_Auth::getInstance()->getStatusId('active');
 
                     // activate user in database
-                    $this->getResource()->updateUser($id, array('status_id' => $statusId));
+                    $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
                     // log the event
                     $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($id, 'reenable');
+                    $detailResource->logEvent($userId, 'reenable');
 
                     // send mail
-                    $mailResource = new Auth_Model_Resource_Mail();
-                    $mailResource->sendReenableMail($user);
+                    $this->getModelHelper('mail')->send('auth.reenable', array(
+                        'to' => $user['email'],
+                        'firstname' => $user['firstname'],
+                        'lastname' => $user['lastname'],
+                        'username' => $user['username']
+                    ));
 
                     return array('status' => 'ok');
                 }
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 

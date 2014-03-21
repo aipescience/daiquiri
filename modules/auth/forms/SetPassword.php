@@ -20,14 +20,8 @@
  *  limitations under the License.
  */
 
-/**
- * Class for the form which is used to set the password by an admin. 
- */
 class Auth_Form_SetPassword extends Auth_Form_Abstract {
 
-    /**
-     * Initializes the form. 
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();

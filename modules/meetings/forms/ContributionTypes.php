@@ -20,14 +20,15 @@
  *  limitations under the License.
  */
 
-class Config_Form_Template extends Daiquiri_Form_Abstract {
+class Meetings_Form_ContributionTypes extends Daiquiri_Form_Abstract {
 
-    private $_submit = null;
-    private $_entry = null;
+    private $_submit;
+    private $_entry;
 
     public function setSubmit($submit) {
         $this->_submit = $submit;
     }
+
     public function setEntry($entry) {
         $this->_entry = $entry;
     }
@@ -35,10 +36,10 @@ class Config_Form_Template extends Daiquiri_Form_Abstract {
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
-
+        
         // add elements
-        $this->addElement('text', 'template', array(
-            'label' => 'Template',
+        $this->addElement('text', 'contribution_type', array(
+            'label' => 'Contribution type',
             'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -46,41 +47,19 @@ class Config_Form_Template extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'subject', array(
-            'label' => 'Subject',
-            'class' => 'input-xxlarge',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-            )
-        ));
-        $this->addElement('textarea', 'body', array(
-            'label' => 'Body',
-            'class' => 'input-xxlarge',
-            'rows' => '20',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Textarea()),
-            )
-        ));
+
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('template','subject', 'body'));
+        $this->addHorizontalGroup(array('contribution_type'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        if (isset($this->_entry['template'])) {
-            $this->setDefault('template', $this->_entry['template']);
-        }
-        if (isset($this->_entry['subject'])) {
-            $this->setDefault('subject', $this->_entry['subject']);
-        }
-        if (isset($this->_entry['body'])) {
-            $this->setDefault('body', $this->_entry['body']);
+        foreach (array('contribution_type') as $element) {
+            if (isset($this->_entry[$element])) {
+                $this->setDefault($element, $this->_entry[$element]);
+            }
         }
     }
 

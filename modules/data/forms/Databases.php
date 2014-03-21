@@ -20,22 +20,11 @@
  *  limitations under the License.
  */
 
-class Data_Form_Table extends Daiquiri_Form_Abstract {
+class Data_Form_Databases extends Daiquiri_Form_Abstract {
 
-    protected $_databases = array();
-    protected $_database_id;
     protected $_roles = array();
     protected $_entry = array();
     protected $_submit;
-    protected $_csrfActive = true;
-
-    public function setDatabases($databases) {
-        $this->_databases = $databases;
-    }
-
-    public function setDatabaseId($database_id) {
-        $this->_database_id = $database_id;
-    }
 
     public function setRoles($roles) {
         $this->_roles = $roles;
@@ -49,25 +38,13 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
         $this->_submit = $submit;
     }
 
-    public function setCsrfActive($csrfActive) {
-        $this->_csrfActive = $csrfActive;
-    }
-
     public function init() {
         $this->setFormDecorators();
-
-        if($this->_csrfActive === true) {
-            $this->addCsrfElement();
-        }
+        $this->addCsrfElement();
         
         // add elements
-        $this->addElement('select', 'database_id', array(
-            'label' => 'Database:',
-            'required' => true,
-            'multiOptions' => $this->_databases
-        ));
         $this->addElement('text', 'name', array(
-            'label' => 'Table name:',
+            'label' => 'Database name',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -84,14 +61,14 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
             )
         ));
         $this->addElement('text', 'order', array(
-            'label' => 'Order',
+            'label' => 'Order in list',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => 'int'),
             )
         ));
         $this->addElement('select', 'publication_role_id', array(
-            'label' => 'Published for: ',
+            'label' => 'Published for',
             'required' => true,
             'multiOptions' => $this->_roles,
         ));
@@ -110,9 +87,14 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
             'required' => true,
             'class' => 'checkbox'
         ));
+        $this->addElement('checkbox', 'publication_show', array(
+            'label' => 'Allow SHOW TABLES',
+            'required' => true,
+            'class' => 'checkbox'
+        ));
         if (empty($this->_entry)) {
             $this->addElement('checkbox', 'autofill', array(
-                'label' => 'Autofill columns',
+                'label' => 'Autofill tables',
                 'required' => false,
                 'class' => 'checkbox'
             ));
@@ -122,8 +104,8 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $inputelements = array('database_id', 'name', 'description', 'order', 'publication_role_id', 'publication_select',
-            'publication_update', 'publication_insert');
+        $inputelements = array('name', 'description', 'order', 'publication_role_id', 'publication_select',
+            'publication_update', 'publication_insert', 'publication_show');
         if (empty($this->_entry)) {
             $inputelements[] = 'autofill';
         }
@@ -131,15 +113,12 @@ class Data_Form_Table extends Daiquiri_Form_Abstract {
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('order', 'name', 'description', 'publication_role_id', 'publication_select',
-    'publication_update', 'publication_insert') as $element) {
+        foreach (array('order', 'name', 'description', 'adapter', 'publication_role_id', 'publication_select',
+    'publication_update', 'publication_insert', 'publication_show') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }
         }
-        if (isset($this->_database_id)) {
-            $this->setDefault('database_id', $this->_database_id);
-        }
-    }
 
+    }
 }

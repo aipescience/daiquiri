@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Data_Form_Column extends Daiquiri_Form_Abstract {
+class Data_Form_Columns extends Daiquiri_Form_Abstract {
 
     protected $_tables = array();
     protected $_table_id;

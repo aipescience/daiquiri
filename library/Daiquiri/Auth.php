@@ -49,13 +49,13 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         // get the acl class, this could be more general
         $this->_acl = new Daiquiri_Acl();
 
-        // get the roles
+        // store roles in auth object
         $roleModel = new Auth_Model_Roles();
-        $this->_roles = $roleModel->getValues();
+        $this->_roles = $roleModel->getResource()->fetchValues('role');
 
         // store status in auth object
         $statusModel = new Auth_Model_Status();
-        $this->_status = $statusModel->getValues();
+        $this->_status = $statusModel->getResource()->fetchValues('status');
 
         // get treatment from default crypt object
         try {

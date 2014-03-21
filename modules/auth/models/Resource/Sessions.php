@@ -20,103 +20,110 @@
  *  limitations under the License.
  */
 
-/**
- * Resource class for the application management.
- */
-class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
+class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Simple {
 
     /**
      * Constructor. Sets DbTable class.
      */
     public function __construct() {
-        $this->setTable('Auth_Model_DbTable_Sessions');
+        $this->setTablename('Auth_Sessions');
     }
 
+    /**
+     * Returns the colums of the sessions table.
+     * @return array $cols
+     */
     public function fetchCols() {
         return array('session', 'username', 'email', 'ip', 'userAgent', 'modified');
     }
 
+    /**
+     * Fetches a set of rows of the sessions table specified by $sqloptions.
+     * @param array $sqloptions
+     * @return array $rows
+     */
     public function fetchRows($sqloptions = array()) {
         // get select object
-        $sqloptions['from'][] = 'data';
-        $select = $this->getTable()->getSelect($sqloptions);
+        $select = $this->select($sqloptions);
+        $select->from('Auth_Sessions');
         $select->where("`data` LIKE '%Zend_Auth%'");
 
-        // get result convert to array
+        $dbrows = $this->fetchAll($select);
+
+        // loop over array to parse the database output
         $rows = array();
-        foreach ($this->getTable()->fetchAll($select) as $dbrow) {
+        foreach ($dbrows as $dbrow) {
             $match = array();
-            if (in_array("session", $sqloptions['from'])) {
-                $row['session'] = $dbrow->session;
-            }
-            if (in_array("username", $sqloptions['from'])) {
-                if (preg_match('/s\:8\:\"username\"\;s\:[0-9]*\:\"(.*?)\"\;/', $dbrow->data, $match)) {
-                    $row['username'] = $match[1];
-                } else {
-                    $row['username'] = '';
-                }
-            }
-            if (in_array("email", $sqloptions['from'])) {
-                if (preg_match('/s\:5\:\"email"\;s\:[0-9]*\:\"(.*?)\"\;/', $dbrow->data, $match)) {
-                    $row['email'] = $match[1];
-                } else {
-                    $row['email'] = '';
-                }
-            }
-            if (in_array("ip", $sqloptions['from'])) {
-                if (preg_match('/s\:2\:\"ip"\;s\:[0-9]*\:\"(.*?)\"\;/', $dbrow->data, $match)) {
-                    $row['ip'] = $match[1];
-                } else {
-                    $row['ip'] = '';
-                }
-            }
-            if (in_array("userAgent", $sqloptions['from'])) {
-                if (preg_match('/s\:9\:\"userAgent"\;s\:[0-9]*\:\"(.*?)\"\;/', $dbrow->data, $match)) {
-                    $row['userAgent'] = $match[1];
-                } else {
-                    $row['userAgent'] = '';
-                }
-            }
-            if (in_array("modified", $sqloptions['from'])) {
-                $row['modified'] = date("Y-m-d H:i:s", $dbrow->modified);
+
+            $row['session'] = $dbrow['session'];
+
+            if (preg_match('/s\:8\:\"username\"\;s\:[0-9]*\:\"(.*?)\"\;/', $dbrow['data'], $match)) {
+                $row['username'] = $match[1];
+            } else {
+                $row['username'] = '';
             }
 
+            if (preg_match('/s\:5\:\"email"\;s\:[0-9]*\:\"(.*?)\"\;/', $dbrow['data'], $match)) {
+                $row['email'] = $match[1];
+            } else {
+                $row['email'] = '';
+            }
+
+            if (preg_match('/s\:2\:\"ip"\;s\:[0-9]*\:\"(.*?)\"\;/', $dbrow['data'], $match)) {
+                $row['ip'] = $match[1];
+            } else {
+                $row['ip'] = '';
+            }
+        
+            if (preg_match('/s\:9\:\"userAgent"\;s\:[0-9]*\:\"(.*?)\"\;/', $dbrow['data'], $match)) {
+                $row['userAgent'] = $match[1];
+            } else {
+                $row['userAgent'] = '';
+            }
+            
+            $row['modified'] = date("Y-m-d H:i:s", $dbrow['modified']);
+            
             $rows[] = $row;
         }
 
-        // get result convert to array and return
         return $rows;
     }
 
+    /**
+     * Fetches all auth sessions for one user.
+     * @param int $userId id of the user
+     * @return array $rows
+     */
     public function fetchAuthSessionsByUserId($userId) {
-        // check input
-        if ($userId === null) {
-            throw new Exception('$id is no int or missing');
+        if (empty($userId)) {
+            throw new Exception('$userId not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         // query the database
-        $select = $this->getTable()->select()->where("`data` LIKE '%Zend_Auth%'");
-        $singleQuotedUserId = $this->getTable()->getAdapter()->quoteInto('?', $userId);
+        $select = $this->select();
+        $select->from('Auth_Sessions', array('session'));
+        $select->where("`data` LIKE '%Zend_Auth%'");
+        $singleQuotedUserId = $this->getAdapter()->quoteInto('?', $userId);
         $doubleQuotedUserId = str_replace("'", '"', $singleQuotedUserId);
         $select->where("`data` REGEXP 's:2:" . '"id";s:[0-9]*:' . $doubleQuotedUserId . "'");
-        $select->from($this->getTable(), array('session'));
-
+        
         // get the rowset and convert to flat array
-        $sessions = array();
-        foreach ($this->getTable()->fetchAll($select) as $row) {
-            $sessions[] = $row->session;
+        $rows = array();
+        foreach ($this->fetchAll($select) as $row) {
+            $rows[] = $row['session'];
         }
-
-        return $sessions;
+        return $rows;
     }
 
-    public function countRows(array $sqloptions = null, $tableclass = null) {
-        //get the table
-        $table = $this->getTable($tableclass);
-
-        // create selcet object
-        $select = $table->select();
-        $select->from($table, 'COUNT(*) as count');
+    /**
+     * Counts the number of sessions in the sessions table.
+     * Takes where conditions into account.
+     * @param array $sqloptions array of sqloptions (start,limit,order,where,from)
+     * @return int $count
+     */
+    public function countRows(array $sqloptions = null) {
+        $select = $this->select();
+        $select->from('Auth_Sessions', 'COUNT(*) as count');
         $select->where("`data` LIKE '%Zend_Auth%'");
         
         if ($sqloptions) {
@@ -133,6 +140,7 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
         }
 
         // query database and return
-        return (int) $table->fetchRow($select)->count;
+        $row = $this->fetchOne($select);
+        return (int) $row['count'];
     }
 }

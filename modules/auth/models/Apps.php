@@ -20,37 +20,37 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the application management.
- */
-class Auth_Model_Apps extends Daiquiri_Model_SimpleTable {
+class Auth_Model_Apps extends Daiquiri_Model_Abstract {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource.
      */
     public function __construct() {
         $this->setResource('Auth_Model_Resource_Apps');
-        $this->setValueField('appname');
     }
 
     /**
      * Creates a new app in the database.
-     * @param string $app
-     * @param string $key 
+     * @param array $formParams
+     * @return array $response
      */
     public function create(array $formParams = array()) {
         // create the form object
         $form = new Auth_Form_Apps();
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // split string at slash
-            $this->getResource()->storeApp($values);
+                // split string at slash
+                $this->getResource()->insertRow($values);
 
-            return array('status' => 'ok');
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
         }
 
         return array('form' => $form, 'status' => 'form');

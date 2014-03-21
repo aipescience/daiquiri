@@ -44,11 +44,11 @@ class Daiquiri_Acl extends Zend_Acl {
 
         // get the roles
         $roleModel = new Auth_Model_Roles();
-        $roles = $roleModel->getValues();
+        $roles = $roleModel->getResource()->fetchValues('role');
 
         // get the apps
         $appsModel = new Auth_Model_Apps();
-        $apps = $appsModel->getValues();
+        $apps = $appsModel->getResource()->fetchValues('appname');
 
         // define roles for acl using roles and apps
         if (!empty($roles)) {
@@ -63,7 +63,7 @@ class Daiquiri_Acl extends Zend_Acl {
 
         // get the resources
         $resourcesModel = new Auth_Model_Resources();
-        $this->_defined_resources = $resourcesModel->getValues();
+        $this->_defined_resources = $resourcesModel->getResource()->fetchValues('resource');
 
         // define resources
         foreach ($this->_defined_resources as $resource) {
@@ -72,7 +72,7 @@ class Daiquiri_Acl extends Zend_Acl {
 
         // get the rules
         $rulesModel = new Auth_Model_Rules();
-        $rules = $rulesModel->getTable();
+        $rules = $rulesModel->getResource()->fetchRows();
 
         // define permissions
         foreach ($rules as $rule) {

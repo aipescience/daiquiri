@@ -20,52 +20,47 @@
  *  limitations under the License.
  */
 
-/**
- * Resource class for the application management.
- */
-class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Table {
+class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Simple {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets tablename.
      */
     public function __construct() {
-        $this->setTable('Auth_Model_DbTable_Apps');
+        $this->setTablename('Auth_Apps');
     }
 
     /**
-     * Stores a new app.
-     * @param array $credentials
+     * Inserts a new row App table.
+     * @param array $data
+     * @throws Exception
      * @return int $id (id of the new app) 
      */
-    public function storeApp($credentials) {
-        // handle unencrypted password
-        if (!empty($credentials['newPassword'])) {
-            // crypt new password
-            $crypt = Daiquiri_Crypt_Abstract::factory();
-            $credentials['password'] = $crypt->encrypt($credentials['newPassword']);
+    public function insertRow($data) {
+        if (empty($data)) {
+            throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        // get the user table
-        $table = $this->getTable('Auth_Model_DbTable_Apps');
+        // handle unencrypted password
+        $data['password'] = Daiquiri_Crypt_Abstract::factory()->encrypt($data['newPassword']);
 
         // insert the new row
-        $table->insert(array(
-            'appname' => $credentials['appname'],
-            'password' => $credentials['password'],
+        $this->getAdapter()->insert('Auth_Apps', array(
+            'appname' => $data['appname'],
+            'password' => $data['password'],
             'active' => 1
         ));
 
         // create database for app
         if (Daiquiri_Config::getInstance()->query) {
-            $userDb = Daiquiri_Config::getInstance()->getUserDbName($credentials['appname']);
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $credentials['appname']);
+            $userDb = Daiquiri_Config::getInstance()->getUserDbName($data['appname']);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $data['appname']);
 
             $sql = "CREATE DATABASE `{$userDb}`";
             $adapter->query($sql)->closeCursor();
         }
 
         // return the id of the newly created app
-        return $table->getAdapter()->lastInsertId();
+        return $this->getAdapter()->lastInsertId();
     }
 
 }

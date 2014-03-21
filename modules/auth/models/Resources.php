@@ -20,46 +20,53 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the rules management for acl.
- */
-class Auth_Model_Resources extends Daiquiri_Model_SimpleTable {
+class Auth_Model_Resources extends Daiquiri_Model_Abstract {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource object and tablename.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Table');
-        $this->getResource()->setTable('Auth_Model_DbTable_Resources');
-        $this->setValueField('resource');
+        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->getResource()->setTablename('Auth_Resources');
     }
 
     /**
-     * Creates a resource for the ACLs.
+     * Creates resource entry.
      * @param array $formParams
+     * @return array $response
      */
     public function create(array $formParams = array()) {
         // create the form object
         $form = new Auth_Form_Resources();
 
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // check if resource is allready there
-            $resource = $this->getId($values['resource']);
-            if (empty($resource)) {
-                $this->getResource()->insertRow(array(
-                    'resource' => $values['resource']
+                // check if the entry is already there
+                $rows = $this->getResource()->fetchRows(array(
+                    'where' => array('`resource` = ?' => $values['resource'])
                 ));
+
+                if (empty($rows)) {
+                    // insert the row
+                    $id = $this->getResource()->insertRow($values);
+                    return array('status' => 'ok');
+                } else {
+                    $form->setDescription('Key already stored');
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+                }
+
+                $rows = $this->getResource()->fetchRows(array(
+                    'where' => array('`key` = ?' => $values['key'])
+                ));
+
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
-
-            return array('status' => 'ok');
         }
-
         return array('form' => $form, 'status' => 'form');
     }
-
 
 }

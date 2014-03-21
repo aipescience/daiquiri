@@ -20,17 +20,31 @@
  *  limitations under the License.
  */
 
-class Auth_Form_Disable extends Daiquiri_Form_Abstract {
+class Auth_Form_Registration extends Auth_Form_Abstract {
 
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
         
-        // add fields
-        $this->addDangerButtonElement('submit', 'Disable user');
+        $u = array();
+        $d = array();
+
+        // add elements
+        foreach ($this->getDetails() as $detail) {
+            $d[] = $this->addDetailElement($detail, true);
+        }
+        $u[] = $this->addUsernameElement(true, true);
+        $u[] = $this->addEmailElement(true, true);
+        $u[] = $this->addNewPasswordElement(true);
+        $u[] = $this->addConfirmPasswordElement(true);
+        $this->addCaptchaElement();
+        $this->addPrimaryButtonElement('submit', 'Register');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
+        $this->addHorizontalGroup($d, 'detail-group');
+        $this->addHorizontalGroup($u, 'user-group');
+        $this->addCaptchaGroup('captcha');
         $this->addActionGroup(array('submit', 'cancel'));
     }
 

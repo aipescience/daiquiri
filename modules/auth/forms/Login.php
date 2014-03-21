@@ -20,14 +20,8 @@
  *  limitations under the License.
  */
 
-/**
- * Class for the form which is used log in. 
- */
 class Auth_Form_Login extends Auth_Form_Abstract {
 
-    /**
-     * Initializes the form.
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();

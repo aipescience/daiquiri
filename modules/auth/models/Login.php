@@ -20,9 +20,6 @@
  *  limitations under the License.
  */
 
-/**
- * Model for logging in and out.
- */
 class Auth_Model_Login extends Daiquiri_Model_Abstract {
 
     /**
@@ -49,7 +46,10 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
                     return array('status' => 'redirect');
                 } else {
                     $form->setDescription('Wrong credentials provided');
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
                 }
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 

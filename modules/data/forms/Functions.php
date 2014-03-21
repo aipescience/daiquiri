@@ -20,16 +20,22 @@
  *  limitations under the License.
  */
 
-class Config_Form_Entry extends Daiquiri_Form_Abstract {
+class Data_Form_Functions extends Daiquiri_Form_Abstract {
 
-    private $_submit = null;
-    private $_entry = null;
+    protected $_roles = array();
+    protected $_entry = array();
+    protected $_submit;
+
+    public function setRoles($roles) {
+        $this->_roles = $roles;
+    }
+
+    public function setEntry($entry) {
+        $this->_entry = $entry;
+    }
 
     public function setSubmit($submit) {
         $this->_submit = $submit;
-    }
-    public function setEntry($entry) {
-        $this->_entry = $entry;
     }
 
     public function init() {
@@ -37,38 +43,48 @@ class Config_Form_Entry extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'key', array(
-            'label' => 'Key',
-            'class' => 'input-xxlarge',
+        $this->addElement('text', 'name', array(
+            'label' => 'Function name',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('textarea', 'value', array(
-            'label' => 'Value',
-            'class' => 'input-xxlarge',
+        $this->addElement('textarea', 'description', array(
+            'label' => 'Function description',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addPrimaryButtonElement('submit', 'Create config entry');
+        $this->addElement('text', 'order', array(
+            'label' => 'Order in list',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => 'int'),
+            )
+        ));
+        $this->addElement('select', 'publication_role_id', array(
+            'label' => 'Published for',
+            'required' => true,
+            'multiOptions' => $this->_roles,
+        ));
+
+        $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('key', 'value'));
+        $this->addHorizontalGroup(array('name','description','order','publication_role_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        if (isset($this->_entry['key'])) {
-            $this->setDefault('key', $this->_entry['key']);
-        }
-        if (isset($this->_entry['value'])) {
-            $this->setDefault('value', $this->_entry['value']);
+        foreach (array('order', 'name', 'description', 'publication_role_id') as $element) {
+            if (isset($this->_entry[$element])) {
+                $this->setDefault($element, $this->_entry[$element]);
+            }
         }
     }
 

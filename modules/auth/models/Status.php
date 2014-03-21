@@ -20,35 +20,23 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the status management.
- */
-class Auth_Model_Status extends Daiquiri_Model_SimpleTable {
+class Auth_Model_Status extends Daiquiri_Model_Abstract {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Table');
-        $this->getResource()->setTable('Auth_Model_DbTable_Status');
-        $this->setValueField('status');
+        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->getResource()->setTablename('Auth_Status');
     }
 
+    /**
+     * Creates status entry.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create(array $formParams = array()) {
-        // create the form object
-        $form = new Auth_Form_Status();
-
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
-
-            $this->addValue($values['status']);
-
-            return array('status' => 'ok');
-        }
-
-        return array('form' => $form, 'status' => 'form');
+        return $this->getModelHelper('CRUD')->create($formParams,'Create user status');
     }
 
 }

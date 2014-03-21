@@ -110,7 +110,7 @@ class Config_Model_Templates extends Daiquiri_Model_Table {
      */
     public function create(array $formParams = array()) {
         // create the form object
-        $form = new Config_Form_Template(array(
+        $form = new Config_Form_Templates(array(
             'submit' => 'Create new mail template'
         ));
 
@@ -170,7 +170,7 @@ class Config_Model_Templates extends Daiquiri_Model_Table {
         $variables  = implode(' ', $tmp);
 
         // create the form object
-        $form = new Config_Form_Template(array(
+        $form = new Config_Form_Templates(array(
             'submit'=> 'Update mail template',
             'entry' => $entry
         ));

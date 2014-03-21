@@ -20,18 +20,47 @@
  *  limitations under the License.
  */
 
-class Auth_Form_Reject extends Daiquiri_Form_Abstract {
+class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Abstract {
+
+    private $_submit;
+    private $_entry;
+
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
+    }
+
+    public function setEntry($entry) {
+        $this->_entry = $entry;
+    }
 
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
         
-        // add fields
-        $this->addDangerButtonElement('submit', 'Reject user');
+        // add elements
+        $this->addElement('text', 'key', array(
+            'label' => 'Participant detail key',
+            'class' => 'input-xxlarge',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
+
+        $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
+        $this->addHorizontalGroup(array('key'));
         $this->addActionGroup(array('submit', 'cancel'));
+
+        // set fields
+        foreach (array('key') as $element) {
+            if (isset($this->_entry[$element])) {
+                $this->setDefault($element, $this->_entry[$element]);
+            }
+        }
     }
 
 }

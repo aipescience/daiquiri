@@ -95,6 +95,24 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
     }
 
     /**
+     * Fetches all rows from the databases adapter specified by the select object as associative array.
+     * @param Daiquiri_Db_Select $select daiquiri select object
+     * @return array $rows
+     */
+    public function fetchAssoc(Daiquiri_Db_Select $select = null) {
+        return $this->getAdapter()->fetchAssoc($select);
+    }
+
+    /**
+     * Fetches all rows from the databases adapter specified by the select object as key value pairs.
+     * @param Daiquiri_Db_Select $select daiquiri select object
+     * @return array $rows
+     */
+    public function fetchPairs(Daiquiri_Db_Select $select = null) {
+        return $this->getAdapter()->fetchPairs($select);
+    }
+
+    /**
      * Fetches one (and only one) row from the database specfied by the select object. 
      * Raises an Exception when more than one row is found. Returns an empty arrau when 
      * no rows are found
@@ -107,7 +125,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
         if (empty($rows)) {
             return array();
         } else if (count($rows) > 1) {
-            throw new Exception('More than one row returned in ' . get_class($this) . '::fetchRow()');
+            throw new Exception('More than one row returned in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         } else {
             return $rows[0];
         }
@@ -148,7 +166,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function fetchRow($input) {
         if (empty($input)) {
-            throw new Exception('$id or $sqloptions not provided in ' . get_class($this) . '::fetchRow()');
+            throw new Exception('$id or $sqloptions not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         if (is_array($input)) {
@@ -206,7 +224,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function fetchValues($fieldname) {
         if (empty($fieldname)) {
-            throw new Exception('$fieldname not provided in ' . get_class($this) . '::insertRow()');
+            throw new Exception('$fieldname not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         // get the name of the primary key
@@ -226,11 +244,11 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
 
     /**
      * Counts the number of rows in the previously set database table.
-     * @param @param array $sqloptions array of sqloptions (start,limit,order,where,from)
-     * @return int
+     * Takes where conditions into account.
+     * @param array $sqloptions array of sqloptions (start,limit,order,where,from)
+     * @return int $count
      */
     public function countRows(array $sqloptions = null) {
-        // get select object
         $select = $this->select();
         $select->from($this->getTablename(), 'COUNT(*) as count');
 
@@ -247,7 +265,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
             }
         }
 
-        // query database
+        // query database and return
         $row = $this->fetchOne($select);
         return (int) $row['count'];
     }
@@ -261,7 +279,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function insertRow($data = array()) {
         if (empty($data)) {
-            throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
+            throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $this->getAdapter()->insert($this->getTablename(), $data);
@@ -277,7 +295,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function updateRow($id, $data) {
         if (empty($id) || empty($data)) {
-            throw new Exception('$id or $data not provided in ' . get_class($this) . '::insertRow()');
+            throw new Exception('$id or $data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
         $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
         $this->getAdapter()->update($this->getTablename(), $data, array($identifier . '= ?' => $id));
@@ -290,7 +308,7 @@ class Daiquiri_Model_Resource_Simple extends Daiquiri_Model_Resource_Abstract {
      */
     public function deleteRow($id) {
         if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::deleteRow()');
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
         $identifier = $this->getAdapter()->quoteIdentifier($this->fetchPrimary());
         $this->getAdapter()->delete($this->getTablename(), array($identifier . '= ?' => $id));

@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -24,8 +23,6 @@
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
         <p>User disabled.</p>
-    <?php elseif ($this->status === 'error'): ?>
-        <p><?php $this->errors ?></p>
     <?php else: ?>
         <p>Really disable user?</p>
         <?php echo $this->form; ?>

@@ -20,60 +20,55 @@
  *  limitations under the License.
  */
 
-/**
- * Class for the form which is used to update a user detail. 
- */
-class Auth_Form_UpdateDetail extends Auth_Form_Abstract {
+class Config_Form_Entries extends Daiquiri_Form_Abstract {
 
-    protected $_key;
-    protected $_value;
+    private $_submit = null;
+    private $_entry = null;
 
-    public function setKey($key) {
-        $this->_key = $key;
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
+    }
+    public function setEntry($entry) {
+        $this->_entry = $entry;
     }
 
-    public function setValue($value) {
-        $this->_value = $value;
-    }
-
-    /**
-     * Initializes the form. 
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
-
+        
+        // add elements
         $this->addElement('text', 'key', array(
-            'label' => 'Key:',
+            'label' => 'Key',
+            'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => 'alnum'),
+                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
-        $this->addElement('text', 'value', array(
-            'label' => 'Value:',
-            'required' => true,
+        $this->addElement('textarea', 'value', array(
+            'label' => 'Value',
+            'class' => 'input-xxlarge',
+            'rows' => '4',
+            'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
-
-        $this->addPrimaryButtonElement('submit', 'Submit');
+        $this->addPrimaryButtonElement('submit', 'Create config entry');
         $this->addButtonElement('cancel', 'Cancel');
 
-        // set decorators
+        // add groups
         $this->addHorizontalGroup(array('key', 'value'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        if (isset($this->_key)) {
-            $this->setDefault('key', $this->_key);
-            $this->setFieldReadonly('key');
+        if (isset($this->_entry['key'])) {
+            $this->setDefault('key', $this->_entry['key']);
         }
-        if (isset($this->_value)) {
-            $this->setDefault('value', $this->_value);
+        if (isset($this->_entry['value'])) {
+            $this->setDefault('value', $this->_entry['value']);
         }
     }
 

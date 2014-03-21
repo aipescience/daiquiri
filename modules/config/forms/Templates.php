@@ -20,76 +20,67 @@
  *  limitations under the License.
  */
 
-class Meetings_Form_Contribution extends Daiquiri_Form_Abstract {
+class Config_Form_Templates extends Daiquiri_Form_Abstract {
 
-    private $_submit;
-    private $_entry;
-    private $_meeting;
-    private $_participants;
+    private $_submit = null;
+    private $_entry = null;
 
     public function setSubmit($submit) {
         $this->_submit = $submit;
     }
-
     public function setEntry($entry) {
         $this->_entry = $entry;
-    }
-
-    public function setMeeting($meeting) {
-        $this->_meeting = $meeting;
-    }
-
-    public function setParticipants($participants) {
-        $this->_participants = $participants;
     }
 
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
-        
+
         // add elements
-        $this->addElement('select', 'participant_id', array(
-            'label' => 'Participant',
-            'required' => true,
-            'multiOptions' => $this->_participants,
-        ));
-        $this->addElement('select', 'contribution_type_id', array(
-            'label' => 'Contribution type',
-            'required' => true,
-            'multiOptions' => $this->_meeting['contribution_types'],
-        ));
-        $this->addElement('text', 'title', array(
-            'label' => 'Title',
+        $this->addElement('text', 'template', array(
+            'label' => 'Template',
             'class' => 'input-xxlarge',
-            'required' => false,
+            'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('textarea', 'abstract', array(
-            'label' => 'Abstract',
+        $this->addElement('text', 'subject', array(
+            'label' => 'Subject',
             'class' => 'input-xxlarge',
-            'rows' => 6,
-            'required' => false,
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
+        $this->addElement('textarea', 'body', array(
+            'label' => 'Body',
+            'class' => 'input-xxlarge',
+            'rows' => '20',
+            'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
-        
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('participant_id','contribution_type_id','title','abstract'));
+        $this->addHorizontalGroup(array('template','subject', 'body'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('contribution_type_id','title','abstract') as $element) {
-            if (isset($this->_entry[$element])) {
-                $this->setDefault($element, $this->_entry[$element]);
-            }
+        if (isset($this->_entry['template'])) {
+            $this->setDefault('template', $this->_entry['template']);
+        }
+        if (isset($this->_entry['subject'])) {
+            $this->setDefault('subject', $this->_entry['subject']);
+        }
+        if (isset($this->_entry['body'])) {
+            $this->setDefault('body', $this->_entry['body']);
         }
     }
 

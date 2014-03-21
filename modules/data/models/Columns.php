@@ -41,7 +41,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
         $ucdsResource = new Daiquiri_Model_Resource_Simple();
         $ucdsResource->setTablename('Data_UCD');
 
-        $form = new Data_Form_Column(array(
+        $form = new Data_Form_Columns(array(
             'tables' => $tablesResource->fetchValues('name'),
             'tableId' => $tableId,
             'ucds' => $ucdsResource->fetchRows(),
@@ -129,7 +129,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
         $ucdsResource = new Daiquiri_Model_Resource_Simple();
         $ucdsResource->setTablename('Data_UCD');
         
-        $form = new Data_Form_Column(array(
+        $form = new Data_Form_Columns(array(
             'tables' => $tablesResource->fetchValues('name'),
             'tableId' => $entry['table_id'],
             'ucds' => $ucdsResource->fetchRows(),

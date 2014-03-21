@@ -20,14 +20,8 @@
  *  limitations under the License.
  */
 
-/**
- * Class for the form which is used to reset the password by a user. 
- */
 class Auth_Form_ResetPassword extends Auth_Form_Abstract {
 
-    /**
-     * Initializes the form. 
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();

@@ -38,9 +38,6 @@ class Data_Model_Init extends Daiquiri_Model_Init {
 
     public function init(array $options) {
         if ($options['config']['data']) {
-            // get role model
-            $authRoleModel = new Auth_Model_Roles();
-
             // create column entries in the data module
             if (isset($options['data']['columns']) &&
                     is_array($options['data']['columns'])) {
@@ -48,7 +45,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                 if ($dataColumnsModel->getResource()->countRows() == 0) {
                     foreach ($options['data']['columns'] as $a) {
 
-                        $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                        $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
                         unset($a['publication_role']);
 
                         try {
@@ -69,7 +66,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                     foreach ($options['data']['tables'] as $a) {
                         echo '    Generating metadata for table: ' . $a['name'] . PHP_EOL;
 
-                        $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                        $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
                         unset($a['publication_role']);
 
                         try {
@@ -90,7 +87,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                     foreach ($options['data']['databases'] as $a) {
                         echo '    Generating metadata for database: ' . $a['name'] . PHP_EOL;
 
-                        $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                        $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
                         unset($a['publication_role']);
 
                         try {
@@ -110,7 +107,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                 if ($dataFunctionsModel->getResource()->countRows() == 0) {
                     foreach ($options['data']['functions'] as $a) {
 
-                        $a['publication_role_id'] = $authRoleModel->getId($a['publication_role']);
+                        $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
                         unset($a['publication_role']);
                         
                         try {

@@ -146,7 +146,10 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
         );
 
         $csrf = $form->getElement('csrf');
-        if (!empty($csrf)) $response['csrf'] = $csrf->getHash();
+        if (!empty($csrf)) {
+            $csrf->initCsrfToken();
+            $response['csrf'] = $csrf->getHash();
+        }
 
         return $response;
     }
@@ -161,7 +164,7 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
         $class = get_class($this->getModel());
 
         if ($formname === null) {
-            $formname = substr($class, strrpos($class,'_') + 1,-1);
+            $formname = substr($class, strrpos($class,'_') + 1);
         }
 
         $module = substr($class, 0, strpos($class,'_'));

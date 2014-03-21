@@ -57,7 +57,7 @@ daiquiri.Modal.prototype.show = function() {
 
                 // get title
                 var match = html.match(/\<h2\>(.*?)\<\/h2\>/g);
-                if (match.length) {
+                if (match && match.length) {
                     self.title = match[0];
 
                     // remove title

@@ -20,17 +20,32 @@
  *  limitations under the License.
  */
 
-class Auth_Form_Delete extends Daiquiri_Form_Abstract {
+class Auth_Form_CreateUser extends Auth_Form_Abstract {
 
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
         
-        // add fields
-        $this->addDangerButtonElement('submit', 'Delete user');
+        $d = array();
+        $u = array();
+
+        // add elements
+        foreach ($this->getDetails() as $detail) {
+            $d[] = $this->addDetailElement($detail, true);
+        }
+        $u[] = $this->addUsernameElement(true, true);
+        $u[] = $this->addEmailElement(true, true);
+        $u[] = $this->addNewPasswordElement(true);
+        $u[] = $this->addConfirmPasswordElement(true);
+        $u[] = $this->addRoleIdElement(true);
+        $u[] = $this->addStatusIdElement(true);
+
+        $this->addPrimaryButtonElement('submit', 'Create user');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
+        $this->addHorizontalGroup($d, 'detail-group');
+        $this->addHorizontalGroup($u, 'user-group');
         $this->addActionGroup(array('submit', 'cancel'));
     }
 

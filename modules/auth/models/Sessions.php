@@ -20,108 +20,98 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the session manegement.
- */
-class Auth_Model_Sessions extends Daiquiri_Model_PaginatedTable {
+class Auth_Model_Sessions extends Daiquiri_Model_Table {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource object and cols.
      */
     public function __construct() {
         $this->setResource('Auth_Model_Resource_Sessions');
+        $this->_cols = array('session','username','ip','userAgent','modified');
     }
 
     /**
-     * Returns the main data of the user table.
-     * @return array 
-     */
-    public function rows(array $params = array()) {
-        // set default columns
-        if (empty($params['cols'])) {
-            $params['cols'] = $this->getResource()->fetchCols();
-        } else {
-            $params['cols'] = explode(',', $params['cols']);
-        }
-
-        // get the table from the resource
-        $sqloptions = $this->_sqloptions($params);
-        $rows = $this->getResource()->fetchRows($sqloptions);
-
-        // loop through the table and add an options to destroy the session
-        if (isset($params['options']) && $params['options'] === 'true') {
-            for ($i = 0; $i < sizeof($rows); $i++) {
-                $session = $rows[$i]['session'];
-                $link = $this->internalLink(array(
-                    'text' => 'Destroy',
-                    'href' => '/auth/sessions/destroy/session/' . $session,
-                    'resource' => 'Auth_Model_Sessions',
-                    'permission' => 'destroy'));
-                $rows[$i]['options'] = $link;
-            }
-        }
-
-        return $this->_response($rows, $sqloptions, 'session');
-    }
-
-    /**
-     * Returns the columns of the table.
-     * @return array 
+     * Returns the columns of the session table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
      */
     public function cols(array $params = array()) {
-        // set default columns
-        if (empty($params['cols'])) {
-            $params['cols'] = $this->getResource()->fetchCols();
-        } else {
-            $params['cols'] = explode(',', $params['cols']);
-        }
-
-        foreach ($params['cols'] as $name) {
+        $cols = array();
+        foreach ($this->_cols as $colname) {
             $col = array(
-                'name' => $name,
+                'name' => ucfirst($colname),
                 'sortable' => 'true'
             );
-            if ($name === 'email') {
+            if ($colname === 'email') {
                 $col['width'] = '18em';
-            } else if ($name === 'modified') {
+            } else if ($colname === 'modified') {
                 $col['width'] = '13em';
             } else {
                 $col['width'] = '8em';
             }
             $cols[] = $col;
         }
-
-        if (isset($params['options']) && $params['options'] === 'true') {
-            $cols[] = array(
-                'name' => 'options',
-                'width' => '8em',
-                'sortable' => 'false'
-            );
-        }
+        $cols[] = array(
+            'name' => 'Options',
+            'width' => '8em',
+            'sortable' => 'false'
+        );
+        
         return array('cols' => $cols, 'status' => 'ok');
+    }
+
+    /**
+     * Returns the rows of the session table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
+     */
+    public function rows(array $params = array()) {
+        // parse params
+        $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
+
+        // get the data from the database
+        $dbRows = $this->getResource()->fetchRows($sqloptions);
+
+        // loop through the table and add an options to destroy the session
+        $rows = array();
+        foreach ($dbRows as $dbRow) {
+            $row = array();
+            foreach ($this->_cols as $col) {
+                $row[] = $dbRow[$col];
+            }
+
+            $row[] = $this->internalLink(array(
+                'text' => 'Destroy',
+                'href' => '/auth/sessions/destroy/session/' . $dbRow['session'],
+                'resource' => 'Auth_Model_Sessions',
+                'permission' => 'destroy'
+            ));
+
+            $rows[] = $row;
+        }
+
+        return $this->getModelHelper('pagination')->response($rows, $sqloptions);
     }
 
     /**
      * Destroys a given session
      * @param string $session
+     * @param array $formParams
      * @return array
      */
     public function destroy($session, array $formParams = array()) {
         // create the form object
-        $form = new Auth_Form_DestroySession();
+        $form = new Daiquiri_Form_Danger(array(
+            'submit' => 'Destroy session'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
                 $this->getResource()->deleteRow($session);
-
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'form' => $form,
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 

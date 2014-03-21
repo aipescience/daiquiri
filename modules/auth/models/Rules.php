@@ -20,79 +20,78 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the rule management for acl.
- */
-class Auth_Model_Rules extends Daiquiri_Model_SimpleTable {
+class Auth_Model_Rules extends Daiquiri_Model_Abstract {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Table');
-        $this->getResource()->setTable('Auth_Model_DbTable_Rules');
-        $this->setValueField('permissions');
+        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->getResource()->setTablename('Auth_Rules');
     }
 
     /**
-     * Creates a rule for the ACLs.
-     * @param string $role
-     * @param string $ressource
-     * @param string $permissions 
+     * Creates a rule entry for the ACLs.
+     * @param array $formParams
+     * @return array $response
      */
     public function create(array $formParams = array()) {
         // create the form object
         $form = new Auth_Form_Rules();
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // get additional models
-            $roleModel = new Auth_Model_Roles();
-            $appsModel = new Auth_Model_Apps();
-            $resourceModel = new Auth_Model_Resources();
+                // get additional models
+                $roleModel = new Auth_Model_Roles();
+                $appsModel = new Auth_Model_Apps();
+                $resourceModel = new Auth_Model_Resources();
 
-            // get proper ids
-            $roleId = $roleModel->getId($values['role']);
-            if ($roleId === null) {
-                // check if it is an app
-                $roleId = $appsModel->getId($values['role']);
-                if ($roleId === null) {
-                    return array(
-                        'form' => $form,
-                        'status' => 'error',
-                        'error' => 'role "' . $values['role'] . '" not found in database'
-                    );
+                // get proper ids
+                $roleId = $roleModel->getResource()->fetchId(array('where' => array('role=?' => $values['role'])));
+                if ($roleId === false) {
+                    // check if it is an app
+                    $roleId = $appsModel->getResource()->fetchId(array('where' => array('appname=?' => $values['role'])));
+                    if ($roleId === false) {
+                        return array(
+                            'form' => $form,
+                            'status' => 'error',
+                            'error' => 'role "' . $values['role'] . '" not found in database'
+                        );
+                    } else {
+                        $roleId = - $roleId;
+                    }
+                }
+                if ($values['resource'] === '') {
+                    $resourceId = null;
                 } else {
-                    $roleId = - $roleId;
+                    $resourceId = $resourceModel->getResource()->fetchId(array('where' => array('resource=?' => $values['resource'])));
+                    if ($resourceId === false) {
+                        return array(
+                            'form' => $form,
+                            'status' => 'error',
+                            'error' => 'resource "' . $values['resource'] . '" not found in database'
+                        );
+                    }
                 }
-            }
-            if ($values['resource'] === '') {
-                $resourceId = null;
+                if ($values['permissions'] === '') {
+                    $values['permissions'] = null;
+                }
+
+                // insert into database
+                $this->getResource()->insertRow(array(
+                    'role_id' => $roleId,
+                    'resource_id' => $resourceId,
+                    'permissions' => $values['permissions']
+                ));
+
+                return array('status' => 'ok');
             } else {
-                $resourceId = $resourceModel->getId($values['resource']);
-                if ($resourceId === null) {
-                    return array(
-                        'form' => $form,
-                        'status' => 'error',
-                        'error' => 'resource "' . $values['resource'] . '" not found in database'
-                    );
-                }
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
-            if ($values['permissions'] === '') {
-                $values['permissions'] = null;
-            }
-
-            // insert into database
-            $this->getResource()->insertRow(array(
-                'role_id' => $roleId,
-                'resource_id' => $resourceId,
-                'permissions' => $values['permissions']
-            ));
-
-            return array('status' => 'ok');
         }
 
         return array('form' => $form, 'status' => 'form');

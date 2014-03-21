@@ -20,22 +20,27 @@
  *  limitations under the License.
  */
 
-class Data_Form_Function extends Daiquiri_Form_Abstract {
+class Meetings_Form_Contributions extends Daiquiri_Form_Abstract {
 
-    protected $_roles = array();
-    protected $_entry = array();
-    protected $_submit;
+    private $_submit;
+    private $_entry;
+    private $_meeting;
+    private $_participants;
 
-    public function setRoles($roles) {
-        $this->_roles = $roles;
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
     }
 
     public function setEntry($entry) {
         $this->_entry = $entry;
     }
 
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
+    public function setMeeting($meeting) {
+        $this->_meeting = $meeting;
+    }
+
+    public function setParticipants($participants) {
+        $this->_participants = $participants;
     }
 
     public function init() {
@@ -43,45 +48,45 @@ class Data_Form_Function extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'name', array(
-            'label' => 'Function name',
+        $this->addElement('select', 'participant_id', array(
+            'label' => 'Participant',
             'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
-            )
+            'multiOptions' => $this->_participants,
         ));
-        $this->addElement('textarea', 'description', array(
-            'label' => 'Function description',
-            'rows' => '4',
+        $this->addElement('select', 'contribution_type_id', array(
+            'label' => 'Contribution type',
+            'required' => true,
+            'multiOptions' => $this->_meeting['contribution_types'],
+        ));
+        $this->addElement('text', 'title', array(
+            'label' => 'Title',
+            'class' => 'input-xxlarge',
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'order', array(
-            'label' => 'Order in list',
+        $this->addElement('textarea', 'abstract', array(
+            'label' => 'Abstract',
+            'class' => 'input-xxlarge',
+            'rows' => 6,
+            'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => 'int'),
+                array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
-        $this->addElement('select', 'publication_role_id', array(
-            'label' => 'Published for',
-            'required' => true,
-            'multiOptions' => $this->_roles,
-        ));
-
+        
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('name','description','order','publication_role_id'));
+        $this->addHorizontalGroup(array('participant_id','contribution_type_id','title','abstract'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('order', 'name', 'description', 'publication_role_id') as $element) {
+        foreach (array('contribution_type_id','title','abstract') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

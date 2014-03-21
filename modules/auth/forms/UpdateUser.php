@@ -20,39 +20,37 @@
  *  limitations under the License.
  */
 
-/**
- * Class for the form which is used to create a new user. 
- */
-class Auth_Form_Create extends Auth_Form_Abstract {
+class Auth_Form_UpdateUser extends Auth_Form_Abstract {
 
-    /**
-     * Initializes the form. 
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
         
-        $d = array();
-        $u = array();
+        $elements = array();
 
         // add elements
         foreach ($this->getDetails() as $detail) {
-            $d[] = $this->addDetailElement($detail, true);
+            $elements[] = $this->addDetailElement($detail, true);
         }
-        $u[] = $this->addUsernameElement(true, true);
-        $u[] = $this->addEmailElement(true, true);
-        $u[] = $this->addNewPasswordElement(true);
-        $u[] = $this->addConfirmPasswordElement(true);
-        $u[] = $this->addRoleIdElement(true);
-        $u[] = $this->addStatusIdElement(true);
-
-        $this->addPrimaryButtonElement('submit', 'Create user');
+        if ($this->_changeUsername) {
+            $elements[] = $this->addUsernameElement(true, false, $this->_user['id']);
+        }
+        if ($this->_changeEmail) {
+            $elements[] = $this->addEmailElement(true, false, $this->_user['id']);
+        }
+        $elements[] = $this->addRoleIdElement(true);
+        $elements[] = $this->addStatusIdElement(true);
+        $this->addPrimaryButtonElement('submit', 'Update user profile');
         $this->addButtonElement('cancel', 'Cancel');
 
-        // add groups
-        $this->addHorizontalGroup($d, 'detail-group');
-        $this->addHorizontalGroup($u, 'user-group');
+        // set decorators
+        $this->addHorizontalGroup($elements);
         $this->addActionGroup(array('submit', 'cancel'));
+
+        // set fields
+        foreach ($elements as $element) {
+            $this->setDefault($element, $this->_user[$element]);
+        }
     }
 
 }

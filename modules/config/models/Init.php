@@ -74,7 +74,7 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                     'lastname'
                 ),
                 'timeout' => 0,
-                'disableOnForgotPassword' => true,
+                'disableOnForgotPassword' => false,
                 'changeEmail' => true,
                 'lowerCaseUsernames' => false,
                 'usernameMinLength' => 4,

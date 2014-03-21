@@ -20,18 +20,38 @@
  *  limitations under the License.
  */
 
-class Auth_Form_Confirm extends Daiquiri_Form_Abstract {
+class Auth_Form_Account extends Auth_Form_Abstract {
 
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
         
-        // add fields
-        $this->addDangerButtonElement('submit', 'Confirm user');
+        $elements = array();
+
+        // add elements
+        foreach ($this->getDetails() as $detail) {
+            $this->addDetailElement($detail, true);
+            $elements[] = $detail;
+        }
+        if ($this->_changeUsername) {
+            $element = $this->addUsernameElement(true, true, $this->_user['id']);
+            $elements[] = 'username';
+        }
+        if ($this->_changeEmail) {
+            $element = $this->addEmailElement(true, true, $this->_user['id']);
+            $elements[] = 'email';
+        }
+        $this->addPrimaryButtonElement('submit', 'Update profile');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
+        $this->addHorizontalGroup($elements);
         $this->addActionGroup(array('submit', 'cancel'));
+
+        // set fields
+        foreach ($elements as $element) {
+            $this->setDefault($element, $this->_user[$element]);
+        }
     }
 
 }

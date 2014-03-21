@@ -46,7 +46,7 @@ class Config_Model_Entries extends Daiquiri_Model_Table {
      */
     public function create(array $formParams = array()) {
         // create the form object
-        $form = new Config_Form_Entry();
+        $form = new Config_Form_Entries();
 
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
@@ -90,7 +90,7 @@ class Config_Model_Entries extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function update($id, array $formParams = array()) {
-        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update entry', 'Config_Form_Entry');
+        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update entry');
     }
 
     /**

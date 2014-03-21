@@ -26,12 +26,12 @@
         <?php
         echo $this->internalLink(array(
             'text' => 'Back',
-            'href' => $this->redirect,
+            'href' => '/',
             'prepend' => '<p>',
             'append' => '</p>'));
         ?>
     <?php else: ?>
-        <h2>Edit your user credentials</h2>
+        <h2>Update your user credentials</h2>
         <?php echo $this->form; ?>
     <?php endif; ?>
 </div>

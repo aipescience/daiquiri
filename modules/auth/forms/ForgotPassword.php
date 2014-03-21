@@ -20,14 +20,8 @@
  *  limitations under the License.
  */
 
-/**
- * Class for the form which is used to request a new password. 
- */
 class Auth_Form_ForgotPassword extends Auth_Form_Abstract {
 
-    /**
-     * Initializes the form. 
-     */
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();

@@ -26,12 +26,16 @@
         <?php
         echo $this->internalLink(array(
             'text' => 'Back to user',
-            'href' => $this->redirect,
+            'href' => '/auth/user/',
             'prepend' => '<p>',
             'append' => '</p>'));
         ?>
     <?php else: ?>
-        <h2>Create user detail</h2>
-        <?php echo $this->form; ?>
+        <h2>Update user detail</h2>
+        <?php if (empty($this->form)): ?>
+            <p class="text-error"><?php echo $this->escape($this->error); ?></p>
+        <?php else: ?>
+            <?php echo $this->form; ?>
+        <?php endif; ?>
     <?php endif; ?>
 </div>

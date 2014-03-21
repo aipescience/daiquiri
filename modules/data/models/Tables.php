@@ -43,7 +43,7 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         // create the form object
-        $form = new Data_Form_Table(array(
+        $form = new Data_Form_Tables(array(
             'databases' => $databases,
             'databaseId' => $databaseId,
             'roles' => $roles,
@@ -136,7 +136,7 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
         // get roles
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
-        $form = new Data_Form_Table(array(
+        $form = new Data_Form_Tables(array(
             'databases' => $databases,
             'databaseId' => $entry['database_id'],
             'roles' => $roles,

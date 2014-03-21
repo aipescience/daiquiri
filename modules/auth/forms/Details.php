@@ -20,27 +20,38 @@
  *  limitations under the License.
  */
 
-class Meetings_Form_ContributionType extends Daiquiri_Form_Abstract {
+class Auth_Form_Details extends Auth_Form_Abstract {
 
-    private $_submit;
-    private $_entry;
+    protected $_key;
+    protected $_value;
+    protected $_submit;
+
+    public function setKey($key) {
+        $this->_key = $key;
+    }
+
+    public function setValue($value) {
+        $this->_value = $value;
+    }
 
     public function setSubmit($submit) {
         $this->_submit = $submit;
     }
 
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement();
-        
-        // add elements
-        $this->addElement('text', 'contribution_type', array(
-            'label' => 'Contribution type',
-            'class' => 'input-xxlarge',
+
+        $this->addElement('text', 'key', array(
+            'label' => 'Key:',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => 'alnum'),
+            )
+        ));
+        $this->addElement('text', 'value', array(
+            'label' => 'Value:',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -51,15 +62,17 @@ class Meetings_Form_ContributionType extends Daiquiri_Form_Abstract {
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
-        // add groups
-        $this->addHorizontalGroup(array('contribution_type'));
+        // set decorators
+        $this->addHorizontalGroup(array('key', 'value'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('contribution_type') as $element) {
-            if (isset($this->_entry[$element])) {
-                $this->setDefault($element, $this->_entry[$element]);
-            }
+        if (isset($this->_key)) {
+            $this->setDefault('key', $this->_key);
+            $this->setFieldReadonly('key');
+        }
+        if (isset($this->_value)) {
+            $this->setDefault('value', $this->_value);
         }
     }
 

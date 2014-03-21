@@ -43,7 +43,7 @@ class Meetings_Model_Meetings extends Daiquiri_Model_Table {
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
         
         // create the form object
-        $form = new Meetings_Form_Meeting(array(
+        $form = new Meetings_Form_Meetings(array(
             'submit'=> 'Create meeting',
             'contributionTypes' => $contributionTypeModel->getResource()->fetchValues('contribution_type'),
             'participantDetailKeys' => $participantDetailKeysModel->getResource()->fetchValues('key'),
@@ -88,7 +88,7 @@ class Meetings_Model_Meetings extends Daiquiri_Model_Table {
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
         // create the form object
-        $form = new Meetings_Form_Meeting(array(
+        $form = new Meetings_Form_Meetings(array(
             'submit'=> 'Update meeting',
             'contributionTypes' => $contributionTypeModel->getResource()->fetchValues('contribution_type'),
             'participantDetailKeys' => $participantDetailKeysModel->getResource()->fetchValues('key'),

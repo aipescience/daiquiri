@@ -20,14 +20,11 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the user management.
- */
-class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
+class Auth_Model_User extends Daiquiri_Model_Table {
 
     /**
      * Possible options for each user.
-     * @var array 
+     * @var array $_options
      */
     private $_options = array(
         'Show' => array(
@@ -92,117 +89,105 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
     );
 
     /**
-     * Default columns to be returned in cols/rows.
-     * @var array 
-     */
-    private $_cols = array('id', 'username', 'email', 'role', 'status');
-
-    /**
-     * Construtor. Sets resource.
+     * Constructor. Sets resource object and cols.
      */
     public function __construct() {
         $this->setResource('Auth_Model_Resource_User');
+        $this->_cols = array('id', 'username', 'email', 'role', 'status');
     }
 
     /**
-     * Returns the columns for the index.
-     * @return array 
+     * Returns the columns of the user table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
      */
     public function cols(array $params = array()) {
-        // set default columns
-        if (empty($params['cols'])) {
-            $params['cols'] = $this->_cols;
-        } else {
-            $params['cols'] = explode(',', $params['cols']);
-        }
-
         $cols = array();
-        foreach ($params['cols'] as $name) {
-            $col = array('name' => $name);
-            if ($name === 'id') {
+        foreach ($this->_cols as $colname) {
+            $col = array(
+                'name' => ucfirst($colname),
+                'sortable' => 'true'
+            );
+            if ($colname === 'id') {
                 $col['width'] = '3em';
                 $col['align'] = 'center';
-            } else if ($name === 'username') {
+            } else if ($colname === 'username') {
                 $col['width'] = '8em';
-            } else if ($name === 'email') {
+            } else if ($colname === 'email') {
                 $col['width'] = '16em';
-            } else if ($name === 'role') {
+            } else if ($colname === 'role') {
                 $col['width'] = '6em';
-            } else if ($name === 'status') {
+            } else if ($colname === 'status') {
                 $col['width'] = '6em';
             } else {
                 $col['width'] = '8em';
             }
             $cols[] = $col;
         }
-
-        if (isset($params['options']) && $params['options'] === 'true') {
-            $cols[] = array(
-                'name' => 'options',
-                'width' => '30em',
-                'sortable' => 'false'
-            );
-        }
-
+        $cols[] = array(
+            'name' => 'Options',
+            'width' => '30em',
+            'sortable' => 'false'
+        );
+        
         return array('cols' => $cols, 'status' => 'ok');
     }
 
     /**
-     * Returns the main data of the user table.
-     * @return array 
+     * Returns the rows of the user table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
      */
     public function rows(array $params = array()) {
-        // set default columns
-        if (empty($params['cols'])) {
-            $params['cols'] = $this->_cols;
-        } else {
-            $params['cols'] = explode(',', $params['cols']);
-        }
+        // parse params
+        $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
-        // get the table from the resource
-        $sqloptions = $this->_sqloptions($params);
-        $rows = $this->getResource()->fetchRows($sqloptions);
+        // get the data from the database
+        $dbRows = $this->getResource()->fetchRows($sqloptions);
+
+        // loop through the table and add an options to destroy the session
+        $rows = array();
+        foreach ($dbRows as $dbRow) {
+            $row = array();
+            foreach ($this->_cols as $col) {
+                $row[] = $dbRow[$col];
+            }
+
+            $status = $dbRow['status'];
         
-        // loop through the table and add options
-        if (isset($params['options']) && $params['options'] === 'true') {
-            for ($i = 0; $i < count($rows); $i++) {
-                $id = $rows[$i]['id'];
-                $links = '';
-
-                $status = null;
-                if (array_search('status', $params['cols'])) {
-                    $status = $rows[$i]['status'];
-                }
-
-                foreach ($this->_options as $key => $value) {
-                    if ($status !== null &&
-                            isset($value['prerequisites']) &&
-                            !in_array($status, $value['prerequisites'])) {
-                        // pass
-                    } else {
-                        $links .= $this->internalLink(array(
-                            'text' => $key,
-                            'href' => $value['url'] . '/id/' . $id,
-                            'resource' => $value['resource'],
-                            'permission' => $value['permission'],
-                            'class' => $value['class'],
-                            'append' => '&nbsp;'));
+            $options = array();
+            foreach ($this->_options as $key => $value) {
+                if ($status !== null &&
+                    isset($value['prerequisites']) &&
+                    !in_array($status, $value['prerequisites'])) {
+                    // pass
+                } else {
+                    $option = $this->internalLink(array(
+                        'text' => $key,
+                        'href' => $value['url'] . '/id/' . $dbRow['id'],
+                        'resource' => $value['resource'],
+                        'permission' => $value['permission'],
+                        'class' => $value['class']));
+                    if (!empty($option)) {
+                       $options[] = $option;
                     }
                 }
-
-                $rows[$i]['options'] = $links;
             }
+            $row[] = implode('&nbsp;',$options);
+
+            $rows[] = $row;
         }
 
-        return $this->_response($rows, $sqloptions);
+        return $this->getModelHelper('pagination')->response($rows, $sqloptions);
     }
 
     /**
      * Returns the credentials of a given user from the database.
-     * @return array 
+     * @param int $id id of the user
+     * @return array $response
      */
     public function show($id) {
-        return $this->getResource()->fetchRow($id);
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
     /**
@@ -217,11 +202,11 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
         unset($roles[1]); // unset the guest user
 
         // create the form object
-        $form = new Auth_Form_Create(array(
-                    'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
-                    'status' => $status,
-                    'roles' => $roles
-                ));
+        $form = new Auth_Form_CreateUser(array(
+            'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
+            'status' => $status,
+            'roles' => $roles
+        ));
 
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
@@ -233,7 +218,7 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
                 unset($values['confirmPassword']);
 
                 // create the user
-                $id = $this->getResource()->storeUser($values);
+                $id = $this->getResource()->insertRow($values);
 
                 // log the event
                 $detailsResource = new Auth_Model_Resource_Details();
@@ -241,10 +226,7 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'form' => $form,
-                    'errors' => $form->getMessages());
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
         return array('form' => $form, 'status' => 'form');
@@ -252,9 +234,9 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
 
     /**
      * Updates an existing user.
-     * @param int $id
+     * @param int $id id of the user
      * @param array $formParams
-     * @return Object
+     * @return array $response
      */
     public function update($id, array $formParams = array()) {
         // get the status model, the roles model and the roles
@@ -263,70 +245,32 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
         unset($roles[1]); // unset the guest user
 
         // create the form object
-        $form = new Auth_Form_Update(array(
-                    'user' => $this->getResource()->fetchRow($id),
-                    'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
-                    'status' => $status,
-                    'roles' => $roles,
-                    'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
-                    'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,
-                ));
+        $form = new Auth_Form_UpdateUser(array(
+            'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
+            'status' => $status,
+            'roles' => $roles,
+            'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
+            'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,
+            'user' => $this->getResource()->fetchRow($id)
+        ));
 
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
+        // check if request is POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
 
-            // update the user and redirect
-            $this->getResource()->updateUser($id, $values);
+                // update the user and redirect
+                $this->getResource()->updateRow($id, $values);
 
-            // log the event
-            $detailsResource = new Auth_Model_Resource_Details();
-            $detailsResource->logEvent($id, 'update');
+                // log the event
+                $detailsResource = new Auth_Model_Resource_Details();
+                $detailsResource->logEvent($id, 'update');
 
-            return array('status' => 'ok');
-        } else {
-            $csrf = $form->getElement('csrf');
-            $csrf->initCsrfToken();
-            return array(
-                'form' => $form,
-                'csrf' => $csrf->getHash(),
-                'status' => 'error',
-                'errors' => $form->getMessages()
-                );
-        }
-
-        return array('form' => $form, 'status' => 'form');
-    }
-
-    /**
-     * Edits the credentials of the currently logged in user.
-     * @param array $formParams
-     * @return array
-     */
-    public function edit(array $formParams = array()) {
-        // get id
-        $id = Daiquiri_Auth::getInstance()->getCurrentId();
-
-        // create the form object
-        $form = new Auth_Form_Edit(array(
-                    'user' => $this->getResource()->fetchRow($id),
-                    'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
-                    'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
-                    'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,
-                ));
-
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
-
-            // update the user and redirect
-            $this->getResource()->updateUser($id, $values);
-
-            // log the event
-            $detailsResource = new Auth_Model_Resource_Details();
-            $detailsResource->logEvent($id, 'edit');
-
-            return array('status' => 'ok');
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
         }
 
         return array('form' => $form, 'status' => 'form');
@@ -334,13 +278,15 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
 
     /**
      * Deletes an existing user.
-     * @param int $id
+     * @param int $id id of the user
      * @param array $formParams
-     * @return array 
+     * @return array $response
      */
     public function delete($id, array $formParams = array()) {
         // create the form object
-        $form = new Auth_Form_Delete();
+        $form = new Daiquiri_Form_Danger(array(
+            'submit' => 'Delete user'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -349,7 +295,7 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
                 $values = $form->getValues();
 
                 // delete the user and redirect
-                $this->getResource()->deleteUser($id);
+                $this->getResource()->deleteRow($id);
 
                 // invalidate the session of the user
                 $resource = new Auth_Model_Resource_Sessions();
@@ -359,10 +305,7 @@ class Auth_Model_User extends Daiquiri_Model_PaginatedTable {
                 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 

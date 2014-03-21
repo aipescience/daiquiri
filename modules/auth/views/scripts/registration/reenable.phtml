@@ -23,9 +23,7 @@
 
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
-        <p>User reenable.</p>
-    <?php elseif ($this->status === 'error'): ?>
-        <p><?php $this->errors ?></p>
+        <p>User reenabled.</p>
     <?php else: ?>
         <p>Really reenable user?</p>
         <?php echo $this->form; ?>

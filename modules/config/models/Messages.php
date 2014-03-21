@@ -64,7 +64,7 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
      */
     public function create(array $formParams = array()) {
         // create the form object
-        $form = new Config_Form_Message();
+        $form = new Config_Form_Messages();
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -109,7 +109,7 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function update($id, array $formParams = array()) {
-        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update entry', 'Config_Form_Message');
+        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update entry');
     }
 
     /**
