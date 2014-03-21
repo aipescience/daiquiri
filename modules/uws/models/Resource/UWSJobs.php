@@ -20,90 +20,71 @@
  *  limitations under the License.
  */
 
-/**
- * Resource class ...
- */
-class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
+class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Simple {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets Tablename.
      */
     public function __construct() {
-        $this->addTables(array(
-            'Uws_Model_DbTable_UWSJobs',
-        ));
+        $this->addTablename('Uws_UWSJobs');
     }
 
     /**
-     * Returns a specific row from the (pending) job table
-     * @param type $id
+     * Fetches a specific row from the (pending) job table
+     * @param string $id UWSJobId of the job
      * @throws Exception
-     * @return type 
+     * @return array $row
      */
     public function fetchRow($id) {
-        $sqloptions = array();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`jobId` = ?", $id);
-        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current();
-
-        $data = false;
-
-        if($row) {
-            $data = $row->toArray();
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        return $data;
+        $select = $this->select();
+        $select->from('Uws_UWSJobs');
+        $select->where("jobId = ?", $id);
+        $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
+
+        return $this->fetchOne($select);
     }
 
     /**
-     * Returns a specific row from the (pending) job table
-     * @param type $id
+     * Fetches a set of rows from the (pending) job table
      * @throws Exception
-     * @return type 
+     * @return array $rows
      */
     public function fetchRows() {
-        $sqloptions = array();
+        $select = $this->select();
+        $select->from('Uws_UWSJobs');
+        $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
 
-        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-        return $row;
+        return $this->fetchAll($select);
     }
 
     /**
-     * Returns the id of the job with a given UWS job id
-     * @param string $UWSJobId
+     * Returns the information of the job with a given UWS job id
+     * @param string $id UWSJobId of the job
      * @return array
      */
     public function fetchObjectWithId($id) {
-        $sqloptions = array();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-
-        $select->where("`jobId` = ?", $id);
-        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-
-        if ($row) {
-            //map information to an object
-            return $this->_objectFromRow($row[0]);
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        return false;
+        $row = $this->fetchRow($id);
+        if ($row) {
+            // map information to an object
+            return $this->_objectFromRow($row);
+        } else {
+            return false;
+        }
     }
 
+    /**
+     * Maps the information of a row in the UwsJobs table to an object
+     * @param array $row database row
+     * @return array$jobUWS
+     */
     private function _objectFromRow($row) {
         //create new job object
         $jobUWS = new Uws_Model_Resource_JobSummaryType("job");
