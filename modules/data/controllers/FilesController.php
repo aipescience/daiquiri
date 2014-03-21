@@ -20,48 +20,38 @@
  *  limitations under the License.
  */
 
-class Files_IndexController extends Daiquiri_Controller_Abstract {
+class Data_FilesController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        $this->_model = Daiquiri_Proxy::factory('Files_Model_Files');
+        $this->_model = Daiquiri_Proxy::factory('Data_Model_Files');
     }
 
     public function indexAction() {
-        $files = $this->_model->index();
-
-        $this->view->files = $files;
-        $this->view->status = 'ok';
+        $response = $this->_model->index();
+        $this->setViewElements($response);
     }
 
     public function singleAction() {
+        // get parameters from request
         $name = $this->_getParam('name');
 
-        if (empty($name)) {
-            throw new Daiquiri_Exception_AuthError();
-        }
-
-        //getting rid of all the output buffering in Zend
+        // getting rid of all the output buffering in Zend
         $this->_helper->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-
-        $controller = Zend_Controller_Front::getInstance();
-        $controller->getDispatcher()->setParam('disableOutputBuffering', true);
-
+        Zend_Controller_Front::getInstance()->getDispatcher()->setParam('disableOutputBuffering', true);
         ob_end_clean();
 
+        // call model function to send the file to the client
         return $this->_model->single($name);
     }
 
     public function singlesizeAction() {
+        // get parameter
         $name = $this->_getParam('name');
-
-        if (empty($name)) {
-            throw new Daiquiri_Exception_AuthError();
-        }
 
         $response = $this->_model->singleSize($name);
 
-        $this->view->assign($response);
+        $this->setViewElements($response);
     }
 
     public function multiAction() {
@@ -69,18 +59,14 @@ class Files_IndexController extends Daiquiri_Controller_Abstract {
         $table = $this->_getParam('table');
         $column = $this->_getParam('column');
 
-        //getting rid of all the output buffering in Zend
+        // getting rid of all the output buffering in Zend
         $this->_helper->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-
-        $controller = Zend_Controller_Front::getInstance();
-        $controller->getDispatcher()->setParam('disableOutputBuffering', true);
-
+        Zend_Controller_Front::getInstance()->getDispatcher()->setParam('disableOutputBuffering', true);
         ob_end_clean();
 
-        $response = $this->_model->multi($table, $column);
-
-        return $response;
+        // call model function to send multible files to the client
+        return $this->_model->multi($table, $column);
     }
 
     public function multisizeAction() {
@@ -90,21 +76,18 @@ class Files_IndexController extends Daiquiri_Controller_Abstract {
 
         $response = $this->_model->multiSize($table, $column);
 
-        $this->view->assign($response);
+        $this->setViewElements($response);
     }
 
     public function rowAction() {
         // get parameters from request
         $table = $this->_getParam('table');
-        $row_ids = explode(",", $this->_getParam('id'));
+        $row_ids = explode(',', $this->_getParam('id'));
 
-        //getting rid of all the output buffering in Zend
+        // getting rid of all the output buffering in Zend
         $this->_helper->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-
-        $controller = Zend_Controller_Front::getInstance();
-        $controller->getDispatcher()->setParam('disableOutputBuffering', true);
-
+        Zend_Controller_Front::getInstance()->getDispatcher()->setParam('disableOutputBuffering', true);
         ob_end_clean();
 
         $response = $this->_model->row($table, $row_ids);
@@ -115,11 +98,11 @@ class Files_IndexController extends Daiquiri_Controller_Abstract {
     public function rowsizeAction() {
         // get parameters from request
         $table = $this->_getParam('table');
-        $row_ids = explode(",", $this->_getParam('id'));
+        $row_ids = explode(',', $this->_getParam('id'));
 
         $response = $this->_model->rowSize($table, $row_ids);
 
-        $this->view->assign($response);
+        $this->setViewElements($response);
     }
 
 }

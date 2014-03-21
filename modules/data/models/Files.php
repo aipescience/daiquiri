@@ -22,21 +22,11 @@
 
 require_once(Daiquiri_Config::getInstance()->core->libs->PHPZip . '/ZipStream.php');
 
-/**
- * Model for the currently running query jobs.
- */
-class Files_Model_Files extends Daiquiri_Model_Abstract {
+class Data_Model_Files extends Daiquiri_Model_Abstract {
 
     /**
-     * Constructor. Sets resource object and primary field.
-     */
-    public function __construct() {
-        
-    }
-
-    /**
-     * Returns a list of all available files
-     * @return array
+     * Returns a list of all available files.
+     * @return array $response
      */
     public function index() {
         $directories = Daiquiri_Config::getInstance()->files->static->toArray();
@@ -53,15 +43,19 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
             $files[] = array("name" => $name, "size" => $size);
         }
 
-        return $files;
+        return array('status' => 'ok', 'files' => $files);
     }
 
+    /**
+     * Sends a single file to the client.
+     * @param string $name name of the file
+     */
     public function single($name) {
         if (empty($name)) {
             throw new Daiquiri_Exception_AuthError();
         }
 
-        //first find file
+        // find file
         $files = $this->_findFile($name);
 
         if (count($files) > 1) {
@@ -70,7 +64,7 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
             throw new Daiquiri_Exception_AuthError();
         }
 
-        //determine mime type of this file
+        // determine mime type of this file
         $finfo = new finfo;
 
         $file = $files[0];
@@ -82,12 +76,17 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         http_send_file($file);
     }
 
+    /**
+     * Returns a the size of a single file.
+     * @param string $name name of the file
+     * @return array $response
+     */
     public function singleSize($name) {
         if (empty($name)) {
             throw new Daiquiri_Exception_AuthError();
         }
 
-        //first find file
+        // find file
         $files = $this->_findFile($name);
 
         if (count($files) > 1) {
@@ -101,10 +100,15 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         return array('size' => $size, 'status' => 'ok');
     }
 
+    /**
+     * Sends all files from a column in a users table to the client.
+     * @param string $name name of the database table
+     * @param string $column name of the column
+     */
     public function multi($table, $column) {
         $rows = $this->_getFilesInCol($table, $column);
 
-        //leave some time for the file to be transferred
+        // leave some time for the file to be transferred
         ini_set('max_execution_time', 3600);
 
         $fileName = $table . "_" . $column . ".zip";
@@ -137,6 +141,12 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         $zip->finalize();
     }
 
+    /**
+     * Returns a the size of all files from a column in a users table.
+     * @param string $name name of the database table
+     * @param string $column name of the column
+     * @return array $response
+     */
     public function multiSize($table, $column) {
         $rows = $this->_getFilesInCol($table, $column);
 
@@ -162,8 +172,13 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         return array('size' => $size, 'status' => 'ok');
     }
 
-    public function row($table, array $row_ids) {
-        $data = $this->_getFilesInRow($table, $row_ids);
+    /**
+     * Sends all files from a set of rows of a users table to the client.
+     * @param string $name name of the database table
+     * @param string $rowIds ids of the rows
+     */
+    public function row($table, array $rowIds) {
+        $data = $this->_getFilesInRow($table, $rowIds);
 
         if ($data['rows'] === NULL) {
             return NULL;
@@ -176,7 +191,7 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
 
         $zip = new ZipStream($fileName);
 
-        $comment = "All files connected to rows " . implode(", ", $row_ids) . " of table " . $table . " downloaded on " . date('l jS \of F Y h:i:s A');
+        $comment = "All files connected to rows " . implode(", ", $rowIds) . " of table " . $table . " downloaded on " . date('l jS \of F Y h:i:s A');
 
         $zip->setComment($comment);
 
@@ -204,8 +219,14 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         $zip->finalize();
     }
 
-    public function rowSize($table, array $row_ids) {
-        $data = $this->_getFilesInRow($table, $row_ids);
+    /**
+     * Returns a the size of a set of rows of a users table to the client.
+     * @param string $name name of the database table
+     * @param string $rowIds ids of the rows
+     * @return array $response
+     */
+    public function rowSize($table, array $rowIds) {
+        $data = $this->_getFilesInRow($table, $rowIds);
 
         if ($data['rows'] === NULL) {
             return array('status' => 'error');
@@ -235,12 +256,55 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         return array('size' => $size, 'status' => 'ok');
     }
 
+    /**
+     * Returns the absolute path of a specific file.
+     * @param string $name name of the file
+     * @return array $file
+     */
+    private function _findFile($name) {
+        $directories = Daiquiri_Config::getInstance()->files->static->toArray();
+
+        $file = array();
+        foreach ($directories as $dir) {
+            $file = array_merge($file, $this->_findFileRec($name, $dir));
+        }
+
+        return $file;
+    }
+
+    /**
+     * Recursive function to find a specific file.
+     * @param string $name name of the file
+     * @param string $currDir current directory
+     * @return array $file
+     */
+    private function _findFileRec($name, $currDir) {
+        $subdirs = glob($currDir . '/*', GLOB_ONLYDIR|GLOB_NOSORT);
+
+        $file = array();
+        foreach($subdirs as $subdir) {
+            $file = array_merge($file, $this->_findFileRec($name, $subdir));
+        }
+
+        if(file_exists($currDir . DIRECTORY_SEPARATOR . $name)) {
+                $file[] = $currDir . DIRECTORY_SEPARATOR . $name;
+        }
+
+        return $file;
+    }
+
+    /**
+     * Returns all files of a specific column in a users table.
+     * @param string $name name of the database table
+     * @param string $column name of the column
+     * @return array $rows
+     */
     private function _getFilesInCol($table, $column) {
         if (empty($table) || empty($column)) {
             throw new Daiquiri_Exception_AuthError();
         }
 
-        //get the column of the result set to obtain a list of all files we are dealing with
+        // get the column of the result set to obtain a list of all files we are dealing with
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $db = Daiquiri_Config::getInstance()->getUserDbName($username);
 
@@ -269,8 +333,14 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         return $rows;
     }
 
-    private function _getFilesInRow($table, array $row_ids) {
-        if (empty($table) || empty($row_ids)) {
+    /**
+     * Returns all files of a set of rows in a users table.
+     * @param string $name name of the database table
+     * @param @param string $rowIds ids of the rows
+     * @return array $data 
+     */
+    private function _getFilesInRow($table, array $rowIds) {
+        if (empty($table) || empty($rowIds)) {
             throw new Daiquiri_Exception_AuthError();
         }
 
@@ -297,9 +367,9 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         //get the data from the result table
         $rows = array();
 
-        foreach ($row_ids as $row_id) {
+        foreach ($rowIds as $rowId) {
             try {
-                $row = $viewer->getResource()->fetchRow($row_id);
+                $row = $viewer->getResource()->fetchRow($rowId);
             } catch (Exception $e) {
                 return NULL;
             }
@@ -309,30 +379,6 @@ class Files_Model_Files extends Daiquiri_Model_Abstract {
         return array('cols' => $cols['data'], 'rows' => $rows);
     }
 
-    private function _findFile($name) {
-        $directories = Daiquiri_Config::getInstance()->files->static->toArray();
 
-        $file = array();
-        foreach ($directories as $dir) {
-            $file = array_merge($file, $this->_findFileRec($name, $dir));
-        }
-
-        return $file;
-    }
-
-    private function _findFileRec($name, $currDir) {
-        $subdirs = glob($currDir . '/*', GLOB_ONLYDIR|GLOB_NOSORT);
-
-        $file = array();
-        foreach($subdirs as $subdir) {
-            $file = array_merge($file, $this->_findFileRec($name, $subdir));
-        }
-
-        if(file_exists($currDir . DIRECTORY_SEPARATOR . $name)) {
-                $file[] = $currDir . DIRECTORY_SEPARATOR . $name;
-        }
-
-        return $file;
-    }
 
 }
