@@ -294,7 +294,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 $sql = $ns->sql;
                 $planString = $ns->planString;
 
-                $this->getModelHelper('mail')->send('auth.activate', array(
+                $this->getModelHelper('mail')->send('query.plan', array(
                     'to' => Daiquiri_Config::getInstance()->query->processor->mail->admin->toArray(),
                     'sql' => $sql,
                     'plan' => $planString,
