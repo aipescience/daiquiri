@@ -49,8 +49,6 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
 
     abstract public function getQueue();
 
-    abstract public function getCsrf();
-
     public function getFieldId($string) {
         if (!isset($this->_formOptions['name'])) {
 	    throw new Exception('no name was specified');

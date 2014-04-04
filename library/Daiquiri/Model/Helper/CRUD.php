@@ -138,14 +138,29 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
         return array('form' => $form, 'status' => 'form');
     }
  
-    public function validationErrorResponse($form) {
+    public function validationErrorResponse($form, $extraErrors = false) {
+        // get validation errors from form
+        $errors = $form->getMessages();
+
+        // add description for extra error
+        if ($extraErrors !== false) {
+            if (!is_array($extraErrors)) {
+                $extraErrors = array($extraErrors);
+            }
+
+            $form->setDescription(implode('; ',$extraErrors));
+            $errors['form'] = $extraErrors;
+        }
+
+        // construct response array
         $response = array(
             'form' => $form,
             'status' => 'error',
-            'errors' => $form->getMessages()
+            'errors' => $errors
         );
 
-        $csrf = $form->getElement('csrf');
+        // add and re-init csrf
+        $csrf = $form->getCsrf();
         if (!empty($csrf)) {
             $csrf->initCsrfToken();
             $response['csrf'] = $csrf->getHash();

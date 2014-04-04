@@ -87,6 +87,11 @@ daiquiri.Modal.prototype.display = function () {
     // 'lock' body
     $('body').css('overflow','hidden');
 
+    // set title to empty string in nessesary
+    if (typeof(this.title) === 'undefined') {
+        this.title = ''
+    }
+
     // create diolog
     this.modal = $('<div />',{
         'html': '<div class="daiquiri-modal-dialog"><div class="daiquiri-modal-close-container"><a class="daiquiri-modal-close" href="#">x</a></div><div class="daiquiri-modal-title">' + this.title + '</div><div class="daiquiri-modal-body">' + this.html + '</div></div>',

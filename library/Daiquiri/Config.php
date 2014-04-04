@@ -53,7 +53,7 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     public function init() {
         // init the databases resource
         try {
-            $resource = new Daiquiri_Model_Resource_Simple();
+            $resource = new Daiquiri_Model_Resource_Table();
             $resource->setTablename('Config_Entries');
 
             $config = array();
@@ -151,6 +151,14 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     public function getBaseUrl() {
         $front = Zend_Controller_Front::getInstance();
         return $front->getBaseUrl();
+    }
+
+    /**
+     * Returns the web (default) database adapter
+     * @return Zend_
+     */
+    public function getWebAdapter() {
+        return Zend_Db_Table::getDefaultAdapter();
     }
 
     /**

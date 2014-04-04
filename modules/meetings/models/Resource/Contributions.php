@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Simple {
+class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Table {
 
     public function __construct() {
         $this->setTablename('Meetings_Contributions');
@@ -28,11 +28,11 @@ class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Simp
 
     public function fetchCols() {
         $cols = parent::fetchCols();
-        $cols['participant_firstname'] = $this->quoteIdentifier('Meetings_Participants','firstname');
-        $cols['participant_lastname'] = $this->quoteIdentifier('Meetings_Participants','lastname');
-        $cols['meeting_title'] = $this->quoteIdentifier('Meetings_Meetings','title');
-        $cols['contribution_type_id'] = $this->quoteIdentifier('Meetings_ContributionTypes','id');
-        $cols['contribution_type'] = $this->quoteIdentifier('Meetings_ContributionTypes','contribution_type');
+        $cols[] = 'participant_firstname';
+        $cols[] = 'participant_lastname';
+        $cols[] = 'meeting_title';
+        $cols[] = 'contribution_type_id';
+        $cols[] = 'contribution_type';
         return $cols;
     }
 

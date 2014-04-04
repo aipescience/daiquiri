@@ -20,18 +20,21 @@
  *  limitations under the License.
  */
 
-abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Resource_Table {
+abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Resource_Abstract {
 
-    //this can be either QPROC_SIMPLE, QPROC_INFOPLAN, QPROC_ALTERPLAN
+    /**
+     * Plan type. This can be either QPROC_SIMPLE, QPROC_INFOPLAN, QPROC_ALTERPLAN
+     * @var string $planTypes
+     */
     public static $planTypes = false;
 
     /**
      * Processor factory.
+     * @return Query_Model_Resource_AbstractProcessor $processor
      */
-    static function factory($queue = 'direct') {
-
+    public static function factory() {
         // get the values from the config
-        $processor = Daiquiri_Config::getInstance()->query->processor->name;
+        $processor = Daiquiri_Config::getInstance()->query->processor->type;
 
         // get the name of the class
         $className = 'Query_Model_Resource_' . ucfirst($processor) . 'Processor';
@@ -44,11 +47,29 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
     }
 
     /**
-     * Constructor. 
+     * Permissions resource.
+     * @var Query_Model_Resource_Permissions $_permissions
+     */
+    protected $_permissions;
+
+    /**
+     * Processing resource.
+     * @var Query_Model_Resource_Processing $_processing
+     */
+    protected $_processing;
+
+    /**
+     * Name of the database the results of the query are stores in.
+     * @var string $_resultDb
+     */
+    protected $_userDb;
+
+    /**
+     * Constructor. Sets processing and permissions resource.
      */
     public function __construct() {
-        $this->permissions = new Query_Model_Resource_Permissions();
-        $this->processing = new Query_Model_Resource_Processing();
+        $this->_permissions = new Query_Model_Resource_Permissions();
+        $this->_processing = new Query_Model_Resource_Processing();
 
         // get current user
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
@@ -56,90 +77,64 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
             $username = 'Guest';
         }
 
-        $this->resultDB = Daiquiri_Config::getInstance()->getUserDBName($username);
+        $this->_userDb = Daiquiri_Config::getInstance()->getUserDbName($username);
     }
 
     /**
      * Validates a raw query before any processing and altering of the query occurred.
-     * 
-     * @param string sql query
-     * @param string result table name
-     * @param array errors holding any error that occurs
-     * @param array options any options that a specific implementation of validateQuery needs to get
-     * @return TRUE if valid, FALSE if not
+     * @param string $sql query string
+     * @param string $table name of the job's table
+     * @param array $errors array holding any errors that occur
+     * @param array $options any options that a specific implementation of validateQuery needs to get
+     * @return bool $success
      */
     abstract public function validateQuery($sql, $table, array &$errors, $options = false);
 
     /**
      * Validates a query plan (if alterable) before submission of the query. If no alteration of the
      * plan is supported by the specific query facility, this function needs to be implemented empty
-     * just returning TRUE
-     * 
-     * @param array plan
-     * @param string result table name
-     * @param array errors holding any error that occurs
-     * @param array options any options that a specific implementation of validateQuery needs to get
-     * @return TRUE if valid, FALSE if not
+     * just returning true
+     * @param array $plan $query plan
+     * @param string $table name of the job's table
+     * @param array $errors array holding any errors that occur
+     * @param array $options any options that a specific implementation of validateQuery needs to get
+     * @return bool $success
      */
     abstract public function validatePlan(&$plan, $table, array &$errors, $options = false);
 
     /**
      * Prepares a job object according to the query plan (if supported), otherwise just prepares a job 
      * according to the processed query (without plan, depending on implementation)
-     * 
-     * @param array sql query
-     * @param array errors holding any error that occurs
-     * @param array plan
-     * @param string result table name
-     * @param array options any options that a specific implementation of validateQuery needs to get
-     * @return object job
+     * @param string $sql query string
+     * @param array $errors array holding any errors that occur
+     * @param array $plan $query plan
+     * @param string $table name of the job's table
+     * @param array $options any options that a specific implementation of validateQuery needs to get
+     * @return array $job
      */
     abstract public function query(&$sql, array &$errors, &$plan = false, $resultTableName = false, $options = false);
 
     /**
      * Returns the query plan depending on implementation. If an implementation does not support query
      * plans, this needs to return an empty array.
-     * 
-     * @param array sql query
-     * @param array errors holding any error that occurs
-     * @param array options any options that a specific implementation of validateQuery needs to get
-     * @return plan 
+     * @param array $plan $query plan
+     * @param array $errors array holding any errors that occur
+     * @param array $options any options that a specific implementation of validateQuery needs to get
+     * @return array $plan 
      */
     abstract public function getPlan(&$sql, array &$errors, $options = false);
 
     /**
-     * Checks whether a given plan execution type is supported by the implementation or not.
-     * 
-     * @param string plan type
-     * @return TRUE if supported, FALSE if not
+     * Checks whether a given plan execution type is supported by the implementation (true) or not (false).
+     * @param string $planType type of the plan
+     * @return bool
      */
     public function supportsPlanType($planType) {
         if (in_array($planType, static::$planTypes)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
-    }
-
-    /*    /**
-     * Returns an unset DB Table resource which is hooked up to the User DB Adapter
-     * @return DBAdapter
-     */
-
-    protected function getUserDBResource() {
-        //NOTE: Cannot be done differently! Adapter needs to be set to a DB, otherwise
-        //      database cannot work. Database cannot have db set to ""...
-        //build adapter
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $userDBName = Daiquiri_Config::getInstance()->getUserDbName($username);
-        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($username);
-
-        $userDBResource = new Daiquiri_Model_Resource_Table();
-
-        $userDBResource->setTable('Daiquiri_Model_DbTable_Simple', $userDBName);
-        $userDBResource->getTable()->setAdapter($adapter);
-
-        return $userDBResource;
     }
 
 }

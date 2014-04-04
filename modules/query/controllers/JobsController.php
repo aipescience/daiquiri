@@ -36,87 +36,27 @@ class Query_JobsController extends Daiquiri_Controller_Abstract {
         }
     }
 
-    public function rowsAction() {
-        // call model functions
-        $response = $this->_model->rows($this->_request->getQuery());
-
-        // assign to view
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-        $this->view->redirect = $this->_getParam('redirect', '/query/jobs/');
-        $this->view->status = 'ok';
+    public function colsAction() {
+        $this->getControllerHelper('pagination')->cols();
     }
 
-    public function colsAction() { 
-        // call model functions
-        $response = $this->_model->cols($this->_request->getQuery());
-        
-        // assign to view
-        $this->view->cols = $response['cols'];
-        $this->view->redirect = $this->_getParam('redirect', '/query/jobs/');
-        $this->view->status = 'ok';
+    public function rowsAction() {
+        $this->getControllerHelper('pagination')->rows();
     }
 
     public function showAction() {
-        // get params from request
         $id = $this->_getParam('id');
-
-        $this->view->redirect = $this->_getParam('redirect', '/query/jobs/');
-        $this->view->data = $this->_model->show($id);
-        $this->view->status = 'ok';
+        $this->getControllerHelper('table')->show($id);
     }
 
     public function killAction() {
-        // get parameters from request
         $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', '/query/jobs/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and delete user
-                $response = $this->_model->kill($id, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->kill($id);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->getControllerHelper('form')->kill($id);
     }
 
     public function removeAction() {
-        // get parameters from request
         $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', '/query/jobs/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and delete user
-                $response = $this->_model->remove($id, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->remove($id);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->getControllerHelper('form')->remove($id);
     }
 
 }

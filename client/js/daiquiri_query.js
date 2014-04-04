@@ -45,22 +45,22 @@ daiquiri.query.Query = function (siteUrl) {
     }
 
     this.url = {
-        'jobs': baseUrl + '/query/index/list-jobs',
-        'browser':baseUrl + '/query/index/database',
-        'query': baseUrl + '/query/index/query',
-        'download': baseUrl + '/query/index/download',
-        'plot': baseUrl + '/query/index/plot',
-        'show': baseUrl + '/query/index/show-job',
-        'kill': baseUrl + '/query/index/kill-job',
-        'remove': baseUrl + '/query/index/remove-job',
-        'rename': baseUrl + '/query/index/rename-job',
+        'jobs': baseUrl + '/query/account/list-jobs',
+        'browser':baseUrl + '/query/account/databases',
+        'query': baseUrl + '/query/form/',
+        'download': baseUrl + '/query/download/',
+        //'plot': baseUrl + '/query/index/plot',
+        'show': baseUrl + '/query/account/show-job',
+        'kill': baseUrl + '/query/account/kill-job',
+        'remove': baseUrl + '/query/account/remove-job',
+        'rename': baseUrl + '/query/account/rename-job',
         'results': {
             'cols': baseUrl + '/data/viewer/cols',
             'rows': baseUrl + '/data/viewer/rows',
             'base': baseUrl
         },
-        'fileDownload': baseUrl + '/files/index/row',
-        'sampStream': siteUrl + '/query/index/stream',
+        'fileDownload': baseUrl + '/data/files/row',
+        'sampStream': siteUrl + '/query/download/stream',
         'baseUrl': baseUrl
     }
 
@@ -200,7 +200,6 @@ daiquiri.query.Query.prototype.displayPlan = function(redirect){
         'success': function (json) {
             if (typeof json === 'undefined') {
                 // the mail button was clicked!
-                console.log($('.daiquiri-modal form'));
                 self.mailPlan($('.daiquiri-modal form'));
             } else {
                 // the form was submitted
@@ -222,7 +221,7 @@ daiquiri.query.Query.prototype.mailPlan = function(form){
     var values = $(form).serialize();
 
     $.ajax({
-        url: action + '?mail=1',
+        url: action + '&mail=1',
         type: 'POST',
         dataType: 'json',
         headers: {
@@ -256,7 +255,7 @@ daiquiri.query.Query.prototype.loadJob = function(jobId){
         error: daiquiri.common.ajaxError,
         success: function (json) {
             if (json.status == 'ok') {
-                self.job = json.data;
+                self.job = json.job;
 
                 // call display methods
                 self.displayDetails();
@@ -303,7 +302,7 @@ daiquiri.query.Query.prototype.displayJobs = function(){
         },
         error: daiquiri.common.ajaxError,
         success: function (json){
-            self.jobs = json.data;
+            self.jobs = json.jobs;
 
             // clean up content
             if ($('#jobs').children().length != 0) {
@@ -313,7 +312,7 @@ daiquiri.query.Query.prototype.displayJobs = function(){
             // construct html string
             var html = '<ul class="nav nav-pills nav-stacked">';
             html += '<li class="nav-header">Jobs</li>';
-            $.each(json.data, function (key, value) {
+            $.each(self.jobs, function (key, value) {
                 if(typeof self.job.id != 'undefined' && self.job.id.value == value.id)  {
                     html += '<li class="nav-item active">';
                 } else {
@@ -777,14 +776,14 @@ daiquiri.query.Query.prototype.displayDownloadPendingMessage = function() {
 
 daiquiri.query.Query.prototype.displayDownloadErrors = function (error) {
     if(typeof error == 'undefined') {
-        error = '';
+        error = {'form': ''};
     } 
 
     $('#daiquiri-query-download-pending').remove();
     $('#daiquiri-query-download-link').remove();
     $('<div/>',{
         'id': 'daiquiri-query-download-pending',
-        'html' : '<p class="text-error">Your file cannot be created due to an error. Please contact support.<br />' + error + '</p>'
+        'html' : '<p class="text-error">Your file cannot be created due to an error. Please contact support.<br />' + error.form + '</p>'
     }).appendTo(this.tabs.download);
 };
 

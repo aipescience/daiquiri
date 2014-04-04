@@ -48,20 +48,20 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
         // get columns from params or from the database
         if (empty($params['cols'])) {
-            $params['cols'] = array_keys($this->getResource()->fetchCols());
+            $params['cols'] = $this->getResource()->fetchCols();
         } else {
             $params['cols'] = explode(',', $params['cols']);
         }
 
         // obtain table metadata
         $tablesResource = new Data_Model_Resource_Tables();
-        $tableId = $tablesResource->fetchId($db,$table);
+        $tableId = $tablesResource->fetchIdByName($db,$table);
         if ($tableId === false) {
             // this table is not in the metadata table - let's see if we can get
             // further information from the table itself
             $descResource = new Data_Model_Resource_Description();
-            $descResource->init($database);
-            $tableMeta = $descResource->describeTable($table);
+            $descResource->init($params['db']);
+            $tableMeta = $descResource->describeTable($params['table']);
         } else {
             // get the metadata from the metadata tables
             $tableMeta =  $tablesResource->fetchRow($tableId, true);
@@ -155,7 +155,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
         // get columns from params or from the database
         if (empty($params['cols'])) {
-            $params['cols'] = array_keys($this->getResource()->fetchCols());
+            $params['cols'] = $this->getResource()->fetchCols();
         } else {
             $params['cols'] = explode(',', $params['cols']);
         }

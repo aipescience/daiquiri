@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
+class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
 
     /**
      * Constructor. Sets tablename.
@@ -33,7 +33,7 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
      * Fetches all function entries.
      * @return array $rows
      */
-    public function fetchRows() {
+    public function fetchRows(array $sqloptions = array()) {
         $select = $this->select();
         $select->from('Data_Functions');
         $select->order('order ASC');
@@ -48,9 +48,9 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
      * @throws Exception
      * @return int $id
      */
-    public function fetchId($function) {
+    public function fetchIdByName($function) {
         if (empty($function)) {
-            throw new Exception('$function not provided in ' . get_class($this) . '::fetchId()');
+            throw new Exception('$function not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $select = $this->select();
@@ -73,7 +73,7 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
      */
     public function fetchRow($id) {
         if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $select = $this->select();
@@ -95,7 +95,7 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Simple {
      */
     public function checkACL($id) {
         if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::checkACL()');
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $row = $this->fetchRow($id);

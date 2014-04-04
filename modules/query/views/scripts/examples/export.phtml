@@ -20,32 +20,9 @@
  */
 ?>
 
-<div class="main">
-    <h2>Examples</h2>
+<pre>
 
-    <pre>
-        <?php
-        echo PHP_EOL;
-        echo "'query' => array(" . PHP_EOL;
-        echo "    'examples' => array(" . PHP_EOL;
-        foreach ($this->examples as $example) {
-            echo "        array(" . PHP_EOL;
-            foreach ($example as $key => $value) {
-                if (!in_array($key, array('id', 'tables'))) {
-                    echo "            '{$this->escape($key)}' => '{$this->escape($value)}'," . PHP_EOL;
-                }
-            }
-            echo "        )," . PHP_EOL;
-        }
-        echo "    )" . PHP_EOL;
-        echo ")" . PHP_EOL;
-        ?>
-    </pre>
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to query examples',
-        'href' => '/query/examples/',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-</div>
+<?php var_export($this->data); ?>
+
+
+</pre>

@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -19,19 +18,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-class Query_Form_KillJob extends Daiquiri_Form_Abstract {
-
-    public function init() {
-        $this->setFormDecorators();
-        $this->addCsrfElement();
-
-        // add fields
-        $this->addDangerButtonElement('submit', 'Kill job');
-        $this->addButtonElement('cancel', 'Cancel');
-
-        // add groups
-        $this->addActionGroup(array('submit', 'cancel'));
-    }
-
-}
+<div class="main">
+    <?php if ($this->status === 'pending'): ?>
+        <p>Your file is beeing created... Please wait...</p>
+    <?php elseif ($this->status === 'ok'): ?>
+        <p>You can now download the file using:</p>
+        <p>
+            <a target="_blank" href="<?php echo $this->escape($this->link); ?>">
+                <?php echo $this->escape($this->link); ?>
+            </a>
+        </p>
+    <?php else: ?>
+        <?php if(isset($this->form)): ?> 
+            <h4>Download table</h4>
+            <p>
+                Please select the format for your download:
+            </p>
+            <p>
+                <?php echo $this->form; ?>
+            </p>
+        <?php else: ?>
+            <p class="text-error"><?php echo $this->error; ?></p>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>

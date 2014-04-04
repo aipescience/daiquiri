@@ -38,7 +38,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
     public function create($tableId = null, array $formParams = array()) {
         // get tables and ucds
         $tablesResource = new Data_Model_Resource_Tables();
-        $ucdsResource = new Daiquiri_Model_Resource_Simple();
+        $ucdsResource = new Daiquiri_Model_Resource_Table();
         $ucdsResource->setTablename('Data_UCD');
 
         $form = new Data_Form_Columns(array(
@@ -53,15 +53,15 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
             if ($form->isValid($formParams)) {
                 $values = $form->getValues();
 
-                if(array_key_exists("ucd_list", $values)) {
-                    unset($values['ucd_list']);
-                }
-
                 $tmp = explode('.',$tables[$values['table_id']]);
                 $db = $tmp[0];
                 $table = $tmp[1];
-                if ($this->getResource()->fetchId($db, $table, $values['name']) !== false) {
-                    throw new Exception("Column entry already exists.");
+                if ($this->getResource()->fetchIdByName($db, $table, $values['name']) !== false) {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form,'Column entry already exists.');
+                }
+
+                if(array_key_exists("ucd_list", $values)) {
+                    unset($values['ucd_list']);
                 }
 
                 // check if the order needs to be set to NULL
@@ -92,7 +92,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
             if (empty($input['db']) || empty($input['table']) || empty($input['column'])) {
                 throw new Exception('Either int id or array with "db","table" and "column" keys must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($input['db'],$input['table'],$input['column']);
+            $id = $this->getResource()->fetchIdByName($input['db'],$input['table'],$input['column']);
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -113,7 +113,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
             if (empty($input['db']) || empty($input['table']) || empty($input['column'])) {
                 throw new Exception('Either int id or array with "db","table" and "column" keys must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($input['db'],$input['table'],$input['column']);
+            $id = $this->getResource()->fetchIdByName($input['db'],$input['table'],$input['column']);
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -126,7 +126,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
 
         // get tables and ucds
         $tablesResource = new Data_Model_Resource_Tables();
-        $ucdsResource = new Daiquiri_Model_Resource_Simple();
+        $ucdsResource = new Daiquiri_Model_Resource_Table();
         $ucdsResource->setTablename('Data_UCD');
         
         $form = new Data_Form_Columns(array(
@@ -176,7 +176,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
             if (empty($input['db']) || empty($input['table']) || empty($input['column'])) {
                 throw new Exception('Either int id or array with "db","table" and "column" keys must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($input['db'],$input['table'],$input['column']);
+            $id = $this->getResource()->fetchIdByName($input['db'],$input['table'],$input['column']);
         } else {
             throw new Exception('$input has wrong type.');
         }

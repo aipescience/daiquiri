@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Auth_Model_Resource_Details extends Daiquiri_Model_Resource_Simple {
+class Auth_Model_Resource_Details extends Daiquiri_Model_Resource_Table {
 
     /**
      * Constructor. Sets tablename.

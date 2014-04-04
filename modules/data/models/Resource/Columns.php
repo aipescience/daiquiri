@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
+class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
 
     /**
      * Constructor. Sets tablename.
@@ -33,7 +33,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
      * Fetches all column entries.
      * @return array $rows
      */
-    public function fetchRows() {
+    public function fetchRows(array $sqloptions = array()) {
         $select = $this->select();
         $select->from('Data_Columns');
         $select->order('order ASC');
@@ -50,9 +50,9 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
      * @throws Exception
      * @return int $id
      */
-    public function fetchId($db, $table, $column) {
+    public function fetchIdByName($db, $table, $column) {
         if (empty($db) || empty($table) || empty($column)) {
-            throw new Exception('$db, $table or $column not provided in ' . get_class($this) . '::fetchId()');
+            throw new Exception('$db, $table or $column not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $select = $this->select();
@@ -80,7 +80,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
      */
     public function fetchRow($id) {
         if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $select = $this->select();
@@ -106,7 +106,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
      */
     public function insertRow(array $data = array()) {
         if (empty($data)) {
-            throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
+            throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         if (array_key_exists('comment', $data)) {
@@ -158,7 +158,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Simple {
      */
     public function updateRow($id, $data) {
         if (empty($id) || empty($data)) {
-            throw new Exception('$id or $data not provided in ' . get_class($this) . '::updateRow()');
+            throw new Exception('$id or $data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $database = $data['database'];

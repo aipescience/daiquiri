@@ -20,26 +20,36 @@
  *  limitations under the License.
  */
 
-/**
- * Model for the user input into the query system.
- */
 class Query_Model_Query extends Daiquiri_Model_Abstract {
 
     /**
-     * Constructor. 
+     * Queue resource.
+     * @var Query_Model_Resource_AbstractQuery $_processor
+     */
+    protected $_queue;
+
+    /**
+     * Processor resource.
+     * @var Query_Model_Resource_AbstractProcessor $_processor
+     */
+    protected $_processor;
+
+    /**
+     * Constructor. Sets queue resource and processor resource.
      */
     public function __construct() {
-        parent::__construct();
-
-        $this->queue = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
-        $this->processor = Query_Model_Resource_AbstractProcessor::factory(Daiquiri_Config::getInstance()->query->processor);
+        $this->_queue = Query_Model_Resource_AbstractQuery::factory();
+        $this->_processor = Query_Model_Resource_AbstractProcessor::factory();
     }
 
+    /**
+     * Returns whether the Query Interface supports a query plan (true) or not (false).
+     * @return bool
+     */
     public function canShowPlan() {
-        $planType = Daiquiri_Config::getInstance()->query->processor->type;
-        $planType = "QPROC_" . strtoupper($planType);
+        $planType = "QPROC_" . strtoupper(Daiquiri_Config::getInstance()->query->processor->plan);
 
-        if ($this->processor->supportsPlanType($planType) and
+        if ($this->_processor->supportsPlanType($planType) &&
                 ($planType === "QPROC_INFOPLAN" or $planType === "QPROC_ALTERPLAN")) {
             return true;
         } else {
@@ -47,12 +57,14 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
         }
     }
 
+    /**
+     * Returns whether the Query Interface supports altering the query plan (true) or not (false).
+     * @return bool
+     */
     public function canAlterPlan() {
-        $planType = Daiquiri_Config::getInstance()->query->processor->type;
-        $planType = "QPROC_" . strtoupper($planType);
+        $planType = "QPROC_" . strtoupper(Daiquiri_Config::getInstance()->query->processor->plan);
 
-        if ($this->processor->supportsPlanType($planType) and
-                ($planType === "QPROC_ALTERPLAN")) {
+        if ($this->_processor->supportsPlanType($planType) && ($planType === "QPROC_ALTERPLAN")) {
             return true;
         } else {
             return false;
@@ -60,12 +72,12 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Validates a plain text query.
-     * @param string $sql
-     * @param string $plan
-     * @param string $table
-     * @param array &$errors
-     * @return TRUE if valid, FALSE if not. 
+     * Validates a plain text query. TRUE if valid, FALSE if not. 
+     * @param string $sql the sql string
+     * @param bool $plan flag for plan creation
+     * @param string $table result table
+     * @param array &$errors buffer array for errors
+     * @return bool 
      */
     public function validate($sql, $plan = false, $table, array &$errors) {
         // init error array
@@ -79,13 +91,13 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
 
         // process sql string
         if ($plan === false) {
-            if ($this->processor->validateQuery($sql, $table, $errors) !== true) {
+            if ($this->_processor->validateQuery($sql, $table, $errors) !== true) {
                 return false;
             }
         }
 
-        if ($plan !== false and $this->processor->supportsPlanType("QPROC_ALTERPLAN") === true) {
-            if ($this->processor->validatePlan($plan, $table, $errors) !== true) {
+        if ($plan !== false and $this->_processor->supportsPlanType("QPROC_ALTERPLAN") === true) {
+            if ($this->_processor->validatePlan($plan, $table, $errors) !== true) {
                 return false;
             }
         }
@@ -94,12 +106,12 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Querys the system with a plain text query.
-     * @param string $sql
-     * @param string $plan
-     * @param string $table
+     * Querys the database with a plain text query.
+     * @param string $sql the sql string
+     * @param bool $plan flag for plan creation
+     * @param string $table result table
      * @param array $options for further options that are handeled by the queue
-     * @return object 
+     * @return array $response 
      */
     public function query($sql, $plan = false, $table, $options = array()) {
         // init error array
@@ -120,21 +132,21 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             $options['usrGrp'] = "guest";
         }
 
-        //if plan type direct, obtain query plan
-        if ($this->processor->supportsPlanType("QPROC_SIMPLE") === true and $plan === false) {
-            $plan = $this->processor->getPlan($sql, $errors);
+        // if plan type direct, obtain query plan
+        if ($this->_processor->supportsPlanType("QPROC_SIMPLE") === true and $plan === false) {
+            $plan = $this->_processor->getPlan($sql, $errors);
 
             if (!empty($errors)) {
                 return array('status' => 'error', 'errors' => $errors);
             }
         } else {
-            //if plan type is AlterPlan and no plan is available, throw error
-            if ($this->processor->supportsPlanType("QPROC_ALTERPLAN") === true and $plan === false) {
+            // if plan type is AlterPlan and no plan is available, throw error
+            if ($this->_processor->supportsPlanType("QPROC_ALTERPLAN") === true and $plan === false) {
                 $errors['planError'] = 'Query plan required. If you end up here, something went badly wrong';
                 return array('status' => 'error', 'errors' => $errors);
             }
 
-            //split plan into lines
+            // split plan into lines
             $processing = new Query_Model_Resource_Processing();
             $noMultilineCommentSQL = $processing->removeMultilineComments($plan);
             $multiLines = $processing->splitQueryIntoMultiline($noMultilineCommentSQL, $errors);
@@ -142,19 +154,19 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
         }
 
         // process sql string
-        $job = $this->processor->query($sql, $errors, $plan, $tablename);
+        $job = $this->_processor->query($sql, $errors, $plan, $tablename);
         if (!empty($errors)) {
             return array('status' => 'error', 'errors' => $errors);
         }
 
         // before submission, see if user has enough quota
-        if ($this->_checkQuota($this->queue, $usrGrp)) {
+        if ($this->_checkQuota($this->_queue, $usrGrp)) {
             $errors['quotaError'] = 'Your quota has been reached. Drop some tables to free space or contact the administrators';
             return array('status' => 'error', 'errors' => $errors);
         }
 
         // submit job
-        $statusId = $this->queue->submitJob($job, $errors, $options);
+        $statusId = $this->_queue->submitJob($job, $errors, $options);
         if (!empty($errors)) {
             return array('status' => 'error', 'errors' => $errors);
         }
@@ -167,20 +179,25 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Obtrains the query plan
-     * @param string $sql
-     * @return object 
+     * Returns the query plan.
+     * @param string $sql the sql string
+     * @return array $response 
      */
     public function plan($sql, array &$errors) {
         // init error array
         $errors = array();
 
-        $plan = $this->processor->getPlan($sql, $errors);
+        $plan = $this->_processor->getPlan($sql, $errors);
 
         return $plan;
     }
 
-    //returns true if quota is reached
+    /**
+     * Returns whether the quota is reached (true) or not (false).
+     * @param string $resource
+     * @param string $usrGrp
+     * @return bool
+     */
     private function _checkQuota($resource, $usrGrp) {
         $dbStatData = $resource->fetchDatabaseStats();
 

@@ -20,13 +20,19 @@
  *  limitations under the License.
  */
 
-class Query_Form_UpdateExample extends Daiquiri_Form_Abstract {
+class Query_Form_Example extends Daiquiri_Form_Abstract {
 
-    protected $_example = null;
+    protected $_row;
+    protected $_submit;
+
     protected $_roles = array();
 
-    public function setExample($example) {
-        $this->_example = $example;
+    public function setSubmit($submit) {
+        $this->_submit = $submit;
+    }
+
+    public function setRow($row) {
+        $this->_row = $row;
     }
 
     public function setRoles($roles) {
@@ -72,7 +78,7 @@ class Query_Form_UpdateExample extends Daiquiri_Form_Abstract {
             'required' => true,
             'multiOptions' => $this->_roles,
         ));
-        $this->addPrimaryButtonElement('submit', 'Update Example');
+        $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
@@ -80,9 +86,9 @@ class Query_Form_UpdateExample extends Daiquiri_Form_Abstract {
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        if (isset($this->_example)) {
+        if (isset($this->_row)) {
             foreach (array('name', 'query', 'description', 'publication_role_id') as $element) {
-                $this->setDefault($element, $this->_example[$element]);
+                $this->setDefault($element, $this->_row[$element]);
             }
         }
     }

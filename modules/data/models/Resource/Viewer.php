@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Simple {
+class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
 
     /**
      * Sets the adapter and the tablename of the resource retroactively.
@@ -37,7 +37,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Simple {
         } else {
             // get the database id and check permission on database
             $databasesResource = new Data_Model_Resource_Databases();
-            $databaseId = $databasesResource->fetchId($db);
+            $databaseId = $databasesResource->fetchIdByName($db);
             if ($databaseId === false) {
                 throw new Exception("Requested database not available");
             }
@@ -50,7 +50,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Simple {
             // check permission on table access
             if ($table) {
                 $tablesResource = new Data_Model_Resource_Databases();
-                $tableId = $tablesResource->fetchId($db, $table);
+                $tableId = $tablesResource->fetchIdByName($db, $table);
                 if ($databaseId === false) {
                     throw new Exception("Requested table not available");
                 }

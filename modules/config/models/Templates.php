@@ -28,7 +28,7 @@ class Config_Model_Templates extends Daiquiri_Model_Table {
      * Constructor. Sets resource object and the database table. Also sets a list of use templates with fields.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Config_Templates');
 
         $this->templates = array(

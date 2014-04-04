@@ -119,12 +119,12 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             // files module
             'Files_Model_Files',
             // query module
-            'Query_Model_Form',
-            'Query_Model_Jobs',
-            'Query_Model_CurrentJobs',
+            'Query_Model_Account',
             'Query_Model_Database',
             'Query_Model_Examples',
-            // uws module
+            'Query_Model_Form',
+            'Query_Model_Jobs',
+            'Query_Model_Query',
             'Query_Model_Uws',
         );
 
@@ -259,15 +259,15 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             if ($options['config']['query']['guest']) {
                 // guest
                 $rules['guest']['Query_Model_Form'] = array('submit');
-                $rules['guest']['Query_Model_CurrentJobs'] = array(
-                    'index', 'show', 'kill', 'remove', 'rename'
+                $rules['guest']['Query_Model_Account'] = array(
+                    'listJobs', 'showJob', 'killJob', 'removeJob', 'renameJob', 'databases', 'functions', 'examples'
                 );
                 $rules['guest']['Query_Model_Database'] = array(
-                    'index', 'download', 'file', 'stream', 'regen'
+                    'download', 'file', 'stream', 'regen'
                 );
                 $rules['guest']['Query_Model_Examples'] = array('index', 'show');
-                if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
-                    strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
+                if (strtolower($options['config']['query']['processor']['plan']) === 'alterplan' ||
+                    strtolower($options['config']['query']['processor']['plan']) === 'infoplan') {
 
                     $rules['guest']['Query_Model_Form'][] = 'plan';
                     $rules['guest']['Query_Model_Form'][] = 'mail';
@@ -275,15 +275,15 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             } else {
                 // user
                 $rules['user']['Query_Model_Form'] = array('submit');
-                $rules['user']['Query_Model_CurrentJobs'] = array(
-                    'index', 'show', 'kill', 'remove', 'rename'
+                $rules['user']['Query_Model_Account'] = array(
+                    'listJobs', 'showJob', 'killJob', 'removeJob', 'renameJob', 'databases', 'functions', 'examples'
                 );
                 $rules['user']['Query_Model_Database'] = array(
-                    'index', 'download', 'file', 'stream', 'regen'
+                    'download', 'file', 'stream', 'regen'
                 );
                 $rules['user']['Query_Model_Examples'] = array('index', 'show');
-                if (strtolower($options['config']['query']['processor']['type']) === 'alterplan' ||
-                    strtolower($options['config']['query']['processor']['type']) === 'infoplan') {
+                if (strtolower($options['config']['query']['processor']['plan']) === 'alterplan' ||
+                    strtolower($options['config']['query']['processor']['plan']) === 'infoplan') {
 
                     $rules['user']['Query_Model_Form'][] = 'plan';
                     $rules['user']['Query_Model_Form'][] = 'mail';
@@ -295,13 +295,13 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 'rows', 'cols', 'show', 'kill', 'remove', 'rename'
             );
             $rules['admin']['Query_Model_Examples'] = array(
-                'index', 'show', 'create', 'update', 'delete'
+                'index', 'create', 'update', 'delete', 'export'
             );
-        }
 
-        // construct rules for uws module
-        if (!empty($options['config']['uws'])) {
-            $rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote','createJobId', 'getPendingJob', 'getQuote', 'setDestructTime','setDestructTimeImpl', 'setExecutionDuration', 'setParameters','deleteJob', 'abortJob', 'runJob');
+            // construct rules for uws module
+            if (!empty($options['config']['uws'])) {
+                $rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote','createJobId', 'getPendingJob', 'getQuote', 'setDestructTime','setDestructTimeImpl', 'setExecutionDuration', 'setParameters','deleteJob', 'abortJob', 'runJob');
+            }
         }
 
         $this->_buildRules_r($input['rules'], $output['rules'], $rules);

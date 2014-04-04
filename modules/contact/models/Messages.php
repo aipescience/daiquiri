@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Contact_Model_Messages extends Daiquiri_Model_PaginatedTable {
+class Contact_Model_Messages extends Daiquiri_Model_Table {
 
     public function __construct() {
         $this->setResource('Contact_Model_Resource_Messages');

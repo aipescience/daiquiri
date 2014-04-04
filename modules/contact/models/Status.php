@@ -23,7 +23,7 @@
 class Contact_Model_Status extends Daiquiri_Model_Table {
 
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Contact_Status');
     }
 

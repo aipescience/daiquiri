@@ -70,7 +70,7 @@
                     <div class="tab-content">
                         <?php foreach ($this->forms as $key => $form): ?>
                             <div class="tab-pane <?php if (isset($form['default']) && $form['default'] == true) echo 'active'; ?>" id="<?php echo $this->escape($key); ?>-form-tab">
-                                <?php echo $this->action('form', 'index', 'query', array('form' => $key)); ?>
+                                <?php echo $this->action('index', 'form', 'query', array('form' => $key)); ?>
                             </div>
                         <?php endforeach; ?>
                         <div class="tab-pane" id="details-tab"></div>

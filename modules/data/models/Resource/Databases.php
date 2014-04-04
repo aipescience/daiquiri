@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
+class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
 
     /**
      * Constructor. Sets tablename.
@@ -33,7 +33,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
      * Fetches all database entries.
      * @return array $rows
      */
-    public function fetchRows() {
+    public function fetchRows(array $sqloptions = array()) {
         $select = $this->select();
         $select->from('Data_Databases');
         $select->order('order ASC');
@@ -48,9 +48,9 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
      * @throws Exception
      * @return int $id
      */
-    public function fetchId($db) {
+    public function fetchIdByName($db) {
         if (empty($db)) {
-            throw new Exception('$db not provided in ' . get_class($this) . '::fetchId()');
+            throw new Exception('$db not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $select = $this->select();
@@ -75,7 +75,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
      */
     public function fetchRow($id, $tables = false, $columns = false) {
         if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         // get the primary sql select object
@@ -118,20 +118,24 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
      * Inserts one database entry and, if set, the fills the columns and tables automatically.
      * Returns the primary key of the new row.
      * @param array $data row data
-     * @param bool $autofill automatically fill the columns and tables
      * @throws Exception
      * @return int $id
      */
-    public function insertRow(array $data = array(), $autofill = false) {
+    public function insertRow(array $data = array()) {
         if (empty($data)) {
-            throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
+            throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        if (isset($data['autofill'])) {
+            $autofill = $data['autofill'];
+            unset($data['autofill']);
         }
 
         // store row in database and get id
         $this->getAdapter()->insert('Data_Databases', $data);
         $id = $this->getAdapter()->lastInsertId();
 
-        if ($autofill) {
+        if (isset($autofill) && $autofill = true) {
             // get the additional resources
             $descResource = new Data_Model_Resource_Description();
             $tableResource = new Data_Model_Resource_Tables();
@@ -140,18 +144,19 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
             try {
                 $descResource->init($data['name']);
                 foreach ($descResource->fetchTables() as $table) {
-                    $t = $descResource->describeTable($table);
-
-                    $tableDescription = $t;
-                    $t['database_id'] = $id;
-                    $t['publication_role_id'] = $data['publication_role_id'];
-                    $t['publication_select'] = $data['publication_select'];
-                    $t['publication_update'] = $data['publication_update'];
-                    $t['publication_insert'] = $data['publication_insert'];
-                    unset($t['columns']);
-                    unset($t['database']);
-
-                    $tableResource->insertRow($t, true, $tableDescription);
+                    $desc = $descResource->describeTable($table);
+                    $tableData = array(
+                        'database_id' => $id,
+                        'name' => $desc['name'],
+                        'description' => $desc['description'],
+                        'publication_role_id' => $data['publication_role_id'],
+                        'publication_select' => $data['publication_select'],
+                        'publication_update' => $data['publication_update'],
+                        'publication_insert' => $data['publication_insert'],
+                        'autofill' => true,
+                        'tableDescription' => $desc
+                    );
+                    $tableResource->insertRow($tableData);
                 }
             } catch (Exception $e) {
                 // delete database entry again
@@ -171,7 +176,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
      */
     public function deleteRow($id) {
         if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::deleteRow()');
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $row = $this->fetchRow($id, true, true);
@@ -197,7 +202,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Simple {
      */
     public function checkACL($id, $command) {
         if (empty($id) || empty($command)) {
-            throw new Exception('$id or $command not provided in ' . get_class($this) . '::checkACL()');
+            throw new Exception('$id or $command not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
         $row = $this->fetchRow($id);

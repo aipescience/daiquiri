@@ -31,6 +31,13 @@
 abstract class Daiquiri_Form_Abstract extends Zend_Form {
 
     /**
+     * Returns the csrf element of the form.
+     */ 
+    public function getCsrf() {
+        return $this->getElement('csrf');
+    }
+
+    /**
      * @brief   Init the form by setting form decorators
      * 
      * Sets the form decorator to what is defined in $_formDecorators.

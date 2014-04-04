@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -19,18 +18,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-class Query_Model_Resource_Mail extends Daiquiri_Model_Resource_Mail {
-
-    public function send(array $values) {
-        // set addresses
-        foreach (Daiquiri_Config::getInstance()->query->processor->mail->admin as $admin) {
-            $this->_mail->addTo($admin);
-        }
-
-        // set mail and send
-        $this->_setSubjectAndBodyText('query.plan', $values);
-        $this->_send();
-    }
-
-}
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Query successfully submitted.</p>
+    <?php elseif ($this->status === 'redirect'): ?>
+        <?php $this->redirector($this->redirect); ?>
+    <?php else: ?>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#<?php echo $this->escape($this->form->getAttrib('id')); ?>").daiquiri_query_buttons();
+            });
+        </script>
+        <?php echo $this->form; ?>
+    <?php endif ?>
+</div>

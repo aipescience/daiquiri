@@ -20,9 +20,9 @@
  *  limitations under the License.
  */
 
-class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Simple {
+class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
 
-    public function fetchRows() {
+    public function fetchRows(array $sqloptions = array()) {
         // get select object
         $select = $this->getAdapter()->select();
         $select->from('Meetings_Meetings');
@@ -55,7 +55,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Simple {
         );
     }
 
-    public function insertRow(array $data) {
+    public function insertRow(array $data = array()) {
         if (empty($data)) {
             throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
         }

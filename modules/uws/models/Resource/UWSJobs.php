@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Simple {
+class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
 
     /**
      * Constructor. Sets Tablename.
@@ -53,7 +53,7 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Simple {
      * @throws Exception
      * @return array $rows
      */
-    public function fetchRows() {
+    public function fetchRows(array $sqloptions = array()) {
         $select = $this->select();
         $select->from('Uws_UWSJobs');
         $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());

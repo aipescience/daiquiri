@@ -87,7 +87,6 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                 'navPath' => '/var/lib/daiquiri/navigation'
             ),
             'query' => array(
-                'adapter' => 'user',
                 'guest' => false,
                 'userDb' => array(
                     'prefix' => '',
@@ -103,15 +102,15 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                         'view' => $this->_daiquiri_path . '/modules/query/views/scripts/_partials/sql-query.phtml',
                     )
                 ),
-                'examples' => array(),
                 'resultTable' => array(
                     'placeholder' => '/*@GEN_RES_TABLE_HERE*/'
                 ),
-                'validate' => array('serverSide' => false,
+                'validate' => array(
+                    'serverSide' => false,
                     'function' => 'paqu_validateSQL'
                 ),
-                'queue' => array(
-                    'type' => 'simple',
+                'query' => array(
+                    'type' => 'direct', // or qqueue
                     'qqueue' => array(
                         'defaultUsrGrp' => 'user',
                         'defaultQueue' => 'short'
@@ -119,8 +118,8 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                 ),
                 'scratchdb' => '',
                 'processor' => array(
-                    'name' => 'direct',
-                    'type' => 'simple',
+                    'type' => 'direct', // or mysql or paqu
+                    'plan' => 'simple', // or infoplan or alterplan
                     'mail' => array(
                         'enabled' => false,
                         'mail' => array()
@@ -132,9 +131,9 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                     'admin' => '1.5GB',
                 ),
                 'download' => array(
+                    'type' => 'direct', // or gearman
                     'dir' => "/var/lib/daiquiri/download",
                     'queue' => array(
-                        'type' => 'simple',
                         'gearman' => array(
                             'port' => '4730',
                             'host' => 'localhost',
@@ -232,17 +231,18 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                 $output['query']['userDb']['postfix'] = $split[1];
             }
 
-            $queueType = $output['query']['queue']['type'];
-            if ($queueType == 'simple') {
-                unset($output['query']['queue']['qqueue']);
+            // query.query.type
+            $queueType = $output['query']['query']['type'];
+            if ($queueType == 'direct') {
+                unset($output['query']['query']['qqueue']);
             } else if ($queueType == 'qqueue') {
                 // pass
             } else {
-                $this->_error("Unknown config value '{$output['query']['queue']['type']}' in query.queue.type");
+                $this->_error("Unknown config value '{$output['query']['query']['type']}' in query.query.type");
             }
 
-            // query.downloadQueue
-            if ($output['query']['download']['queue']['type'] == 'simple') {
+            // query.download.type
+            if ($output['query']['download']['type'] == 'direct') {
                 unset($output['query']['download']['queue']['gearman']);
             } else if ($output['query']['download']['queue']['type'] == 'gearman') {
                 // pass

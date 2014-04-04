@@ -63,9 +63,13 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
-
                 // get the form values
                 $values = $form->getValues();
+
+                // check if entry is already there
+                if ($this->getResource()->fetchIdByName($values['name']) !== false) {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form,'Function entry already exists.');
+                }
 
                 // check if the order needs to be set to NULL
                 if ($values['order'] === '') {
@@ -95,7 +99,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
             if (empty($input['function'])) {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($input['function']);
+            $id = $this->getResource()->fetchIdByName($input['function']);
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -118,7 +122,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
             if (empty($input['function'])) {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($input['function']);
+            $id = $this->getResource()->fetchIdByName($input['function']);
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -173,7 +177,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
             if (empty($input['function'])) {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $id = $this->getResource()->fetchId($input['function']);
+            $id = $this->getResource()->fetchIdByName($input['function']);
         } else {
             throw new Exception('$input has wrong type.');
         }

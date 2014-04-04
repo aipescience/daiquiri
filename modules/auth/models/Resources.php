@@ -26,7 +26,7 @@ class Auth_Model_Resources extends Daiquiri_Model_Abstract {
      * Constructor. Sets resource object and tablename.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Auth_Resources');
     }
 

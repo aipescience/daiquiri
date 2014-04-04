@@ -22,7 +22,6 @@
 
 require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/php-sql-parser.php');
 require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/php-sql-creator.php');
-
 require_once(Daiquiri_Config::getInstance()->core->libs->paqu . '/parseSqlAll.php');
 
 /**
@@ -37,8 +36,8 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      * @return string $sql 
      */
     function removeMultilineComments($sql) {
-        //get rid of comments that span multiple lines
-        //Example:
+        // get rid of comments that span multiple lines
+        // Example:
         // /* bla
         // 
         // bla */
@@ -141,8 +140,8 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      */
     function multilineProcessQueryWildcard($multilineSqlTree, array &$error) {
         // get the resource
-        $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
-        $adapter = $resource->getTable()->getAdapter();
+        $resource = Query_Model_Resource_AbstractQuery::factory();
+        $adapter = $resource->getAdapter();
 
         foreach ($multilineSqlTree as $key => $currSqlTree) {
             try {
@@ -230,7 +229,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
         $result = array();
 
-        $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
+        $resource = Query_Model_Resource_AbstractQuery::factory();
         $engine = Daiquiri_Config::getInstance()->query->userDb->engine;
 
         if (empty($engine)) {
@@ -329,7 +328,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         } else if ($lastOtherKey !== false) {
             $query = $multiLineSQL[$lastOtherKey];
 
-            $quoteQuery = $resource->getTable()->getAdapter()->quote($query);
+            $quoteQuery = $resource->getAdapter()->quote($query);
             unset($resource);
 
             $result[$lastOtherKey] = $query . '; SET @i = 0; CREATE TABLE `' . $resultDB . '`.`' . $resultTableName . '`' .
@@ -419,10 +418,10 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      */
     function validateSQLServerSideMYSQL($sql, $db, array &$errors) {
         // get the resource
-        $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
+        $resource = Query_Model_Resource_AbstractQuery::factory();
 
         //check if PaQu Validate plugin is installed.
-        $resource->getTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_ASSOC);
+        $resource->getAdapter()->setFetchMode(Zend_Db::FETCH_ASSOC);
 
         try {
             $pluginAvail = $resource->plainQuery('select name from mysql.func where name="paqu_validateSQL";');
@@ -436,10 +435,10 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
         $sql = trim($sql);
 
-        $resource->getTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_ASSOC);
-        $conn = $resource->getTable()->getAdapter()->getConnection();
+        $resource->getAdapter()->setFetchMode(Zend_Db::FETCH_ASSOC);
+        $conn = $resource->getAdapter()->getConnection();
 
-        $sqlStr = $resource->getTable()->getAdapter()->quoteInto('select paqu_validateSQL(?) as a;', $sql);
+        $sqlStr = $resource->getAdapter()->quoteInto('select paqu_validateSQL(?) as a;', $sql);
 
         try {
             $conn->exec("use " . $db);
@@ -452,7 +451,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         $errorString = $validate[0]['a'];
 
         //check if we are giving out any information about our setup in the error message
-        $config = $resource->getTable()->getAdapter()->getConfig();
+        $config = $resource->getAdapter()->getConfig();
         $errorString = str_replace("'localhost'", "'XXXXXXXXXXXX'", $errorString);
         $errorString = str_replace("'{$config['host']}'", "'XXXXXXXXXXXX'", $errorString);
         $errorString = str_replace("'{$config['username']}'", "'XXXXXXXXXXXX'", $errorString);
@@ -507,12 +506,12 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      * @return true or false
      */
     public function tableExists($table) {
-        $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
+        $resource = Query_Model_Resource_AbstractQuery::factory();
 
         $sql = "SHOW TABLES LIKE '{$table}';";
 
         try {
-            $stmt = $resource->getTable()->getAdapter()->query($sql);
+            $stmt = $resource->getAdapter()->query($sql);
         } catch (Exception $e) {
             //check if this is error 1051 Unknown table
             if (strpos($e->getMessage(), "1051") === false) {

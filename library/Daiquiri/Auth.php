@@ -291,17 +291,16 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         // check in the data module first, if metadata exists and handle them
         // accordingly
         $databasesModel = new Data_Model_Databases();
-        $response = $databasesModel->show($database);
-
-        if ($response['status'] === 'ok' && $databasesModel->checkACL($response['data']['id'], $permission)) {
+        $response = $databasesModel->show(array('db' => $database));
+        if ($response['status'] === 'ok' && $databasesModel->getResource()->checkACL($response['row']['id'], $permission)) {
             if ($table === false) {
                 return true;
             } else {
                 //access to database granted, so let's check for table access
                 $tablesModel = new Data_Model_Tables();
-                $response = $tablesModel->show(false, $database, $table);
+                $response = $tablesModel->show(array('db' => $database, 'table' => $table));
 
-                if ($response['status'] === 'ok' && $tablesModel->checkACL($response['data']['id'], $permission)) {
+                if ($response['status'] === 'ok' && $tablesModel->getResource()->checkACL($response['row']['id'], $permission)) {
                     return true;
                 }
             }

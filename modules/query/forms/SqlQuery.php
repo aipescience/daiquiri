@@ -50,6 +50,11 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         $this->addCsrfElement('sql_csrf');
 
         // add fields
+        $head = new Daiquiri_Form_Element_Note('head', array(
+            'value' => "<h2>{$this->_formOptions['title']}</h2><p>{$this->_formOptions['help']}</p>"
+        ));
+
+        $this->addElement($head);
         $this->addElement('textarea', 'sql_query', array(
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -77,6 +82,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         $this->addPrimaryButtonElement('sql_submit', 'Submit new SQL Query');
         $this->addDumbButtonElement('sql_clear', 'Clear input window');
 
+        $this->addParagraphGroup(array('head'), 'sql-head-group');
         $this->addParagraphGroup(array('sql_query'), 'sql-input-group');
         $this->addParagraphGroup(array('sql_tablename'), 'sql-table-group', false, true);
         $this->addQueueGroup('sql_queue_', 'sql-queue-group');

@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simple {
+class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table {
 
     public function __construct() {
         $this->setTablename('Meetings_Participants');
@@ -95,7 +95,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Simpl
         return $data;
     }
 
-    public function insertRow(array $data) {
+    public function insertRow(array $data = array()) {
         if (empty($data)) {
             throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
         }

@@ -23,7 +23,7 @@
 class Meetings_Model_ContributionTypes extends Daiquiri_Model_Table {
 
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Meetings_ContributionTypes');
     }
 

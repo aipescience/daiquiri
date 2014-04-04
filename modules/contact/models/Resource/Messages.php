@@ -20,13 +20,13 @@
  *  limitations under the License.
  */
 
-class Contact_Model_Resource_Messages extends Daiquiri_Model_Resource_Simple {
+class Contact_Model_Resource_Messages extends Daiquiri_Model_Resource_Table {
 
     public function __construct() {
         $this->setTablename('Contact_Messages');
     }
 
-    public function fetchRows($sqloptions = array()) {
+    public function fetchRows(array $sqloptions = array()) {
         $select = $this->select($sqloptions);
         $select->from($this->getTablename());
         $select->join('Contact_Categories','Contact_Categories.id = Contact_Messages.category_id','category');

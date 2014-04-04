@@ -24,90 +24,95 @@ require_once(Daiquiri_Config::getInstance()->core->libs->paqu . '/parallelQuery.
 
 class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractProcessor {
 
+    /**
+     * Plan types. This can be either QPROC_SIMPLE, QPROC_INFOPLAN, QPROC_ALTERPLAN
+     * @var string $planTypes
+     */
     public static $planTypes = array("QPROC_SIMPLE", "QPROC_INFOPLAN", "QPROC_ALTERPLAN");
 
     /**
-     * Construtor. Sets table. 
+     * PaQu parallel query object
+     * @var string $planTypes
+     */
+    protected $_paraQuery;
+    /**
+     * Construtor. 
      */
     public function __construct() {
         parent::__construct();
 
-        $this->paraQuery = new ParallelQuery();
+        // get parallel query obejct
+        $this->_paraQuery = new ParallelQuery();
 
+        // get daiquiri config instance
         $config = Daiquiri_Config::getInstance();
 
-        //check if server is a PaQu enabled server...
-        $adapter = $this->getUserDBResource()->getTable()->getAdapter();
+        // check if server is a PaQu enabled server...
+        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter();
 
-        //check if PaQu spider plugin is installed.
+        // check if PaQu spider plugin is installed.
         $adapter->setFetchMode(Zend_Db::FETCH_ASSOC);
-        $pluginAvail = $adapter->fetchAll('select name from mysql.func where name="spider_bg_direct_sql";');
-
+        $pluginAvail = $adapter->fetchAll('SELECT name FROM mysql.func WHERE name="spider_bg_direct_sql";');
         if (empty($pluginAvail) || $pluginAvail[0]['name'] !== "spider_bg_direct_sql") {
             //    throw new Exception('PaQu spider engine setup not correct.');
         }
 
-        //set options in parallel query object
-        $this->paraQuery->setEngine($config->query->userDb->engine);
-        $this->paraQuery->setDB($config->query->scratchdb);
-        $this->paraQuery->setConnectOnServerSite($config->query->processor->paqu->serverConnectStr);
-        $this->paraQuery->setSpiderUsr($config->query->processor->paqu->spiderUsr);
-        $this->paraQuery->setSpiderPwd($config->query->processor->paqu->spiderPwd);
+        // set options in parallel query object
+        $this->_paraQuery->setEngine($config->query->userDb->engine);
+        $this->_paraQuery->setDB($config->query->scratchdb);
+        $this->_paraQuery->setConnectOnServerSite($config->query->processor->paqu->serverConnectStr);
+        $this->_paraQuery->setSpiderUsr($config->query->processor->paqu->spiderUsr);
+        $this->_paraQuery->setSpiderPwd($config->query->processor->paqu->spiderPwd);
 
-        //set the tables that only reside on the head node
+        // set the tables that only reside on the head node
         $listOfHeadNodeTables = array();
 
-        //all tables in the user db are head node tables, therefore add the database name and a list
-        //of all tables in the database
-        $listOfHeadNodeTables[] = $this->resultDB;
+        // all tables in the user db are head node tables, therefore add the database name and a list
+        // of all tables in the database
+        $listOfHeadNodeTables[] = $this->_userDb;
 
-        //get list of tables in user database
-        $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
-
-        $sql = "SHOW TABLES;";
-        $stmt = $resource->getTable()->getAdapter()->query($sql);
-        $rows = $stmt->fetchAll();
-
-        foreach($rows as $row) {
+        // get list of tables in user database
+        $resource = Query_Model_Resource_AbstractJobs::factory();
+        $stmt = $resource->getAdapter()->query('SHOW TABLES;');
+        foreach($stmt->fetchAll() as $row) {
             $listOfHeadNodeTables[] = array_shift($row);
         }
 
-        $this->paraQuery->setHeadNodeTables($listOfHeadNodeTables);
+        $this->_paraQuery->setHeadNodeTables($listOfHeadNodeTables);
 
         if(empty($config->query->processor->paqu->federated)) {
-            $this->paraQuery->setFedEngine("FEDERATED");
+            $this->_paraQuery->setFedEngine("FEDERATED");
         } else {
-            $this->paraQuery->setFedEngine($config->query->processor->paqu->federated);
+            $this->_paraQuery->setFedEngine($config->query->processor->paqu->federated);
         }
     }
 
     /**
      * Validates a raw query before any processing and altering of the query occurred.
-     * 
-     * @param string query
-     * @param string result table name
-     * @param array errors holding any error that occurs
-     * @param array options any options that a specific implementation of validateQuery needs to get
-     * @return TRUE if valid, FALSE if not
+     * @param string $sql query string
+     * @param string $table name of the job's table
+     * @param array $errors array holding any errors that occur
+     * @param array $options any options that a specific implementation of validateQuery needs to get
+     * @return bool $success
      */
     public function validateQuery($sql, $table, array &$errors, $options = false) {
         $errors = array();
 
         // preprocess string
-        $noMultilineCommentSQL = $this->processing->removeMultilineComments($sql);
-        $multiLines = $this->processing->splitQueryIntoMultiline($noMultilineCommentSQL, $errors);
+        $noMultilineCommentSQL = $this->_processing->removeMultilineComments($sql);
+        $multiLines = $this->_processing->splitQueryIntoMultiline($noMultilineCommentSQL, $errors);
 
         if ($multiLines === false) {
             return false;
         }
 
-        $multiLineParseTrees = $this->processing->multilineParseTree($multiLines, $errors);
+        $multiLineParseTrees = $this->_processing->multilineParseTree($multiLines, $errors);
 
         if (!empty($errors)) {
             return false;
         }
 
-        $multiLineUsedDBs = $this->processing->multilineUsedDB($multiLineParseTrees, $this->resultDB);
+        $multiLineUsedDBs = $this->_processing->multilineUsedDB($multiLineParseTrees, $this->_userDb);
 
         //we are not permitting "USE"!
         foreach ($multiLineParseTrees as $key => $currTree) {
@@ -121,19 +126,19 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             }
         }
 
-        $multiLineParseTrees = $this->processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+        $multiLineParseTrees = $this->_processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
 
         if (!empty($errors)) {
             return false;
         }
 
         //check ACLs
-        if ($this->permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
+        if ($this->_permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
             return false;
         }
 
         //check if table already exists
-        if ($table !== null && $this->processing->tableExists($table)) {
+        if ($table !== null && $this->_processing->tableExists($table)) {
             $errors['submitError'] = "Table '{$table}' already exists";
             return false;
         }
@@ -145,11 +150,11 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         }
 
         //combine multiline queries into one
-        $combinedQuery = $this->processing->combineMultiLine($multiLines);
+        $combinedQuery = $this->_processing->combineMultiLine($multiLines);
 
         //validate sql on server
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
-            if ($this->processing->validateSQLServerSide($combinedQuery, $this->resultDB, $errors) !== true) {
+            if ($this->_processing->validateSQLServerSide($combinedQuery, $this->_userDb, $errors) !== true) {
                 return false;
             }
         }
@@ -160,20 +165,19 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
     /**
      * Validates a query plan (if alterable) before submission of the query. If no alteration of the
      * plan is supported by the specific query facility, this function needs to be implemented empty
-     * just returning TRUE
-     * 
-     * @param array plan
-     * @param string result table name
-     * @param array errors holding any error that occurs
-     * @param array options any options that a specific implementation of validateQuery needs to get
-     * @return TRUE if valid, FALSE if not
+     * just returning true
+     * @param array $plan $query plan
+     * @param string $table name of the job's table
+     * @param array $errors array holding any errors that occur
+     * @param array $options any options that a specific implementation of validateQuery needs to get
+     * @return bool $success
      */
     public function validatePlan(&$plan, $table, array &$errors, $options = false) {
         $errors = array();
 
         // preprocess string
-        $noMultilineCommentSQL = $this->processing->removeMultilineComments($plan);
-        $multiLines = $this->processing->splitQueryIntoMultiline($noMultilineCommentSQL, $errors);
+        $noMultilineCommentSQL = $this->_processing->removeMultilineComments($plan);
+        $multiLines = $this->_processing->splitQueryIntoMultiline($noMultilineCommentSQL, $errors);
 
         if ($multiLines === false) {
             return false;
@@ -181,11 +185,11 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
         $plan = $multiLines;
 
-        $multiLineParseTrees = $this->processing->multilineParseTree($multiLines, $errors);
+        $multiLineParseTrees = $this->_processing->multilineParseTree($multiLines, $errors);
 
         if (!empty($errors)) {
             foreach($errors as $error) {
-                //check on an nonexisting temp table should be ignored here
+                // check on an nonexisting temp table should be ignored here
                 if(strpos($error, "42S02") === false) {
                     return false;
                 }
@@ -218,13 +222,12 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
     /**
      * Prepares a job object according to the query plan (if supported), otherwise just prepares a job 
      * according to the processed query (without plan, depending on implementation)
-     * 
-     * @param array query
-     * @param array errors holding any error that occurs
-     * @param array plan
-     * @param string result table name
-     * @param array options any options that a specific implementation of validateQuery needs to get
-     * @return object job
+     * @param string $sql query string
+     * @param array $errors array holding any errors that occur
+     * @param array $plan $query plan
+     * @param string $table name of the job's table
+     * @param array $options any options that a specific implementation of validateQuery needs to get
+     * @return array $job
      */
     public function query(&$sql, array &$errors, &$plan = false, $resultTableName = false, $options = false) {
         $errors = array();
@@ -233,9 +236,9 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             $errors[] = "Paqu no plan submitted! This should not happen at all!";
             return false;
         } else {
-            //replace result table tag with real result table
+            // replace result table tag with real result table
 
-            //determine result table name
+            // determine result table name
             if (empty($resultTableName)) {
                 $micro = explode(" ", microtime());
                 $resultTableName = date("Y-m-d\TH:i:s") . ":" . substr($micro[0], 2, 4);
@@ -245,24 +248,24 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                 $line = str_replace(Daiquiri_Config::getInstance()->query->resultTable->placeholder, $resultTableName, $line);
             }
 
-            $this->paraQuery->setParallelQueryPlan($plan);
-            $this->paraQuery->translateQueryPlan();
+            $this->_paraQuery->setParallelQueryPlan($plan);
+            $this->_paraQuery->translateQueryPlan();
 
-            $queries = $this->paraQuery->getActualQueries();
+            $queries = $this->_paraQuery->getActualQueries();
 
-            $combinedQuery = $this->processing->combineMultiLine($queries);
+            $combinedQuery = $this->_processing->combineMultiLine($queries);
 
             $combinedQuery = str_replace(";;", ";", $combinedQuery);
         }
 
-        //build job object
+        // build job object
         $job = array(
             'table' => $resultTableName,
-            'database' => $this->resultDB,
+            'database' => $this->_userDb,
             'host' => false,
             'query' => $sql,
             'actualQuery' => $plan,
-            'fullActualQuery' => $combinedQuery, //this is set, if we want to use a query we don't want to show the user
+            'fullActualQuery' => $combinedQuery, // this is set, if we want to use a query we don't want to show the user
             'user_id' => false,
             'status_id' => false,
             'time' => false
@@ -273,27 +276,26 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
     /**
      * Returns the query plan depending on implementation. If an implementation does not support query
      * plans, this needs to return an empty array.
-     * 
-     * @param array query
-     * @param array errors holding any error that occurs
-     * @param array options any options that a specific implementation of validateQuery needs to get
-     * @return plan 
+     * @param array $plan $query plan
+     * @param array $errors array holding any errors that occur
+     * @param array $options any options that a specific implementation of validateQuery needs to get
+     * @return array $plan 
      */
     public function getPlan(&$sql, array &$errors, $options = false) {
         $errors = array();
 
         // preprocess string
-        $noMultilineCommentSQL = $this->processing->removeMultilineComments($sql);
-        $multiLines = $this->processing->splitQueryIntoMultiline($noMultilineCommentSQL, $errors);
+        $noMultilineCommentSQL = $this->_processing->removeMultilineComments($sql);
+        $multiLines = $this->_processing->splitQueryIntoMultiline($noMultilineCommentSQL, $errors);
 
         if ($multiLines === false) {
             return array();
         }
 
-        $this->paraQuery->setCheckOnDB(false);
-        $this->paraQuery->setAddRowNumbersToFinalTable(true);
+        $this->_paraQuery->setCheckOnDB(false);
+        $this->_paraQuery->setAddRowNumbersToFinalTable(true);
 
-        $adapter = $this->getUserDBResource()->getTable()->getAdapter();
+        $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter();
 
         // get current user
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
@@ -304,31 +306,28 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         $dummyTableName = Daiquiri_Config::getInstance()->getUserDBName($username) . ".`" . Daiquiri_Config::getInstance()->query->resultTable->placeholder . "`";
 
         try {
-            $this->paraQuery->setSQL($noMultilineCommentSQL, $adapter);
-            $this->paraQuery->generateParallelQueryPlan($dummyTableName);
+            $this->_paraQuery->setSQL($noMultilineCommentSQL, $adapter);
+            $this->_paraQuery->generateParallelQueryPlan($dummyTableName);
         } catch (Exception $err) {
             $errors[] = "Paqu Error: " . $err->getMessage();
             return array();
         }
 
-        $resultStr = $this->_formatPlan($this->paraQuery->getParallelQueryPlan());
+        $resultStr = $this->_formatPlan($this->_paraQuery->getParallelQueryPlan());
 
         return $resultStr;
     }
 
     /**
-     * Takes the output of the explan extended query, and formats it nicely
-     * 
-     * @param array plan
-     * @return array string with formatted plan
+     * Takes the output of the explan extended query, and formats it nicely. 
+     * @param array $plan
+     * @return $string $plan formatted plan
      */
     private function _formatPlan(&$plan) {
         $result = array();
-
         foreach ($plan as $key => $row) {
             $result[] = $row . ";";
         }
-
         return $result;
     }
 
@@ -430,7 +429,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                         preg_match("/\(\s*\"(.+)\"\s*,\s*\"(.+)\"\s*\)/", $query['CALL'][1], $res);
 
                         $sql[$keyQuery] = $res[1];
-                        $tree = $this->processing->multilineParseTree(array($res[1]), $errors);
+                        $tree = $this->_processing->multilineParseTree(array($res[1]), $errors);
 
                         $queryArray[] = $tree[0];
                     }
@@ -446,10 +445,10 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
         //do normal permission check
         $currNode = $query; //array($node);
-        $multiLineUsedDBs = $this->processing->multilineUsedDB($queryArray, $this->resultDB);
+        $multiLineUsedDBs = $this->_processing->multilineUsedDB($queryArray, $this->_userDb);
 
         //check ACLs
-        if ($this->permissions->check($queryArray, $multiLineUsedDBs, $errors) === false) {
+        if ($this->_permissions->check($queryArray, $multiLineUsedDBs, $errors) === false) {
             return false;
         }
 
@@ -460,7 +459,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
                 $combinedSql = $combinedSql . $part . "; ";
             }
 
-            if ($this->processing->validateSQLServerSide($combinedSql, $this->resultDB, $errors) !== true) {
+            if ($this->_processing->validateSQLServerSide($combinedSql, $this->_userDb, $errors) !== true) {
                 $scratchdb = Daiquiri_Config::getInstance()->query->scratchdb;
                 foreach ($errors as $error) {
                     if (strpos($error, "ERROR 1146") === false && strpos($error, $scratchdb) === false) {

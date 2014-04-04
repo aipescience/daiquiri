@@ -26,7 +26,7 @@ class Config_Model_Entries extends Daiquiri_Model_Table {
      * Constructor. Sets resource object and the database table.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_Simple');
+        $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Config_Entries');
         $this->_cols = array('key','value');
     }

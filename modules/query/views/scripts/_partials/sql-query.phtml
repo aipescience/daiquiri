@@ -25,13 +25,13 @@
 <?php elseif ($this->status === 'plan'): ?>
     <p>Query submitted.</p>
     <p>You need to view and approve the <a href="<?php echo $this->escape($this->redirect); ?>">query plan</a>.
-<?php elseif ($this->status === 'form' || $this->status === 'error'): ?>
+<?php else: ?>
     <script type="text/javascript">      
         $(document).ready(function() {
             $('#sql_query').daiquiri_codemirror();
 
             $('#daiquiri-form-query-sql').daiquiri_query_buttons();
-                                
+
             $('.daiquiri-query-example').click(function() {
                 var string = $(this).attr('data-toggle');
 
@@ -78,7 +78,7 @@
             </div>
             <div id="sql-query-accordion-2" class="accordion-body collapse">
                 <div class="accordion-inner">
-                    <?php echo $this->action('example-queries', 'index', 'query'); ?>
+                    <?php echo $this->action('examples', 'account', 'query'); ?>
                 </div>
             </div>
         </div>
@@ -96,5 +96,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> 
 <?php endif; ?>

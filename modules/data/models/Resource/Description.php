@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Simple {
+class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
 
     /**
      * Database name for this resource. Set by init().

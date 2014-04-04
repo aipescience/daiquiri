@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Simple {
+class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Table {
 
     /**
      * Constructor. Sets tablename.
@@ -35,7 +35,7 @@ class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Simple {
      * @throws Exception
      * @return int $id (id of the new app) 
      */
-    public function insertRow($data) {
+    public function insertRow(array $data = array()) {
         if (empty($data)) {
             throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }

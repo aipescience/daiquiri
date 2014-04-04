@@ -20,7 +20,7 @@
  *  limitations under the License.
  */
 
-class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Simple {
+class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
 
     /**
      * Constructor. Sets DbTable class.
@@ -42,7 +42,7 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Simple {
      * @param array $sqloptions
      * @return array $rows
      */
-    public function fetchRows($sqloptions = array()) {
+    public function fetchRows(array $sqloptions = array()) {
         // get select object
         $select = $this->select($sqloptions);
         $select->from('Auth_Sessions');

@@ -21,7 +21,7 @@
  */
 
 /**
- * Abstract base class for all resource models in the daiquiri framework
+ * Abstract base class for all resource models in the daiquiri framework.
  */
 abstract class Daiquiri_Model_Resource_Abstract {
     

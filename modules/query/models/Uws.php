@@ -93,9 +93,8 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
         }
 
-        //obtain queue information
-        $resourceString = Daiquiri_Config::getInstance()->query->queue->type;
-        $resource = Query_Model_Resource_AbstractQueue::factory($resourceString);
+        // obtain queue information
+        $resource = Query_Model_Resource_AbstractQuery::factory();
         $queues = array();
         if ($resource::$hasQueues === true) {
             $queues = $resource->fetchQueues();
@@ -199,8 +198,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
     public function runJob(Uws_Model_Resource_JobSummaryType &$job) {
         //obtain queue information
-        $resourceString = Daiquiri_Config::getInstance()->query->queue->type;
-        $resource = Query_Model_Resource_AbstractQueue::factory($resourceString);
+        $resource = Query_Model_Resource_AbstractQuery::factory();
         $queues = array();
         if ($resource::$hasQueues === true && isset($job->parameters['queue'])) {
             $queues = $resource->fetchQueues();
@@ -219,7 +217,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
             if ($job->executionDuration === 0) {
                 //use default queue here
-                $queue = Daiquiri_Config::getInstance()->query->queue->qqueue->defaultQueue;
+                $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
 
                 foreach ($queues as $currQueue) {
                     if ($currQueue['name'] === $queue) {

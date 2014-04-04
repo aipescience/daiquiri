@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -19,17 +18,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+?>
 
-/**
- * DbTable class for the table holding list of query jobs.
- */
-class Query_Model_DbTable_UserGroupsPaquQQueue extends Daiquiri_Model_DbTable_Abstract {
+<div class="main">
+    <h2>Jobs from <?php echo $this->escape(Daiquiri_Auth::getInstance()->getCurrentUsername()); ?> </h2>
 
-    /**
-     * Name of the database table.
-     * @var string
-     */
-    protected $_name = 'qqueue_usrGrps';
-    protected $_schema = 'mysql';
-
-}
+    <?php foreach ($this->jobs as $job): ?>
+        <table class="table table-bordered">
+            <?php foreach ($job as $key => $value): ?>
+                <tr>
+                    <td class="onehundredfifty"><?php echo ucfirst($this->escape($key)); ?></td>
+                    <td><?php echo $this->escape($value); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    <?php endforeach; ?>
+</div>

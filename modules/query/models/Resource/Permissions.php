@@ -37,6 +37,10 @@
  */
 class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract {
 
+    /**
+     * Cache for table ACLs
+     * @var array $_tableACLCache
+     */
     private $_tableACLCache = array();
 
     /**
@@ -265,7 +269,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
             $functionModel = new Data_Model_Functions();
             $response = $functionModel->show(false, $currNode['base_expr']);
             if ($response['status'] === 'ok' && array_key_exists("data", $response) && 
-            			$functionModel->checkACL($response['data']['id'])) {
+            			$functionModel->getResource()->checkACL($response['data']['id'])) {
                 return true;
             } else {
                 $error[] = "No permission to use function named " . $currNode['base_expr'];
