@@ -254,6 +254,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 case 'round':
                 case 'sign':
                 case 'sin':
+                case 'std':
                 case 'sqrt':
                 case 'tan':
                 case 'truncate':
