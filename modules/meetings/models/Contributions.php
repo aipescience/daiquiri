@@ -22,12 +22,20 @@
 
 class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource and columns.
+     */
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Contributions');
         $this->_cols = array('title','contribution_type','participant_firstname','participant_lastname','accepted');
         // Note: only 'title','type','participant','accepted' are actually visible
     }
 
+    /**
+     * Returns the public information about a meetings contributions
+     * @param int $meetingId id of the meeting
+     * @return array $response
+     */
     public function info($meetingId) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
@@ -61,6 +69,11 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
         }
     }
 
+    /**
+     * Returns the columns of the contributions table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
+     */
     public function cols(array $params = array()) {
         if (empty($params['meetingId'])) {
             $this->_cols[] = 'meeting_title';
@@ -78,6 +91,11 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
         );
     }
 
+    /**
+     * Returns the rows of the contributions table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
+     */
     public function rows(array $params = array()) {
         if (empty($params['meetingId'])) {
             $this->_cols[] = 'meeting_title';
@@ -135,10 +153,20 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
         return $this->getModelHelper('pagination')->response($rows, $sqloptions);
     }
 
+    /**
+     * Returns one specific contribution.
+     * @param int $id id of the contribution
+     * @return array $response
+     */
     public function show($id) {
         return $this->getModelHelper('CRUD')->show($id);
     }
 
+    /**
+     * Creates a new contribution.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create($meetingId, array $formParams = array()) {
         // get models
         $meetingsModel = new Meetings_Model_Meetings();
@@ -162,17 +190,19 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages(),
-                    'form' => $form
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Updates an contribution.
+     * @param int $id id of the contribution
+     * @param array $formParams
+     * @return array $response
+     */
     public function update($id, array $formParams = array()) {
         // get participant from the database
         $entry = $this->getResource()->fetchRow($id);
@@ -203,21 +233,29 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages(),
-                    'form' => $form
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
     
+    /**
+     * Deletes a contribution.
+     * @param int $id id of the contribution
+     * @param array $formParams
+     * @return array $response
+     */
     public function delete($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 
+    /**
+     * Accepts a contribution.
+     * @param int $id id of the contribution
+     * @param array $formParams
+     * @return array $response
+     */
     public function accept($id, array $formParams = array()) {
         // create the form object
         $form = new Daiquiri_Form_Confirm(array(
@@ -237,16 +275,19 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Rejects a contribution.
+     * @param int $id id of the contribution
+     * @param array $formParams
+     * @return array $response
+     */
     public function reject($id, array $formParams = array()) {
         // create the form object
         $form = new Daiquiri_Form_Confirm(array(
@@ -261,10 +302,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 

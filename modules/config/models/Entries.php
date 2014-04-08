@@ -33,7 +33,7 @@ class Config_Model_Entries extends Daiquiri_Model_Table {
 
     /**
      * Returns all config entries.
-     * @return array
+     * @return array $response
      */
     public function index() {
         return $this->getModelHelper('CRUD')->index();

@@ -20,8 +20,6 @@
  *  limitations under the License.
  */
 
-// TODO should be renamed to Daiquiri_Model_Resource_Table
-
 class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
 
     /**
@@ -131,7 +129,7 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
     }
 
     /**
-     * Fetches primary key and one specified field from the previously set database table 
+     * Fetches the primary key and one specified field from the previously set database table 
      * as a flat array.
      * @param string $field name of the field
      * @return array $rows

@@ -22,27 +22,56 @@
 
 class Meetings_Model_ParticipantDetailKeys extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource and tablename.
+     */
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Meetings_ParticipantDetailKeys');
     }
 
+    /**
+     * Returns all participants detail keys
+     * @return array $response
+     */
     public function index() {
         return $this->getModelHelper('CRUD')->index();
     }
 
+    /**
+     * Returns one specific participant detail key.
+     * @param int $id id of the participant detail key
+     * @return array $response
+     */
     public function show($id) {
         return $this->getModelHelper('CRUD')->show($id);
     }
 
+    /**
+     * Creates a new participant detail key.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create(array $formParams = array()) {
         return $this->getModelHelper('CRUD')->create($formParams);
     }
 
+    /**
+     * Updates an participant detail key.
+     * @param int $id id of the participant detail key
+     * @param array $formParams
+     * @return array $response
+     */
     public function update($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->update($id, $formParams);
     }
 
+    /**
+     * Deletes a participant detail key.
+     * @param int $id id of the participant detail key
+     * @param array $formParams
+     * @return array $response
+     */
     public function delete($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }

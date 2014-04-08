@@ -22,18 +22,35 @@
 
 class Meetings_Model_Meetings extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource.
+     */
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Meetings');
     }
 
+    /**
+     * Returns all meetings
+     * @return array $response
+     */
     public function index() {
         return $this->getModelHelper('CRUD')->index();
     }
 
+    /**
+     * Returns one specific meeting.
+     * @param int $id id of the meeting
+     * @return array $response
+     */
     public function show($id) {
         return $this->getModelHelper('CRUD')->show($id);
     }
 
+    /**
+     * Creates a new meeting.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create(array $formParams = array()) {
         // get models
         $contributionTypeModel = new Meetings_Model_ContributionTypes();
@@ -62,17 +79,19 @@ class Meetings_Model_Meetings extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages(),
-                    'form' => $form
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Updates an meeting.
+     * @param int $id id of the meeting
+     * @param array $formParams
+     * @return array $response
+     */
     public function update($id , array $formParams = array()) {
         // get meeting from teh database
         $entry = $this->getResource()->fetchRow($id);
@@ -107,92 +126,92 @@ class Meetings_Model_Meetings extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages(),
-                    'form' => $form
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Deletes a meeting.
+     * @param int $id id of the meeting
+     * @param array $formParams
+     * @return array $response
+     */
     public function delete($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 
-    public function mails($id, array $formParams = array()) {
-        // get meeting from the database
-        $meeting = $this->getResource()->fetchRow($id);
-        if (empty($meeting)) {
-            throw new Exception('$id ' . $id . ' not found.');
-        }
+    // public function mails($id, array $formParams = array()) {
+    //     // get meeting from the database
+    //     $meeting = $this->getResource()->fetchRow($id);
+    //     if (empty($meeting)) {
+    //         throw new Exception('$id ' . $id . ' not found.');
+    //     }
 
-        // get all accepted and all rejected participants
-        $participantModel = new Meetings_Model_Participants();
-        $accepted = $participantModel->getResource()->fetchRows(array(
-            'where' => array('status = "accepted"')
-        ));
-        $rejected = $participantModel->getResource()->fetchRows(array(
-            'where' => array('status = "rejected"')
-        ));
+    //     // get all accepted and all rejected participants
+    //     $participantModel = new Meetings_Model_Participants();
+    //     $accepted = $participantModel->getResource()->fetchRows(array(
+    //         'where' => array('status = "accepted"')
+    //     ));
+    //     $rejected = $participantModel->getResource()->fetchRows(array(
+    //         'where' => array('status = "rejected"')
+    //     ));
 
-        // get mail templates
-        $templateModel = new Config_Model_Templates();
-        $acceptTemplate = $templateModel->getResource()->fetchRow('meetings.accept');
-        $rejectTemplate = $templateModel->getResource()->fetchRow('meetings.reject');
+    //     // get mail templates
+    //     $templateModel = new Config_Model_Templates();
+    //     $acceptTemplate = $templateModel->getResource()->fetchRow('meetings.accept');
+    //     $rejectTemplate = $templateModel->getResource()->fetchRow('meetings.reject');
 
-        // create the form object
-        $form = new Meetings_Form_Mails(array(
-            'accepted' => $accepted,
-            'rejected' => $rejected,
-            'acceptTemplate' => $acceptTemplate,
-            'rejectTemplate' => $rejectTemplate
-        ));
+    //     // create the form object
+    //     $form = new Meetings_Form_Mails(array(
+    //         'accepted' => $accepted,
+    //         'rejected' => $rejected,
+    //         'acceptTemplate' => $acceptTemplate,
+    //         'rejectTemplate' => $rejectTemplate
+    //     ));
 
-        // valiadate the form if POST
-        if (!empty($formParams)) {
-            if ($form->isValid($formParams)) {
-                // get the form values
-                $values = $form->getValues();
+    //     // valiadate the form if POST
+    //     if (!empty($formParams)) {
+    //         if ($form->isValid($formParams)) {
+    //             // get the form values
+    //             $values = $form->getValues();
 
-                foreach($accepted as $participant) {
-                    if (in_array($participant['id'],$values['accepted_id'])) {
-                        $this->getModelHelper('mail')->send('meetings.accept', array(
-                            'to' => $participant['email'],
-                            'meeting' => $meeting['title'],
-                            'firstname' => $participant['firstname'],
-                            'lastname' => $participant['lastname']
-                        ));
-                    }
-                }
-                foreach($rejected as $participant) {
-                    if (in_array($participant['id'],$values['rejected_id'])) {
-                        $this->getModelHelper('mail')->send('meetings.reject', array(
-                            'to' => $participant['email'],
-                            'meeting' => $meeting['title'],
-                            'firstname' => $participant['firstname'],
-                            'lastname' => $participant['lastname']
-                        ));
-                    }
-                }
+    //             foreach($accepted as $participant) {
+    //                 if (in_array($participant['id'],$values['accepted_id'])) {
+    //                     $this->getModelHelper('mail')->send('meetings.accept', array(
+    //                         'to' => $participant['email'],
+    //                         'meeting' => $meeting['title'],
+    //                         'firstname' => $participant['firstname'],
+    //                         'lastname' => $participant['lastname']
+    //                     ));
+    //                 }
+    //             }
+    //             foreach($rejected as $participant) {
+    //                 if (in_array($participant['id'],$values['rejected_id'])) {
+    //                     $this->getModelHelper('mail')->send('meetings.reject', array(
+    //                         'to' => $participant['email'],
+    //                         'meeting' => $meeting['title'],
+    //                         'firstname' => $participant['firstname'],
+    //                         'lastname' => $participant['lastname']
+    //                     ));
+    //                 }
+    //             }
 
-                return array('status' => 'ok');
-            } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
-            }
-        }
+    //             return array('status' => 'ok');
+    //         } else {
+    //             return array(
+    //                 'status' => 'error',
+    //                 'errors' => $form->getMessages()
+    //             );
+    //         }
+    //     }
 
-        return array(
-            'status' => 'form',
-            'form' => $form,
-            'accpted' => $accepted
-        );
-    }
-
-
+    //     return array(
+    //         'status' => 'form',
+    //         'form' => $form,
+    //         'accpted' => $accepted
+    //     );
+    // }
 }

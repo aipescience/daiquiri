@@ -45,7 +45,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
 
     /**
      * Fetches a set of rows from the (joined) Auth tables specified by $sqloptions.
-     * @param array $sqloptions
+     * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows
      */
     public function fetchRows(array $sqloptions = array()) {
@@ -70,7 +70,8 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
 
     /**
      * Fetches a specific row from the (joined) Auth tables.
-     * @param mixed $input primary key of the row OR array of sqloptions
+     * @param mixed $input primary key of the row OR array of sqloptions (start,limit,order,where)
+     * @throws Exception
      * @return array $row 
      */
     public function fetchRow($input) {
@@ -130,7 +131,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * Returns the primary key of the new row.
      * @param array $data row data
      * @throws Exception
-     * @return int $id
+     * @return int $id id of the new user
      */
     public function insertRow(array $data = array()) {
         if (empty($data)) {
@@ -197,7 +198,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * @param array $data row data
      * @throws Exception
      */
-    public function updateRow($id, array $data) {
+    public function updateRow($id, array $data = array()) {
         if (empty($id) || empty($data)) {
             throw new Exception('$id or $data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
@@ -384,7 +385,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
 
     /**
      * Validate a registred user in the database
-     * @param int $id
+     * @param int $id id of the user in the registration table
      * @param string $code
      * @return array $row credntials of the new user 
      */

@@ -22,27 +22,56 @@
 
 class Meetings_Model_ContributionTypes extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource and tablename.
+     */
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Meetings_ContributionTypes');
     }
 
+    /**
+     * Returns all contribution types
+     * @return array $response
+     */
     public function index() {
         return $this->getModelHelper('CRUD')->index();
     }
 
+    /**
+     * Returns one specific contribution type.
+     * @param int $id id of the contribution type
+     * @return array $response
+     */
     public function show($id) {
         return $this->getModelHelper('CRUD')->show($id);
     }
 
+    /**
+     * Creates a new contribution type.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create(array $formParams = array()) {
         return $this->getModelHelper('CRUD')->create($formParams);
     }
 
+    /**
+     * Updates an contribution type.
+     * @param int $id id of the contribution type
+     * @param array $formParams
+     * @return array $response
+     */
     public function update($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->update($id, $formParams);
     }
 
+    /**
+     * Deletes a contribution type.
+     * @param int $id id of the contribution type
+     * @param array $formParams
+     * @return array $response
+     */
     public function delete($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }

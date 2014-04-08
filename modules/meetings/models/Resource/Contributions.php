@@ -22,10 +22,17 @@
 
 class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Table {
 
+    /**
+     * Constructor. Sets tablename.
+     */
     public function __construct() {
         $this->setTablename('Meetings_Contributions');
     }
 
+    /**
+     * Returns the colums of the contributions table.
+     * @return array $cols
+     */
     public function fetchCols() {
         $cols = parent::fetchCols();
         $cols[] = 'participant_firstname';
@@ -36,45 +43,69 @@ class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Tabl
         return $cols;
     }
 
+    /**
+     * Fetches a set of rows from the contributions table specified by $sqloptions.
+     * @param array $sqloptions array of sqloptions (start,limit,order,where)
+     * @return array $rows
+     */
     public function fetchRows($sqloptions = array()) {
         $select = $this->select($sqloptions);
         $select->from('Meetings_Contributions');
         $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array('participant_firstname' => 'firstname','participant_lastname' => 'lastname'));
         $select->join('Meetings_Meetings', 'Meetings_Participants.meeting_id = Meetings_Meetings.id', array('meeting_title' => 'title'));
         $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id', array('contribution_type_id' => 'id', 'contribution_type' => 'contribution_type'));
-        return $this->getAdapter()->fetchAll($select);
+        return $this->fetchAll($select);
     }
 
-    public function countRows(array $sqloptions = null) {
-        // get select object
-        $select = $this->select($sqloptions);
-        $select->from('Meetings_Contributions', 'COUNT(*) as count');
-        $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array());
-        $select->join('Meetings_Meetings', 'Meetings_Participants.meeting_id = Meetings_Meetings.id', array());
-        $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id', array());
-
-        // query database
-        $row = $this->getAdapter()->fetchRow($select);
-        return (int) $row['count'];
-    }
-
+    /**
+     * Fetches a specific row from the contributions table.
+     * @param int $id primary key of the row
+     * @throws Exception
+     * @return array $row 
+     */
     public function fetchRow($id) {
         if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        $select = $this->getAdapter()->select();
+        $select = $this->select();
         $select->from('Meetings_Contributions');
         $select->where('Meetings_Contributions.id = ?', $id);
         $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array('participant_email' => 'email'));
         $select->join('Meetings_Meetings', 'Meetings_Participants.meeting_id = Meetings_Meetings.id', array('meeting_id' => 'id', 'meeting_title' => 'title'));
         $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id');
         
-        $row = $this->getAdapter()->fetchRow($select);
-        if (empty($row)) {
-            throw new Exception($id . ' not found in ' . get_class($this) . '::fetchRow()');
+        return $this->fetchOne($select);
+    }
+
+    /**
+     * Counts the number of rows of the contributions table.
+     * @param array $sqloptions array of sqloptions (start,limit,order,where,from)
+     * @return int $count
+     */
+    public function countRows(array $sqloptions = null) {
+        // get select object
+        $select = $this->select();
+        $select->from('Meetings_Contributions', 'COUNT(*) as count');
+        $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array());
+        $select->join('Meetings_Meetings', 'Meetings_Participants.meeting_id = Meetings_Meetings.id', array());
+        $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id', array());
+
+        if ($sqloptions) {
+            if (isset($sqloptions['where'])) {
+                foreach ($sqloptions['where'] as $w) {
+                    $select = $select->where($w);
+                }
+            }
+            if (isset($sqloptions['orWhere'])) {
+                foreach ($sqloptions['orWhere'] as $w) {
+                    $select = $select->orWhere($w);
+                }
+            }
         }
 
-        return $row;
+        // query database
+        $row = $this->fetchOne($select);
+        return (int) $row['count'];
     }
 }

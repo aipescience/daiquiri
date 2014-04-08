@@ -22,10 +22,18 @@
 
 class Contact_Model_Resource_Messages extends Daiquiri_Model_Resource_Table {
 
+    /**
+     * Constructor. Sets the name of the database table.
+     */
     public function __construct() {
         $this->setTablename('Contact_Messages');
     }
 
+    /**
+     * Fetches a set of rows specified by SQL keywords from the message table.
+     * @param array $sqloptions array of sqloptions (start,limit,order,where)
+     * @return array $rows
+     */
     public function fetchRows(array $sqloptions = array()) {
         $select = $this->select($sqloptions);
         $select->from($this->getTablename());
@@ -35,7 +43,13 @@ class Contact_Model_Resource_Messages extends Daiquiri_Model_Resource_Table {
         return $this->getAdapter()->fetchAll($select);
     }
 
-    public function fetchRow($id, array $from = array()) {
+    /**
+     * Fetches one row specified by its primary key from the message table.
+     * @param mixed $id primary key of the row
+     * @throws Exception
+     * @return array $row
+     */
+    public function fetchRow($id) {
         if (empty($id)) {
             throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
         }

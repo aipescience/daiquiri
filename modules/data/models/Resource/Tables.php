@@ -43,7 +43,7 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches the id of one table entry specified database and the table name.
+     * Fetches the id of one table entry specified by the database and the table name.
      * @param string $db name of the database
      * @param string $table name of the table
      * @return int $id

@@ -23,7 +23,7 @@
 class Auth_Model_Status extends Daiquiri_Model_Abstract {
 
     /**
-     * Constructor. Sets resource.
+     * Constructor. Sets resource and database table.
      */
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Table');

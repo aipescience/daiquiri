@@ -20,19 +20,21 @@
  *  limitations under the License.
  */
 
-/*
- * Placeholder for future conference model development. Only initial implementation
- * provided...
- *
- */
-
 class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource and columns.
+     */
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Participants');
         $this->_cols = array('firstname','lastname','email','status');
     }
 
+    /**
+     * Returns the public information about a meetings contributions
+     * @param int $meetingId id of the meeting
+     * @return array $response
+     */
     public function info($meetingId) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
@@ -58,6 +60,11 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         }
     }
 
+    /**
+     * Returns the columns of the participants table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
+     */
     public function cols(array $params = array()) {
         if (empty($params['meetingId'])) {
             $this->_cols[] = 'meeting_title';
@@ -72,6 +79,11 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         return array('status' => 'ok', 'cols' => $cols);
     }
 
+    /**
+     * Returns the rows of the participants table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
+     */
     public function rows(array $params = array()) {
         if (empty($params['meetingId'])) {
             $this->_cols[] = 'meeting_title';
@@ -126,10 +138,20 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         return $this->getModelHelper('pagination')->response($rows, $sqloptions);
     }
 
+    /**
+     * Returns one specific participant.
+     * @param int $id id of the participant
+     * @return array $response
+     */
     public function show($id) {
         return $this->getModelHelper('CRUD')->show($id);
     }
 
+    /**
+     * Creates a new participant.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create($meetingId, array $formParams = array()) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
@@ -175,17 +197,19 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages(),
-                    'form' => $form
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Updates an participant.
+     * @param int $id id of the participant
+     * @param array $formParams
+     * @return array $response
+     */
     public function update($id, array $formParams = array()) {
         // get participant from the database
         $entry = $this->getResource()->fetchRow($id);
@@ -237,21 +261,29 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages(),
-                    'form' => $form
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Deletes a participant.
+     * @param int $id id of the participant
+     * @param array $formParams
+     * @return array $response
+     */
     public function delete($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 
+    /**
+     * Accepts a participant.
+     * @param int $id id of the participant
+     * @param array $formParams
+     * @return array $response
+     */
     public function accept($id, array $formParams = array()) {
         // create the form object
         $form = new Daiquiri_Form_Confirm(array(
@@ -272,16 +304,19 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Rejects a participant.
+     * @param int $id id of the participant
+     * @param array $formParams
+     * @return array $response
+     */
     public function reject($id, array $formParams = array()) {
         // create the form object
         $form = new Daiquiri_Form_Confirm(array(
@@ -302,10 +337,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
                 return array('status' => 'ok');
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages()
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 

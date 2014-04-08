@@ -22,36 +22,19 @@
 
 class Contact_Model_Messages extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource object and cols.
+     */
     public function __construct() {
         $this->setResource('Contact_Model_Resource_Messages');
         $this->_cols = array('id','firstname','lastname','email','subject','datetime','category','status');
     }
 
-    public function rows(array $params = array()) {
-        // get the data from the database
-        $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
-        $dbRows = $this->getResource()->fetchRows($sqloptions);
-
-        // loop through the table and add an options to show the message
-        $rows = array();
-        foreach ($dbRows as $dbRow) {
-            $row = array();
-            foreach ($this->_cols as $col) {
-                $row[] = $dbRow[$col];
-            }
-
-            $row[] = $this->internalLink(array(
-                'text' => 'Respond',
-                'href' => '/contact/messages/respond/id/' . $dbRow['id'],
-                'resource' => 'Contact_Model_Messages',
-                'permission' => 'respond'));
-
-            $rows[] = $row;
-        }
-
-        return $this->getModelHelper('pagination')->response($rows, $sqloptions);
-    }
-
+    /**
+     * Returns the columns of the message table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
+     */
     public function cols(array $params = array()) {
         // set default columns
         if (empty($params['cols'])) {
@@ -88,6 +71,42 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
         return array('cols' => $cols, 'status' => 'ok');
     }
 
+    /**
+     * Returns the rows of the message table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
+     */
+    public function rows(array $params = array()) {
+        // get the data from the database
+        $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
+        $dbRows = $this->getResource()->fetchRows($sqloptions);
+
+        // loop through the table and add an options to show the message
+        $rows = array();
+        foreach ($dbRows as $dbRow) {
+            $row = array();
+            foreach ($this->_cols as $col) {
+                $row[] = $dbRow[$col];
+            }
+
+            $row[] = $this->internalLink(array(
+                'text' => 'Respond',
+                'href' => '/contact/messages/respond/id/' . $dbRow['id'],
+                'resource' => 'Contact_Model_Messages',
+                'permission' => 'respond'));
+
+            $rows[] = $row;
+        }
+
+        return $this->getModelHelper('pagination')->response($rows, $sqloptions);
+    }
+
+    /**
+     * Responds to a contact message.
+     * @param int $id id of the message
+     * @param array $formParams
+     * @return array $response
+     */
     public function respond($id, array $formParams = array()) {
         // get the message
         $message = $this->getResource()->fetchRow($id);

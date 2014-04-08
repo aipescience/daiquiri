@@ -22,6 +22,10 @@
 
 class Config_Model_Templates extends Daiquiri_Model_Table {
 
+    /**
+     * List of available mail templates.
+     * @var array $templates
+     */
     public $templates;
 
     /**

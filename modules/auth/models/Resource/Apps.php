@@ -30,10 +30,10 @@ class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Inserts a new row App table.
+     * Inserts a new row into the App table and create the corresponding user table.
      * @param array $data
      * @throws Exception
-     * @return int $id (id of the new app) 
+     * @return int $id id of the new app
      */
     public function insertRow(array $data = array()) {
         if (empty($data)) {

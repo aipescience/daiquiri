@@ -30,10 +30,10 @@ class Auth_Model_Resource_Details extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches a specific value details table.
+     * Fetches a specific value from the details table.
      * @param int $userId id of the user
      * @param string $key key of the detail
-     * @return string $detail 
+     * @return string $value value of the detail
      */
     public function fetchValue($userId, $key) {
         if (empty($userId) || empty($key)) {
@@ -55,7 +55,7 @@ class Auth_Model_Resource_Details extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Inserts a specific value.
+     * Inserts a specific value into the details table.
      * @param int $userId id of the user
      * @param string $key key of the detail
      * @param string $value value of the detail
@@ -73,7 +73,7 @@ class Auth_Model_Resource_Details extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Updates a specific value.
+     * Updates a specific datail.
      * @param int $userId id of the user
      * @param string $key key of the detail
      * @param string $value value of the detail
@@ -92,9 +92,10 @@ class Auth_Model_Resource_Details extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Deletes a specific value details table.
+     * Deletes a specific value from the details table.
      * @param int $userId id of the user
      * @param string $key key of the detail
+     * @throws Exception
      */
     public function deleteValue($userId, $key) {
         if (empty($userId) || empty($key)) {

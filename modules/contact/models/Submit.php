@@ -22,12 +22,19 @@
 
 class Contact_Model_Submit extends Daiquiri_Model_Abstract {
 
+    /**
+     * Constructor. Sets resource.
+     */
     public function __construct() {
         $this->setResource('Contact_Model_Resource_Messages');
     }
 
+    /**
+     * Submits a contact message.
+     * @param array $formParams
+     * @return array $response
+     */
     public function contact(array $formParams = array()) {
-
         // get categories
         $categoriesModel = new Contact_Model_Categories();
         $categories = $categoriesModel->getResource()->fetchValues('category');

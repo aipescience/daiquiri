@@ -22,27 +22,56 @@
 
 class Meetings_Model_ParticipantStatus extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource and tablename.
+     */
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Meetings_ParticipantStatus');
     }
 
+    /**
+     * Returns all participants status
+     * @return array $response
+     */
     public function index() {
         return $this->getModelHelper('CRUD')->index();
     }
 
+    /**
+     * Returns one specific participant status.
+     * @param int $id id of the participant status
+     * @return array $response
+     */
     public function show($id) {
         return $this->getModelHelper('CRUD')->show($id);
     }
 
+    /**
+     * Creates a new particpant status.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create(array $formParams = array()) {
         return $this->getModelHelper('CRUD')->create($formParams, 'Create participant status');
     }
 
+    /**
+     * Updates an participant status.
+     * @param int $id id of the participant status
+     * @param array $formParams
+     * @return array $response
+     */
     public function update($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update participant status');
     }
 
+    /**
+     * Deletes a participant status.
+     * @param int $id id of the participant status
+     * @param array $formParams
+     * @return array $response
+     */
     public function delete($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete participant status');
     }

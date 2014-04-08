@@ -43,7 +43,7 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches the id of one column entry specified database, the table and the column name.
+     * Fetches the id of one column entry specified by the database, the table and the column name.
      * @param string $db name of the database
      * @param string $table name of the table
      * @param string $table name of the column

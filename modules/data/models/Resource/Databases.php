@@ -43,7 +43,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches the id of one database entry specified database name.
+     * Fetches the id of one database entry specified by the database name.
      * @param string $db name of database
      * @throws Exception
      * @return int $id

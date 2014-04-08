@@ -23,7 +23,7 @@
 class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets tablename.
      */
     public function __construct() {
         $this->setTablename('Auth_Sessions');
@@ -39,7 +39,7 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
 
     /**
      * Fetches a set of rows of the sessions table specified by $sqloptions.
-     * @param array $sqloptions
+     * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows
      */
     public function fetchRows(array $sqloptions = array()) {
@@ -118,7 +118,7 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
     /**
      * Counts the number of sessions in the sessions table.
      * Takes where conditions into account.
-     * @param array $sqloptions array of sqloptions (start,limit,order,where,from)
+     * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return int $count
      */
     public function countRows(array $sqloptions = null) {

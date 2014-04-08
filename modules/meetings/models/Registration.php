@@ -22,23 +22,47 @@
 
 class Meetings_Model_Registration extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource and tablename.
+     */
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Meetings_Registration');
     }
 
+    /**
+     * Returns all registration entries
+     * @return array $response
+     */
     public function index() {
         return $this->getModelHelper('CRUD')->index();
     }
 
+    /**
+     * Returns one specific registration entry.
+     * @param int $id id of the registration entry
+     * @return array $response
+     */
     public function show($id) {
         return $this->getModelHelper('CRUD')->show($id);
     }
 
+    /**
+     * Deletes a registration entry.
+     * @param int $id id of the registration entry
+     * @param array $formParams
+     * @return array $response
+     */
     public function delete($id, array $formParams = array()) {
         return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete registation');
     }
 
+    /**
+     * Registers a participant.
+     * @param int $meetingId id of the meeting
+     * @param array $formParams
+     * @return array $response
+     */
     public function register($meetingId, array $formParams = array()) {
         // get models
         $meetingsModel = new Meetings_Model_Meetings();
@@ -148,18 +172,20 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                     return array('status' => 'ok');
                 }
             } else {
-                return array(
-                    'status' => 'error',
-                    'errors' => $form->getMessages(),
-                    'form' => $form, 
-                    'message' => $meeting['registration_message']
-                );
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
         }
 
         return array('form' => $form, 'status' => 'form', 'message' => $meeting['registration_message']);
     }
 
+    /**
+     * Validates a participant.
+     * @param int $id id of the registration entry
+     * @param string $code validation code
+     * @param array $formParams
+     * @return array $response
+     */
     public function validate($id, $code) {
         $registration = $this->getResource()->fetchRow($id);
 

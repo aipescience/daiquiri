@@ -43,7 +43,7 @@ class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches the id of one function entry specified function name.
+     * Fetches the id of one function entry specified by the function name.
      * @param string $function name of function
      * @throws Exception
      * @return int $id

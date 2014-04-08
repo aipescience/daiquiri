@@ -22,11 +22,19 @@
 
 class Contact_Model_Categories extends Daiquiri_Model_Table {
 
+    /**
+     * Constructor. Sets resource and database table.
+     */
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Table');
         $this->getResource()->setTablename('Contact_Categories');
     }
 
+    /**
+     * Creates message category entry.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create(array $formParams = array()) {
         return $this->getModelHelper('CRUD')->create($formParams,'Create message category','Contact_Form_Category');
     }

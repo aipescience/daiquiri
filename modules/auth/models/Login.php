@@ -25,7 +25,7 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
     /**
      * Authenticates a given user.
      * @param array $formParams
-     * @return Array
+     * @return $response
      */
     public function login(array $formParams = array()) {
 
@@ -57,9 +57,9 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Detroys the session of the user currently logged in.
+     * Destroys the session of the user currently logged in.
      * @param boot $cms whether to log out of the cms as well
-     * @return Array
+     * @return array $response
      */
     public function logout($cms = true) {
         $cookies = array();

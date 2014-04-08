@@ -97,7 +97,7 @@ class Auth_Model_Sessions extends Daiquiri_Model_Table {
      * Destroys a given session
      * @param string $session
      * @param array $formParams
-     * @return array
+     * @return array $response
      */
     public function destroy($session, array $formParams = array()) {
         // create the form object

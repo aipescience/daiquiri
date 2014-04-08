@@ -193,7 +193,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
     /**
      * Creates a new user.
      * @param array $formParams
-     * @return Object
+     * @return array $response
      */
     public function create(array $formParams = array()) {
         // get the status model, the roles model and the roles
