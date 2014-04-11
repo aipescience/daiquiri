@@ -34,15 +34,16 @@
  */
 class Daiquiri_Init {
 
-    protected $_application_path;
-    protected $_daiquiri_path;
-    protected $_options = array();
-    protected $_init_models = array();
-    protected $_opts = array();
-    protected $_modules = array(
-        'admin', 'auth', 'config', 'contact', 'data', 'files', 'meetings', 'query', 'uws'
+    protected static $_modules = array(
+        'config' => array(),
+        'auth' => array('config'),
+        'contact' => array('config'),
+        'data' => array('auth','config'),
+        'meetings' => array('auth','config'),
+        'query' => array('data','auth','config'),
     );
-    protected $_commandline_options = array(
+
+    protected static $_commandline_options = array(
         'h|help' => 'Displays usage information.',
         'a|application' => 'Creates the application.ini file (must be invoked first).',
         'l|links' => 'Creates the neccessary softlinks.',
@@ -55,24 +56,37 @@ class Daiquiri_Init {
         'i|init' => 'Runs the initalisation process.'
     );
 
+    public $application_path;
+    public $daiquiri_path;
+
+    public $options;
+    public $input;
+
+    public $models = array();
+    protected $_opts = array();
+
     /**
      * Constructor. Sets options.
      * @param string $$application_path
      * @param string $daiquiri_path
-     * @param array $input_options
+     * @param array $input
      */
-    public function __construct($application_path, $daiquiri_path, $input_options) {
+    public function __construct($application_path, $daiquiri_path, $input) {
         // setup autoloader
         require_once('Zend/Loader/Autoloader.php');
         Zend_Loader_Autoloader::getInstance();
 
-        $this->_application_path = $application_path;
-        $this->_daiquiri_path = $daiquiri_path;
+        $this->application_path = $application_path;
+        $this->daiquiri_path = $daiquiri_path;
+        $this->input = $input;
 
         $this->_parseCommandLine();
 
         // init the options array with database and mail options
-        $options = $this->_initOptions($input_options);
+        $this->options = array();
+        $this->_processDatabaseOptions();
+        $this->_processMailOptions();
+        $this->_processModulesOptions();
 
         if ($this->_opts === array('application')) {
             // pass
@@ -80,45 +94,27 @@ class Daiquiri_Init {
             // setup zend application environment 
             $this->_setupEnvironment();
 
-            // get init models from the modules, order is important
-            $this->_init_models['config'] = new Config_Model_Init($application_path, $daiquiri_path, $input_options);
-            $this->_init_models['auth'] = new Auth_Model_Init($application_path, $daiquiri_path, $input_options);
-            $this->_init_models['contact'] = new Contact_Model_Init($application_path, $daiquiri_path, $input_options);
-            $this->_init_models['data'] = new Data_Model_Init($application_path, $daiquiri_path, $input_options);
-            $this->_init_models['meetings'] = new Meetings_Model_Init($application_path, $daiquiri_path, $input_options);
-            $this->_init_models['query'] = new Query_Model_Init($application_path, $daiquiri_path, $input_options);
+            // get init models from the modules
+            foreach($this->options['modules'] as $module) {
+                $classname = ucfirst($module) . '_Model_Init';
+                $this->models[] = new $classname($this);
+            }
 
-            // parse options in an incremental way, order is important
-            foreach ($this->_init_models as $key => $value) {
-                $options = $value->parseOptions($options);
+            // parse the config array for each model 
+            $this->options['config'] = array();
+            foreach($this->models as $model) {
+                $model->processConfig();
+            }
+            
+            // parse the init array for each model
+            $this->options['init'] = array();
+            foreach($this->models as $model) {
+                $model->processInit();
             }
         }
-
-        $this->_options = $options;
     }
 
     /**
-     * @brief   getApplicationOptions - Gets application options
-     * 
-     * Gets application options.
-     */
-    public function getApplicationOptions() {
-        return $this->_options;
-    }
-
-    /**
-     * @brief   setApplicationOptions - Sets application options
-     * @param   array $options: array holding all the applications configuration
-     * 
-     * Sets application options.
-     */
-    public function setApplicationOptions($options) {
-        $this->_options = $options;
-    }
-
-    /**
-     * @brief   run method - The function that does all the magic of setting the app up
-     * 
      * The function that does all the magic of setting the app up.
      */
     public function run() {
@@ -129,16 +125,18 @@ class Daiquiri_Init {
         }
     }
 
+    /**
+     * Parses the comment line.
+     */
     private function _parseCommandLine() {
-        // parse command line
         try {
-            $opts = new Zend_Console_Getopt($this->_commandline_options);
+            $opts = new Zend_Console_Getopt(Daiquiri_Init::$_commandline_options);
             $opts->parse();
         } catch (Zend_Console_Getopt_Exception $e) {
             exit($e->getMessage() . "\n\n" . $e->getUsageMessage());
         }
 
-        foreach (array_keys($this->_commandline_options) as $key) {
+        foreach (array_keys(Daiquiri_Init::$_commandline_options) as $key) {
             $arr = explode('|', $key);
             if (isset($opts->$arr[0])) {
                 $this->_opts[] = $arr[1];
@@ -159,9 +157,12 @@ class Daiquiri_Init {
         }
     }
 
+    /**
+     * Sets up the Zend environment.
+     */
     private function _setupEnvironment() {
         // setup variables
-        define('APPLICATION_PATH', $this->_application_path . '/application');
+        define('APPLICATION_PATH', $this->application_path . '/application');
         define('APPLICATION_ENV', 'development');
         // check if the application.ini.file is present
         if (!is_file(APPLICATION_PATH . '/configs/application.ini')) {
@@ -170,19 +171,19 @@ class Daiquiri_Init {
         }
 
         // set include path
-        set_include_path($this->_daiquiri_path . '/library/' . PATH_SEPARATOR . get_include_path());
+        set_include_path($this->daiquiri_path . '/library/' . PATH_SEPARATOR . get_include_path());
 
         // add daiquiri namespaces to autoloader
         $autoloader = Zend_Loader_Autoloader::getInstance();
         $autoloader->registerNamespace('Daiquiri_');
-        foreach ($this->_modules as $module) {
+        foreach ($this->options['modules'] as $module) {
             $autoloader->registerNamespace(ucfirst($module) . '_');
         }
 
         // initialize Zend_Application and bootstrap
         $this->_zend_application = new Zend_Application(
-                        APPLICATION_ENV,
-                        APPLICATION_PATH . '/configs/application.ini'
+            APPLICATION_ENV,
+            APPLICATION_PATH . '/configs/application.ini'
         );
 
         // fake request
@@ -196,13 +197,16 @@ class Daiquiri_Init {
         $this->_zend_application->bootstrap();
     }
 
-    private function _initOptions($input_options) {
-        if (!isset($input_options['database'])) {
+    /**
+     * Processes the 'database' part of $options.
+     */
+    private function _processDatabaseOptions() {
+        if (!isset($this->input['database'])) {
             $this->_error("No database options provided.");
-        } else if (!is_array($input_options['database'])) {
+        } else if (!is_array($this->input['database'])) {
             $this->_error('Database options needs to be an array.');
         } else {
-            $input = $input_options['database'];
+            $input = $this->input['database'];
         }
 
         $database_defaults = array(
@@ -244,15 +248,19 @@ class Daiquiri_Init {
             }
         }
 
-        $options['database'] = $output;
+        $this->options['database'] = $output;
+    }
 
-        // mail options
-        if (!isset($input_options['mail'])) {
+    /**
+     * Processes the 'mail' part of $options.
+     */
+    private function _processMailOptions() {
+        if (!isset($this->input['mail'])) {
             $this->_error("No mail options provided.");
-        } else if (!is_array($input_options['mail'])) {
+        } else if (!is_array($this->input['mail'])) {
             $this->_error('Mail options needs to be an array.');
         } else {
-            $input = $input_options['mail'];
+            $input = $this->input['mail'];
         }
 
         $mail_defaults = array(
@@ -281,10 +289,48 @@ class Daiquiri_Init {
             }
         }
 
-        $options['mail'] = $output;
-        return $options;
+        $this->options['mail'] = $output;
     }
 
+    /**
+     * Processes the 'modules' part of $options. Sets the correct modules in the 
+     * right order based on the input and the dependencies. 
+     */
+    private function _processModulesOptions() {
+        if (!isset($this->input['modules'])) {
+            $this->_error("No modules specified in options.");
+        } else if (!is_array($this->input['modules'])) {
+            $this->_error('Modules needs to be an array.');
+        } else {
+            $input = $this->input['modules'];
+        }
+
+        $output = array();
+        foreach (array_keys(Daiquiri_Init::$_modules) as $module) {
+            // add module if it is in the input list, but only if it is not already there
+            if (in_array($module, $input) && !in_array($module, $output)) {
+                $output[] = $module;
+            }
+
+            // add dependencies (no recursion, we are lazy)
+            foreach ($input as $input_module) {
+                // see if the current module is a dependency
+                $dependencies = Daiquiri_Init::$_modules[$input_module];
+
+                // add module to the list if it is a dependency,
+                // but again only if it is not already there
+                if (in_array($module, $dependencies) && !in_array($module, $output)) {
+                    $output[] = $module;
+                }
+            }
+        }
+
+        $this->options['modules'] = $output;
+    }
+
+    /**
+     * Creates the application.ini file
+     */
     private function _application() {
         echo "Creating application.ini file." . PHP_EOL;
 
@@ -304,7 +350,7 @@ class Daiquiri_Init {
         );
 
         // prepare database configuration part of application.ini
-        foreach ($this->_options['database'] as $adapter => $database) {
+        foreach ($this->options['database'] as $adapter => $database) {
             $output[] = "resources.multidb.$adapter.adapter = Pdo_Mysql";
             $output[] = "resources.multidb.$adapter.charset = utf8";
             if ($adapter === 'web') {
@@ -320,7 +366,7 @@ class Daiquiri_Init {
         }
 
         // prepare mail configuration part of application.ini
-        foreach ($this->_options['mail'] as $key => $value) {
+        foreach ($this->options['mail'] as $key => $value) {
             if (in_array($key, array('email', 'name'))) {
                 $output[] = "resources.mail.defaultFrom.$key = $value";
             } else {
@@ -352,7 +398,7 @@ class Daiquiri_Init {
         );
 
         // write application.ini into file
-        $filename = $this->_application_path . '/application/configs/application.ini';
+        $filename = $this->application_path . '/application/configs/application.ini';
         if (!$handle = fopen($filename, "w")) {
             throw new Exception("application/configs/application.ini can not be opened for write");
         }
@@ -369,24 +415,24 @@ class Daiquiri_Init {
      */
     private function _links() {
         // captcha directory
-        $captcha = $this->_application_path . '/public/captcha';
-        $links[$captcha] = $this->_options['config']['core']['captcha']['dir'];
+        $captcha = $this->application_path . '/public/captcha';
+        $links[$captcha] = $this->options['config']['core']['captcha']['dir'];
 
         // client js and css directory
-        $client = $this->_application_path . '/public/daiquiri';
-        if (!empty($this->_options['config']['core']['minify'])
-            && $this->_options['config']['core']['minify']['enabled'] == true) {
+        $client = $this->application_path . '/public/daiquiri';
+        if (!empty($this->options['config']['core']['minify'])
+            && $this->options['config']['core']['minify']['enabled'] == true) {
 
             $links[$client] = null;
         } else {
-            $links[$client] = $this->_daiquiri_path . '/client';
+            $links[$client] = $this->daiquiri_path . '/client';
         }
 
         // cms (word press directory)
-        $cms = $this->_application_path . '/public' . $this->_options['config']['cms']['url'];
-        if (!empty($this->_options['config']['cms']) 
-            && $this->_options['config']['cms']['enabled']) {
-            $links[$cms] = $this->_options['config']['cms']['path'];
+        $cms = $this->application_path . '/public' . $this->options['config']['cms']['url'];
+        if (!empty($this->options['config']['cms']) 
+            && $this->options['config']['cms']['enabled']) {
+            $links[$cms] = $this->options['config']['cms']['path'];
         } else {
             $links[$cms] = null;
         }
@@ -413,7 +459,7 @@ class Daiquiri_Init {
      * Minifies the static js and css files.
      */
     private function _minify() {
-        $client = $this->_daiquiri_path . '/client/';
+        $client = $this->daiquiri_path . '/client/';
 
         if (!file_exists('public/min')) {
             mkdir('public/min');
@@ -436,7 +482,7 @@ class Daiquiri_Init {
         // take care of images
         foreach (Daiquiri_View_Helper_HeadDaiquiri::$img as $img) {
             $target = $client . $img;
-            $link = $this->_application_path . '/public/img/' . basename($img);
+            $link = $this->application_path . '/public/img/' . basename($img);
             if (is_link($link)) {
                 unlink($link);
             }
@@ -454,7 +500,7 @@ class Daiquiri_Init {
      * Displays the commands to delete the database.
      */
     private function _clean() {
-        foreach ($this->_options['database'] as $db) {
+        foreach ($this->options['database'] as $db) {
             echo "DELETE FROM mysql.user where User='{$db['username']}';" . PHP_EOL;
             echo "DELETE FROM mysql.tables_priv where User='{$db['username']}';" . PHP_EOL;
             echo "DELETE FROM mysql.db where User='{$db['username']}';" . PHP_EOL;
@@ -467,7 +513,7 @@ class Daiquiri_Init {
      * Displays the commands to create the database user.
      */
     private function _user() {
-        foreach ($this->_options['database'] as $dbkey => $db) {
+        foreach ($this->options['database'] as $dbkey => $db) {
             // fix localhost confusion of mysql
             $localhost = array('localhost', '127.0.0.1', '::1');
             if (in_array($db['host'], $localhost)) {
@@ -484,10 +530,10 @@ class Daiquiri_Init {
                 $output[$host][] = "GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to `{$db['username']}`@`{$host}`;";
 
                 if ($dbkey === 'web') {
-                    foreach ($this->_options['database'] as $currDb) {
+                    foreach ($this->options['database'] as $currDb) {
                         foreach ($currDb['additional'] as $dbname) {
-                            if (empty($this->_options['config']['data']['writeToDB']) ||
-                                    $this->_options['config']['data']['writeToDB'] === 0) {
+                            if (empty($this->options['config']['data']['writeToDB']) ||
+                                    $this->options['config']['data']['writeToDB'] === 0) {
 
                                 $output[$host][] = "GRANT SELECT ON `{$dbname}`.* to `{$db['username']}`@`{$host}`;";
                             } else {
@@ -497,8 +543,8 @@ class Daiquiri_Init {
                     }
                 } else {
                     foreach ($db['additional'] as $dbname) {
-                        if (empty($this->_options['config']['data']['writeToDB']) ||
-                                $this->_options['config']['data']['writeToDB'] === 0) {
+                        if (empty($this->options['config']['data']['writeToDB']) ||
+                                $this->options['config']['data']['writeToDB'] === 0) {
 
                             $output[$host][] = "GRANT SELECT ON `{$dbname}`.* to `{$db['username']}`@`{$host}`;";
                         } else {
@@ -535,36 +581,28 @@ class Daiquiri_Init {
     }
 
     /**
-     * Display the virtual host configuration.
+     * Displays the virtual host configuration.
      */
     private function _vhost() {
         // guess an alias name
-        $alias = basename($this->_application_path);
+        $alias = basename($this->application_path);
 
         echo <<<EOT
 For a virtual host:
     
     #SetEnv APPLICATION_ENV development
-    DocumentRoot "{$this->_application_path}/public"
-    <Directory "{$this->_application_path}/public">
-        Options FollowSymLinks -Indexes -MultiViews
-        AllowOverride All
-        Order allow,deny
-        Allow from all
-    </Directory>
     
-or for an Alias:
+    DocumentRoot "{$this->application_path}/public"
+    # or 
+    Alias /{$alias} "{$this->application_path}/public"
 
-    #SetEnv APPLICATION_ENV development
-    Alias /{$alias} "{$this->_application_path}/public"
-    SetEnvIf Request_URI ^/{$alias} SUBDOMAIN_DOCUMENT_ROOT={$this->_application_path}/public
-    <Directory "{$this->_application_path}/public">
+    <Directory "{$this->application_path}/public">
         Options FollowSymLinks -Indexes -MultiViews
         AllowOverride All
         Order allow,deny
         Allow from all
     </Directory>
-    
+
 Uncomment 'SetEnv APPLICATION_ENV development' for a debugging.
 
 EOT;
@@ -576,8 +614,8 @@ EOT;
     private function _drop() {
         echo "Dropping databases." . PHP_EOL;
 
-        if (isset($this->_options['database']['web'])) {
-            $webDb = $this->_options['database']['web'];
+        if (isset($this->options['database']['web'])) {
+            $webDb = $this->options['database']['web'];
             echo '    Dropping ' . $webDb['dbname'] . '.' . PHP_EOL;
 
             // drop web application database
@@ -585,8 +623,8 @@ EOT;
             exec($this->_getConnectionString($webDb) . " -e'{$sql1}'");
         }
 
-        if (isset($this->_options['database']['user'])) {
-            $userDb = $this->_options['database']['user'];
+        if (isset($this->options['database']['user'])) {
+            $userDb = $this->options['database']['user'];
             echo '    Dropping ' . $userDb['dbname'] . '.' . PHP_EOL;
 
             // drop user databases
@@ -602,8 +640,8 @@ EOT;
         echo "Syncing databases." . PHP_EOL;
 
         // set up web database
-        if (isset($this->_options['database']['web'])) {
-            $webDb = $this->_options['database']['web'];
+        if (isset($this->options['database']['web'])) {
+            $webDb = $this->options['database']['web'];
             echo '    Syncing ' . $webDb['dbname'] . '.' . PHP_EOL;
 
             // create web application database if it does not exist
@@ -612,26 +650,21 @@ EOT;
 
             // source schema sql scripts for all active modules
             $moduleDir = __DIR__ . '/../../modules';
-            foreach ($this->_modules as $module) {
-                if (in_array($module, array('auth', 'contact', 'data', 'query'))
-                        && empty($this->_options['config'][$module])) {
-                    // pass
-                } else {
-                    $schema = $moduleDir . '/' . $module . '/db/schema.sql';
-                    if (file_exists($schema)) {
-                        exec($this->_getConnectionString($webDb) . " -D'{$webDb['dbname']}' < {$schema}");
-                    }
-                    $data = $moduleDir . '/' . $module . '/db/data.sql';
-                    if (file_exists($data)) {
-                        exec($this->_getConnectionString($webDb) . " -D'{$webDb['dbname']}' < {$data}");
-                    }
+            foreach ($this->options['modules'] as $module) {
+                $schema = $moduleDir . '/' . $module . '/db/schema.sql';
+                if (file_exists($schema)) {
+                    exec($this->_getConnectionString($webDb) . " -D'{$webDb['dbname']}' < {$schema}");
+                }
+                $data = $moduleDir . '/' . $module . '/db/data.sql';
+                if (file_exists($data)) {
+                    exec($this->_getConnectionString($webDb) . " -D'{$webDb['dbname']}' < {$data}");
                 }
             }
         }
 
         // set up guest user database
-        if (isset($this->_options['database']['user'])) {
-            $userDb = $this->_options['database']['user'];
+        if (isset($this->options['database']['user'])) {
+            $userDb = $this->options['database']['user'];
             echo '    Syncing ' . $userDb['dbname'] . '.' . PHP_EOL;
 
             // create guest database
@@ -646,8 +679,8 @@ EOT;
     private function _init() {
         echo "Running init process." . PHP_EOL;
 
-        foreach ($this->_init_models as $key => $value) {
-            $value->init($this->_options);
+        foreach ($this->models as $model) {
+            $model->init($this->options);
         }
 
         echo '    done!' . PHP_EOL;
@@ -683,19 +716,12 @@ EOT;
         return $conn;
     }
 
-    protected function _check($r, $a) {
-        if ($r['status'] !== 'ok') {
-            echo 'ERROR';
-            if (array_key_exists('error', $r)) {
-                echo ': ' . $r['error'];
-            }
-            Zend_Debug::dump($a);
-            die(0);
-        }
-    }
-
-    protected function _error($string) {
-        echo $string . PHP_EOL;
+    /**
+     * Displays an error and quits the script.
+     * @param string $error the error string
+     */
+    protected function _error($error) {
+        echo $error . PHP_EOL;
         die(0);
     }
 

@@ -22,21 +22,135 @@
 
 class Auth_Model_Init extends Daiquiri_Model_Init {
 
-    public function parseOptions(array $options) {
-        if (!isset($this->_input_options['auth'])) {
-            $input = array();
-        } else if (!is_array($this->_input_options['auth'])) {
-            $this->_error('Auth options need to be an array.');
-        } else {
-            $input = $this->_input_options['auth'];
+    /**
+     * Returns the acl resources for the auth module.
+     * @return array $resources
+     */
+    public function getResources() {
+        return array(
+            'Auth_Model_Login',
+            'Auth_Model_Password',
+            'Auth_Model_Registration',
+            'Auth_Model_User',
+            'Auth_Model_Account',
+            'Auth_Model_Sessions',
+            'Auth_Model_Details',
+        );
+    }
+
+    /**
+     * Returns the acl rules for the auth module.
+     * @return array $rules
+     */
+    public function getRules() {
+        $rules = array();
+
+        // guest
+        $rules['guest'] = array(
+            'Auth_Model_Login' => array('login'),
+            'Auth_Model_Password' => array('forgot','reset')
+        );
+        if ($this->_init->options['config']['auth']['registration']) {
+            $rules['guest']['Auth_Model_Registration'] = array('register','validate');
         }
 
+        // user
+        $rules['user'] = array(
+            'Auth_Model_User' => array('edit'),
+            'Auth_Model_Password' => array('change'),
+            'Auth_Model_Account' => array('show','update')
+        );
+
+        // manager
+        if ($this->_init->options['config']['auth']['confirmation']) {
+            $rules['manager'] = array(
+                'Auth_Model_User' => array('rows','cols','show'),
+                'Auth_Model_Registration' => array('confirm','reject')
+            );
+        }
+
+        // admin
+        $rules['admin'] = array(
+            'Auth_Model_User' => array('rows','cols','show','create','update','delete'),
+            'Auth_Model_Password' => array('set'),
+            'Auth_Model_Details' => array('show','create','update', 'delete'),
+            'Auth_Model_Sessions' => array('rows','cols','destroy'),
+            'Auth_Model_Registration' => array('activate','disable','reenable')
+        );
+
+        return $rules;
+    }
+
+    /**
+     * Processes the 'auth' part of $options['config'].
+     */
+    public function processConfig() {
+        if (!isset($this->_init->input['config']['auth'])) {
+            $input = array();
+        } else if (!is_array($this->_init->input['config']['auth'])) {
+            $this->_error('Auth config options need to be an array.');
+        } else {
+            $input = $this->_init->input['config']['auth'];
+        }
+
+        // create default entries
+        $defaults = array(
+            'registration' => false,
+            'activation' => false,
+            'confirmation' => false,
+            'password' => array(
+                'default' => array(
+                    'algo' => 'cryptSha512'
+                )
+            ),
+            'details' => array(
+                'firstname',
+                'lastname'
+            ),
+            'timeout' => 0,
+            'disableOnForgotPassword' => false,
+            'changeEmail' => true,
+            'lowerCaseUsernames' => false,
+            'usernameMinLength' => 4,
+            'passwordMinLength' => 4
+        );
+
+        // create config array
+        $output = array();
+        $this->_buildConfig_r($input, $output, $defaults);
+
+        // process and check
+        if (!empty($output['confirmation'])) {
+            $output['registration'] = true;
+            $output['activation'] = true;
+        }
+        if (!empty($output['activation'])) {
+            $output['registration'] = true;
+        }
+
+        // set options
+        $this->_init->options['config']['auth'] = $output;
+    }
+
+    /**
+     * Processes the 'auth' part of $options['init'].
+     */
+    public function processInit() {
+        if (!isset($this->_init->input['init']['auth'])) {
+            $input = array();
+        } else if (!is_array($this->_init->input['init']['auth'])) {
+            $this->_error('Auth init options need to be an array.');
+        } else {
+            $input = $this->_init->input['init']['auth'];
+        }
+
+        // init output array
         $output = array();
 
         // construct status array
         $output['status'] = array();
-        if ($options['config']['auth']['registration']) {
-            if ($options['config']['auth']['confirmation']) {
+        if ($this->_init->options['config']['auth']['registration']) {
+            if ($this->_init->options['config']['auth']['confirmation']) {
                 $output['status'] = array('active', 'registered', 'confirmed', 'disabled');
             } else {
                 $output['status'] = array('active', 'registered', 'disabled');
@@ -54,10 +168,10 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 }
             }
         }
-        if ($options['config']['contact']) {
+        if (in_array('contact',$this->_init->options['modules'])) {
             $output['roles'][] = 'support';
         }
-        if ($options['config']['auth']['confirmation']) {
+        if ($this->_init->options['config']['auth']['confirmation']) {
             $output['roles'][] = 'manager';
         }
         $output['roles'][] = 'admin';
@@ -68,7 +182,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             if (is_array($input['user'])) {
                 $output['user'] = $input['user'];
             } else {
-                $this->_error("Auth option 'user' needs to be an array.");
+                $this->_error("Auth init option 'user' needs to be an array.");
             }
         }
 
@@ -78,56 +192,17 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             if (is_array($input['apps'])) {
                 $output['apps'] = $input['apps'];
             } else {
-                $this->_error("Auth option 'apps' needs to be an array.");
+                $this->_error("Auth init option 'apps' needs to be an array.");
             }
         }
 
-        // contstruct resources array
-        $output['resources'] = array(
-            // admin module
-            'Admin_IndexController',
-            // auth module
-            'Auth_Model_Login',
-            'Auth_Model_Password',
-            'Auth_Model_Registration',
-            'Auth_Model_User',
-            'Auth_Model_Account',
-            'Auth_Model_Sessions',
-            'Auth_Model_Details',
-            // config module
-            'Config_Model_Entries',
-            'Config_Model_Messages',
-            'Config_Model_Templates',
-            // contact module
-            'Contact_Model_Submit',
-            'Contact_Model_Messages',
-            // data module
-            'Data_Model_Viewer',
-            'Data_Model_Functions',
-            'Data_Model_Databases',
-            'Data_Model_Tables',
-            'Data_Model_Columns',
-            // meeting
-            'Meetings_Model_Meetings',
-            'Meetings_Model_Participants',
-            'Meetings_Model_ParticipantDetails',
-            'Meetings_Model_ParticipantDetailKeys',
-            'Meetings_Model_ParticipantStatus',
-            'Meetings_Model_Contributions',
-            'Meetings_Model_ContributionTypes',
-            'Meetings_Model_Registration',
-            // files module
-            'Files_Model_Files',
-            // query module
-            'Query_Model_Account',
-            'Query_Model_Database',
-            'Query_Model_Examples',
-            'Query_Model_Form',
-            'Query_Model_Jobs',
-            'Query_Model_Query',
-            'Query_Model_Uws',
-        );
-
+        // construct resources array
+        $output['resources'] = array();
+        foreach ($this->_init->models as $model) {
+            foreach ($model->getResources() as $resource) {
+                $output['resources'][] = $resource;
+            }
+        }
         if (isset($input['resources'])) {
             if (is_array($input['resources'])) {
                 $output['resources'] = array_merge($output['resources'], $input['resources']);
@@ -137,219 +212,44 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
 
         // prepare rules array
-        $rules = array();
+        $output['rules'] = array();
         foreach ($output['roles'] as $role) {
-            $rules[$role] = array();
+            $output['rules'][$role] = array();
         }
 
-        // construct rules for admin module
-        if ($options['config']['contact']) {
-            $rules['support']['Admin_IndexController'] = array('index');
-        }
-        if ($options['config']['contact'] && $options['config']['auth']['confirmation']) {
-            $rules['manager']['Admin_IndexController'] = array('index');
-        }
-        $rules['admin']['Admin_IndexController'] = array('index');
-
-        // construct rules for auth module
-        if ($options['config']['auth']) {
-            // guest
-            $rules['guest']['Auth_Model_Login'] = array('login');
-            $rules['guest']['Auth_Model_Password'] = array('forgot','reset');
-            if ($options['config']['auth']['registration']) {
-                $rules['guest']['Auth_Model_Registration'] = array('register','validate');
-            }
-
-            // user
-            $rules['user']['Auth_Model_User'] = array('edit');
-            $rules['user']['Auth_Model_Password'] = array('change');
-            $rules['user']['Auth_Model_Account'] = array('show','update');
-
-            // manager
-            if ($options['config']['auth']['confirmation']) {
-                $rules['manager']['Auth_Model_User'] = array('rows','cols','show');
-                $rules['manager']['Auth_Model_Registration'] = array('confirm','reject');
-            }
-
-            // admin
-            $rules['admin']['Auth_Model_User'] = array(
-                'rows','cols','show','create','update','delete'
-            );
-            $rules['admin']['Auth_Model_Password'] = array('set');
-            $rules['admin']['Auth_Model_Details'] = array('show','create','update', 'delete');
-            $rules['admin']['Auth_Model_Sessions'] = array('rows','cols','destroy');
-            $rules['admin']['Auth_Model_Registration'] = array('activate','disable','reenable');
-        }
-
-        // construct rules for config module
-        $rules['admin']['Config_Model_Entries'] = array('index', 'create', 'update', 'delete', 'export');
-        $rules['admin']['Config_Model_Messages'] = array('index', 'create', 'update', 'delete', 'export');
-        $rules['admin']['Config_Model_Templates'] = array('index', 'create', 'update', 'delete', 'export');
-        
-        // construct rules for contact module
-        if (!empty($options['config']['contact'])) {
-            // guest
-            $rules['guest']['Contact_Model_Submit'] = array('contact');
-
-            // support
-            $rules['support']['Contact_Model_Messages'] = array('rows','cols','show','respond');
-        }
-
-        // construct rules for data module
-        if (!empty($options['config']['data'])) {
-            // guest
-            $rules['guest']['Data_Model_Viewer'] = array('rows','cols');
-
-            // admin
-            $rules['admin']['Data_Model_Functions'] = array(
-                'index','create','show','update','delete'
-            );
-            $rules['admin']['Data_Model_Databases'] = array(
-                'index','create','show','update','delete'
-            );
-            $rules['admin']['Data_Model_Tables'] = array(
-                'create','show','update','delete'
-            );
-            $rules['admin']['Data_Model_Columns'] = array(
-                'create','show','update','delete'
-            );
-        }
-
-        // construct rules for meeting module
-        if (!empty($options['config']['meetings'])) {
-            // guest
-            $rules['guest']['Meetings_Model_Participants'] = array('info');
-            $rules['guest']['Meetings_Model_Contributions'] = array('info');
-            $rules['guest']['Meetings_Model_Registration'] = array('register','validate');
-
-            // admin
-            $rules['admin']['Meetings_Model_Meetings'] = array(
-                'index','create','show','update','delete','mails'
-            );
-            $rules['admin']['Meetings_Model_Participants'] = array(
-                'index','cols','rows','create','show','update','delete','accept','reject'
-            );
-            $rules['admin']['Meetings_Model_ParticipantDetails'] = array(
-                'index','create','show','update','delete'
-            );
-            $rules['admin']['Meetings_Model_ParticipantDetailKeys'] = array(
-                'index','create','show','update','delete'
-            );
-            $rules['admin']['Meetings_Model_ParticipantStatus'] = array(
-                'index','create','show','update','delete'
-            );
-            $rules['admin']['Meetings_Model_Contributions'] = array(
-                'index','cols','rows','create','show','update','delete','accept','reject'
-            );
-            $rules['admin']['Meetings_Model_ContributionTypes'] = array(
-                'index','create','show','update','delete'
-            );
-            $rules['admin']['Meetings_Model_Registration'] = array('index','show','delete');
-        }
-
-        // construct rules for files module
-        if (!empty($options['config']['files'])) {
-            $rules['user']['Files_Model_Files'] = array(
-                'index', 'single', 'singleSize', 'multi', 'multiSize', 'row', 'rowSize'
-            );
-        }
-
-        // construct rules for query module
-        if (!empty($options['config']['query'])) {
-            if ($options['config']['query']['guest']) {
-                // guest
-                $rules['guest']['Query_Model_Form'] = array('submit');
-                $rules['guest']['Query_Model_Account'] = array(
-                    'listJobs', 'showJob', 'killJob', 'removeJob', 'renameJob', 'databases', 'functions', 'examples'
-                );
-                $rules['guest']['Query_Model_Database'] = array(
-                    'download', 'file', 'stream', 'regen'
-                );
-                $rules['guest']['Query_Model_Examples'] = array('index', 'show');
-                if (strtolower($options['config']['query']['processor']['plan']) === 'alterplan' ||
-                    strtolower($options['config']['query']['processor']['plan']) === 'infoplan') {
-
-                    $rules['guest']['Query_Model_Form'][] = 'plan';
-                    $rules['guest']['Query_Model_Form'][] = 'mail';
+        // get rules for the modules
+        foreach ($this->_init->models as $model) {
+            foreach ($model->getRules() as $role => $rules) {
+                if (!isset($output['rules'][$role])) {
+                    $output['rules'][$role] = array();
                 }
-            } else {
-                // user
-                $rules['user']['Query_Model_Form'] = array('submit');
-                $rules['user']['Query_Model_Account'] = array(
-                    'listJobs', 'showJob', 'killJob', 'removeJob', 'renameJob', 'databases', 'functions', 'examples'
-                );
-                $rules['user']['Query_Model_Database'] = array(
-                    'download', 'file', 'stream', 'regen'
-                );
-                $rules['user']['Query_Model_Examples'] = array('index', 'show');
-                if (strtolower($options['config']['query']['processor']['plan']) === 'alterplan' ||
-                    strtolower($options['config']['query']['processor']['plan']) === 'infoplan') {
-
-                    $rules['user']['Query_Model_Form'][] = 'plan';
-                    $rules['user']['Query_Model_Form'][] = 'mail';
+                foreach ($rules as $resource => $permissions) {
+                    $output['rules'][$role][$resource] = $permissions;
                 }
             }
+        }
 
-            // admin
-            $rules['admin']['Query_Model_Jobs'] = array(
-                'rows', 'cols', 'show', 'kill', 'remove', 'rename'
-            );
-            $rules['admin']['Query_Model_Examples'] = array(
-                'index', 'create', 'update', 'delete', 'export'
-            );
-
-            // construct rules for uws module
-            if (!empty($options['config']['uws'])) {
-                $rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote','createJobId', 'getPendingJob', 'getQuote', 'setDestructTime','setDestructTimeImpl', 'setExecutionDuration', 'setParameters','deleteJob', 'abortJob', 'runJob');
+        // add rules from the input
+        foreach ($input['rules'] as $role => $rules) {
+            if (!isset($output['rules'][$role])) {
+                $output['rules'][$role] = array();
+            }
+            foreach ($rules as $resource => $permissions) {
+                $output['rules'][$role][$resource] = $permissions;
             }
         }
 
-        $this->_buildRules_r($input['rules'], $output['rules'], $rules);
-
-        $options['auth'] = $output;
-        return $options;
+        $this->_init->options['init']['auth'] = $output;
     }
 
-    private function _buildRules_r(&$input, &$output, $defaults) {
-        if (is_array($defaults)) {
-            if (empty($defaults)) {
-                $output = array();
-            } else if ($input === false) {
-                $output = false;
-            } else if (is_array($input)) {
-                foreach (array_keys($defaults) as $key) {
-                    $this->_buildRules_r($input[$key], $output[$key], $defaults[$key]);
-                    unset($input[$key]);
-                }
-            } else {
-                $output = $defaults;
-            }
-            if (!empty($input)) {
-                if (is_array($input)) {
-                    foreach ($input as $key => $value) {
-                        $output[$key] = $value;
-                    }
-                }
-            }
-        } else {
-            if (isset($input)) {
-                if (is_array($input)) {
-                    $this->_error("Rules '?' is an array but should not.");
-                } else {
-                    $output = $input;
-                    unset($input);
-                }
-            } else {
-                $output = $defaults;
-            }
-        }
-    }
-
-    public function init(array $options) {
+    /**
+     * Initializes the database with the init data for the meetings module.
+     */
+    public function init() {
         // create status entries
         $authStatusModel = new Auth_Model_Status();
         if ($authStatusModel->getResource()->countRows() === 0) {
-            foreach ($options['auth']['status'] as $status) {
+            foreach ($this->_init->options['init']['auth']['status'] as $status) {
                 $a = array('status' => $status);
                 $r = $authStatusModel->create($a);
                 $this->_check($r, $a);
@@ -359,7 +259,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create roles entries
         $authRoleModel = new Auth_Model_Roles();
         if ($authRoleModel->getResource()->countRows() === 0) {
-            foreach ($options['auth']['roles'] as $role) {
+            foreach ($this->_init->options['init']['auth']['roles'] as $role) {
                 $a = array('role' => $role);
                 $r = $authRoleModel->create($a);
                 $this->_check($r, $a);
@@ -370,7 +270,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         Daiquiri_Config::getInstance()->init(); // re-init Configuration object
         $authUserModel = new Auth_Model_User();
         if ($authUserModel->getResource()->countRows() === 0) {
-            foreach ($options['auth']['user'] as $credentials) {
+            foreach ($this->_init->options['init']['auth']['user'] as $credentials) {
                 // get the corresponding role_id and status_id 
                 $credentials['role_id'] = Daiquiri_Auth::getInstance()->getRoleId($credentials['role']);
                 unset($credentials['role']);
@@ -399,7 +299,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         Daiquiri_Config::getInstance()->init(); // re-init Configuration object
         $authAppsModel = new Auth_Model_Apps();
         if ($authAppsModel->getResource()->countRows() === 0) {
-            foreach ($options['auth']['apps'] as $credentials) {
+            foreach ($this->_init->options['init']['auth']['apps'] as $credentials) {
                 // pre-process password first
                 $credentials['newPassword'] = $credentials['password'];
                 $credentials['confirmPassword'] = $credentials['password'];
@@ -421,7 +321,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create acl ressources
         $authResourcesModel = new Auth_Model_Resources();
         if ($authResourcesModel->getResource()->countRows() === 0) {
-            foreach ($options['auth']['resources'] as $resource) {
+            foreach ($this->_init->options['init']['auth']['resources'] as $resource) {
                 $a = array(
                     'resource' => $resource,
                 );
@@ -433,7 +333,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create acl rules, needs to be after create apps
         $authRulesModel = new Auth_Model_Rules();
         if ($authRulesModel->getResource()->countRows() === 0) {
-            foreach ($options['auth']['rules'] as $role => $rule) {
+            foreach ($this->_init->options['init']['auth']['rules'] as $role => $rule) {
                 foreach ($rule as $resource => $permissions) {
                     $a = array(
                         'role' => $role,

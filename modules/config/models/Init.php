@@ -22,304 +22,104 @@
 
 class Config_Model_Init extends Daiquiri_Model_Init {
 
-    public function parseOptions(array $options) {
-        $options = $this->_parseConfigOptions($options);
-        $options = $this->_parseTemplatesOptions($options);
-        $options = $this->_parseStatusOptions($options);
-        return $options;
+    /**
+     * Returns the acl resources for the meetings module.
+     * @return array $resources
+     */
+    public function getResources() {
+        return array(
+            'Admin_IndexController',
+            'Config_Model_Entries',
+            'Config_Model_Messages',
+            'Config_Model_Templates'
+        );
     }
 
-    private function _parseConfigOptions($options) {
-        if (!isset($this->_input_options['config'])) {
+
+
+
+    /**
+     * Returns the acl rules for the meeitngs module.
+     * @return array $rules
+     */
+    public function getRules() {
+        $rules = array(
+            'admin' => array(
+                'Admin_IndexController' => array('index'),
+                'Config_Model_Entries' => array('index', 'create', 'update', 'delete', 'export'),
+                'Config_Model_Messages' => array('index', 'create', 'update', 'delete', 'export'),
+                'Config_Model_Templates' => array('index', 'create', 'update', 'delete', 'export')
+            )
+        );
+        if (in_array('contact',$this->_init->options['modules'])) {
+            $rules['support']['Admin_IndexController'] = array('index');
+        }
+        if ($this->_init->options['config']['auth']['confirmation']) {
+            $rules['manager']['Admin_IndexController'] = array('index');
+        }
+        return $rules;
+    }
+
+    /**
+     * Processes the 'core' part of $options['config'].
+     */
+    public function processConfig() {
+        if (!isset($this->_init->input['config']['core'])) {
             $input = array();
-        } else if (!is_array($this->_input_options['config'])) {
-            $this->_error('Config options needs to be an array.');
+        } else if (!is_array($this->_init->input['config']['core'])) {
+            $this->_error('Core config options need to be an array.');
         } else {
-            $input = $this->_input_options['config'];
+            $input = $this->_init->input['config']['core'];
         }
 
-        // create default config
+        // create default entries
         $defaults = array(
-            'core' => array(
-                'captcha' => array(
-                    'fontpath' => $this->_daiquiri_path . "/client/font/DroidSans.ttf",
-                    'dir' => "/var/lib/daiquiri/captcha",
-                    'url' => "/captcha",
-                ),
-                'minify' => array(
-                    'enabled' => false
-                ),
-                'libs' => array(
-                    'phpSqlParser' => $this->_daiquiri_path . '/library/PHP-SQL-Parser/',
-                    'paqu' => $this->_daiquiri_path . '/library/paqu/src/',
-                    'PHPZip' => $this->_daiquiri_path . '/library/PHPZip',
-                ),
-                'system' => array(
-                    'mysql' => array(
-                        'socket' => '/var/run/mysqld/mysqld.sock'
-                    )
+            'captcha' => array(
+                'fontpath' => $this->_init->daiquiri_path . "/client/font/DroidSans.ttf",
+                'dir' => "/var/lib/daiquiri/captcha",
+                'url' => "/captcha",
+            ),
+            'minify' => array(
+                'enabled' => false
+            ),
+            'libs' => array(
+                'phpSqlParser' => $this->_init->daiquiri_path . '/library/PHP-SQL-Parser/',
+                'paqu' => $this->_init->daiquiri_path . '/library/paqu/src/',
+                'PHPZip' => $this->_init->daiquiri_path . '/library/PHPZip',
+            ),
+            'system' => array(
+                'mysql' => array(
+                    'socket' => '/var/run/mysqld/mysqld.sock'
                 )
-            ),
-            'auth' => array(
-                'registration' => false,
-                'activation' => false,
-                'confirmation' => false,
-                'password' => array(
-                    'default' => array(
-                        'algo' => 'cryptSha512'
-                    )
-                ),
-                'details' => array(
-                    'firstname',
-                    'lastname'
-                ),
-                'timeout' => 0,
-                'disableOnForgotPassword' => false,
-                'changeEmail' => true,
-                'lowerCaseUsernames' => false,
-                'usernameMinLength' => 4,
-                'passwordMinLength' => 4
-            ),
-            'cms' => array(
-                'enabled' => false,
-                'url' => '/cms/',
-                'path' => '/var/lib/daiquiri/wordpress',
-                'navPath' => '/var/lib/daiquiri/navigation'
-            ),
-            'query' => array(
-                'guest' => false,
-                'userDb' => array(
-                    'prefix' => '',
-                    'postfix' => '',
-                    'engine' => 'MyISAM',
-                ),
-                'forms' => array(
-                    'sql' => array(
-                        'default' => true,
-                        'title' => 'SQL query',
-                        'help' => 'Place your SQL statement directly in the text area below and submit your request using the button.',
-                        'class' => 'Query_Form_SqlQuery',
-                        'view' => $this->_daiquiri_path . '/modules/query/views/scripts/_partials/sql-query.phtml',
-                    )
-                ),
-                'resultTable' => array(
-                    'placeholder' => '/*@GEN_RES_TABLE_HERE*/'
-                ),
-                'validate' => array(
-                    'serverSide' => false,
-                    'function' => 'paqu_validateSQL'
-                ),
-                'query' => array(
-                    'type' => 'direct', // or qqueue
-                    'qqueue' => array(
-                        'defaultUsrGrp' => 'user',
-                        'defaultQueue' => 'short'
-                    )
-                ),
-                'scratchdb' => '',
-                'processor' => array(
-                    'type' => 'direct', // or mysql or paqu
-                    'plan' => 'simple', // or infoplan or alterplan
-                    'mail' => array(
-                        'enabled' => false,
-                        'mail' => array()
-                    )
-                ),
-                'quota' => array(
-                    'guest' => '100MB',
-                    'user' => '500MB',
-                    'admin' => '1.5GB',
-                ),
-                'download' => array(
-                    'type' => 'direct', // or gearman
-                    'dir' => "/var/lib/daiquiri/download",
-                    'queue' => array(
-                        'gearman' => array(
-                            'port' => '4730',
-                            'host' => 'localhost',
-                            'numThread' => '2',
-                            'pid' => '/var/lib/daiquiri/download/GearmanManager.pid',
-                            'workerDir' => $this->_daiquiri_path . '/modules/query/scripts/download/worker',
-                            'manager' => $this->_daiquiri_path . '/library/GearmanManager/pecl-manager.php'
-                        )
-                    ),
-                    'adapter' => array(
-                        'enabled' => array(
-                            'csv'
-                        ),
-                        'config' => array(
-                            'mysql' => array(
-                                'name' => "MySql database dump",
-                                'suffix' => ".sql",
-                                'adapter' => $this->_daiquiri_path . "/modules/query/scripts/download/adapter/mysql.sh",
-                                'binPath' => '/usr/bin/',
-                                'compress' => 'none',
-                            ),
-                            'csv' => array(
-                                'name' => "Comma separated Values",
-                                'suffix' => ".csv",
-                                'adapter' => $this->_daiquiri_path . "/modules/query/scripts/download/adapter/csv.sh",
-                                'binPath' => '/usr/bin/',
-                                'compress' => 'none',
-                            ),
-                            'vodump-csv' => array(
-                                'name' => "Comma separated Values",
-                                'suffix' => ".csv",
-                                'adapter' => $this->_daiquiri_path . "/modules/query/scripts/download/adapter/vodump-csv.sh",
-                                'binPath' => '/usr/local/bin/',
-                                'compress' => 'none',
-                            ),
-                            'votable' => array(
-                                'name' => "IVOA VOTable XML file - ASCII Format",
-                                'suffix' => ".xml",
-                                'adapter' => $this->_daiquiri_path . "/modules/query/scripts/download/adapter/votable.sh",
-                                'binPath' => '/usr/local/bin/',
-                                'compress' => 'none',
-                            ),
-                            'votableB1' => array(
-                                'name' => "IVOA VOTable XML file - BINARY 1 Format",
-                                'suffix' => ".xml",
-                                'adapter' => $this->_daiquiri_path . "/modules/query/scripts/download/adapter/votable-binary1.sh",
-                                'binPath' => '/usr/local/bin/',
-                                'compress' => 'none',
-                            ),
-                            'votableB2' => array(
-                                'name' => "IVOA VOTable XML file - BINARY 2 Format",
-                                'suffix' => ".xml",
-                                'adapter' => $this->_daiquiri_path . "/modules/query/scripts/download/adapter/votable-binary2.sh",
-                                'binPath' => '/usr/local/bin/',
-                                'compress' => 'none',
-                            )
-                        )
-                    )
-                )
-            ),
-            'contact' => true,
-            'data' => array(
-                'writeToDB' => 0,
-                'viewer' => array(
-                    'removeNewline' => false,
-                    'columnWidth' => '12em'
-                )
-            ),
-            'meetings' => array(
-                'enabled' => false,
-                'validation' => true,
-                'autoAccept' => false
-            ),
-            'files' => array(),
+            )
         );
 
         // create config array
         $output = array();
         $this->_buildConfig_r($input, $output, $defaults);
 
-        // check auth
-        if (!empty($output['auth']['confirmation'])) {
-            $output['auth']['registration'] = true;
-        }
-
-        // check queue
-        if (!empty($output['query'])) {
-
-            if (empty($options['database']['user'])) {
-                $this->_error("No user database adapter specified for query.");
-            } else {
-                // get prefix and postfix for database
-                $split = explode('%', $options['database']['user']['dbname']);
-                $output['query']['userDb']['prefix'] = $split[0];
-                $output['query']['userDb']['postfix'] = $split[1];
-            }
-
-            // query.query.type
-            $queueType = $output['query']['query']['type'];
-            if ($queueType == 'direct') {
-                unset($output['query']['query']['qqueue']);
-            } else if ($queueType == 'qqueue') {
-                // pass
-            } else {
-                $this->_error("Unknown config value '{$output['query']['query']['type']}' in query.query.type");
-            }
-
-            // query.download.type
-            if ($output['query']['download']['type'] == 'direct') {
-                unset($output['query']['download']['queue']['gearman']);
-            } else if ($output['query']['download']['queue']['type'] == 'gearman') {
-                // pass
-            } else {
-                $this->_error("Unknown value '{$output['query']['download']['queue']['type']}' in query.download.queue.type");
-            }
-        }
-
-        // check download adapters
-        if (!empty($output['query']['download']['adapter']['enabled'])) {
-            foreach ($output['query']['download']['adapter']['enabled'] as $key => $adapter) {
-                $config = $output['query']['download']['adapter']['config'][$adapter];
-                if ($config['compress'] === false || $config['compress'] === true) {
-                    $this->_error("Unknown compression '{$config['compress']}' in query.download.adapter.{$key}. Only 'none', 'zip', 'gzip', 'bzip2', 'pbzip2' allowed.");
-                }
-
-                switch ($config['compress']) {
-                    case 'none':
-                    case 'zip':
-                    case 'gzip':
-                    case 'bzip2':
-                    case 'pbzip2':
-                        break;
-                    default:
-                        $this->_error("Unknown compression '{$config['compress']}' in query.download.adapter.{$key}. Only 'none', 'zip', 'gzip', 'bzip2', 'pbzip2' allowed.");
-                        break;
-                }
-            }
-        }
-
-        $options['config'] = $output;
-        return $options;
+        // set options
+        $this->_init->options['config']['config'] = $output;
     }
 
-    private function _buildConfig_r(&$input, &$output, $defaults) {
-        if (is_array($defaults)) {
-            if (empty($defaults)) {
-                $output = array();
-            } else if ($input === false) {
-                $output = false;
-            } else if (is_array($input)) {
-                foreach (array_keys($defaults) as $key) {
-                    $this->_buildConfig_r($input[$key], $output[$key], $defaults[$key]);
-                    unset($input[$key]);
-                }
-            } else {
-                $output = $defaults;
-            }
-            if (!empty($input)) {
-                if (is_array($input)) {
-                    foreach ($input as $key => $value) {
-                        $output[$key] = $value;
-                    }
-                }
-            }
-        } else {
-            if (isset($input)) {
-                if (is_array($input)) {
-                    $this->_error("Config option '?' is an array but should not.");
-                } else {
-                    $output = $input;
-                    unset($input);
-                }
-            } else {
-                $output = $defaults;
-            }
-        }
+    /**
+     * Processes the 'templates' and 'status' part of $options['init'].
+     */
+    public function processInit() {
+        $this->_processTemplatesInit();
+        $this->_processMessagesInit();
     }
 
-    private function _parseTemplatesOptions($options) {
-
-        if (!isset($this->_input_options['templates'])) {
+    /**
+     * Processes the 'templates' part of $options['init'].
+     */
+    private function _processTemplatesInit() {
+        if (!isset($this->_init->options['init']['templates'])) {
             $input = array();
-        } else if (!is_array($this->_input_options['templates'])) {
-            $this->_error('Templates options need to be an array.');
+        } else if (!is_array($this->_init->options['init']['templates'])) {
+            $this->_error('Templates init options need to be an array.');
         } else {
-            $input = $this->_input_options['templates'];
+            $input = $this->_init->options['init']['templates'];
         }
 
         $defaults = array(
@@ -527,24 +327,26 @@ Best Regards'
                 if (is_array($input[$key])) {
                     $output[$key] = $input[$key];
                 } else {
-                    $this->_error("Templates option 'templates.$key' needs to be an array.");
+                    $this->_error("Templates init option 'templates.$key' needs to be an array.");
                 }
             } else {
                 $output[$key] = $value;
             }
         }
 
-        $options['templates'] = $output;
-        return $options;
+        $this->_init->options['init']['templates'] = $output;
     }
 
-    private function _parseStatusOptions($options) {
-        if (!isset($this->_input_options['messages'])) {
+    /**
+     * Processes the 'messages' part of $options['init'].
+     */
+    private function _processMessagesInit() {
+        if (!isset($this->_init->options['init']['messages'])) {
             $input = array();
-        } else if (!is_array($this->_input_options['messages'])) {
-            $this->_error('Message options needs to be an array.');
+        } else if (!is_array($this->_init->options['init']['messages'])) {
+            $this->_error('Message init options needs to be an array.');
         } else {
-            $input = $this->_input_options['messages'];
+            $input = $this->_init->options['init']['messages'];
         }
 
         // create default config
@@ -562,16 +364,18 @@ Best Regards'
             }
         }
 
-        $options['messages'] = $output;
-        return $options;
+        $this->_init->options['init']['messages'] = $output;
     }
 
-    public function init(array $options) {
+    /**
+     * Initializes the database with the init data for the config module.
+     */
+    public function init() {
         // create config entries
         $entriesModel = new Config_Model_Entries();
         if ($entriesModel->getResource()->countRows() == 0) {
             $entries = array();
-            $this->_buildConfigEntries_r($entries, $options['config'], array());
+            $this->_buildConfigEntries_r($entries, $this->_init->options['config'], array());
             foreach ($entries as $key => $value) {
                 $a = array(
                     'key' => $key,
@@ -583,10 +387,10 @@ Best Regards'
         }
 
         // create templates
-        if (!empty($options['templates'])) {
+        if (!empty($this->_init->options['templates'])) {
             $templatesModel = new Config_Model_Templates();
             if ($templatesModel->getResource()->countRows() == 0) {
-                foreach ($options['templates'] as $key => $value) {
+                foreach ($this->_init->options['templates'] as $key => $value) {
                     $a = array(
                         'template' => $key,
                         'subject' => $value['subject'],
@@ -599,10 +403,10 @@ Best Regards'
         }
 
         // create messages
-        if (!empty($options['messages'])) {
+        if (!empty($this->_init->options['messages'])) {
             $messagesModel = new Config_Model_Messages();
             if ($messagesModel->getResource()->countRows() == 0) {
-                foreach ($options['messages'] as $key => $value) {
+                foreach ($this->_init->options['messages'] as $key => $value) {
                     $a = array(
                         'key' => $key,
                         'value' => $value
@@ -614,6 +418,9 @@ Best Regards'
         }
     }
 
+    /**
+     * Recusively builds the config entries to be inserted into the database.
+     */
     private function _buildConfigEntries_r(&$entries, &$config, $keys) {
         if (is_array($config)) {
             foreach (array_keys($config) as $key) {
@@ -623,5 +430,4 @@ Best Regards'
             $entries[implode('.', $keys)] = $config;
         }
     }
-
 }

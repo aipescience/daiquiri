@@ -22,62 +22,98 @@
 
 class Contact_Model_Init extends Daiquiri_Model_Init {
 
-    public function parseOptions(array $options) {
-        if (!isset($this->_input_options['contact'])) {
+    /**
+     * Returns the acl resources for the contact module.
+     * @return array $resources
+     */
+    public function getResources() {
+        return array(
+            'Contact_Model_Submit',
+            'Contact_Model_Messages'
+        );
+    }
+
+    /**
+     * Returns the acl rules for the contact module.
+     * @return array $rules
+     */
+    public function getRules() {
+        return array(
+            'guest' => array(
+                'Contact_Model_Submit' => array('contact')
+            ),
+            'support' => array(
+                'Contact_Model_Messages' => array('rows','cols','show','respond')
+            )
+        );
+    }
+
+    /**
+     * Processes the 'contact' part of $options['config'].
+     */
+    public function processConfig() {
+        if (isset($this->_init->input['config']['contact'])) {
+            $this->_error('No config options for the contact module are supported.');
+        }
+    }
+
+    /**
+     * Processes the 'contact' part of $options['init'].
+     */
+    public function processInit() {
+        if (!isset($this->_init->input['init']['contact'])) {
             $input = array();
-        } else if (!is_array($this->_input_options['contact'])) {
-            $this->_error('Contact options need to be an array.');
+        } else if (!is_array($this->_init->input['init']['contact'])) {
+            $this->_error('Contact init options need to be an array.');
         } else {
-            $input = $this->_input_options['contact'];
+            $input = $this->_init->input['init']['contact'];
         }
 
+        // create default values
         $defaults = array(
             'status' => array('active', 'closed'),
             'categories' => array('Support', 'Bug'),
         );
+
+        // construct init array
         $output = array();
-
-        if (!empty($options['config']['contact'])) {
-            foreach ($defaults as $key => $value) {
-                if (array_key_exists($key, $input)) {
-                    if (is_array($input[$key])) {
-                        $output[$key] = $input[$key];
-                    } else {
-                        $this->_error("Contact option 'contact.$key' needs to be an array.");
-                    }
+        foreach ($defaults as $key => $value) {
+            if (array_key_exists($key, $input)) {
+                if (is_array($input[$key])) {
+                    $output[$key] = $input[$key];
                 } else {
-                    $output[$key] = $value;
+                    $this->_error("Contact init option 'contact.$key' needs to be an array.");
                 }
+            } else {
+                $output[$key] = $value;
+            }
+        }
+        
+        $this->_init->options['init']['contact'] = $output;
+    }
+
+    /**
+     * Initializes the database with the init data for the contact module.
+     */
+    public function init() {
+        // create status entries for the contact module
+        $contactStatusModel = new Contact_Model_Status();
+        if ($contactStatusModel->getResource()->countRows() == 0) {
+            foreach ($this->_init->options['init']['contact']['status'] as $status) {
+                $a = array('status' => $status);
+                $r = $contactStatusModel->create($a);
+                $this->_check($r, $a);
             }
         }
 
-        $options['contact'] = $output;
-        return $options;
-    }
-
-    public function init(array $options) {
-        if ($options['config']['contact']) {
-            // create status entries for the contact module
-            $contactStatusModel = new Contact_Model_Status();
-            if ($contactStatusModel->getResource()->countRows() == 0) {
-                foreach ($options['contact']['status'] as $status) {
-                    $a = array('status' => $status);
-                    $r = $contactStatusModel->create($a);
-                    $this->_check($r, $a);
-                }
-            }
-
-            // create category entries for the contact module
-            $contactCategoriesModel = new Contact_Model_Categories();
-            if ($contactCategoriesModel->getResource()->countRows() == 0) {
-                foreach ($options['contact']['categories'] as $category) {
-                    $a = array('category' => $category);
-                    $r = $contactCategoriesModel->create($a);
-                    $this->_check($r, $a);
-                }
+        // create category entries for the contact module
+        $contactCategoriesModel = new Contact_Model_Categories();
+        if ($contactCategoriesModel->getResource()->countRows() == 0) {
+            foreach ($this->_init->options['init']['contact']['categories'] as $category) {
+                $a = array('category' => $category);
+                $r = $contactCategoriesModel->create($a);
+                $this->_check($r, $a);
             }
         }
     }
-
 }
-
