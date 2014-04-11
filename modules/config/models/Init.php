@@ -35,9 +35,6 @@ class Config_Model_Init extends Daiquiri_Model_Init {
         );
     }
 
-
-
-
     /**
      * Returns the acl rules for the meeitngs module.
      * @return array $rules
@@ -99,7 +96,7 @@ class Config_Model_Init extends Daiquiri_Model_Init {
         $this->_buildConfig_r($input, $output, $defaults);
 
         // set options
-        $this->_init->options['config']['config'] = $output;
+        $this->_init->options['config']['core'] = $output;
     }
 
     /**
