@@ -47,8 +47,8 @@ class Daiquiri_View_Helper_WpNavigation extends Zend_View_Helper_Abstract {
      * 
      */
     public function wpNavigation($menu) {
-        if (Daiquiri_Config::getInstance()->cms->enabled) {
-            $this->view->addScriptPath(Daiquiri_Config::getInstance()->cms->navPath);
+        if (Daiquiri_Config::getInstance()->core->cms->enabled) {
+            $this->view->addScriptPath(Daiquiri_Config::getInstance()->core->cms->navPath);
             try {
                 return $this->view->partial($menu . '.html');
             } catch (Zend_View_Exception $e) {

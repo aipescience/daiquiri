@@ -429,10 +429,9 @@ class Daiquiri_Init {
         }
 
         // cms (word press directory)
-        $cms = $this->application_path . '/public' . $this->options['config']['cms']['url'];
-        if (!empty($this->options['config']['cms']) 
-            && $this->options['config']['cms']['enabled']) {
-            $links[$cms] = $this->options['config']['cms']['path'];
+        if (!empty($this->options['config']['core']['cms']) && $this->options['config']['core']['cms']['enabled']) {
+            $cms = $this->application_path . '/public' . $this->options['config']['core']['cms']['url'];
+            $links[$cms] = $this->options['config']['core']['cms']['path'];
         } else {
             $links[$cms] = null;
         }
@@ -588,14 +587,12 @@ class Daiquiri_Init {
         $alias = basename($this->application_path);
 
         echo <<<EOT
-For a virtual host:
+Virtual host configuration:
     
     #SetEnv APPLICATION_ENV development
     
     DocumentRoot "{$this->application_path}/public"
-    # or 
-    Alias /{$alias} "{$this->application_path}/public"
-
+    # or Alias /{$alias} "{$this->application_path}/public"
     <Directory "{$this->application_path}/public">
         Options FollowSymLinks -Indexes -MultiViews
         AllowOverride All

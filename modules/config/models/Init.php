@@ -88,6 +88,13 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                 'mysql' => array(
                     'socket' => '/var/run/mysqld/mysqld.sock'
                 )
+            ),
+            'cms' => array(
+                'enabled' => false,
+                'url' => '/cms/',
+                'type' => 'wordpress',
+                'path' => '/var/lib/daiquiri/wordpress',
+                'navPath' => '/var/lib/daiquiri/navigation',
             )
         );
 
