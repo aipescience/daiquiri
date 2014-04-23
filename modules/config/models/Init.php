@@ -391,33 +391,29 @@ Best Regards'
         }
 
         // create templates
-        if (!empty($this->_init->options['templates'])) {
-            $templatesModel = new Config_Model_Templates();
-            if ($templatesModel->getResource()->countRows() == 0) {
-                foreach ($this->_init->options['templates'] as $key => $value) {
-                    $a = array(
-                        'template' => $key,
-                        'subject' => $value['subject'],
-                        'body' => $value['body']
-                    );
-                    $r = $templatesModel->create($a);
-                    $this->_check($r, $a);
-                }
+        $templatesModel = new Config_Model_Templates();
+        if ($templatesModel->getResource()->countRows() == 0) {
+            foreach ($this->_init->options['init']['templates'] as $key => $value) {
+                $a = array(
+                    'template' => $key,
+                    'subject' => $value['subject'],
+                    'body' => $value['body']
+                );
+                $r = $templatesModel->create($a);
+                $this->_check($r, $a);
             }
         }
 
         // create messages
-        if (!empty($this->_init->options['messages'])) {
-            $messagesModel = new Config_Model_Messages();
-            if ($messagesModel->getResource()->countRows() == 0) {
-                foreach ($this->_init->options['messages'] as $key => $value) {
-                    $a = array(
-                        'key' => $key,
-                        'value' => $value
-                    );
-                    $r = $messagesModel->create($a);
-                    $this->_check($r, $a);
-                }
+        $messagesModel = new Config_Model_Messages();
+        if ($messagesModel->getResource()->countRows() == 0) {
+            foreach ($this->_init->options['init']['messages'] as $key => $value) {
+                $a = array(
+                    'key' => $key,
+                    'value' => $value
+                );
+                $r = $messagesModel->create($a);
+                $this->_check($r, $a);
             }
         }
     }

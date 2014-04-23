@@ -53,7 +53,7 @@ abstract class Daiquiri_Crypt_Abstract {
         $authConfig = Daiquiri_Config::getInstance()->auth;
         if ($authConfig == Null) {
             // values are not set in the configuration
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // get the values from the config

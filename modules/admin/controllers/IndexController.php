@@ -26,7 +26,7 @@ class Admin_IndexController extends Daiquiri_Controller_Abstract {
         if (Daiquiri_Auth::getInstance()->checkAcl('Admin_IndexController', 'index')) {
             $this->view->status = 'ok';
         } else {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
     }
 

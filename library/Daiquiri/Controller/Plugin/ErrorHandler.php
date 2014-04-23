@@ -40,7 +40,7 @@ class Daiquiri_Controller_Plugin_ErrorHandler extends Zend_Controller_Plugin_Abs
      * need different handling.
      * 
      * The following exceptions are handled differently:
-     *   - <b>Daiquiri_Exception_AuthError</b>:  redirection to the login page
+     *   - <b>Daiquiri_Exception_Forbidden</b>:  redirection to the login page
      * 
      */
     public function postDispatch(Zend_Controller_Request_Abstract $request) {
@@ -50,7 +50,7 @@ class Daiquiri_Controller_Plugin_ErrorHandler extends Zend_Controller_Plugin_Abs
         $error = $front->getPlugin('Zend_Controller_Plugin_ErrorHandler');
 
         // redirect certain exeption to non-default error controllers
-        if ($error->getResponse()->hasExceptionOfType('Daiquiri_Exception_AuthError')) {
+        if ($error->getResponse()->hasExceptionOfType('Daiquiri_Exception_Forbidden')) {
             $error->setErrorHandlerModule("auth");
             $error->setErrorHandlerController("error");
             $error->setErrorHandlerAction("login");

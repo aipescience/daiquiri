@@ -94,7 +94,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
      */
     public function regen($table, $format) {
         if (empty($format) || empty($table)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // create link and file sysytem path for table dump
@@ -107,10 +107,10 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
 
         // security
         if (!is_dir($dir)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
         if (file_exists($file . ".lock")) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // delete the files...
@@ -240,7 +240,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
      */
     public function file($table, $format) {
         if (empty($format) || empty($table)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // create link and file sysytem path for table dump
@@ -253,10 +253,10 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
 
         // security
         if (!is_dir($dir)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
         if (!file_exists($file)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // determine mime type of this file

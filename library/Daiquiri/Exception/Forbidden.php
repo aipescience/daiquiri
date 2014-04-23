@@ -20,13 +20,6 @@
  *  limitations under the License.
  */
 
-/**
- * @class   Daiquiri_Exception_RuntimeError RuntimeError.php
- * @brief   Daiquiri Exception for runtime errors.
- * 
- * Just a simple inherit of Zend_Exception to give this a special name...
- * 
- */
-class Daiquiri_Exception_RuntimeError extends Zend_Exception {
+class Daiquiri_Exception_Forbidden extends Zend_Exception {
     
 }

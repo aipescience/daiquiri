@@ -20,13 +20,10 @@
  *  limitations under the License.
  */
 
-/**
- * @class   Daiquiri_Exception_AuthError AuthError.php
- * @brief   Daiquiri Exception for authentication errors.
- * 
- * Just a simple inherit of Zend_Exception to give this a special name...
- * 
- */
-class Daiquiri_Exception_AuthError extends Zend_Exception {
+class Daiquiri_Exception_NotFound {
     
+    public function __construct() {
+        throw new Zend_Controller_Action_Exception('This page does not exist', 404);
+    }
+
 }

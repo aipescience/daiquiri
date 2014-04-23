@@ -93,7 +93,7 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
             if (is_array($config[$key])) {
                 $this->_buildConfig($config[$key], $keys, $value);
             } else {
-                throw new Daiquiri_Exception_RuntimeError('Bad config array: ' . print_r($key, true));
+                throw new Exception('Bad config array: ' . print_r($key, true));
             }
         }
     }

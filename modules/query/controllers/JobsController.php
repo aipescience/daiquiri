@@ -32,7 +32,7 @@ class Query_JobsController extends Daiquiri_Controller_Abstract {
         if (Daiquiri_Auth::getInstance()->checkAcl('Query_Model_Jobs', 'rows')) {
             $this->view->status = 'ok';
         } else {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
     }
 

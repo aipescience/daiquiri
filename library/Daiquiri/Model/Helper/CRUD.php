@@ -30,6 +30,11 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
     }
 
     public function show($id) {
+        $row = $this->getResource()->fetchRow($id);
+        if (empty($row)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
         return array(
             'status' => 'ok',
             'row' => $this->getResource()->fetchRow($id)

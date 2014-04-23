@@ -32,7 +32,7 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
         if (Daiquiri_Auth::getInstance()->checkAcl('Auth_Model_User', 'rows')) {
             $this->view->status = 'ok';
         } else {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
     }
 

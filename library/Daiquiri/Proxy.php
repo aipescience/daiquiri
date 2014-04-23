@@ -43,7 +43,7 @@ class Daiquiri_Proxy {
      * Proxies calls to member function to the model. Implements security layer.
      * @param string $methodname
      * @param array $arguments
-     * @throws Daiquiri_Exception_AuthError
+     * @throws Daiquiri_Exception_Forbidden
      * @return type (return value of model function)
      */
     public function __call($methodname, array $arguments) {
@@ -59,7 +59,7 @@ class Daiquiri_Proxy {
         if ($result === true) {
             return call_user_func_array(array($this->_model, $methodname), $arguments);
         } else {
-            throw new Daiquiri_Exception_AuthError('Not Authorised in ' . get_class($this->_model) . '::' . $methodname);
+            throw new Daiquiri_Exception_Forbidden('Not Authorised in ' . get_class($this->_model) . '::' . $methodname);
         }
     }
 

@@ -52,7 +52,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      */
     public function single($name) {
         if (empty($name)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // find file
@@ -61,7 +61,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         if (count($files) > 1) {
             return array("status" => "err_multi");
         } else if (count($files) == 0) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // determine mime type of this file
@@ -83,7 +83,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      */
     public function singleSize($name) {
         if (empty($name)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // find file
@@ -92,7 +92,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         if (count($files) > 1) {
             return array("status" => "err_multi");
         } else if (count($files) == 0) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         $size = filesize($files[0]);
@@ -301,7 +301,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      */
     private function _getFilesInCol($table, $column) {
         if (empty($table) || empty($column)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // get the column of the result set to obtain a list of all files we are dealing with
@@ -312,7 +312,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         try {
             $cols = $viewer->cols($db, $table);
         } catch (Exception $e) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         //extract file link columns by looking for the singleFileLink formatter...
@@ -341,7 +341,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      */
     private function _getFilesInRow($table, array $rowIds) {
         if (empty($table) || empty($rowIds)) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         //get the column of the result set to obtain a list of all files we are dealing with
@@ -352,7 +352,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         try {
             $cols = $viewer->cols($db, $table);
         } catch (Exception $e) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         //extract file link columns by looking for the singleFileLink formatter...

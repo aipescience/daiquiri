@@ -61,7 +61,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get job and check permissions
         $dbRow = $this->getResource()->fetchRow($id);
         if (empty($dbRow) || $dbRow['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // fetch table statistics
@@ -101,7 +101,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get job and check permissions
         $row = $this->getResource()->fetchRow($id);
         if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // create the form object
@@ -147,7 +147,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get job and check permissions
         $row = $this->getResource()->fetchRow($id);
         if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // create the form object
@@ -185,7 +185,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get job and check permissions
         $row = $this->getResource()->fetchRow($id);
         if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
 
         // create the form object

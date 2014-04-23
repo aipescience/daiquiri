@@ -31,7 +31,7 @@ class Data_IndexController extends Daiquiri_Controller_Abstract {
         if (Daiquiri_Auth::getInstance()->checkAcl('Data_Model_Databases', 'update')) {
             $this->view->status = 'ok';
         } else {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Forbidden();
         }
     }
 
