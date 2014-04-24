@@ -72,14 +72,21 @@ class Daiquiri_Init {
      * @param array $input
      */
     public function __construct($application_path, $daiquiri_path, $input) {
-        // setup autoloader
-        require_once('Zend/Loader/Autoloader.php');
-        Zend_Loader_Autoloader::getInstance();
-
         $this->application_path = $application_path;
         $this->daiquiri_path = $daiquiri_path;
         $this->input = $input;
 
+        // put Zend in the include_path
+        set_include_path(implode(PATH_SEPARATOR, array(
+            realpath($this->daiquiri_path . '/library'),
+            get_include_path(),
+        )));
+
+        // setup autoloader
+        require_once('Zend/Loader/Autoloader.php');
+        Zend_Loader_Autoloader::getInstance();
+
+        // parse command line
         $this->_parseCommandLine();
 
         // init the options array with database and mail options
@@ -88,30 +95,26 @@ class Daiquiri_Init {
         $this->_processMailOptions();
         $this->_processModulesOptions();
 
-        if ($this->_opts === array('application')) {
-            // pass
-        } else {
-            // setup zend application environment 
-            $this->_setupEnvironment();
+        // setup zend application environment 
+        $this->_setupEnvironment();
 
-            // get init models from the modules
-            foreach($this->options['modules'] as $module) {
-                $classname = ucfirst($module) . '_Model_Init';
-                $this->models[] = new $classname($this);
-            }
-
-            // parse the config array for each model 
-            $this->options['config'] = array();
-            foreach($this->models as $model) {
-                $model->processConfig();
-            }
-            
-            // parse the init array for each model
-            $this->options['init'] = array();
-            foreach($this->models as $model) {
-                $model->processInit();
-            }
+        // get init models from the modules
+        foreach($this->options['modules'] as $module) {
+            $classname = ucfirst($module) . '_Model_Init';
+            $this->models[] = new $classname($this);
         }
+
+        // parse the config array for each model 
+        $this->options['config'] = array();
+        foreach($this->models as $model) {
+            $model->processConfig();
+        }
+        
+        // parse the init array for each model
+        $this->options['init'] = array();
+        foreach($this->models as $model) {
+            $model->processInit();
+        } 
     }
 
     /**
@@ -143,13 +146,6 @@ class Daiquiri_Init {
             }
         }
 
-        // check for application option
-        if (in_array('application', $this->_opts) && count($this->_opts) > 1) {
-            echo "Error: application.ini must be created first." . PHP_EOL;
-            echo "Please run ./init.php with -a|--application as the only option." . PHP_EOL;
-            die();
-        }
-
         // show help message
         if (isset($opts->h) || count($this->_opts) == 0) {
             echo $opts->getUsageMessage();
@@ -164,33 +160,56 @@ class Daiquiri_Init {
         // setup variables
         define('APPLICATION_PATH', $this->application_path . '/application');
         define('APPLICATION_ENV', 'development');
-        // check if the application.ini.file is present
-        if (!is_file(APPLICATION_PATH . '/configs/application.ini')) {
-            echo "Error: No application.ini file found." . PHP_EOL . "Please run ./init.php -a first." . PHP_EOL;
-            die(0);
-        }
 
-        // set include path
-        set_include_path($this->daiquiri_path . '/library/' . PATH_SEPARATOR . get_include_path());
-
-        // add daiquiri namespaces to autoloader
-        $autoloader = Zend_Loader_Autoloader::getInstance();
-        $autoloader->registerNamespace('Daiquiri_');
-        foreach ($this->options['modules'] as $module) {
-            $autoloader->registerNamespace(ucfirst($module) . '_');
+        $options = array(
+            'phpSettings' => array(
+                'display_startup_errors' => 1,
+                'display_errors' => 1
+            ),
+            'bootstrap' => array(
+                'path' => $this->application_path . '/application/Bootstrap.php',
+                'class' => 'Bootstrap'
+            ),
+            'appnamespace' => 'Application',
+            'autoloadernamespaces' => array('Daiquiri'),
+            'resources' => array(
+                'frontController' => array(
+                    'params' => array(
+                        'displayExceptions' => 1
+                    ),
+                    'controllerDirectory' => $this->application_path . '/application/controllers',
+                    'moduleDirectory' => $this->daiquiri_path . '/modules'
+                ),
+                'modules' => array(''),
+                'multidb' => array(
+                    'web' => array(
+                        'adapter' => 'Pdo_Mysql',
+                        'charset' => 'utf8',
+                        'default' => 'true',
+                    ),
+                    'user' => array(
+                        'adapter' => 'Pdo_Mysql',
+                        'charset' => 'utf8',
+                    )
+                )
+            )
+        );
+        foreach ($this->options['database'] as $adapter => $database) {
+            foreach (array('dbname', 'username', 'password', 'host') as $key) {
+                $options['resources']['multidb'][$adapter][$key] = $database[$key];
+            }
+            if ($database['host'] !== 'localhost') {
+                $options['resources']['multidb'][$adapter]['port'] = $database['port'];
+            }
         }
 
         // initialize Zend_Application and bootstrap
-        $this->_zend_application = new Zend_Application(
-            APPLICATION_ENV,
-            APPLICATION_PATH . '/configs/application.ini'
-        );
-
-        // fake request
+        $this->_zend_application = new Zend_Application(APPLICATION_ENV, $options);
         $front = $this->_zend_application->getBootstrap()
                 ->bootstrap('frontController')
                 ->getResource('frontController');
 
+        // fake request    
         $request = new Daiquiri_Controller_Request_Init();
         $front->setRequest($request);
 
@@ -342,9 +361,14 @@ class Daiquiri_Init {
             'bootstrap.path = APPLICATION_PATH "/Bootstrap.php"',
             'bootstrap.class = "Bootstrap"',
             'appnamespace = "Application"',
-            'resources.frontController.controllerDirectory = APPLICATION_PATH "/controllers"',
+            'autoloadernamespaces[] = "Daiquiri"',
+            '',
             'resources.frontController.params.displayExceptions = 0',
+            'resources.frontController.controllerDirectory = APPLICATION_PATH "/controllers"',
+            'resources.frontController.moduleDirectory = APPLICATION_PATH "/../modules"',
+            'resources.modules[] = ',
             'resources.view[] = ',
+            'resources.view.helperPath.Daiquiri_View_Helper = APPLICATION_PATH "/../library/Daiquiri/View/Helper"',
             'resources.layout.layoutPath = APPLICATION_PATH "/layouts/scripts/"',
             ''
         );
@@ -379,12 +403,6 @@ class Daiquiri_Init {
 
         // prepare final part of application.ini
         $output = array_merge($output, array(
-            'includePaths.library = APPLICATION_PATH "/../../daiquiri/library"',
-            'autoloadernamespaces[] = "Daiquiri"',
-            'resources.frontController.moduleDirectory = APPLICATION_PATH "/../../daiquiri/modules"',
-            'resources.modules[] = ',
-            'resources.view.helperPath.Daiquiri_View_Helper = APPLICATION_PATH "/../../daiquiri/library/Daiquiri/View/Helper"',
-            '',
             '[staging : production]',
             'testing : production',
             'phpSettings.display_startup_errors = 1',
@@ -414,23 +432,24 @@ class Daiquiri_Init {
      * Creates the necessary softlinks
      */
     private function _links() {
-        // captcha directory
-        $captcha = $this->application_path . '/public/captcha';
-        $links[$captcha] = $this->options['config']['core']['captcha']['dir'];
+        $links = array(
+            $this->application_path . '/library' => $this->daiquiri_path . '/library',
+            $this->application_path . '/modules' => $this->daiquiri_path . '/modules',
+            $this->application_path . '/public/captcha' => $this->options['config']['core']['captcha']['dir']
+        );
 
         // client js and css directory
         $client = $this->application_path . '/public/daiquiri';
         if (!empty($this->options['config']['core']['minify'])
             && $this->options['config']['core']['minify']['enabled'] == true) {
-
             $links[$client] = null;
         } else {
             $links[$client] = $this->daiquiri_path . '/client';
         }
 
         // cms (word press directory)
+        $cms = $this->application_path . '/public' . $this->options['config']['core']['cms']['url'];
         if (!empty($this->options['config']['core']['cms']) && $this->options['config']['core']['cms']['enabled']) {
-            $cms = $this->application_path . '/public' . $this->options['config']['core']['cms']['url'];
             $links[$cms] = $this->options['config']['core']['cms']['path'];
         } else {
             $links[$cms] = null;
