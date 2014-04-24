@@ -163,7 +163,7 @@ class Config_Model_Templates extends Daiquiri_Model_Table {
     public function update($id, array $formParams = array()) {
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
-            throw new Exception('$id ' . $id . ' not found.');
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // produce variables string

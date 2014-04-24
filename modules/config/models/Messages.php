@@ -50,6 +50,9 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
             $id = $this->getResource()->fetchId(array(
                 'where' => array('`key` = ?' => $input)
             ));
+            if (empty($id)) {
+                throw new Daiquiri_Exception_NotFound();
+            }
         } else {
             throw new Exception('$input has wrong type.');
         }

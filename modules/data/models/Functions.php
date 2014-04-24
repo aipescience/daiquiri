@@ -100,6 +100,9 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
             $id = $this->getResource()->fetchIdByName($input['function']);
+            if (empty($id)) {
+                throw new Daiquiri_Exception_NotFound();
+            }
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -123,6 +126,9 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
             $id = $this->getResource()->fetchIdByName($input['function']);
+            if (empty($id)) {
+                throw new Daiquiri_Exception_NotFound();
+            }
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -130,7 +136,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
         // get the entry
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
-            throw new Exception('$id ' . $id . ' not found.');
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // get roles

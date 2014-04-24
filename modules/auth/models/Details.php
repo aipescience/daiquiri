@@ -38,7 +38,7 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
     public function show($userId, $key) {
         $detail = $this->getResource()->fetchValue($userId, $key);
         if ($detail === false) {
-            return array('status' => 'key not found');
+            throw new Daiquiri_Exception_NotFound();
         } else {
             return array('status' => 'ok', 'data' => $detail);
         }
@@ -89,7 +89,7 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
         // get the detail from the database
         $value = $this->getResource()->fetchValue($userId, $key);
         if ($value === false) {
-            return array('status' => 'error', 'error' => 'Key not found');
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // create the form object

@@ -207,7 +207,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
         // get participant from the database
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
-            throw new Exception('$id ' . $id . ' not found.');
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // get the meeting

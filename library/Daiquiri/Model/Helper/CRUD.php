@@ -84,7 +84,7 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
         // get entry from teh database
         $entry = $this->getResource()->fetchRow($id);
         if (empty($entry)) {
-            throw new Exception('$id ' . $id . ' not found.');
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // create the form object

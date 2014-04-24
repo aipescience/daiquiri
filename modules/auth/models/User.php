@@ -244,6 +244,12 @@ class Auth_Model_User extends Daiquiri_Model_Table {
         $roles = Daiquiri_Auth::getInstance()->getRoles();
         unset($roles[1]); // unset the guest user
 
+        // get user
+        $user = $this->getResource()->fetchRow($id);
+        if (empty($user)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
         // create the form object
         $form = new Auth_Form_UpdateUser(array(
             'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
@@ -251,7 +257,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
             'roles' => $roles,
             'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
             'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,
-            'user' => $this->getResource()->fetchRow($id)
+            'user' => $user
         ));
 
         // check if request is POST

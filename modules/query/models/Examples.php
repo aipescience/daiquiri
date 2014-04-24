@@ -83,7 +83,7 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
         // get example from database
         $row = $this->getResource()->fetchRow($id);
         if ($row === false) {
-            return array('status' => 'error', 'error' => 'The Example was not found in the database.');
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // get roles

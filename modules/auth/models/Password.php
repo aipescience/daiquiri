@@ -37,7 +37,11 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
      */
     public function show($userId, $type = 'default') {
         $password = $this->getResource()->fetchPassword($userId, $type);
-        return array('status' => 'ok', 'data' => $password);
+        if (empty($password)) {
+            throw new Daiquiri_Exception_NotFound();
+        } else {
+            return array('status' => 'ok', 'data' => $password);
+        }
     }
 
     /**

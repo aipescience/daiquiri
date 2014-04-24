@@ -51,11 +51,11 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
 
         // create the form object
         $form = new Auth_Form_Account(array(
-                    'user' => $this->getResource()->fetchRow($id),
-                    'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
-                    'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
-                    'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,
-                ));
+            'user' => $this->getResource()->fetchRow($id),
+            'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
+            'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
+            'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
