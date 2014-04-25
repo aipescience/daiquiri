@@ -67,7 +67,9 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
      */
     public function create(array $formParams = array()) {
         // create the form object
-        $form = new Config_Form_Messages();
+        $form = new Config_Form_Messages(array(
+            'submit' => 'Create status message'
+        ));
 
         // valiadate the form if POST
         if (!empty($formParams)) {
@@ -112,7 +114,7 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function update($id, array $formParams = array()) {
-        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update entry');
+        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update status message');
     }
 
     /**
@@ -122,7 +124,7 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function delete($id, array $formParams = array()) {
-        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete entry');
+        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete status message');
     }
 
     /**

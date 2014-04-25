@@ -88,12 +88,12 @@ class Contact_Model_Submit extends Daiquiri_Model_Abstract {
                 ));
 
                 // send mail to support
-                $userMailModel = new Auth_Model_Mail();
+                $userResource = new Auth_Model_Resource_User();
                 $this->getModelHelper('mail')->send('contact.submit_support', array(
                     'to' => array_merge(
-                        $userMailModel->show('support'),
-                        $userMailModel->show('manager'),
-                        $userMailModel->show('admin')
+                        $userResource->fetchEmailByRole('support'),
+                        $userResource->fetchEmailByRole('manager'),
+                        $userResource->fetchEmailByRole('admin')
                     ),
                     'reply_to' => $values['email'],
                     'firstname' => $values['firstname'],

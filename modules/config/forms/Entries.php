@@ -39,7 +39,7 @@ class Config_Form_Entries extends Daiquiri_Form_Abstract {
         // add elements
         $this->addElement('text', 'key', array(
             'label' => 'Key',
-            'class' => 'input-xxlarge',
+            'class' => 'input-xxlarge mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -48,7 +48,7 @@ class Config_Form_Entries extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'value', array(
             'label' => 'Value',
-            'class' => 'input-xxlarge',
+            'class' => 'input-xxlarge mono',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),

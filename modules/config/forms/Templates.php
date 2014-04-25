@@ -39,7 +39,7 @@ class Config_Form_Templates extends Daiquiri_Form_Abstract {
         // add elements
         $this->addElement('text', 'template', array(
             'label' => 'Template',
-            'class' => 'input-xxlarge',
+            'class' => 'input-xxlarge mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -48,7 +48,7 @@ class Config_Form_Templates extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'subject', array(
             'label' => 'Subject',
-            'class' => 'input-xxlarge',
+            'class' => 'input-xxlarge mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -57,7 +57,7 @@ class Config_Form_Templates extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'body', array(
             'label' => 'Body',
-            'class' => 'input-xxlarge',
+            'class' => 'input-xxlarge mono',
             'rows' => '20',
             'required' => true,
             'filters' => array('StringTrim'),

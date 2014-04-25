@@ -39,8 +39,8 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
 
         // add elements
         $this->addElement('text', 'subject', array(
-            'label' => 'Subject:',
-            'class' => 'input-xxlarge',
+            'label' => 'Subject',
+            'class' => 'input-xxlarge mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -48,8 +48,8 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
             )
         ));
         $this->addElement('textarea', 'body', array(
-            'label' => 'Message:',
-            'class' => 'input-xxlarge',
+            'label' => 'Message',
+            'class' => 'input-xxlarge mono',
             'rows' => '10',
             'required' => true,
             'filters' => array('StringTrim'),

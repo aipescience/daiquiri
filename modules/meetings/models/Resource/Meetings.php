@@ -36,7 +36,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
      */
     public function fetchRows(array $sqloptions = array()) {
         // get select object
-        $select = $this->getAdapter()->select();
+        $select = $this->select();
         $select->from('Meetings_Meetings');
 
         // order by begin
@@ -57,7 +57,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
             throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
         }
 
-        $select = $this->getAdapter()->select();
+        $select = $this->select();
         $select->from('Meetings_Meetings');
         $select->where('Meetings_Meetings.id = ?', $id);
 

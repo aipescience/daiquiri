@@ -39,7 +39,7 @@
         <h4>Sender information</h4>
         <dl class="dl-horizontal">
             <?php foreach (array('firstname', 'lastname', 'email') as $key): ?>
-                <dt><?php echo ucfirst($this->escape($key)); ?>:</dt>
+                <dt><?php echo ucfirst($this->escape($key)); ?></dt>
                 <dd><?php echo $this->escape($this->message[$key]); ?></dd>
             <?php endforeach; ?>
         </dl>
@@ -47,7 +47,7 @@
         <h4>Message</h4>
         <dl class="dl-horizontal">
             <?php foreach (array('status', 'category', 'subject', 'message') as $key): ?>
-                <dt><?php echo ucfirst($this->escape($key)); ?>:</dt>
+                <dt><?php echo ucfirst($this->escape($key)); ?></dt>
                 <dd><?php echo $this->escape($this->message[$key]); ?></dd>
             <?php endforeach; ?>
         </dl>

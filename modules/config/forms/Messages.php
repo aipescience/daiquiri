@@ -39,7 +39,7 @@ class Config_Form_Messages extends Daiquiri_Form_Abstract {
         // add elements
         $this->addElement('text', 'key', array(
             'label' => 'Key',
-            'class' => 'input-xxlarge',
+            'class' => 'input-xxlarge mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -48,7 +48,7 @@ class Config_Form_Messages extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('textarea', 'value', array(
             'label' => 'Value',
-            'class' => 'input-xxlarge',
+            'class' => 'input-xxlarge mono',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),
@@ -56,7 +56,7 @@ class Config_Form_Messages extends Daiquiri_Form_Abstract {
                 array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
-        $this->addPrimaryButtonElement('submit', 'Create config entry');
+        $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
