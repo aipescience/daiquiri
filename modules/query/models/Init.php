@@ -46,7 +46,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
         $rules = array();
 
         if ($this->_init->options['config']['query']['guest']) {
-            $roles['guest'] = array(
+            $rules['guest'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
                     'listJobs','showJob','killJob','removeJob','renameJob','databases','functions','examples'
@@ -64,7 +64,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 $rules['guest']['Query_Model_Form'][] = 'mail';
             }
         } else {
-            $roles['user'] = array(
+            $rules['user'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
                     'listJobs','showJob','killJob','removeJob','renameJob','databases','functions','examples'
@@ -83,16 +83,14 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             }
         }
 
-        $rules['user'] = array(
-            'Query_Model_Uws' => array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote','createJobId', 'getPendingJob', 'getQuote', 'setDestructTime','setDestructTimeImpl', 'setExecutionDuration', 'setParameters','deleteJob', 'abortJob', 'runJob')
-        );
+        $rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote','createJobId', 'getPendingJob', 'getQuote', 'setDestructTime','setDestructTimeImpl', 'setExecutionDuration', 'setParameters','deleteJob', 'abortJob', 'runJob');
 
         $rules['admin'] = array(
             'Query_Model_Jobs' => array('rows','cols','show','kill','remove','rename'),
             'Query_Model_Examples' => array('index','create','update','delete','export')
         );
 
-        return $roles;
+        return $rules;
     }
 
     /**
