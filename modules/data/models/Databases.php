@@ -80,7 +80,11 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
                 }
 
                 // store the values in the database
-                $databaseId = $this->getResource()->insertRow($values);
+                try {
+                    $this->getResource()->insertRow($values);
+                } catch (Exception $e) {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form, $e->getMessage());
+                }
 
                 return array('status' => 'ok');
             } else {

@@ -89,12 +89,12 @@ class Data_Model_Init extends Daiquiri_Model_Init {
      * Processes the 'data' part of $options['init'].
      */
     public function processInit() {
-        if (!isset($this->_init->input['config']['init']['data'])) {
+        if (!isset($this->_init->input['init']['data'])) {
             $input = array();
-        } else if (!is_array($this->_init->input['config']['init']['data'])) {
+        } else if (!is_array($this->_init->input['init']['data'])) {
             $this->_error('Data options needs to be an array.');
         } else {
-            $input = $this->_init->input['config']['init']['data'];
+            $input = $this->_init->input['init']['data'];
         }
 
         // just pass through
@@ -106,7 +106,8 @@ class Data_Model_Init extends Daiquiri_Model_Init {
      */
     public function init() {
         // create column entries in the data module
-        if (isset($this->_init->options['init']['data']['columns']) && is_array($this->_init->options['init']['data']['columns'])) {
+        if (isset($this->_init->options['init']['data']['columns']) 
+            && is_array($this->_init->options['init']['data']['columns'])) {
             $dataColumnsModel = new Data_Model_Columns();
             if ($dataColumnsModel->getResource()->countRows() == 0) {
                 foreach ($this->_init->options['init']['data']['columns'] as $a) {
@@ -125,7 +126,8 @@ class Data_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create table entries in the data module
-        if (isset($this->_init->options['init']['data']['tables']) && is_array($this->_init->options['init']['data']['tables'])) {
+        if (isset($this->_init->options['init']['data']['tables']) 
+            && is_array($this->_init->options['init']['data']['tables'])) {
             $dataTablesModel = new Data_Model_Tables();
             if ($dataTablesModel->getResource()->countRows() == 0) {
                 foreach ($this->_init->options['init']['data']['tables'] as $a) {
@@ -145,7 +147,8 @@ class Data_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create database entries in the data module
-        if (isset($this->_init->options['init']['data']['databases']) && is_array($this->_init->options['init']['data']['databases'])) {
+        if (isset($this->_init->options['init']['data']['databases']) 
+            && is_array($this->_init->options['init']['data']['databases'])) {
             $dataDatabasesModel = new Data_Model_Databases();
             if ($dataDatabasesModel->getResource()->countRows() == 0) {
                 foreach ($this->_init->options['init']['data']['databases'] as $a) {
@@ -165,7 +168,8 @@ class Data_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create function entries in the tables module
-        if (isset($this->_init->options['init']['data']['functions']) && is_array($this->_init->options['init']['data']['functions'])) {
+        if (isset($this->_init->options['init']['data']['functions']) 
+            && is_array($this->_init->options['init']['data']['functions'])) {
             $dataFunctionsModel = new Data_Model_Functions();
             if ($dataFunctionsModel->getResource()->countRows() == 0) {
                 foreach ($this->_init->options['init']['data']['functions'] as $a) {

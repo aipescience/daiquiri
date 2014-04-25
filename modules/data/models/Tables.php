@@ -66,7 +66,11 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
-                $this->getResource()->insertRow($values);
+                try {
+                    $this->getResource()->insertRow($values);
+                } catch (Exception $e) {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form, $e->getMessage());
+                }
 
                 return array('status' => 'ok');
             } else {

@@ -61,11 +61,13 @@
                     echo $this->internalLink(array(
                         'text' => 'Update this table entry',
                         'href' => '/data/tables/update?id=' . $this->escape($this->row['id']),
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Delete this table entry',
                         'href' => '/data/tables/delete?id=' . $this->escape($this->row['id']),
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     ?>
