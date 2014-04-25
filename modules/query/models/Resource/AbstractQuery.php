@@ -168,6 +168,15 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     }
 
     /**
+     * Returns the status array for the query interface.
+     * @return array $status
+     */
+    public function getStatus() {
+        $classname = get_class($this);
+        return $classname::$_status;
+    }
+
+    /**
      * Rename a given table WITHOUT ACL check.
      * @param string $db name of the database
      * @param string $table current name of the table

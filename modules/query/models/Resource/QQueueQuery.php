@@ -157,9 +157,9 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             }
         }
 
-        $jobId = "NULL";
+        $job['id'] = "NULL";
         if (!empty($options) && array_key_exists('jobId', $options)) {
-            $jobId = "{$options['jobId']}";
+            $job['id'] = "{$options['jobId']}";
         }
 
         // if the plan query is not the same as the actual query, this means this is run in the context
@@ -183,7 +183,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $userId = 0;
         }
 
-        $sql = "SELECT qqueue_addJob({$jobId}, {$userId}, '{$userGroup}', '{$queue}', " .
+        $sql = "SELECT qqueue_addJob({$job['id']}, {$userId}, '{$userGroup}', '{$queue}', " .
             $this->getAdapter()->quote($actualQuery) .
             ", '{$database}', '{$table}', NULL, 1, " .
             $this->getAdapter()->quote($query) . ");";
@@ -195,6 +195,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $errors['submitError'] = $e->getMessage();
             return Query_Model_Resource_QQueueQuery::$_status['error'];
         }
+
+        // get username and status
+        $statusStrings = array_flip(Query_Model_Resource_QQueueQuery::$_status);
+        $job['status'] = $statusStrings[$statusId];
+        $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
 
         return $result;
     }

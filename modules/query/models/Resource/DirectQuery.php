@@ -179,16 +179,24 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         }
 
         $job['database'] = $config['dbname'];
-        $job['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
-        $job['status_id'] = $statusId;
         $job['host'] = $config['host'];
         $job['time'] = date("Y-m-d\TH:i:s");
+        $job['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
+        $job['status_id'] = $statusId;
 
         // switch to web adapter
         $this->setAdapter(Daiquiri_Config::getInstance()->getWebAdapter());
 
         // insert job into jobs table
         $this->getAdapter()->insert('Query_Jobs', $job);
+
+        // get Id of the new job
+        $job['id'] = $this->getAdapter()->lastInsertId();
+
+        // get username and status
+        $statusStrings = array_flip(Query_Model_Resource_DirectQuery::$_status);
+        $job['status'] = $statusStrings[$statusId];
+        $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
 
         return $statusId;
     }
@@ -321,7 +329,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         // get the rowset and return
         $rows = $this->fetchAll($select);
 
-        //go through the result set and replace all instances of status with string
+        // go through the result set and replace all instances of status with string
         $statusStrings = array_flip(Query_Model_Resource_DirectQuery::$_status);
         foreach ($rows as &$row) {
             $row['status'] = $statusStrings[$row['status_id']];

@@ -181,11 +181,22 @@ daiquiri.query.Query.prototype.storeNewJob = function(job) {
     this.displayJobs();
     this.displayBrowser();
 
-    // prepare dialog
-    new daiquiri.Modal({
-        'html': '<h2>Query submitted</h2><p>Your query has been submitted as job ' + job.table + '.</p><p>When the job is done you can obtain the results via the job browser on the left side.</p><p><button class="btn btn-primary">Ok</button></p>',
-        'width': 600,
-    });
+    // old job tabs
+    this.header.details.hide();
+    this.header.results.hide();
+    this.header.plot.hide();
+    this.header.download.hide();
+
+    // load job if it was an instant success, like with direct (syncronous) querys
+    if (job.status === 'success') {
+        this.loadJob(job.id);
+    } else {
+        // prepare dialog
+        new daiquiri.Modal({
+            'html': '<h2>Query submitted</h2><p>Your query has been submitted as job ' + job.table + '.</p><p>When the job is done you can obtain the results via the job browser on the left side.</p><p><button class="btn btn-primary">Ok</button></p>',
+            'width': 600,
+        });
+    }
 };
 
 /**
@@ -268,7 +279,7 @@ daiquiri.query.Query.prototype.loadJob = function(jobId){
                     self.displayDownload();
                     
                     if (! (self.tabs.details.hasClass('active') || self.tabs.results.hasClass('active') || self.tabs.plot.hasClass('active'))) {
-                        $('a', self.header.details).tab('show');
+                        $('a', self.header.results).tab('show');
                     }
 
                 } else {
