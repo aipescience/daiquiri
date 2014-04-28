@@ -21,10 +21,12 @@
 ?>
 
 <div class="main">
-    <?php if ($this->hasIdentity): ?>
+    <?php if (Zend_Auth::getInstance()->hasIdentity()): ?>
         <h2>You don't have the permission to view this page.</h2>
         <p>
-            You might want to login or logout and login as a different user. <br />
+            You might want to login or logout and login as a different user.
+        </p>
+        <p>
             <?php echo $this->loginLink(); ?>
         </p>
     <?php else: ?>

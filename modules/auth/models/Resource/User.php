@@ -305,7 +305,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Deletes a given user from the database
+     * Deletes a given user from the database.
      * @param type $id 
      * @throws Exception
      */
@@ -330,17 +330,53 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         if (empty($role)) {
             throw new Exception('$role not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
-    
-            $select = $this->select();
-            $select->from('Auth_User', array('email'));
-            $select->join('Auth_Roles', '`Auth_Roles`.`id` = `Auth_User`.`role_id`', array());
-            $select->where('role = ?', $role);
 
-            $rows = array();
-            foreach ($this->fetchAll($select) as $row) {
-                $rows[] = $row['email'];
+        $select = $this->select();
+        $select->from('Auth_User', array('email'));
+        $select->join('Auth_Roles', '`Auth_Roles`.`id` = `Auth_User`.`role_id`', array());
+        $select->where('role = ?', $role);
+
+        $rows = array();
+        foreach ($this->fetchAll($select) as $row) {
+            $rows[] = $row['email'];
+        }
+        return $rows;
+    }
+
+    /**
+     * Fetches the registrations.
+     * @return array $rows
+     */
+    public function fetchRegistrations() {
+        $select = $this->select();
+        $select->from('Auth_Registration');
+
+        // filter out passwords
+        $rows = array();
+        foreach ($this->fetchAll($select) as $dbRow) {
+            $row = array();
+            foreach ($dbRow as $key => $value) {
+                if (substr($key, 0, 8) !== 'password' || $key == 'details') {
+                    $row[$key] = $value;
+                }
             }
-            return $rows;
+            $rows[] = $row;
+        }
+        return $rows;
+    }    
+
+    /**
+     * Deletes a singe registation entry.
+     * @param type $id 
+     * @throws Exception
+     */
+    public function deleteRegistration($id) {
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        // delete row in user table
+        $this->getAdapter()->delete('Auth_Registration', array('id = ?' => $id));
     }
 
     /**

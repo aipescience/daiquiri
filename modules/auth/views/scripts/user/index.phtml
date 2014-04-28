@@ -57,6 +57,13 @@
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->internalLink(array(
+        'href' => '/auth/registration/',
+        'text' => 'Manage registrations',
+        'resource' => 'Auth_Model_Registration',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
         'href' => '/admin',
         'text' => 'Back to Administration',
         'prepend' => '<p>',

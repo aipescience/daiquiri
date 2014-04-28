@@ -22,6 +22,8 @@
 
 class Meetings_InfoController extends Daiquiri_Controller_Abstract {
 
+    protected $_model;
+
     public function init() {
         $this->_meetingId = $this->_getParam('meetingId');
         if ($this->_meetingId === null) {

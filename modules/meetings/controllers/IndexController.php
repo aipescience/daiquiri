@@ -22,6 +22,8 @@
 
 class Meetings_IndexController extends Daiquiri_Controller_Abstract {
 
+    protected $_model;
+
     public function init() {
 
     }

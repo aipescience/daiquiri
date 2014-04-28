@@ -30,6 +30,47 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
     }
 
     /**
+     * Returns all registration entries.
+     * @return array $response
+     */
+    public function index() {
+        return array(
+            'status' => 'ok',
+            'rows' => $this->getResource()->fetchRegistrations()
+        );
+    }
+
+    /**
+     * Deletes a registration entry.
+     * @param int $id id of registration entry
+     * @param array $formParams
+     * @return array $response
+     */
+    public function delete($id, array $formParams = array()) {
+        // create the form object
+        $form = new Daiquiri_Form_Danger(array(
+            'submit' => 'Delete registration entry'
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                // delete the user and redirect
+                $this->getResource()->deleteRegistration($id);
+
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
      * Registers a new user.
      * @param array $formParams
      * @return array $response

@@ -29,6 +29,15 @@ class Auth_RegistrationController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
+        $this->getControllerHelper('form')->index();
+    }
+
+    public function deleteAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->delete($id);
+    }
+
+    public function registerAction() {
         $this->getControllerHelper('form')->register();
     }
 

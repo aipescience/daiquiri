@@ -75,7 +75,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Auth_Model_Password' => array('set'),
             'Auth_Model_Details' => array('show','create','update', 'delete'),
             'Auth_Model_Sessions' => array('rows','cols','destroy'),
-            'Auth_Model_Registration' => array('activate','disable','reenable')
+            'Auth_Model_Registration' => array('index','delete','activate','disable','reenable')
         );
 
         return $rules;
