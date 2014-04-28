@@ -42,10 +42,12 @@ class Auth_Model_Sessions extends Daiquiri_Model_Table {
                 'name' => ucfirst($colname),
                 'sortable' => 'true'
             );
-            if ($colname === 'email') {
-                $col['width'] = '18em';
+            if ($colname === 'session') {
+                $col['width'] = '14em';
+            } else if ($colname === 'userAgent') {
+                $col['width'] = '26em';
             } else if ($colname === 'modified') {
-                $col['width'] = '13em';
+                $col['width'] = '12em';
             } else {
                 $col['width'] = '8em';
             }
@@ -53,7 +55,7 @@ class Auth_Model_Sessions extends Daiquiri_Model_Table {
         }
         $cols[] = array(
             'name' => 'Options',
-            'width' => '8em',
+            'width' => '12em',
             'sortable' => 'false'
         );
         

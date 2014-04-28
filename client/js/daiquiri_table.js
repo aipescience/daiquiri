@@ -328,13 +328,13 @@ daiquiri.table.Table.prototype.cols = function () {
                 for (var i = 0; i < self.ncols; i++) {
                     // get the id of the column
                     colId = self.colsmodel[i]["id"];
-                    //if (typeof colId === 'undefined') colId = i;
+                    if (typeof colId === 'undefined') colId = i;
 
                     if (self.colsmodel[i].hidden != true) {
                         if (self.colsmodel[i].width != undefined) {
                             width = self.colsmodel[i].width;
                         } else {
-                            width = self.opt.colsWidth;
+                            width = self.opt.columnWidth;
                         }
                         classes = 'daiquiri-table-col-' + colId;
                         if (self.colsmodel[i].sortable != 'false') {
@@ -342,13 +342,13 @@ daiquiri.table.Table.prototype.cols = function () {
                         }
                         html += '<th id="' + self.id + '-thead-col-' + colId + '" style="width:' + width + '" class="' + classes + '">';
                         if (i != 0) {
-                            html += '<div class="handle-left pull-left"></div>';
+                            html += '<div class="handle-left"></div>';
+                        }
+                        html += '<div class="handle-right"></div>';
+                        if (self.colsmodel[i].sortable != 'false') {
+                            html += '<div class="sort"><i id="' + self.id + '-thead-sort" class="icon-chevron-down"></i></div>';
                         }
                         html += '<span>' + self.colsmodel[i].name + '</span>';
-                        html += '<div class="handle-right pull-right"></div>';
-                        if (self.colsmodel[i].sortable != 'false') {
-                            html += '<i id="' + self.id + '-thead-sort" class="icon-chevron-down pull-right"></i>';
-                        }
                         html += '</th>';
                     }
                 }
@@ -457,8 +457,8 @@ daiquiri.table.Table.prototype.cols = function () {
                         var delta = e.pageX - daiquiri.table.resizing.zero;
 
                         var width = daiquiri.table.resizing.width + delta;
-                        if (width < 50) {
-                            width = 50;
+                        if (width < 24) {
+                            width = 24;
                         }
                         daiquiri.table.resizing.cols.width(width);
                     }

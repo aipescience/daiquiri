@@ -45,8 +45,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
                 'sortable' => 'true'
             );
             if ($colname === 'id') {
-                $col['width'] = '2em';
-                $col['align'] = 'center';
+                $col['width'] = '3em';
             } else if (in_array($colname, array('database', 'table'))) {
                 $col['width'] = '16em';
             } else if ($colname === 'time') {
