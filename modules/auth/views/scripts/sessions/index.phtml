@@ -34,7 +34,9 @@
                     new daiquiri.Modal({
                         'url': this.href,
                         'width': 700,
-                        'success': daiquiri.table.items['table'].rows
+                        'success': function() {
+                            daiquiri.table.items['table'].rows();
+                        }
                     });
                     return false;
                 });
