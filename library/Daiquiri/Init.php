@@ -99,20 +99,25 @@ class Daiquiri_Init {
         $this->_setupEnvironment();
 
         // get init models from the modules
-        foreach($this->options['modules'] as $module) {
+        foreach(array_keys(Daiquiri_Init::$_modules) as $module) {
             $classname = ucfirst($module) . '_Model_Init';
-            $this->models[] = new $classname($this);
+            $this->models[$module] = new $classname($this);
         }
 
         // parse the config array for each model 
         $this->options['config'] = array();
-        foreach($this->models as $model) {
+        foreach($this->options['modules'] as $module) {
+            $model = $this->models[$module];
             $model->processConfig();
         }
+
+        // update config singleton
+        Daiquiri_Config::getInstance()->setConfig($this->options['config']);
         
         // parse the init array for each model
         $this->options['init'] = array();
-        foreach($this->models as $model) {
+        foreach($this->options['modules'] as $module) {
+            $model = $this->models[$module];
             $model->processInit();
         } 
     }
@@ -161,7 +166,7 @@ class Daiquiri_Init {
         define('APPLICATION_PATH', $this->application_path . '/application');
         define('APPLICATION_ENV', 'development');
 
-        $options = array(
+        $this->options['application'] = array(
             'phpSettings' => array(
                 'display_startup_errors' => 1,
                 'display_errors' => 1
@@ -180,7 +185,7 @@ class Daiquiri_Init {
                     'controllerDirectory' => $this->application_path . '/application/controllers',
                     'moduleDirectory' => $this->daiquiri_path . '/modules'
                 ),
-                'modules' => array(''),
+                'modules' => $this->options['modules'],
                 'multidb' => array(
                     'web' => array(
                         'adapter' => 'Pdo_Mysql',
@@ -196,16 +201,16 @@ class Daiquiri_Init {
         );
         foreach ($this->options['database'] as $adapter => $database) {
             foreach (array('dbname', 'username', 'password', 'host') as $key) {
-                $options['resources']['multidb'][$adapter][$key] = $database[$key];
+                $this->options['application']['resources']['multidb'][$adapter][$key] = $database[$key];
             }
             if ($database['host'] !== 'localhost') {
-                $options['resources']['multidb'][$adapter]['port'] = $database['port'];
+                $this->options['application']['resources']['multidb'][$adapter]['port'] = $database['port'];
             }
         }
 
         // initialize Zend_Application and bootstrap
-        $this->_zend_application = new Zend_Application(APPLICATION_ENV, $options);
-        $front = $this->_zend_application->getBootstrap()
+        $application = new Zend_Application(APPLICATION_ENV, $this->options['application']);
+        $front = $application->getBootstrap()
                 ->bootstrap('frontController')
                 ->getResource('frontController');
 
@@ -213,7 +218,7 @@ class Daiquiri_Init {
         $request = new Daiquiri_Controller_Request_Init();
         $front->setRequest($request);
 
-        $this->_zend_application->bootstrap();
+        $application->bootstrap();
     }
 
     /**
@@ -366,12 +371,17 @@ class Daiquiri_Init {
             'resources.frontController.params.displayExceptions = 0',
             'resources.frontController.controllerDirectory = APPLICATION_PATH "/controllers"',
             'resources.frontController.moduleDirectory = APPLICATION_PATH "/../modules"',
-            'resources.modules[] = ',
             'resources.view[] = ',
             'resources.view.helperPath.Daiquiri_View_Helper = APPLICATION_PATH "/../library/Daiquiri/View/Helper"',
             'resources.layout.layoutPath = APPLICATION_PATH "/layouts/scripts/"',
             ''
         );
+
+        // prepare module part of application.ini
+        foreach ($this->options['modules'] as $module) {
+            $output[] = "resources.modules[] = '{$module}'";
+        }
+        $output[] = '';
 
         // prepare database configuration part of application.ini
         foreach ($this->options['database'] as $adapter => $database) {
@@ -695,7 +705,8 @@ EOT;
     private function _init() {
         echo "Running init process." . PHP_EOL;
 
-        foreach ($this->models as $model) {
+        foreach ($this->options['modules'] as $module) {
+            $model = $this->models[$module];
             $model->init($this->options);
         }
 

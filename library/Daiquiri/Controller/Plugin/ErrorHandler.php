@@ -44,7 +44,6 @@ class Daiquiri_Controller_Plugin_ErrorHandler extends Zend_Controller_Plugin_Abs
      * 
      */
     public function postDispatch(Zend_Controller_Request_Abstract $request) {
-
         // get the front controller plugin and the zend error handler
         $front = Zend_Controller_Front::getInstance();
         $error = $front->getPlugin('Zend_Controller_Plugin_ErrorHandler');

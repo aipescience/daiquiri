@@ -20,34 +20,14 @@
  *  limitations under the License.
  */
 
-/**
- * @class   Daiquiri_Controller_Plugin_InitCheck InitCheck.php
- * @brief   Daiquiri InitCheck front controller plugin.
- * 
- * Class for the daiquiri front controller plugin handling errors.
- * 
- * Checks whether the Daiquiri configuration environment has been properly set.
- * 
- */
-class Daiquiri_Controller_Plugin_InitCheck extends Zend_Controller_Plugin_Abstract {
+class Daiquiri_Controller_Plugin_Modules extends Zend_Controller_Plugin_Abstract {
 
-    /**
-     * @brief   preDispatch method - called by Front Controller after dispatch
-     * @param   Zend_Controller_Request_Abstract $request: request object
-     * 
-     * Checks whether the Daiquiri configuration environment has been properly set. If
-     * not, raise error.
-     * 
-     */
     public function preDispatch(Zend_Controller_Request_Abstract $request) {
-        parent::preDispatch($request);
-
-        if (Daiquiri_Config::getInstance()->isEmpty()) {
-            $request->setModuleName('config');
-            $request->setControllerName('error');
-            $request->setActionName('init');
+        $modules = Daiquiri_Config::getInstance()->getApplication()->resources->modules->toArray();
+        $modules[] = 'default';
+        if (!in_array($request->getModuleName(),$modules)) {
+            throw new Daiquiri_Exception_NotFound();
         }
     }
 
 }
-

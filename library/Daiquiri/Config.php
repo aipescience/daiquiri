@@ -32,10 +32,10 @@
 class Daiquiri_Config extends Daiquiri_Model_Singleton {
 
     /**
-     * Daquiri configuration object, parsed from database and application.ini
+     * Daquiri configuration object, parsed from database
      * @var Zend_Config_Ini
      */
-    protected $_daiquiri;
+    protected $_config;
 
     /**
      * Zend configuration object, parsed from application.ini
@@ -44,36 +44,42 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     protected $_application;
 
     /**
-     * Constructor. Load the configuration form the ini file into memory
+     * Constructor. Empty.
      */
-    protected function __construct() {
-        $this->init();
+    public function __construct() {
+
     }
 
-    public function init() {
-        // init the databases resource
-        try {
+    public function setApplication($application = null) {
+        if ($application === null) {
+            $this->_application = new Zend_Config_Ini(APPLICATION_PATH . '/configs/application.ini', APPLICATION_ENV);
+        } else {
+            $this->_application = new Zend_Config($application, true);
+        } 
+    }
+
+    public function setConfig($config = null) {
+        if ($config === null) {
+            // init the databases resource
             $resource = new Daiquiri_Model_Resource_Table();
             $resource->setTablename('Config_Entries');
 
+            $rows = $resource->fetchRows();
+
+            if (empty($rows)) {
+                return false;
+            }
+            
             $config = array();
-            foreach ($resource->fetchRows() as $row) {
+            foreach ($rows as $row) {
                 $keys = explode('.', $row['key']);
                 $this->_buildConfig($config, $keys, $row['value']);
             }
-        } catch (Zend_Db_Table_Exception $e) {
-            $config = array();
         }
 
-        // init the database config object
-        $this->_daiquiri = new Zend_Config($config, true);
+        $this->_config = new Zend_Config($config, true);
 
-        // init the daiquiri.ini file config object
-        $this->_application = new Zend_Config_Ini(APPLICATION_PATH . '/configs/application.ini', APPLICATION_ENV);
-
-        if ($this->_application->daiquiri !== null) {
-            $this->_daiquiri->merge($this->_application->daiquiri);
-        }
+        return true;
     }
 
     /**
@@ -104,16 +110,21 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
      * @return Zend_Config_Ini
      */
     public function __get($key) {
-        return $this->_daiquiri->$key;
+        return $this->getConfig()->$key;
     }
 
     public function getConfig() {
-        return $this->_daiquiri->toArray();
+        if (empty($this->_config)) {
+            throw new Exception('Empty config');
+        }
+        return $this->_config;
     }
 
-
-    public function isEmpty() {
-        return ($this->_daiquiri->count() == 0);
+    public function getApplication() {
+        if (empty($this->_application)) {
+            throw new Exception('Empty application config');
+        }
+        return $this->_application;
     }
 
     /**
@@ -167,8 +178,8 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
      * @return string
      */
     public function getUserDbName($username) {
-        $prefix = $this->_daiquiri->query->userDb->prefix;
-        $postfix = $this->_daiquiri->query->userDb->postfix;
+        $prefix = $this->_config->query->userDb->prefix;
+        $postfix = $this->_config->query->userDb->postfix;
 
         return $prefix . $username . $postfix;
     }
