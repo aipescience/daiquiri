@@ -54,17 +54,18 @@ class Config_Model_Templates extends Daiquiri_Model_Table {
             'meetings.reject' => array('meeting', 'firstname', 'lastname'),
         );
         
-        $participantDetailKeysModel = new Meetings_Model_ParticipantDetailKeys();
-        $contributionTypesModel = new Meetings_Model_ContributionTypes();
-        $this->templates['meetings.register'] = array_merge(
-            array('meeting', 'firstname', 'lastname', 'affiliation','email','arrival','departure'),
-            $participantDetailKeysModel->getResource()->fetchValues('key')
-        );
-        foreach ($contributionTypesModel->getResource()->fetchValues('contribution_type') as $contribution_type) {
-            $this->templates['meetings.register'][] = $contribution_type . '_title';
-            $this->templates['meetings.register'][] = $contribution_type . '_abstract';
+        if (Daiquiri_Config::getInstance()->getApplication()->resources->modules->meeting) {
+            $participantDetailKeysModel = new Meetings_Model_ParticipantDetailKeys();
+            $contributionTypesModel = new Meetings_Model_ContributionTypes();
+            $this->templates['meetings.register'] = array_merge(
+                array('meeting', 'firstname', 'lastname', 'affiliation','email','arrival','departure'),
+                $participantDetailKeysModel->getResource()->fetchValues('key')
+            );
+            foreach ($contributionTypesModel->getResource()->fetchValues('contribution_type') as $contribution_type) {
+                $this->templates['meetings.register'][] = $contribution_type . '_title';
+                $this->templates['meetings.register'][] = $contribution_type . '_abstract';
+            }
         }
-
     }
 
     /**

@@ -32,10 +32,15 @@ class Daiquiri_Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
     protected function _initFrontControllerPlugins() {
         $front = Zend_Controller_Front::getInstance();
-        $front->registerPlugin(new Daiquiri_Controller_Plugin_InitCheck());
+        $front->registerPlugin(new Daiquiri_Controller_Plugin_Modules());
+        $front->registerPlugin(new Daiquiri_Controller_Plugin_Config());
         $front->registerPlugin(new Daiquiri_Controller_Plugin_ErrorHandler());
         $front->registerPlugin(new Daiquiri_Controller_Plugin_Authorization());
         $front->registerPlugin(new Daiquiri_Controller_Plugin_Accept());
+    }
+
+    protected function _initConfig() {
+        Daiquiri_Config::getInstance()->setApplication($this->getOptions());
     }
 
     /**
@@ -74,7 +79,8 @@ class Daiquiri_Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
             }
 
             if ($error === true) {
-                header("HTTP/1.1 503 Service Unavailable");
+                header('HTTP/1.1 503 Service Temporarily Unavailable',true,503);
+                echo '<h1>The application is not correctly set up.</h1>';
                 die();
             }
 

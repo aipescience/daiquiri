@@ -196,13 +196,17 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             }
         }
 
-        // construct resources array
+        // prepare resources array
         $output['resources'] = array();
+
+        // fetch resources from ALL modules
         foreach ($this->_init->models as $model) {
             foreach ($model->getResources() as $resource) {
                 $output['resources'][] = $resource;
             }
         }
+
+        // fetch resources specified in the init.php file
         if (isset($input['resources'])) {
             if (is_array($input['resources'])) {
                 $output['resources'] = array_merge($output['resources'], $input['resources']);
@@ -217,8 +221,9 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             $output['rules'][$role] = array();
         }
 
-        // get rules for the modules
-        foreach ($this->_init->models as $model) {
+        // get rules for the ACTIVE modules
+        foreach ($this->_init->options['modules'] as $module) {
+            $model = $this->_init->models[$module];
             foreach ($model->getRules() as $role => $rules) {
                 if (!isset($output['rules'][$role])) {
                     $output['rules'][$role] = array();
@@ -230,12 +235,14 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
 
         // add rules from the input
-        foreach ($input['rules'] as $role => $rules) {
-            if (!isset($output['rules'][$role])) {
-                $output['rules'][$role] = array();
-            }
-            foreach ($rules as $resource => $permissions) {
-                $output['rules'][$role][$resource] = $permissions;
+        if (isset($input['rules'])) {
+            foreach ($input['rules'] as $role => $rules) {
+                if (!isset($output['rules'][$role])) {
+                    $output['rules'][$role] = array();
+                }
+                foreach ($rules as $resource => $permissions) {
+                    $output['rules'][$role][$resource] = $permissions;
+                }
             }
         }
 
@@ -267,7 +274,6 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create users
-        Daiquiri_Config::getInstance()->init(); // re-init Configuration object
         $authUserModel = new Auth_Model_User();
         if ($authUserModel->getResource()->countRows() === 0) {
             foreach ($this->_init->options['init']['auth']['user'] as $credentials) {
@@ -296,7 +302,6 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create apps
-        Daiquiri_Config::getInstance()->init(); // re-init Configuration object
         $authAppsModel = new Auth_Model_Apps();
         if ($authAppsModel->getResource()->countRows() === 0) {
             foreach ($this->_init->options['init']['auth']['apps'] as $credentials) {
