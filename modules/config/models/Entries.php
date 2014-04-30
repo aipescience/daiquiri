@@ -109,7 +109,7 @@ class Config_Model_Entries extends Daiquiri_Model_Table {
      */
     public function export() {
         return array(
-            'data' => Daiquiri_Config::getInstance()->getConfig(),
+            'data' => array('config' => Daiquiri_Config::getInstance()->getConfig()->toArray()),
             'status' => 'ok'
         );
     }

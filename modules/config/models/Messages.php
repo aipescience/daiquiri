@@ -140,7 +140,7 @@ class Config_Model_Messages extends Daiquiri_Model_Abstract {
         }
 
         return array(
-            'data' => $data,
+            'data' => array('messages' => $data),
             'status' => 'ok'
         );
     }

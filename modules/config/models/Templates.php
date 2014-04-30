@@ -234,7 +234,7 @@ class Config_Model_Templates extends Daiquiri_Model_Table {
         }
 
         return array(
-            'data' => $data,
+            'data' => array('templates' => $data),
             'status' => 'ok'
         );
     }
