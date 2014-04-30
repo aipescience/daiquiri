@@ -247,7 +247,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         $this->setAdapter(Daiquiri_Config::getInstance()->getWebAdapter());
 
         // remove job from job table
-        $this->deleteRow($id);
+        $this->getAdapter()->delete('Query_Jobs', array('id = ?' => $id));
     }
 
     /**
