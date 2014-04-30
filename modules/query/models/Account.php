@@ -305,7 +305,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 continue;
             }
 
-            $usercolumns = $resource->fetchCols();
+            $usercolumns = array_keys($resource->fetchCols());
             foreach ($usercolumns as $usercolumn) {
                 $table['columns'][] = array(
                     'id' => 'userdb-column-' . $column_id++,

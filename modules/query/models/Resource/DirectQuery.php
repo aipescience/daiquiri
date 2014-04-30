@@ -50,7 +50,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         'username' => 'User name',
         'database' => 'Database name',
         'table' => 'Table name',
-        'time' => 'Job submission time',
+        'timeSubmit' => 'Job submission time',
         'query' => 'Original query',
         'actualQuery' => 'Actual query',
         'status_id' => 'Job status',
@@ -73,7 +73,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         'actualQuery' => 'actualQuery',
         'user_id' => 'user_id',
         'status_id' => 'status_id',
-        'time' => 'time'
+        'timeSubmit' => 'time'
     );
 
     /**
@@ -281,9 +281,11 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return array $cols
      */
     public function fetchCols() {
-        $cols = Query_Model_Resource_DirectQuery::$_cols;
-        $cols[] = 'status';
-        $cols[] = 'username';
+        $cols = array();
+        foreach (Query_Model_Resource_DirectQuery::$_cols as $col => $dbCol) {
+            $cols[$col] = $this->quoteIdentifier('Query_Jobs',$dbCol);
+        }
+        $cols['username'] = $this->quoteIdentifier('Auth_User','username');
         return $cols;
     }
 
@@ -296,7 +298,8 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     public function countRows(array $sqloptions = null) {
         $select = $this->select();
         $select->from('Query_Jobs', 'COUNT(*) as count');
-
+        $select->join('Auth_User','Query_Jobs.user_id = Auth_User.id','username');
+        
         if ($sqloptions) {
             if (isset($sqloptions['where'])) {
                 foreach ($sqloptions['where'] as $w) {

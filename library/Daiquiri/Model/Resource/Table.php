@@ -54,7 +54,11 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
      * @return array $cols
      */
     public function fetchCols() {
-        return array_keys($this->getAdapter()->describeTable($this->getTablename()));
+        $cols = array();
+        foreach($this->getAdapter()->describeTable($this->getTablename()) as $col) {
+            $cols[$col['COLUMN_NAME']] = $this->quoteIdentifier($col['TABLE_NAME'], $col['COLUMN_NAME']);
+        }
+        return $cols;
     }
 
     /**

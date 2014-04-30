@@ -64,21 +64,27 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
             $sqloptions['limit'] = null;
         }
 
-        if (isset($queryParams['sort'])) {
+        if (isset($queryParams['sort']) && !empty($queryParams['sort'])) {
             $s = explode(' ', $queryParams['sort']);
 
-            if (count($s) == 2) {
-                $sortField = $s[0];
-                $sortOrder = strtoupper($s[1]);
-
-                if (in_array($sortOrder, array('ASC', 'DESC'))) {
-                    $sqloptions['order'] = $sortField . ' ' . $sortOrder;
-                } else {
-                    $sqloptions['order'] = null;
-                }
+            if (!isset($s[0]) || empty($s[0])) {
+                throw new Exception('$sortField missing in ' . get_class($this) . '::' . __FUNCTION__);
             } else {
-                $sqloptions['order'] = null;
+                $sortField = $s[0];
             }
+
+            if (!isset($s[1]) || empty($s[1])) {
+                throw new Exception('$sortOrder missing in ' . get_class($this) . '::' . __FUNCTION__);
+            } else {
+                $sortOrder = strtoupper($s[1]);
+            }
+
+            if (in_array($sortOrder, array('ASC', 'DESC'))) {
+                $sqloptions['order'] = $sortField . ' ' . $sortOrder;
+            } else {
+                throw new Exception('$sortOrder must be ASC or DESC in ' . get_class($this) . '::' . __FUNCTION__);
+            }
+
         } else {
             $sqloptions['order'] = null;
         }
@@ -87,15 +93,26 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
         if (isset($queryParams['search']) && !empty($queryParams['search'])) {
             $dbCols = $this->_model->getResource()->fetchCols();
             $modelCols = $this->_model->getCols();
+
             if (empty($modelCols)) {
-                $cols = $dbCols;
-            } else {
-                $cols = array();
-                foreach ($modelCols as $col) {
-                    $cols[] = $dbCols[$col];
+                $modelCols = array_keys($dbCols);
+            }
+
+            // translate cols from the model to database columns
+            $cols = array();
+            foreach ($modelCols as $col) {
+                if (isset($dbCols[$col])) {
+                    if (is_array($dbCols[$col])) {
+                        foreach ($dbCols[$col] as $col) {
+                            $cols[] = $col;
+                        }
+                    } else {
+                        $cols[] = $dbCols[$col];
+                    }
                 }
             }
 
+            // add where statement for every column
             foreach ($cols as $col) {
                 $quotedSearch = $this->_model->getResource()->getAdapter()->quoteInto('?', $queryParams['search']);
                 $search = substr($quotedSearch, 1, strlen($quotedSearch) - 2);

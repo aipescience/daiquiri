@@ -34,12 +34,15 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * @return array $cols
      */
     public function fetchCols() {
-        $cols = array('id', 'username', 'email', 'role', 'status');
+        $cols = parent::fetchCols();
+
         foreach (Daiquiri_Config::getInstance()->auth->details as $key) {
             if (substr($key, 0, 8) !== 'password') {
-                $cols[] = $key;
+                $cols[$key] = $this->quoteIdentifier('Auth_Details',$key);
             }
         }
+        $cols['status'] = $this->quoteIdentifier('Auth_Status','status');
+        $cols['role'] = $this->quoteIdentifier('Auth_Roles','role');
         return $cols;
     }
 

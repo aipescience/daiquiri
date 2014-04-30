@@ -48,7 +48,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
         // get columns from params or from the database
         if (empty($params['cols'])) {
-            $params['cols'] = $this->getResource()->fetchCols();
+            $params['cols'] = array_keys($this->getResource()->fetchCols());
         } else {
             $params['cols'] = explode(',', $params['cols']);
         }
@@ -155,7 +155,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
         // get columns from params or from the database
         if (empty($params['cols'])) {
-            $params['cols'] = $this->getResource()->fetchCols();
+            $params['cols'] = array_keys($this->getResource()->fetchCols());
         } else {
             $params['cols'] = explode(',', $params['cols']);
         }

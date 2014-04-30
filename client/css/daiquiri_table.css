@@ -24,10 +24,15 @@
 }
 .daiquiri-table th,
 .daiquiri-table td {
-    padding: 2px 4px;
     border-left: 1px solid #ddd;
     overflow: hidden;
     white-space: nowrap;
+}
+.daiquiri-table th {
+    padding: 2px 22px 2px 4px;
+}
+.daiquiri-table td {
+    padding: 2px 4px;
 }
 .daiquiri-table td:first-child,
 .daiquiri-table th:first-child {    
@@ -69,10 +74,12 @@
 }
 .daiquiri-table th {
     position: relative;
+    height: 20px;
+}
+.daiquiri-table th div.name {
+    overflow: hidden;
 }
 .daiquiri-table th div.sort {
-    background-color: white;
-
     position: absolute;
     top: 2px;
     right: 4px;
@@ -88,8 +95,6 @@
 }
 .daiquiri-table th .handle-left,
 .daiquiri-table th .handle-right {
-    background-color: white;
-
     position: absolute;
     top: 2px;
     right: 0;

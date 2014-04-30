@@ -26,10 +26,17 @@
         $('#table').daiquiri_table({
             'rowsurl': "<?php echo $this->baseUrl('/query/jobs/rows') ?>",
             'colsurl': "<?php echo $this->baseUrl('/query/jobs/cols') ?>",
-            'baseurl': "<?php echo $this->baseUrl() ?>",
-            'hoverrows': false,
-            'params': {
-                'options': true
+            'success': function() {
+                $('a','tbody','#table').click(function(){
+                    new daiquiri.Modal({
+                        'url': this.href,
+                        'width': 700,
+                        'success': function() {
+                            daiquiri.table.items['table'].rows();
+                        }
+                    });
+                    return false;
+                });
             }
         });
     });

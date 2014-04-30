@@ -27,6 +27,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
      */
     public function __construct() {
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
+        $this->_cols = array('id','database','table','timeSubmit','username','queue','status');
     }
 
     /**
@@ -35,9 +36,6 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function cols(array $params = array()) {
-        // set columns
-        $this->_cols = $this->getResource()->fetchCols();
-
         $cols = array();
         foreach ($this->_cols as $colname) {
             $col = array(
@@ -45,20 +43,22 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
                 'sortable' => 'true'
             );
             if ($colname === 'id') {
-                $col['width'] = '3em';
+                $col['width'] = '120px';
             } else if (in_array($colname, array('database', 'table'))) {
-                $col['width'] = '16em';
-            } else if ($colname === 'time') {
-                $col['width'] = '12em';
+                $col['width'] = '120px';
+            } else if ($colname === 'username') {
+                $col['width'] = '60px';
+            } else if (in_array($colname, array('queue', 'status'))) {
+                $col['width'] = '40px';
             } else {
-                $col['width'] = '8em';
+                $col['width'] = '100px';
             }
             $cols[] = $col;
         }
 
         $cols[] = array(
             'name' => 'Options',
-            'width' => '12em',
+            'width' => '100px',
             'sortable' => 'false',
             'search' => 'false'
         );
@@ -72,9 +72,6 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function rows(array $params = array()) {
-        // set columns
-        $this->_cols = $this->getResource()->fetchCols();
-
         // parse params
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 

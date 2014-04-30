@@ -35,8 +35,8 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
      */
     public function fetchCols() {
         $cols = parent::fetchCols();
-        $cols[] = 'meeting_title';
-        $cols[] = 'status';
+        $cols['meeting_title'] = $this->quoteIdentifier('Meetings_Meetings','meeting_title');
+        $cols['status'] = $this->quoteIdentifier('Meetings_ParticipantStatus','status');
         return $cols;
     }
 

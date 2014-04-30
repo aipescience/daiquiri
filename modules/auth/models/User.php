@@ -109,24 +109,21 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 'sortable' => 'true'
             );
             if ($colname === 'id') {
-                $col['width'] = '3em';
-                $col['align'] = 'center';
-            } else if ($colname === 'username') {
-                $col['width'] = '8em';
+                $col['width'] = '10px';
             } else if ($colname === 'email') {
-                $col['width'] = '16em';
+                $col['width'] = '120px';
             } else if ($colname === 'role') {
-                $col['width'] = '6em';
+                $col['width'] = '40px';
             } else if ($colname === 'status') {
-                $col['width'] = '6em';
+                $col['width'] = '40px';
             } else {
-                $col['width'] = '8em';
+                $col['width'] = '100px';
             }
             $cols[] = $col;
         }
         $cols[] = array(
             'name' => 'Options',
-            'width' => '30em',
+            'width' => '200px',
             'sortable' => 'false'
         );
         

@@ -348,7 +348,7 @@ daiquiri.table.Table.prototype.cols = function () {
                         if (self.colsmodel[i].sortable != 'false') {
                             html += '<div class="sort"><i id="' + self.id + '-thead-sort" class="icon-chevron-down"></i></div>';
                         }
-                        html += '<span>' + self.colsmodel[i].name + '</span>';
+                        html += '<div class="name">' + self.colsmodel[i].name + '</div>';
                         html += '</th>';
                     }
                 }
@@ -381,8 +381,9 @@ daiquiri.table.Table.prototype.cols = function () {
                     // determine which column was clicked
                     var element = $(this);
                     var classes = element.attr('class');
-                    var colName = $('span', element.parent()).text();
-                            
+                    var colId = element.parent().parent().attr('id').match(/thead-col-(\d+)/)[1];
+                    var colName = self.colsmodel[colId].name;
+
                     // manipulate arrow and change sort options
                     if (classes.indexOf('sorted') == -1) {
                         $('i.sorted', self.container).removeClass('sorted').removeClass('icon-chevron-up').addClass('icon-chevron-down');
@@ -457,8 +458,8 @@ daiquiri.table.Table.prototype.cols = function () {
                         var delta = e.pageX - daiquiri.table.resizing.zero;
 
                         var width = daiquiri.table.resizing.width + delta;
-                        if (width < 24) {
-                            width = 24;
+                        if (width < 10) {
+                            width = 10;
                         }
                         daiquiri.table.resizing.cols.width(width);
                     }
