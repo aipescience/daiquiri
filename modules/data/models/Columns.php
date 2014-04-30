@@ -190,4 +190,15 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
 
+    /**
+     * Returns all columns for export.
+     * @return array $response
+     */
+    public function export() {
+        return array(
+            'data' => array('columns' => $this->getResource()->fetchRows()),
+            'status' => 'ok'
+        );
+    }
+
 }

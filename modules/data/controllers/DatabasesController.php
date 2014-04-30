@@ -68,4 +68,13 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
         }
     }
 
+    public function exportAction() {
+        $response = $this->_model->export();
+        $this->view->data = $response['data'];
+        $this->view->status = $response['status'];
+
+        // disable layout
+        $this->_helper->layout->disableLayout();
+    }
+    
 }

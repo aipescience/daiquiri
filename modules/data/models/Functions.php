@@ -190,4 +190,16 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
 
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
+
+    /**
+     * Returns all functions for export.
+     * @return array $response
+     */
+    public function export() {
+        return array(
+            'data' => array('functions' => $this->getResource()->fetchRows()),
+            'status' => 'ok'
+        );
+    }
+
 }

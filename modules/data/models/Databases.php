@@ -193,4 +193,16 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
 
         return $this->getModelHelper('CRUD')->delete($id, $formParams);
     }
+
+    /**
+     * Returns all config databases for export.
+     * @return array $response
+     */
+    public function export() {
+        return array(
+            'data' => array('databases' => $this->getResource()->fetchRows()),
+            'status' => 'ok'
+        );
+    }
+
 }

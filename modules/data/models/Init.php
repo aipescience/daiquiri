@@ -48,10 +48,10 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                 'Data_Model_Files' => array('index','single','singleSize','multi','multiSize','row','rowSize')
             ),
             'admin' => array(
-                'Data_Model_Databases' => array('index','create','show','update','delete'),
-                'Data_Model_Tables' => array('create','show','update','delete'),
-                'Data_Model_Columns' => array('create','show','update','delete'),
-                'Data_Model_Functions' => array('index','create','show','update','delete')
+                'Data_Model_Databases' => array('index','create','show','update','delete','export'),
+                'Data_Model_Tables' => array('create','show','update','delete','export'),
+                'Data_Model_Columns' => array('create','show','update','delete','export'),
+                'Data_Model_Functions' => array('index','create','show','update','delete','export')
             )
         );
     }
