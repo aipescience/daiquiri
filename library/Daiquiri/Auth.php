@@ -103,7 +103,7 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
      * singleton to its new state. Authentication is carried out using HASHing (using given
      * hash) and SALTing.
      */
-    public function authenticateUser($username, $password) {
+    public function authenticateUser($username, $password, $remember = false) {
 
         // first check if username or password are missing
         if (!$username) {
@@ -136,12 +136,8 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
             $storage = Zend_Auth::getInstance()->getStorage();
             $storage->write($row);
 
-            // get the timeout and use it for the namespace used by Zend_Auth
-            $timeout = Daiquiri_Config::getInstance()->auth->timeout;
-
-            if ($timeout) {
-                $authns = new Zend_Session_Namespace($storage->getNamespace());
-                $authns->setExpirationSeconds($timeout);
+            if ($remember) {
+                Zend_Session::rememberMe(1209600);
             }
 
             return true;

@@ -30,11 +30,15 @@ class Auth_Form_Login extends Auth_Form_Abstract {
         $this->addUsernameElement(true);
         $this->addPasswordElement(true);
 
+        $this->addElement('checkbox', 'remember', array(
+            'label' => 'Remember login'
+        ));
+
         $this->addPrimaryButtonElement('submit', 'Login');
         $this->addButtonElement('cancel', 'Cancel');
 
         // set decorators
-        $this->addHorizontalGroup(array('username', 'password'));
+        $this->addHorizontalGroup(array('username', 'password', 'remember'));
         $this->addActionGroup(array('submit', 'cancel'));
     }
 

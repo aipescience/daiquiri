@@ -39,7 +39,7 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
                 $values = $form->getValues();
 
                 // create DbAuth model and authenticate
-                $result = Daiquiri_Auth::getInstance()->authenticateUser($values['username'], $values['password']);
+                $result = Daiquiri_Auth::getInstance()->authenticateUser($values['username'], $values['password'], $values['remember']);
 
                 // redirect depending on result of authentication
                 if ($result) {
@@ -66,6 +66,7 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
         
         // get the auth singleton, clear the identity and redirect.
         Zend_Auth::getInstance()->clearIdentity();
+        Zend_Session::forgetMe();
 
         return array('status' => 'redirect', 'cookies' => $cookies);
     }
