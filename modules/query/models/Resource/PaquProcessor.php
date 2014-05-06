@@ -19,6 +19,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+if(!class_exists("\PHPSQLParser\PHPSQLCreator"))
+    require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/PHPSQLCreator.php');
+
+if(!class_exists("\PHPSQLParser\PHPSQLParser"))
+    require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/PHPSQLParser.php');
+
 require_once(Daiquiri_Config::getInstance()->core->libs->paqu . '/parallelQuery.php');
 
 class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractProcessor {
@@ -71,7 +77,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         $listOfHeadNodeTables[] = $this->_userDb;
 
         // get list of tables in user database
-        $resource = Query_Model_Resource_AbstractJobs::factory();
+        $resource = Query_Model_Resource_AbstractQuery::factory();
         $stmt = $resource->getAdapter()->query('SHOW TABLES;');
         foreach($stmt->fetchAll() as $row) {
             $listOfHeadNodeTables[] = array_shift($row);
