@@ -20,9 +20,11 @@
  *  limitations under the License.
  */
 
-require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/php-sql-parser.php');
-require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/php-sql-creator.php');
-require_once(Daiquiri_Config::getInstance()->core->libs->paqu . '/parseSqlAll.php');
+if(!class_exists("\PHPSQLParser\PHPSQLCreator"))
+    require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/PHPSQLCreator.php');
+
+if(!class_exists("\PHPSQLParser\PHPSQLParser"))
+    require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/PHPSQLParser.php');
 
 /**
  * Model for the processing in the query system.
@@ -118,7 +120,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
         foreach ($multilineSql as $key => $currSql) {
             try {
-                $tmpTree = envokeParseSqlAllParser($currSql);
+                $tmpTree = new \PHPSQLParser\PHPSQLParser($currSql);
             } catch (Exception $e) {
                 $error['parseError'] = $e->getMessage();
                 return false;
@@ -145,7 +147,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
         foreach ($multilineSqlTree as $key => $currSqlTree) {
             try {
-                $tmpParseObj = processQueryWildcard($currSqlTree, false, $adapter);
+                $tmpParseObj = $this->processQueryWildcard($currSqlTree, false, $adapter);
             } catch (UnsupportedFeatureException $e) {
                 $error['parseError'] = $e->getMessage();
                 return false;
@@ -155,9 +157,13 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
             } catch (Exception $e) {
                 //continue if we could not find the table. this is not that bad and parse tree is still needed
                 //by paqu
-
-                $error['parseError'] = $e->getMessage();
-                return false;
+                if(strpos($e->getMessage(), "Syntax error or access violation") === false) {
+                    $error['parseError'] = $e->getMessage();
+                    return false;
+                } else {
+                    $error['parseError'] = "Error parsing SQL: Specified table does not exist";
+                    return false;
+                }
             }
 
             $parseTrees[$key] = $tmpParseObj;
@@ -352,38 +358,64 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      * @return TRUE if ok, FALSE if not
      */
     function rewriteShow(&$multiLines, &$multiLineParseTrees, &$multiLineUsedDBs, &$outMultiLineSQL, &$outMultiLineParseTrees, array &$errors) {
-
         foreach ($multiLineParseTrees as $key => $currNode) {
             $outMultiLineSQL[$key] = $multiLines[$key];
             $outMultiLineParseTrees[$key] = $multiLineParseTrees[$key];
 
             //check if SHOW is present
             if (array_key_exists("SHOW", $currNode)) {
-                if (strtolower($currNode['SHOW'][1]) === "tables") {
+                if (strtolower($currNode['SHOW'][0]) === "tables") {
                     //retrieve remaining statements to construct the SELECT accordingly
-                    unset($currNode['SHOW'][0]);
-                    unset($currNode['SHOW'][1]);
+                    $db = $multiLineUsedDBs[$key];
+                    foreach($currNode['SHOW'] as $key => $node) {
+                        if($node['expr_type'] === "database") {
+                            $db = trim($node['name'], "`");
+                            break;
+                        }
+                    }
 
-                    $attribute = implode("", $currNode['SHOW']);
+                    $attribute = "";
+                    $found = false;
+                    foreach($currNode['SHOW'] as $node) {
+                        if($node['base_expr'] === "like" || $node['base_expr'] === "where" || $found === true) {
+                            $found = true;
+
+                            if($attribute === "") {
+                                $attribute = "AND ";
+                                continue;
+                            }
+
+                            $attribute .= $node['base_expr'] . " ";
+                        }
+                    }
 
                     //construct select node instead
-                    $db = $multiLineUsedDBs[$key];
                     $outMultiLineSQL[$key] = "select TABLE_NAME from information_schema.tables where TABLE_SCHEMA=\"{$db}\" {$attribute}";
 
-                    $tmpParseTree = new PHPSQLParser($outMultiLineSQL[$key], true);
+                    $tmpParseTree = new \PHPSQLParser\PHPSQLParser($outMultiLineSQL[$key], true);
                     $outMultiLineParseTrees[$key] = $tmpParseTree->parsed;
                 } else if (strtolower($currNode['SHOW'][1]) === "databases") {
                     //retrieve remaining statements to construct the SELECT accordingly
-                    unset($currNode['SHOW'][0]);
-                    unset($currNode['SHOW'][1]);
+                    $attribute = "";
+                    $found = false;
+                    foreach($currNode['SHOW'] as $node) {
+                        if($node['base_expr'] === "like" || $node['base_expr'] === "where" || $found === true) {
+                            $found = true;
 
-                    $attribute = implode("", $currNode['SHOW']);
+                            if($attribute === "") {
+                                $attribute = "WHERE ";
+                                continue;
+                            }
+
+                            $attribute .= $node['base_expr'] . " ";
+                        }
+                    }
 
                     //construct select node instead
                     $db = $multiLineUsedDBs[$key];
                     $outMultiLineSQL[$key] = "select SCHEMA_NAME from information_schema.schemata {$attribute}";
 
-                    $tmpParseTree = new PHPSQLParser($outMultiLineSQL[$key], true);
+                    $tmpParseTree = new \PHPSQLParser\PHPSQLParser($outMultiLineSQL[$key], true);
                     $outMultiLineParseTrees[$key] = $tmpParseTree->parsed;
                 } else {
                     $errors['rewriteError'] = "No permission to use the SHOW command you specified.";
@@ -545,7 +577,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
             $outMultiLineParseTrees[$key] = $currTree;
             $this->escapeFunctionsRec($currTree, $outMultiLineParseTrees[$key]);
 
-            $sqlCreator = new PHPSQLCreator();
+            $sqlCreator = new \PHPSQLParser\PHPSQLCreator();
 
             try {
                 $outMultiLineSQL[$key] = $sqlCreator->create($outMultiLineParseTrees[$key]);
@@ -612,6 +644,10 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
                         $alias = array("as" => true,
                             "name" => "`{$escapedString}`",
                             "base_expr" => "as `{$escapedString}`",
+                            "no_quotes" => array(
+                                    "delim" => ".",
+                                    "parts" => array($escapedString)
+                                ),
                             "position" => 0);
 
                         $outNode[$key]['alias'] = $alias;
@@ -656,4 +692,510 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         return $str;
     }
 
+    /**
+     * @brief Recursive function that acts on a node of the SQL tree to process the
+     *    SQL query.
+     * @param sqlTree SQL tree
+     * @param default database as defined by USE clause
+     * @return a new SQL parser tree with the resolved columns
+     * 
+     * This recursive function parses a given part of the SQL tree and substitutes
+     * all the SQL * attributes in subqueries in FROM, WHERE and eventually in the
+     * SELECT statement.
+     */
+    function processQueryWildcard($sqlTree, $defaultDB = false) {
+        $this->_parseSqlAll_FROM($sqlTree, $defaultDB);
+        $this->_parseSqlAll_WHERE($sqlTree);
+        $this->_parseSqlAll_SELECT($sqlTree);
+
+        //after the rewrite, go through the tree and find any name in WHERE, GROUP, ORDER
+        //that needs to be changed as well
+        $this->_parseSqlAll_fixAliases($sqlTree);
+
+        //set delimiter of the last column in the SELECT statement to false
+        $lastNode = array_pop($sqlTree['SELECT']);
+        $lastNode['delim'] = false;
+        array_push($sqlTree['SELECT'], $lastNode);
+
+        return $sqlTree;
+    }
+
+    function _parseSqlAll_fixAliases(&$sqlTree) {
+        //create list of all tables in FROM clause - link them to array with alias as key, 
+        //and node as value
+        $fromList = array();
+
+        if(!is_array($sqlTree) || !array_key_exists("FROM", $sqlTree)) {
+            return;
+        }
+
+        foreach($sqlTree['FROM'] as $node) {
+            if($this->_isSubquery($node)) {
+                $this->_parseSqlAll_fixAliases($node['sub_tree']);
+            }
+
+            if($this->_hasAlias($node)) {
+                $fromList[$node['alias']['name']] = $node;
+            } else {
+                $fromList[$node['table']] = $node;
+            }
+        }
+
+        //go through WHERE it exists
+        foreach($sqlTree as $key => $sqlNode) {
+            if($key !== "WHERE" && $key !== "GROUP" && $key !== "ORDER")
+                continue;
+
+            if(array_key_exists("WHERE", $sqlTree)) {
+                $this->_parseSqlAll_fixAliasesInNode($sqlTree['WHERE'], $fromList);
+            } 
+
+            if (array_key_exists("GROUP", $sqlTree)) {
+                $this->_parseSqlAll_fixAliasesInNode($sqlTree['GROUP'], $fromList, $sqlTree['SELECT']);
+            } 
+
+            if (array_key_exists("ORDER", $sqlTree)) {
+                $this->_parseSqlAll_fixAliasesInNode($sqlTree['ORDER'], $fromList, $sqlTree['SELECT']);
+            }
+        }
+    }
+
+    function _parseSqlAll_fixAliasesInNode(&$sqlTree, $fromList, &$selectTreeNode = FALSE) {
+        foreach($sqlTree as &$node) {
+            if($this->_isSubquery($node)) {
+                $this->_parseSqlAll_fixAliases($node['sub_tree']);
+            }
+
+            //only process colrefs
+            if(!$this->_isColref($node) && !isExpression($node)) {
+                continue;
+            }
+
+            $table = $this->_extractTableName($node);
+            $column = $this->_extractColumnName($node);
+
+            //we only need to change this column if it was retrieved from a subquery
+            if($table !== false && array_key_exists($table, $fromList) && 
+                $this->_isSubquery($fromList[$table]) && $fromList[$table]['sub_tree'] != NULL) {
+                //look this column up in the sub select
+                foreach($fromList[$table]['sub_tree']['SELECT'] as $selNode) {
+                    if($this->_hasAlias($selNode) && strpos($selNode['alias']['name'], $column)) {
+                            $node['base_expr'] = "`" . $table . "`.`" . trim($selNode['alias']['name'], "`") . "`";
+                            $node['no_quotes'] = array("delim" => ".", "parts" => array($table, trim($selNode['alias']['name'], "`")));
+                    }
+                }
+            } else if ($selectTreeNode !== FALSE) {
+                //go through the list of columns in the select tree part, and find the corresponding alias
+                //we are doing this the cheep way:
+                //take the column name in where/order/group and get rid of all ` and replace . with __
+                //this way we should end up with a name that should be contained in the SELECT column list
+                $currAlias = str_replace(".", "__", str_replace("`", "", $node['base_expr']));
+                $strLenCurrAlias = strlen($currAlias);
+
+                foreach($selectTreeNode as $selNode) {
+                    $nodeAlias = trim($selNode['alias']['name'], "`");
+
+                    $aliasStrPos = strpos($nodeAlias, $currAlias);
+
+                    if($aliasStrPos !== FALSE && strlen($nodeAlias) == $aliasStrPos + $strLenCurrAlias) {
+                        $node['base_expr'] = $selNode['alias']['name'];
+                        $node['no_quotes'] = array("delim" => ".", "parts" => array($selNode['alias']['name']));
+                    }
+                }
+            }
+        }   
+    }
+
+    /**
+     * @brief Identifies subqueries that need processing in the FROM clause
+     * @param sqlTree SQL parser tree node of complete query/subquery
+     * @param default database as defined by USE clause
+     * 
+     * This function parser the current level of the sqlTree to find any subqueries
+     * in the FROM statement. If subqueries are found, process them recursively using
+     * processQueryWildcard.
+     */
+    function _parseSqlAll_FROM(&$sqlTree, $defaultDB = false) {
+        if(!is_array($sqlTree) || !array_key_exists('FROM', $sqlTree))
+            return;
+        
+        foreach($sqlTree['FROM'] as &$node) {
+            if($this->_isSubquery($node) && $node['sub_tree'] != NULL) {
+                $tree = $this->processQueryWildcard($node['sub_tree'], $mysqlConn, $zendAdapter);
+                $node['sub_tree'] = $tree;
+            }
+        }
+
+        //add the default database to FROM tables, as defined in defaultDB
+        if($defaultDB !== false) {
+            foreach($sqlTree['FROM'] as &$node) {
+                $tmp = $this->_parseSqlAll_parseResourceName($node['table']);
+                if(count($tmp) == 2) {
+                    //add the database name
+                    $node['table'] = '`' . trim($defaultDB, '`') . '`.' . $node['table'];
+                    $node['no_quotes'] = array("delim" => ".", "parts" => array(trim($defaultDB, '`'), $node['table']));
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief Identifies subqueries that need processing in the WHERE clause
+     * @param sqlTree SQL parser tree node of complete query/subquery
+     * @param mysqlConn a properly initialised MySQLI/MySQLII connection to the DB
+     * @param zendAdapter a valid ZEND DB adapter
+     * 
+     * This function parser the current level of the sqlTree to find any subqueries
+     * in the WHERE statement. If subqueries are found, process them recursively using
+     * processQueryWildcard.
+     */
+    function _parseSqlAll_WHERE(&$sqlTree) {
+        if(!is_array($sqlTree) || !array_key_exists('WHERE', $sqlTree))
+            return;
+
+        foreach($sqlTree['WHERE'] as &$node) {
+            if($this->_isSubquery($node)) {
+                $tree = $this->processQueryWildcard($node['sub_tree'], $mysqlConn, $zendAdapter);
+                    $node['sub_tree'] = $tree->parsed;
+            }
+        }
+    }
+
+    /**
+     * @brief Add all columns to the SELECT tree
+     * @param sqlTree SQL parser tree node of complete query/subquery
+     * 
+     * This function will evaluate the all the tables that need SQL * attribute substitution.
+     * The database is queried to retrieve a complete list of columns of each table and the
+     * approperiate SELECT colref nodes are added to the SQL parser tree. The SQL * attribute
+     * is removed from the sqlTree SELECT node.
+     */
+    function _parseSqlAll_SELECT(&$sqlTree) {
+        if(!is_array($sqlTree) || !array_key_exists('SELECT', $sqlTree))
+            return;
+
+        $table = false;
+
+        $selectCpy = $sqlTree['SELECT'];
+        $sqlTree['SELECT'] = array();
+
+        foreach($selectCpy as &$node) {
+            if(strpos($node['base_expr'], "*") !== false && $node['sub_tree'] === false) {
+                //we have found an all operator and need to find the corresponding
+                //table to look things up
+
+                $tableFullName = false;
+
+                $dbName = $this->_extractDbName($node);
+                $tableName = $this->_extractTableName($node);
+                $colName = $this->_extractColumnName($node);
+
+                if($dbName !== false) {
+                    $tableFullName = "`" . $dbName . "`.`" . $tableName . "`";
+                } else if ($tableName !== false) {
+                    $tableFullName = "`" . $tableName . "`";
+                }
+
+                $table = array();
+                $alias = array();
+                if($tableFullName === false) {
+                    //add everything *ed from all tables to this query
+                    foreach($sqlTree['FROM'] as $fromNode) {
+                        if($this->_isTable($fromNode)) {
+                            $table[] = $fromNode['table'];
+                            if(!$this->_hasAlias($fromNode)) {
+                                $alias[] = $fromNode['table'];
+                            } else {
+                                $alias[] = $fromNode['alias']['name'];
+                            }
+                        } else if ($this->_isSubquery($fromNode)) {
+                            //handle subqueries...
+                            $this->_parseSqlAll_linkSubquerySELECT($fromNode['sub_tree'], $sqlTree, $fromNode['alias']['name']);
+                        }
+                    }
+                } else {
+                    foreach($sqlTree['FROM'] as $fromNode) {
+                        //it could be, that the table here is actually another aliased table (which should
+                        //have been processed here already, since SELECT is called last) -> link to tree
+                        if($this->_isTable($fromNode)) {
+                            if($this->_hasAlias($fromNode)) {
+                                if(trim($fromNode['alias']['name'], "`") === $tableName) {
+                                    $table[] = $fromNode['table'];
+                                    break;
+                                }
+                            } else {
+                                if($fromNode['table'] === $tableFullName) {
+                                    $table[] = $fromNode['table'];
+                                    break;
+                                }
+                            }
+                        } else if ($this->_isSubquery($fromNode)) {
+                            if(trim($fromNode['alias']['name'], "`") === $tableName) {
+                                $this->_parseSqlAll_linkSubquerySELECT($fromNode['sub_tree'], $sqlTree, $tableName);
+                                continue 2;
+                            }           
+                        }
+                    }
+                    $alias[] = $tableFullName;
+                }
+                
+                if(empty($table))
+                    continue;
+
+                //now that we know the table, we need to look up what is in there
+                foreach(array_keys($table) as $key) {
+                    $this->_parseSqlAll_getColsDaiquiri($sqlTree, $node, false, $table[$key], $alias[$key]);
+                }
+            } else {
+                array_push($sqlTree['SELECT'], $node);
+            }
+        }
+    }
+
+    function _parseSqlAll_linkSubquerySELECT(&$subtreeNode, &$resultTree, $alias) {
+        //link the rows to the tree
+        $count = 0;
+        foreach($subtreeNode['SELECT'] as $selNode) {
+            $tmp = $this->_parseSqlAll_parseResourceName($selNode['base_expr']);
+
+            unset($tmp[0]);
+            $count = 0;
+            $selNode['alias'] = array("as" => true,
+                                      "name" => "",
+                                      "base_expr" => "as ");
+            foreach($tmp as $element) {
+                $selNode['no_quotes'] = array("delim" => ".", "parts" => array());
+                $selNode['alias']['no_quotes'] = array("delim" => ".", "parts" => array());
+
+                if($count === 0) {
+                    $selNode['base_expr'] = "`" . $alias . "`.`" . $element;
+                    $selNode['no_quotes']['parts'] = array($alias, trim($element, "`"));
+                    $selNode['alias']['name'] = "`" . $alias . "__" . $element;
+                    $selNode['alias']['no_quotes']['parts'] = array($alias . "__" . trim($element, "`"));
+                } else {
+                    $selNode['base_expr'] .= "__" . $element;
+                    $selNode['alias']['name'] .= "__" . $element;
+                }
+
+                $count += 1;
+            }
+
+            if(empty($selNode['no_quotes']['parts'])) {
+                $selNode['no_quotes']['parts'][] = $selNode['base_expr'];
+                $selNode['alias']['no_quotes']['parts']['parts'][] = $selNode['alias']['name'];
+            }
+
+            $selNode['base_expr'] .= "`";
+            $selNode['alias']['name'] .= "`";
+            $selNode['alias']['base_expr'] .= $selNode['alias']['name'];
+
+            if($count === 0) {
+                $node = $selNode;
+            } else {
+                array_push($resultTree['SELECT'], $selNode);
+            }
+
+            $count++;
+        }
+    }
+
+    function _parseSqlAll_parseResourceName($resource) {
+        $tmp = array();
+        $tmp[0] = $resource;
+
+        $split = explode(".", $tmp[0]);
+        $currFullName = "";
+        foreach($split as $token) {
+            $numQuote = substr_count($token, "`");
+            if($numQuote === 2 || ($currFullName === "" && $numQuote === 0)) {
+                //either `foo` or foo. token
+                $tmp[] = trim($token, "`");
+            } else if ($currFullName !== "" && $numQuote === 1) {
+                $currFullName .= "." . trim($token, "`");
+                $tmp[] = $currFullName;
+                $currFullName = "";
+            } else {
+                if($currFullName === "") {
+                    $currFullName .= trim($token, "`");
+                } else {
+                    $currFullName .= "." . trim($token, "`");
+                }
+            }
+        }
+
+        return $tmp;
+    }
+
+    function _parseSqlAll_getColsDaiquiri(&$sqlTree, &$node, $zendAdapter, $table, $alias) {
+        $resParts = $this->_parseSqlAll_parseResourceName($table);
+        
+        //process the alias name
+        $aliasParts = $this->_parseSqlAll_parseResourceName($alias);
+        unset($aliasParts[0]);
+
+        $aliasName = "";
+        foreach($aliasParts as $part) {
+            if($aliasName === "") {
+                $aliasName .= "`" . $part . "`";
+            } else {
+                $aliasName .= ".`" . $part . "`";
+            }
+        }
+
+        //check if the given table resource is composed of DATABASE.TABLE
+        if(count($resParts) !== 3) {
+             throw new Exception("Cannot resolve table columns, table name is not valid.");
+        }
+
+        $tableResource = new Data_Model_Resource_Tables();
+
+        $tableData = $tableResource->fetchRow($tableResource->fetchIdByName($resParts[1], $resParts[2]), true);
+
+        foreach($tableData['columns'] as $count => $row) {
+            if($count == 0) {
+                //this is the item we change
+                if($alias === false || empty($alias)) {
+                    $node['base_expr'] = "`" . $row['name'] . "`";
+                    $node['no_quotes'] = array("delim" => ".", "parts" => array($row['name']));
+                } else {
+                    $node['base_expr'] = $aliasName . ".`" . $row['name'] . "`";
+                    $node['no_quotes'] = array("delim" => ".", "parts" => array_merge($aliasParts, array($row['name'])));
+                    $node['alias'] = array("as" => true,
+                                       "name" => "`" . str_replace(".", "__", str_replace("`", "", $node['base_expr'])) . "`",
+                                       "base_expr" => "as `" . str_replace(".", "__", str_replace("`", "", $node['base_expr'])) . "`",
+                                       "no_quotes" => array("delim" => ".", "parts" => array(str_replace(".", "__", str_replace("`", "", $node['base_expr'])))));
+                }
+                $node['delim'] = ",";
+                $nodeTemplate = $node;
+
+                array_push($sqlTree['SELECT'], $node);
+            } else {
+                $newNode = $nodeTemplate;           //this is set on the first passing when count is 0
+                if($alias === false || empty($alias)) {
+                    $newNode['base_expr'] = "`" . $row['name'] . "`";
+                    $newNode['no_quotes'] = array("delim" => ".", "parts" => array($row['name']));
+                } else {
+                    $newNode['base_expr'] = $aliasName . ".`" . $row['name'] . "`";
+                    $newNode['no_quotes'] = array("delim" => ".", "parts" => array_merge($aliasParts, array($row['name'])));
+                    $newNode['alias'] = array("as" => true,
+                                       "name" => "`" . str_replace(".", "__", str_replace("`", "", $newNode['base_expr'])) . "`",
+                                       "base_expr" => "as `" . str_replace(".", "__", str_replace("`", "", $newNode['base_expr'])) . "`",
+                                       "no_quotes" => array("delim" => ".", "parts" => array(str_replace(".", "__", str_replace("`", "", $newNode['base_expr'])))));
+                }
+                
+                array_push($sqlTree['SELECT'], $newNode);
+            }
+        }
+    }
+
+    function _isSubquery($node) {
+        if(isset($node['expr_type']) && $node['expr_type'] === 'subquery') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function _isTable($node) {
+        if(isset($node['expr_type']) && $node['expr_type'] === 'table') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function _isColref($node) {
+        if(isset($node['expr_type']) && $node['expr_type'] === 'colref') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function _hasAlias($node) {
+        if(isset($node['alias']) && $node['alias'] !== false) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function _extractDbName($node) {
+        //is this a table type or something else
+        if($this->_isTable($node)) {
+            $partCounts = count($node['no_quotes']['parts']);
+
+            //a table node
+            if($partCounts > 1) {
+                return $node['no_quotes']['parts'][ $partCounts - 2 ];
+            } else {
+                return false;
+            }
+        } else if($this->_isColref($node)) {
+            //if this is a "*" node, as in SELECT * FROM, then the no_quotes part is not present
+            //and it does not make sense to extract anything anyways
+            if(!isset($node['no_quotes'])) {
+                return false;
+            }
+
+            $partCounts = count($node['no_quotes']['parts']);
+
+            if($partCounts > 2) {
+                return $node['no_quotes']['parts'][ 0 ];
+            } else {
+                return false;
+            }
+        } else {
+            //don't know what to do
+            return false;
+        }
+    }
+
+    function _extractTableName($node) {
+        //is this a table type or colref/alias?
+        if($this->_isTable($node)) {
+            $partCounts = count($node['no_quotes']['parts']);
+        
+            //a table node
+            return $node['no_quotes']['parts'][ $partCounts - 1 ];
+        } else if ( $this->_isColref($node) || isset($node['as']) ) {
+
+            //if this is a "*" node, as in SELECT * FROM, then the no_quotes part is not present
+            //and it does not make sense to extract anything anyways
+            if(!isset($node['no_quotes'])) {
+                return false;
+            }
+
+            $partCounts = count($node['no_quotes']['parts']);
+
+            if($partCounts > 1) {
+                return $node['no_quotes']['parts'][ $partCounts - 2 ];
+            } else {
+                return false;
+            }
+
+        } else {
+            //don't know what to do
+            return false;
+        }
+    }
+
+    function _extractColumnName($node) {
+        //is this a table type or colref/alias?
+        if ( $this->_isColref($node) || isset($node['as']) ) {
+
+            //if this is a "*" node, as in SELECT * FROM, then the no_quotes part is not present
+            //and it does not make sense to extract anything anyways
+            if(!isset($node['no_quotes'])) {
+                return false;
+            }
+
+            $partCounts = count($node['no_quotes']['parts']);
+
+            return $node['no_quotes']['parts'][ $partCounts - 1 ];
+        } else {
+            //don't know what to do
+            return false;
+        }
+    }
 }

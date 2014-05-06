@@ -80,7 +80,7 @@ class Config_Model_Init extends Daiquiri_Model_Init {
                 'enabled' => false
             ),
             'libs' => array(
-                'phpSqlParser' => $this->_init->daiquiri_path . '/library/PHP-SQL-Parser/',
+                'phpSqlParser' => $this->_init->daiquiri_path . '/library/PHP-SQL-Parser/src/PHPSQLParser',
                 'paqu' => $this->_init->daiquiri_path . '/library/paqu/src/',
                 'PHPZip' => $this->_init->daiquiri_path . '/library/PHPZip',
             ),
