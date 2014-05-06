@@ -173,7 +173,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         }
 
         // fire up gearman and submit job
-        $gearmanConf = Daiquiri_Config::getInstance()->query->download->queue->gearman;
+        $gearmanConf = Daiquiri_Config::getInstance()->query->download->gearman;
 
         $gmclient = new GearmanClient();
 

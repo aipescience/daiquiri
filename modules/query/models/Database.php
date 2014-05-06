@@ -32,7 +32,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
      */
     public function download($table, array $formParams = array()) {
         if (empty($table)) {
-            return array('status' => 'error', 'error' => 'Table is not set');
+            return array('status' => 'error', 'errors' => 'Table is not set');
         }
 
         // create the form object
@@ -56,13 +56,13 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                 $format = $values['download_format'];
 
                 $response = $this->_createDownloadFile($table, $format);
-               
-                if ($response['status'] == 'ok')  {
+                if ($response['status'] == 'ok' || $response['status'] == 'pending')  {
                     $csrf = $form->getCsrf();
                     if (!empty($csrf)) {
                         $csrf->initCsrfToken();
                         $response['csrf'] = $csrf->getHash();
                     }
+
                     return $response;
                 } else {
                     return $this->getModelHelper('CRUD')->validationErrorResponse($form,$response['errors']);
@@ -134,11 +134,11 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
      */
     public function stream($table, $format) {
         if (empty($table)) {
-            return array('status' => 'error', 'error' => 'Error: table not set');
+            return array('status' => 'error', 'errors' => 'Error: table not set');
         }
 
         if (empty($format)) {
-            return array('status' => 'error', 'error' => 'Error: format not set');
+            return array('status' => 'error', 'errors' => 'Error: format not set');
         }
 
         // create link and file sysytem path for table dump
@@ -150,7 +150,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             $parts = explode(".", $suffix);
             $suffix = "." . $parts[1];
         } else {
-            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
+            return array('status' => 'error', 'errors' => 'Error: format not supported by stream');
         }
 
         $filename = $this->_generateFileName($table, $suffix);
@@ -161,7 +161,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         // create dir if neccessary
         if (!is_dir($dir)) {
             if (mkdir($dir) === false) {
-                return array('status' => 'error', 'error' => 'Error: configuration of download setup wrong');
+                return array('status' => 'error', 'errors' => 'Error: configuration of download setup wrong');
             }
 
             chmod($dir, 0775);
@@ -176,21 +176,21 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         }
 
         if (!array_key_exists($format, $formats)) {
-            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
+            return array('status' => 'error', 'errors' => 'Error: format not supported by stream');
         }
 
         // construct the streming file name (which has to be $bin with _stream at the end)
         $scriptName = pathinfo($bin);
 
         if (empty($scriptName['dirname']) && empty($scriptName['filename'])) {
-            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
+            return array('status' => 'error', 'errors' => 'Error: format not supported by stream');
         }
 
         $newScriptName = $scriptName['dirname'] . DIRECTORY_SEPARATOR . $scriptName['filename'] . "_stream." .
                 $scriptName['extension'];
 
         if (!file_exists($newScriptName)) {
-            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
+            return array('status' => 'error', 'errors' => 'Error: format not supported by stream');
         }
 
         // check permissions on the dump script
@@ -200,7 +200,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
 
         // check if execution bits are set
         if (($perm & $refPerm) !== $refPerm) {
-            return array('status' => 'error', 'error' => 'Error with stream script permissions. Please set them correctly.');
+            return array('status' => 'error', 'errors' => 'Error with stream script permissions. Please set them correctly.');
         }
 
         // get rid of all the Zend output stuff
@@ -311,7 +311,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         $file = $dir . DIRECTORY_SEPARATOR . $filename;
 
         // get queue type and validate
-        $queueType = strtolower(Daiquiri_Config::getInstance()->query->download->queue->type);
+        $queueType = strtolower(Daiquiri_Config::getInstance()->query->download->type);
         if ($queueType !== "direct" and $queueType !== "gearman") {
             throw new Exception('Download queue type not valid');
         }
@@ -321,7 +321,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             if (mkdir($dir) === false) {
                 return array(
                     'status' => 'error', 
-                    'errors' => array('Configuration of download setup wrong')
+                    'errors' => 'Configuration of download setup wrong'
                 );
             }
 
@@ -341,27 +341,24 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             } catch (Exception $e) {
                 return array(
                     'status' => 'error',
-                    'errors' => array(
-                        'form' => $e->getMessage()
-                    )
+                    'errors' => $e->getMessage()
                 );
             }
         }
 
         if ((!file_exists($file) || file_exists($file . ".lock")) && $queueType === "gearman") {
             // check if GearmanManager is up and running
-            if (!file_exists(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid)) {
+            if (!file_exists(Daiquiri_Config::getInstance()->query->download->gearman->pid)) {
+
                 // check if we have write access to actually create this PID file
-                if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->queue->gearman->pid))) {
+                if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->gearman->pid))) {
                     return array(
                         'status' => 'error',
-                        'errors' => array(
-                            'form' => 'Cannot write to the gearman PID file location'
-                        )
+                        'errors' => 'Cannot write to the gearman PID file location'
                     );
                 }
 
-                $gearmanConf = Daiquiri_Config::getInstance()->query->download->queue->gearman;
+                $gearmanConf = Daiquiri_Config::getInstance()->query->download->gearman;
 
                 // not there, start GearmanManager
                 $cmd = escapeshellcmd($gearmanConf->manager) .
@@ -392,9 +389,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                 if (file_exists($file . ".err")) {
                     return array(
                         'status' => 'error',
-                        'errors' => array(
-                            'form' => 'An error occured.'
-                        )
+                        'errors' => 'An error occured.'
                     );
                 }
 
@@ -415,9 +410,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                     unlink($file . ".lock");
                     return array(
                         'status' => 'error',
-                        'errors' => array(
-                            'form' => $e->getMessage()
-                        )
+                        'errors' => $e->getMessage()
                     );
                 }
 
