@@ -40,6 +40,7 @@ class Daiquiri_Init {
         'data' => array('auth','config'),
         'meetings' => array('auth','config'),
         'query' => array('data','auth','config'),
+        'uws' => array('config')
     );
 
     protected static $_commandline_options = array(

@@ -22,7 +22,7 @@
 class Config_Model_Init extends Daiquiri_Model_Init {
 
     /**
-     * Returns the acl resources for the meetings module.
+     * Returns the acl resources for the config module.
      * @return array $resources
      */
     public function getResources() {
@@ -35,7 +35,7 @@ class Config_Model_Init extends Daiquiri_Model_Init {
     }
 
     /**
-     * Returns the acl rules for the meeitngs module.
+     * Returns the acl rules for the config module.
      * @return array $rules
      */
     public function getRules() {

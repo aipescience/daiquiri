@@ -19,21 +19,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Controller_Plugin_Modules extends Zend_Controller_Plugin_Abstract {
+class Uws_Model_Init extends Daiquiri_Model_Init {
 
-    public function preDispatch(Zend_Controller_Request_Abstract $request) {
-        // get active modules from application configuration
-        $modules = Daiquiri_Config::getInstance()->getApplication()->resources->modules->toArray();
-        
-        // add the default and admin modules
-        $modules[] = 'default';
-        $modules[] = 'admin';
-        $modules[] = 'layout';
+    /**
+     * Returns the acl resources for the uws module. Does nothing so far.
+     * @return array $resources
+     */
+    public function getResources() {
+        return array();
+    }
 
-        // check module in url
-        if (!in_array($request->getModuleName(),$modules)) {
-            throw new Daiquiri_Exception_NotFound();
-        }
+    /**
+     * Returns the acl rules for the uws module. Does nothing so far.
+     * @return array $rules
+     */
+    public function getRules() {
+        return array();
+    }
+
+    /**
+     * Processes the 'uws' part of $options['config']. Does nothing so far.
+     */
+    public function processConfig() {
+
+    }
+
+    /**
+     * Processes the 'uws' of $options['init']. Does nothing so far.
+     */
+    public function processInit() {
+
+    }
+
+    /**
+     * Initializes the database with the init data for the uws module. Does nothing so far.
+     */
+    public function init() {
+
     }
 
 }
