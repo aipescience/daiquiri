@@ -34,7 +34,7 @@ class Contact_MessagesController extends Daiquiri_Controller_Abstract {
         if (Daiquiri_Auth::getInstance()->checkAcl('Contact_Model_Messages', 'rows')) {
             $this->view->status = 'ok';
         } else {
-            throw new Daiquiri_Exception_Forbidden();
+            throw new Daiquiri_Exception_Unauthorized();
         }
     }
 

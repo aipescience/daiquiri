@@ -72,7 +72,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         'actualQuery' => 'actualQuery',
         'user_id' => 'user_id',
         'status_id' => 'status_id',
-        'timeSubmit' => 'time'
+        'time' => 'time'
     );
 
     /**

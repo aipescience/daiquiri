@@ -96,7 +96,7 @@ class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Ab
         if ($this->_active) {
             // get the front controller plugin and the zend error handler
             $front = Zend_Controller_Front::getInstance();
-            $error = $front->getPlugin('Zend_Controller_Plugin_ErrorHandler');
+            $error = $front->getPlugin('Daiquiri_Controller_Plugin_ErrorHandler');
 
             // check if an exception is present
             if (!$error->getResponse()->isException()) {

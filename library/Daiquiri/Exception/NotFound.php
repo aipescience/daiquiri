@@ -19,10 +19,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Exception_NotFound {
+class Daiquiri_Exception_NotFound extends Zend_Exception {
     
     public function __construct() {
-        throw new Zend_Controller_Action_Exception('This page does not exist', 404);
+        parent::__construct('This page does not exist.', 404);
     }
 
 }

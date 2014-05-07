@@ -59,7 +59,10 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         // get job and check permissions
         $dbRow = $this->getResource()->fetchRow($id);
-        if (empty($dbRow) || $dbRow['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+        if (empty($dbRow)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+        if ($dbRow['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
             throw new Daiquiri_Exception_Forbidden();
         }
 

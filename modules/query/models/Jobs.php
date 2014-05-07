@@ -26,7 +26,11 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
      */
     public function __construct() {
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
-        $this->_cols = array('id','database','table','timeSubmit','username','queue','status');
+        if (get_class($this->getResource()) == 'Query_Model_Resource_QQueueQuery') {
+            $this->_cols = array('id','database','table','timeSubmit','username','queue','status');
+        } else {
+            $this->_cols = array('id','database','table','time','username','status');
+        }
     }
 
     /**

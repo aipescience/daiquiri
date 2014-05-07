@@ -19,33 +19,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_SessionsController extends Daiquiri_Controller_Abstract {
+class Daiquiri_Exception_BadRequest extends Zend_Exception {
 
-    protected $_model;
-
-    public function init() {
-        $this->_model = Daiquiri_Proxy::factory('Auth_Model_Sessions');
-    }
-
-    public function indexAction() {
-        if (Daiquiri_Auth::getInstance()->checkAcl('Auth_Model_Sessions', 'rows')) {
-            $this->view->status = 'ok';
-        } else {
-            throw new Daiquiri_Exception_Unauthorized();
-        }
-    }
-
-    public function colsAction() {
-        $this->getControllerHelper('pagination')->cols();
-    }
-
-    public function rowsAction() {
-        $this->getControllerHelper('pagination')->rows();
-    }
-
-    public function destroyAction() {
-        $session = $this->_getParam('session');
-        $this->getControllerHelper('form')->destroy($session);
+    public function __construct() {
+        parent::__construct('There has been an error with your request.', 400);
     }
 
 }

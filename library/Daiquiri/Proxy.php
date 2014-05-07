@@ -58,7 +58,7 @@ class Daiquiri_Proxy {
         if ($result === true) {
             return call_user_func_array(array($this->_model, $methodname), $arguments);
         } else {
-            throw new Daiquiri_Exception_Forbidden('Not Authorised in ' . get_class($this->_model) . '::' . $methodname);
+            throw new Daiquiri_Exception_Unauthorized();
         }
     }
 

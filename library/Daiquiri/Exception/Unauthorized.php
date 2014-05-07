@@ -1,4 +1,5 @@
 <?php
+
 /*
  *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -17,9 +18,11 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-?>
 
-<div class="main">
-    <h2>Error</h2>
-    <p>The application is not properly set up, therefore the access is forbidden.</p>
-</div>
+class Daiquiri_Exception_Unauthorized extends Zend_Exception {
+
+    public function __construct() {
+        parent::__construct('You are not authorized to view this page.', 401);
+    }
+
+}

@@ -19,39 +19,106 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @class   Daiquiri_Controller_Plugin_ErrorHandler ErrorHandler.php
- * @brief   Daiquiri ErrorHandler front controller plugin.
- * 
- * Class for the daiquiri front controller plugin handling errors.
- * 
- * If an error has occured that needs special treatement, add it here to the
- * postDispatch and handle it as you wish.
- * 
- */
-class Daiquiri_Controller_Plugin_ErrorHandler extends Zend_Controller_Plugin_Abstract {
+class Daiquiri_Controller_Plugin_ErrorHandler extends Zend_Controller_Plugin_ErrorHandler {
 
     /**
-     * @brief   postDispatch method - called by Front Controller after dispatch
-     * @param   Zend_Controller_Request_Abstract $request: request object
-     * 
-     * Obtains the default Zend ErrorHandler and checks for certain errors that
-     * need different handling.
-     * 
-     * The following exceptions are handled differently:
-     *   - <b>Daiquiri_Exception_Forbidden</b>:  redirection to the login page
-     * 
+     * Module to use for errors.
+     * @var string
      */
-    public function postDispatch(Zend_Controller_Request_Abstract $request) {
-        // get the front controller plugin and the zend error handler
-        $front = Zend_Controller_Front::getInstance();
-        $error = $front->getPlugin('Zend_Controller_Plugin_ErrorHandler');
+    protected $_errorModule = 'config';
 
-        // redirect certain exeption to non-default error controllers
-        if ($error->getResponse()->hasExceptionOfType('Daiquiri_Exception_Forbidden')) {
-            $error->setErrorHandlerModule("auth");
-            $error->setErrorHandlerController("error");
-            $error->setErrorHandlerAction("login");
+    /**
+     * Controller to use for errors.
+     * @var string
+     */
+    protected $_errorController = 'error';
+
+    /**
+     * Action to use for errors.
+     * @var string
+     */
+    protected $_errorAction = 'error';
+
+    /**
+     * Const - No controller exception; controller does not exist
+     */
+    const EXCEPTION_DAIQUIRI = 'EXCEPTION_DAIQUIRI';
+
+    protected function _handleError(Zend_Controller_Request_Abstract $request) {
+
+        $frontController = Zend_Controller_Front::getInstance();
+        $response = $this->getResponse();
+
+        if ($this->_isInsideErrorHandlerLoop) {
+            $exceptions = $response->getException();
+            if (count($exceptions) > $this->_exceptionCountAtFirstEncounter) {
+                // Exception thrown by error handler; tell the front controller to throw it
+                $frontController->throwExceptions(true);
+                throw array_pop($exceptions);
+            }
+        }
+
+        // check for an exception AND allow the error handler controller the option to forward
+        if (($response->isException()) && (!$this->_isInsideErrorHandlerLoop)) {
+            $this->_isInsideErrorHandlerLoop = true;
+
+            // Get exception information
+            $error            = new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
+            $exceptions       = $response->getException();
+            $exception        = $exceptions[0];
+            $exceptionType    = get_class($exception);
+            $error->exception = $exception;
+
+            switch ($exceptionType) {
+                case 'Daiquiri_Exception_Unauthorized':
+                    $this->setErrorHandlerModule("auth");
+                    $this->setErrorHandlerController("error");
+                    $this->setErrorHandlerAction("login");
+                    $error->type = self::EXCEPTION_DAIQUIRI;
+                    break;
+                case 'Daiquiri_Exception_Forbidden':
+                    $error->type = self::EXCEPTION_DAIQUIRI;
+                    break;
+                case 'Daiquiri_Exception_NotFound':
+                    $error->type = self::EXCEPTION_DAIQUIRI;
+                    break;
+                case 'Daiquiri_Exception_BadRequest':
+                    $error->type = self::EXCEPTION_DAIQUIRI;
+                    break;
+                case 'Zend_Controller_Router_Exception':
+                    if (404 == $exception->getCode()) {
+                        $error->type = self::EXCEPTION_NO_ROUTE;
+                    } else {
+                        $error->type = self::EXCEPTION_OTHER;
+                    }
+                    break;
+                case 'Zend_Controller_Dispatcher_Exception':
+                    $error->type = self::EXCEPTION_NO_CONTROLLER;
+                    break;
+                case 'Zend_Controller_Action_Exception':
+                    if (404 == $exception->getCode()) {
+                        $error->type = self::EXCEPTION_NO_ACTION;
+                    } else {
+                        $error->type = self::EXCEPTION_OTHER;
+                    }
+                    break;
+                default:
+                    $error->type = self::EXCEPTION_OTHER;
+                    break;
+            }
+
+            // Keep a copy of the original request
+            $error->request = clone $request;
+
+            // get a count of the number of exceptions encountered
+            $this->_exceptionCountAtFirstEncounter = count($exceptions);
+
+            // Forward to the error handler
+            $request->setParam('error_handler', $error)
+                    ->setModuleName($this->getErrorHandlerModule())
+                    ->setControllerName($this->getErrorHandlerController())
+                    ->setActionName($this->getErrorHandlerAction())
+                    ->setDispatched(false);
         }
     }
 

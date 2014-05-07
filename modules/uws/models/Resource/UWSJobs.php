@@ -25,7 +25,7 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
      * Constructor. Sets Tablename.
      */
     public function __construct() {
-        $this->addTablename('Uws_UWSJobs');
+        $this->setTablename('Uws_Jobs');
     }
 
     /**
@@ -40,7 +40,7 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
         }
 
         $select = $this->select();
-        $select->from('Uws_UWSJobs');
+        $select->from('Uws_Jobs');
         $select->where("jobId = ?", $id);
         $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
 
@@ -54,7 +54,7 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
      */
     public function fetchRows(array $sqloptions = array()) {
         $select = $this->select();
-        $select->from('Uws_UWSJobs');
+        $select->from('Uws_Jobs');
         $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
 
         return $this->fetchAll($select);

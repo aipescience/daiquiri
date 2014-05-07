@@ -30,12 +30,17 @@
 class Daiquiri_Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
     protected function _initFrontControllerPlugins() {
-        $front = Zend_Controller_Front::getInstance();
-        $front->registerPlugin(new Daiquiri_Controller_Plugin_Modules());
-        $front->registerPlugin(new Daiquiri_Controller_Plugin_Config());
-        $front->registerPlugin(new Daiquiri_Controller_Plugin_ErrorHandler());
-        $front->registerPlugin(new Daiquiri_Controller_Plugin_Authorization());
-        $front->registerPlugin(new Daiquiri_Controller_Plugin_Accept());
+        $frontController = Zend_Controller_Front::getInstance();
+
+        $frontController->registerPlugin(new Daiquiri_Controller_Plugin_Modules());
+        $frontController->registerPlugin(new Daiquiri_Controller_Plugin_Config());
+
+        $frontController->registerPlugin(new Daiquiri_Controller_Plugin_Authorization());
+        $frontController->registerPlugin(new Daiquiri_Controller_Plugin_Accept());
+
+        // exchange error helper
+        $frontController->setParam('noErrorHandler', true);
+        $frontController->registerPlugin(new Daiquiri_Controller_Plugin_ErrorHandler());
     }
 
     protected function _initConfig() {
