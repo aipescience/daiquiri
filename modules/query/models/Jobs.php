@@ -1,156 +1,152 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Model for the currently running query jobs.
- */
-class Query_Model_Jobs extends Daiquiri_Model_PaginatedTable {
+class Query_Model_Jobs extends Daiquiri_Model_Table {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource object.
      */
     public function __construct() {
-        $resource = Query_Model_Resource_AbstractQueue::factory(Daiquiri_Config::getInstance()->query->queue->type);
-        $this->setResource(get_class($resource));
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
+        if (get_class($this->getResource()) == 'Query_Model_Resource_QQueueQuery') {
+            $this->_cols = array('id','database','table','timeSubmit','username','queue','status');
+        } else {
+            $this->_cols = array('id','database','table','time','username','status');
+        }
     }
 
     /**
-     * Returns the messages as rows.
-     * @return array 
-     */
-    public function rows(array $params = array()) {
-        // set default columns
-        if (empty($params['cols'])) {
-            $params['cols'] = $this->getResource()->fetchCols();
-        }
-
-        // get the table from the resource
-        $sqloptions = $this->_sqloptions($params);
-        $rows = $this->getResource()->fetchRows($sqloptions);
-
-        // loop through the table and add options
-        if (isset($params['options']) && $params['options'] === 'true') {
-            for ($i = 0; $i < sizeof($rows); $i++) {
-                $id = $rows[$i]['id'];
-
-                if (! empty($rows[$i]['status'])) {
-                    $status = $rows[$i]['status'];
-                } else {
-                    $status = "";
-                }
-
-                //construct management options
-                $links = array($this->internalLink(array(
-                        'text' => 'Show',
-                        'href' => '/query/jobs/show/id/' . $id,
-                        'resource' => 'Query_Model_Jobs',
-                        'permission' => 'show')));
-
-                if ($this->getResource()->isStatusKillable($status)) {
-
-                    $links[] = $this->internalLink(array(
-                        'text' => 'Kill',
-                        'href' => '/query/jobs/kill/id/' . $id,
-                        'resource' => 'Query_Model_Jobs',
-                        'permission' => 'kill'));
-                }
-
-                $links[] = $this->internalLink(array(
-                    'text' => 'Remove',
-                    'href' => '/query/jobs/remove/id/' . $id,
-                    'resource' => 'Query_Model_Jobs',
-                    'permission' => 'remove'));
-
-                $rows[$i]['options'] = implode('&nbsp;', $links);
-            }
-        }
-
-        return $this->_response($rows, $sqloptions);
-        ;
-    }
-
-    /**
-     * Returns the columns to the rows.
-     * @return array 
+     * Returns the columns of the jobs table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
      */
     public function cols(array $params = array()) {
-        // set default columns
-        if (empty($params['cols'])) {
-            $params['cols'] = $this->getResource()->fetchCols();
-        }
-
         $cols = array();
-        foreach ($params['cols'] as $name) {
+        foreach ($this->_cols as $colname) {
             $col = array(
-                'name' => ucfirst($name),
+                'name' => ucfirst($colname),
                 'sortable' => 'true'
             );
-            if ($name === 'id') {
-                $col['width'] = '2em';
-                $col['align'] = 'center';
-            } else if (in_array($name, array('database', 'table'))) {
-                $col['width'] = '16em';
-            } else if ($name === 'time') {
-                $col['width'] = '12em';
+            if ($colname === 'id') {
+                $col['width'] = '120px';
+            } else if (in_array($colname, array('database', 'table'))) {
+                $col['width'] = '120px';
+            } else if ($colname === 'username') {
+                $col['width'] = '60px';
+            } else if (in_array($colname, array('queue', 'status'))) {
+                $col['width'] = '40px';
             } else {
-                $col['width'] = '8em';
+                $col['width'] = '100px';
             }
             $cols[] = $col;
         }
 
-        if (isset($params['options']) && $params['options'] === 'true') {
-            $cols[] = array(
-                'name' => 'Options',
-                'width' => '12em',
-                'sortable' => 'false',
-                'search' => 'false'
+        $cols[] = array(
+            'name' => 'Options',
+            'width' => '100px',
+            'sortable' => 'false',
+            'search' => 'false'
+        );
+        
+        return array('cols' => $cols, 'status' => 'ok');
+    }
+
+    /**
+     * Returns the rows of the jobs table specified by some parameters. 
+     * @param array $params get params of the request
+     * @return array $response
+     */
+    public function rows(array $params = array()) {
+        // parse params
+        $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
+
+        // get the data from the database
+        $dbRows = $this->getResource()->fetchRows($sqloptions);
+
+        // loop through the table and add options
+        $rows = array();
+        foreach ($dbRows as $dbRow) {
+            $row = array();
+            foreach ($this->_cols as $col) {
+                $row[] = $dbRow[$col];
+            }
+
+            $options = array(
+                $this->internalLink(array(
+                    'text' => 'Show',
+                    'href' => '/query/jobs/show/id/' . $dbRow['id'],
+                    'resource' => 'Query_Model_Jobs',
+                    'permission' => 'show'
+                ))
             );
+            if ($this->getResource()->isStatusKillable($dbRow['status'])) {
+                $options[] = $this->internalLink(array(
+                    'text' => 'Kill',
+                    'href' => '/query/jobs/kill/id/' . $dbRow['id'],
+                    'resource' => 'Query_Model_Jobs',
+                    'permission' => 'kill'
+                ));
+            }
+            $options[] = $this->internalLink(array(
+                'text' => 'Remove',
+                'href' => '/query/jobs/remove/id/' . $dbRow['id'],
+                'resource' => 'Query_Model_Jobs',
+                'permission' => 'remove'
+            ));
+            $row[] = implode('&nbsp;',$options);
+
+            $rows[] = $row;
         }
 
-        return array('cols' => $cols, 'status' => 'ok');
-        ;
+        return $this->getModelHelper('pagination')->response($rows, $sqloptions);
     }
 
     /**
      * Return stored information of a job.
-     * @param type $input id OR name of the job
+     * @param type $id id of the job
+     * @return array $response
      */
     public function show($id) {
-        return $this->getResource()->fetchRow($id);
+        return $this->getModelHelper('CRUD')->show($id);
     }
 
     /**
      * Kills a job if the query queue supports this.
-     * @param array $param
-     * @return status array
+     * @param type $id id of the job
+     * @return array $response
      */
     public function kill($id, array $formParams = array()) {
         // create the form object
-        $form = new Query_Form_KillJob();
+        $form = new Daiquiri_Form_Danger(array(
+            'submit' => 'Kill job'
+        ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $this->getResource()->killJob($id);
-            return array('status' => 'ok');
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $this->getResource()->killJob($id);
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
         }
 
         return array('form' => $form, 'status' => 'form');
@@ -158,17 +154,23 @@ class Query_Model_Jobs extends Daiquiri_Model_PaginatedTable {
 
     /**
      * Remove a job.
-     * @param array $param
-     * @return array
+     * @param type $id id of the job
+     * @return array $response
      */
     public function remove($id, array $formParams = array()) {
         // create the form object
-        $form = new Query_Form_RemoveJob();
+        $form = new Daiquiri_Form_Danger(array(
+            'submit' => 'Remove job'
+        ));
 
         // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $this->getResource()->removeJob($id);
-            return array('status' => 'ok');
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $this->getResource()->removeJob($id);
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
         }
 
         return array('form' => $form, 'status' => 'form');

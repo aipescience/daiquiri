@@ -1,0 +1,75 @@
+<?php
+
+/*
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+
+<div class="main">
+    <?php if ($this->meetingId !== null): ?>
+    <h2><?php echo $this->escape($this->meetingTitle); ?></h2>
+    <h4>Participants</h4>
+    <?php else: ?>
+    <h2>Participants</h4>
+    <?php endif; ?>
+
+    <div id="table"></div>
+
+    <?php
+    if ($this->meetingId !== null) {
+        echo $this->internalLink(array(
+            'text' => 'Create new participant for this meeting',
+            'href' => '/meetings/participants/create/meetingId/' . $this->meetingId,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+    }
+    echo $this->internalLink(array(
+        'text' => 'Back to meetings management',
+        'href' => '/meetings',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        <?php if ($this->meetingId !== null): ?>
+            var params = {'meetingId': <?php echo $this->escape($this->meetingId); ?>};
+        <?php else: ?>
+            var params = {};
+        <?php endif; ?>
+
+        $('#table').daiquiri_table({
+            'rowsurl': "<?php echo $this->baseUrl('/meetings/participants/rows') ?>",
+            'colsurl': "<?php echo $this->baseUrl('/meetings/participants/cols') ?>",
+            'params': params,
+            'success': function() {
+                $('a','tbody','#table').click(function(){
+                    new daiquiri.Modal({
+                        'url': this.href,
+                        'width': 800,
+                        'success': function () {
+                            daiquiri.table.items['table'].rows();
+                        }
+                    });
+                    return false;
+                });
+            }
+        });
+    });
+</script>

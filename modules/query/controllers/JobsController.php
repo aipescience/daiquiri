@@ -1,23 +1,22 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 class Query_JobsController extends Daiquiri_Controller_Abstract {
@@ -32,91 +31,31 @@ class Query_JobsController extends Daiquiri_Controller_Abstract {
         if (Daiquiri_Auth::getInstance()->checkAcl('Query_Model_Jobs', 'rows')) {
             $this->view->status = 'ok';
         } else {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Unauthorized();
         }
+    }
+
+    public function colsAction() {
+        $this->getControllerHelper('pagination')->cols();
     }
 
     public function rowsAction() {
-        // call model functions
-        $response = $this->_model->rows($this->_request->getQuery());
-
-        // assign to view
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-        $this->view->redirect = $this->_getParam('redirect', '/query/jobs/');
-        $this->view->status = 'ok';
-    }
-
-    public function colsAction() { 
-        // call model functions
-        $response = $this->_model->cols($this->_request->getQuery());
-        
-        // assign to view
-        $this->view->cols = $response['cols'];
-        $this->view->redirect = $this->_getParam('redirect', '/query/jobs/');
-        $this->view->status = 'ok';
+        $this->getControllerHelper('pagination')->rows();
     }
 
     public function showAction() {
-        // get params from request
         $id = $this->_getParam('id');
-
-        $this->view->redirect = $this->_getParam('redirect', '/query/jobs/');
-        $this->view->data = $this->_model->show($id);
-        $this->view->status = 'ok';
+        $this->getControllerHelper('table')->show($id);
     }
 
     public function killAction() {
-        // get parameters from request
         $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', '/query/jobs/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and delete user
-                $response = $this->_model->kill($id, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->kill($id);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->getControllerHelper('form')->kill($id);
     }
 
     public function removeAction() {
-        // get parameters from request
         $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', '/query/jobs/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and delete user
-                $response = $this->_model->remove($id, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->remove($id);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->getControllerHelper('form')->remove($id);
     }
 
 }

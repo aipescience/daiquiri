@@ -1,23 +1,22 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -32,10 +31,10 @@
 class Daiquiri_Config extends Daiquiri_Model_Singleton {
 
     /**
-     * Daquiri configuration object, parsed from database and application.ini
+     * Daquiri configuration object, parsed from database
      * @var Zend_Config_Ini
      */
-    protected $_daiquiri;
+    protected $_config;
 
     /**
      * Zend configuration object, parsed from application.ini
@@ -44,37 +43,42 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     protected $_application;
 
     /**
-     * Constructor. Load the configuration form the ini file into memory
+     * Constructor. Empty.
      */
-    protected function __construct() {
-        $this->init();
+    public function __construct() {
+
     }
 
-    public function init() {
-        // init the databases resource
-        try {
-            $resource = new Daiquiri_Model_Resource_KeyValue();
-            $resource->setTable('Daiquiri_Model_DbTable_Simple');
-            $resource->getTable()->setName('Config_Entries');
+    public function setApplication($application = null) {
+        if ($application === null) {
+            $this->_application = new Zend_Config_Ini(APPLICATION_PATH . '/configs/application.ini', APPLICATION_ENV);
+        } else {
+            $this->_application = new Zend_Config($application, true);
+        } 
+    }
 
+    public function setConfig($config = null) {
+        if ($config === null) {
+            // init the databases resource
+            $resource = new Daiquiri_Model_Resource_Table();
+            $resource->setTablename('Config_Entries');
+
+            $rows = $resource->fetchRows();
+
+            if (empty($rows)) {
+                return false;
+            }
+            
             $config = array();
-            foreach ($resource->fetchRows() as $row) {
+            foreach ($rows as $row) {
                 $keys = explode('.', $row['key']);
                 $this->_buildConfig($config, $keys, $row['value']);
             }
-        } catch (Zend_Db_Table_Exception $e) {
-            $config = array();
         }
 
-        // init the database config object
-        $this->_daiquiri = new Zend_Config($config, true);
+        $this->_config = new Zend_Config($config, true);
 
-        // init the daiquiri.ini file config object
-        $this->_application = new Zend_Config_Ini(APPLICATION_PATH . '/configs/application.ini', APPLICATION_ENV);
-
-        if ($this->_application->daiquiri !== null) {
-            $this->_daiquiri->merge($this->_application->daiquiri);
-        }
+        return true;
     }
 
     /**
@@ -94,7 +98,7 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
             if (is_array($config[$key])) {
                 $this->_buildConfig($config[$key], $keys, $value);
             } else {
-                throw new Daiquiri_Exception_RuntimeError('Bad config array: ' . print_r($key, true));
+                throw new Exception('Bad config array: ' . print_r($key, true));
             }
         }
     }
@@ -105,16 +109,21 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
      * @return Zend_Config_Ini
      */
     public function __get($key) {
-        return $this->_daiquiri->$key;
+        return $this->getConfig()->$key;
     }
 
     public function getConfig() {
-        return $this->_daiquiri->toArray();
+        if (empty($this->_config)) {
+            throw new Exception('Empty config');
+        }
+        return $this->_config;
     }
 
-
-    public function isEmpty() {
-        return ($this->_daiquiri->count() == 0);
+    public function getApplication() {
+        if (empty($this->_application)) {
+            throw new Exception('Empty application config');
+        }
+        return $this->_application;
     }
 
     /**
@@ -155,30 +164,40 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     }
 
     /**
+     * Returns the web (default) database adapter
+     * @return Zend_
+     */
+    public function getWebAdapter() {
+        return Zend_Db_Table::getDefaultAdapter();
+    }
+
+    /**
      * Returns the name of the database, where a given user has full access to (MyDBs)
      * @param string $userName
      * @return string
      */
     public function getUserDbName($username) {
-        $prefix = $this->_daiquiri->query->userDb->prefix;
-        $postfix = $this->_daiquiri->query->userDb->postfix;
+        $prefix = $this->_config->query->userDb->prefix;
+        $postfix = $this->_config->query->userDb->postfix;
 
         return $prefix . $username . $postfix;
     }
 
     /**
-     * Returns the adapter for the user database
-     * @param string $userName
+     * Returns the user database adapter
      * @return Zend_
      */
-    public function getUserDbAdapter($username, $db = null) {
+    public function getUserDbAdapter($db = null, $username = null) {
         // get adapter configuration
-        $preset = $this->_daiquiri->query->adapter;
-        $config = $this->_application->resources->multidb->$preset->toArray();
+        $config = $this->_application->resources->multidb->user->toArray();
 
         $adapter = $config['adapter'];
         unset($config['adapter']);
+
         if ($db === null) {
+            if ($username === null) {
+                $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+            }
             $config['dbname'] = $this->getUserDbName($username);
         } else {
             $config['dbname'] = $db;
@@ -202,26 +221,9 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
      * @param string $userName
      * @return Zend_
      */
-    public function getUserDbAdapterConfig($username, $db = null) {
+    public function getUserDbAdapterConfig() {
         // get adapter configuration
-        $preset = $this->_daiquiri->query->adapter;
-        return $this->_application->resources->multidb->$preset->toArray();
-    }
-
-    /**
-     * Returns the different database adapter
-     * @return Zend_
-     */
-    public function getDbAdapter() {
-        $adapter = array();
-        foreach (array_keys($this->_application->resources->multidb->toArray()) as $key) {
-            $adapter[] = $key;
-        }
-        return $adapter;
-    }
-
-    public function getDbAdapterConfig($adapter) {
-        return $this->_application->resources->multidb->$adapter->toArray();
+        return $this->_application->resources->multidb->user->toArray();
     }
 
 }

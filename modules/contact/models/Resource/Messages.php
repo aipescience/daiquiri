@@ -1,95 +1,70 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Provides methods for accessing the Messages database table
- */
 class Contact_Model_Resource_Messages extends Daiquiri_Model_Resource_Table {
 
     /**
-     * Construtor. Sets DbTable.
+     * Constructor. Sets the name of the database table.
      */
     public function __construct() {
-        $this->addTables(array(
-            'Contact_Model_DbTable_Messages',
-            'Contact_Model_DbTable_Categories',
-            'Contact_Model_DbTable_Status'
-        ));
+        $this->setTablename('Contact_Messages');
     }
 
     /**
-     * Returns a set of rows from the (joined) tables specified by $sqloptions.
-     * @param array $sqloptions
-     * @return array 
+     * Fetches a set of rows specified by SQL keywords from the message table.
+     * @param array $sqloptions array of sqloptions (start,limit,order,where)
+     * @return array $rows
      */
-    public function fetchRows($sqloptions = array()) {
-        // get the names of the involved tables
-        $m = $this->getTable('Contact_Model_DbTable_Messages')->getName();
-        $c = $this->getTable('Contact_Model_DbTable_Categories')->getName();
-        $s = $this->getTable('Contact_Model_DbTable_Status')->getName();
+    public function fetchRows(array $sqloptions = array()) {
+        $select = $this->select($sqloptions);
+        $select->from($this->getTablename());
+        $select->join('Contact_Categories','Contact_Categories.id = Contact_Messages.category_id','category');
+        $select->join('Contact_Status','Contact_Status.id = Contact_Messages.status_id','status');
 
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-
-        // add inner joins for the category and the status
-        $select->setIntegrityCheck(false);
-        if (in_array('category', $sqloptions['from'])) {
-            $select->join($c, "`$m`.`category_id` = `$c`.`id` ", 'category');
-        }
-        if (in_array('status', $sqloptions['from'])) {
-            $select->join($s, "`$m`.`status_id` = `$s`.`id` ", 'status');
-        }
-        // get the rowset and return
-        $rows = $this->getTable()->fetchAll($select);
-        return $rows->toArray();
+        return $this->getAdapter()->fetchAll($select);
     }
 
     /**
-     * Returns one row specified by its id from the tables.
-     * @param int $id
-     * @param string $tableclass the name of the tableclass
-     * @return array
+     * Fetches one row specified by its primary key from the message table.
+     * @param mixed $id primary key of the row
+     * @throws Exception
+     * @return array $row
      */
-    public function fetchRow($id, array $from = array()) {
+    public function fetchRow($id) {
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+        }
 
-        $sqloptions = array();
+        $select = $this->select();
+        $select->from('Contact_Messages');
+        $select->where('Contact_Messages.id = ?', $id);
+        $select->join('Contact_Categories','Contact_Categories.id = Contact_Messages.category_id','category');
+        $select->join('Contact_Status','Contact_Status.id = Contact_Messages.status_id','status');
 
-        // get the names of the involved tables
-        $messagesTableName = $this->getTable()->getName();
-        $categoriesTableName = $this->getTable('Contact_Model_DbTable_Categories')->getName();
-        $statusTableName = $this->getTable('Contact_Model_DbTable_Status')->getName();
+        $row = $this->getAdapter()->fetchRow($select);
+        if (empty($row)) {
+            throw new Exception($id . ' not found in ' . get_class($this) . '::fetchRow()');
+        }
 
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`$messagesTableName`.`id` = ?", $id);
-
-        // add inner joins for the category, the status and the user
-        $select->setIntegrityCheck(false);
-        $select->join($categoriesTableName, "`$messagesTableName`.`category_id` = `$categoriesTableName`.`id` ", 'category');
-        $select->join($statusTableName, "`$messagesTableName`.`status_id` = `$statusTableName`.`id` ", 'status');
-
-        // get the rowset and return
-        $rows = $this->getTable()->fetchAll($select)->current();
-        return $rows->toArray();
+        return $row;
     }
 
 }

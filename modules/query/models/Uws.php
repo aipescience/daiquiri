@@ -1,28 +1,27 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
-    //status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED');
+    // status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED');
     private static $statusQueue = array('pending' => 1, 'running' => 2, 'removed' => 6, 'error' => 4, 'success' => 3, 'timeout' => 5, 'killed' => 5);
 
     public function __construct() {
@@ -30,14 +29,20 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
     }
 
     public function getJobList($params) {
-        // get the model
-        $model = Daiquiri_Proxy::factory('Query_Model_CurrentJobs');
+        // get jobs
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
-        $jobList = $model->index();
+        // get the userid
+        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
+
+        // get rows for this user
+        $rows = $this->getResource()->fetchRows(array(
+            'where' => array('user_id = ?' => $userId)
+        ));
 
         $jobs = new Uws_Model_Resource_Jobs();
 
-        foreach ($jobList as $job) {
+        foreach ($rows as $job) {
             $href = Daiquiri_Config::getInstance()->getSiteUrl() .
                     "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
             $status = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
@@ -58,88 +63,96 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         return $jobs;
     }
 
-    public function getJob($params) {
-        //obtain job information
-        $job = $this->_getJob($params['wild0']);
+    public function getJob($requestParams) {
+        // get the job id
+        $id = $requestParams['wild0'];
 
-        if ($job === false) {
-            return false;
+        // set resource
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
+        $resourceClass = get_class($this->getResource());
+
+        // get the job
+        $row = $this->getResource()->fetchRow($id);
+        if (empty($row)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+        if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
         }
 
-        //fill UWS object with information
+        // fetch table statistics
+        $stat = $this->getResource()->fetchTableStats($id);
+        $job = array_merge($row, $stat);
+
+        // fill UWS object with information
         $jobUWS = new Uws_Model_Resource_JobSummaryType("job");
-
-        $jobUWS->jobId = $job['id']['value'];
+        $jobUWS->jobId = $job['id'];
         $jobUWS->ownerId = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $jobUWS->phase = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']['value']]];
+        $jobUWS->phase = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
 
-        if (isset($job['time'])) {
-            //for simple queue
-            //convert to ISO 8601
-            $datetime = new DateTime($job['time']['value']);
-            $jobUWS->startTime = $datetime->format('c');
-            $jobUWS->endTime = $datetime->format('c');
-        } else {
-            //for paqu queue
-            //convert to ISO 8601
-            if ($job['timeExecute']['value'] !== "0000-00-00 00:00:00") {
-                $datetimeStart = new DateTime($job['timeExecute']['value']);
+        // convert timestamps to ISO 8601
+        if ($resourceClass == 'Query_Model_Resource_QQueueQuery') {
+            if ($job['timeExecute'] !== "0000-00-00 00:00:00") {
+                $datetimeStart = new DateTime($job['timeExecute']);
                 $jobUWS->startTime = $datetimeStart->format('c');
             }
 
-            if ($job['timeFinish']['value'] !== "0000-00-00 00:00:00") {
-                $datetimeEnd = new DateTime($job['timeFinish']['value']);
+            if ($job['timeFinish'] !== "0000-00-00 00:00:00") {
+                $datetimeEnd = new DateTime($job['timeFinish']);
                 $jobUWS->endTime = $datetimeEnd->format('c');
             }
+        } else {
+            // for simple queue
+            $datetime = new DateTime($job['time']);
+            $jobUWS->startTime = $datetime->format('c');
+            $jobUWS->endTime = $datetime->format('c');
         }
 
-        //obtain queue information
-        $resourceString = Daiquiri_Config::getInstance()->query->queue->type;
-        $resource = Query_Model_Resource_AbstractQueue::factory($resourceString);
+        // obtain queue information
         $queues = array();
-        if ($resource::$hasQueues === true) {
-            $queues = $resource->fetchQueues();
+        if ($resourceClass::$hasQueues === true) {
+            $queues = $this->getResource->fetchQueues();
 
-            //find the queue
+            // find the queue
             foreach ($queues as $queue) {
-                if ($queue['name'] === $job['queue']['value']) {
+                if ($queue['name'] === $job['queue']) {
                     $jobUWS->executionDuration = $queue['timeout'];
                     break;
                 }
             }
         } else {
-            //no queue information - execution infinite
+            // no queue information - execution infinite
             $jobUWS->executionDuration = 0;
         }
 
-        //no destruction time supported, so return hillariously high number
+        // no destruction time supported, so return hillariously high number
         $datetime = new DateTime('31 Dec 2999');
         $jobUWS->destruction = $datetime->format('c');
 
-        //fill the parameter part of the UWS with the original information stored in the queue
-        foreach ($job as $key => $param) {
-            //allowed parameters
+        // fill the parameter part of the UWS with the original information stored in the queue
+        foreach ($job as $key => $value) {
+            // allowed parameters
             switch ($key) {
                 case 'database':
                 case 'table':
                 case 'query':
                 case 'actualQuery':
                 case 'queue':
-                    $jobUWS->addParameter($key, $param['value']);
+                    $jobUWS->addParameter($key, $value);
                     break;
                 default:
                     break;
             }
         }
-
-        //add link to results if needed
+        
+        // add link to results if needed
         if ($jobUWS->phase === "COMPLETED") {
-            //we have results!
+            // we have results!
             $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/query/index/stream/table/" .
-                    urlencode($job['table']['value']) . "/format/csv";
-            $jobUWS->addResult($job['table']['value'], $href);
+                    urlencode($job['table']) . "/format/csv";
+            $jobUWS->addResult($job['table'], $href);
         } else if ($jobUWS->phase === "ERROR") {
-            $jobUWS->addError($job['error']['value']);
+            $jobUWS->addError($job['error']);
         }
 
         return $jobUWS;
@@ -174,38 +187,43 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
     }
 
     public function deleteJobImpl(Uws_Model_Resource_JobSummaryType &$job) {
-        $model = Daiquiri_Proxy::factory('Query_Model_CurrentJobs');
+        // set job resource
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
-        try {
-            $model->remove($job->jobId, array("id" => $job->jobId));
-        } catch (Exception $e) {
-            return false;
+        // get job and check permissions
+        $row = $this->getResource()->fetchRow($job->jobId);
+        if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
         }
 
+        // remove job
+        $this->getResource()->removeJob($job->jobId);
         return true;
     }
 
     public function abortJobImpl(Uws_Model_Resource_JobSummaryType &$job) {
-        $model = Daiquiri_Proxy::factory('Query_Model_CurrentJobs');
+        // set job resource
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
-        try {
-            $model->kill($job->jobId, array("id" => $job->jobId));
-        } catch (Exception $e) {
-            return false;
+        // get job and check permissions
+        $row = $this->getResource()->fetchRow($job->jobId);
+        if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
         }
 
+        // kill job
+        $this->getResource()->killJob($id);
         return true;
     }
 
     public function runJob(Uws_Model_Resource_JobSummaryType &$job) {
-        //obtain queue information
-        $resourceString = Daiquiri_Config::getInstance()->query->queue->type;
-        $resource = Query_Model_Resource_AbstractQueue::factory($resourceString);
+        // obtain queue information
+        $resource = Query_Model_Resource_AbstractQuery::factory();
         $queues = array();
         if ($resource::$hasQueues === true && isset($job->parameters['queue'])) {
             $queues = $resource->fetchQueues();
 
-            //find the queue
+            // find the queue
             foreach ($queues as $queue) {
                 if ($queue['name'] === $job->parameters['queue']->value) {
                     $job->executionDuration = $queue['timeout'];
@@ -213,13 +231,13 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 }
             }
         } else if ($resource::$hasQueues === true) {
-            //no queue has been specified, but we support queues - if executionDuration is 0, use default queue
-            //otherwise find the desired queue
+            // no queue has been specified, but we support queues - if executionDuration is 0, use default queue
+            // otherwise find the desired queue
             $queues = $resource->fetchQueues();
 
             if ($job->executionDuration === 0) {
-                //use default queue here
-                $queue = Daiquiri_Config::getInstance()->query->queue->qqueue->defaultQueue;
+                // use default queue here
+                $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
 
                 foreach ($queues as $currQueue) {
                     if ($currQueue['name'] === $queue) {
@@ -229,7 +247,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                     }
                 }
             } else {
-                //find a queue that matches the request (i.e. is nearest to the request)
+                // find a queue that matches the request (i.e. is nearest to the request)
                 $maxQueueTimeout = 0;
                 $maxQueue = false;
                 $deltaQueue = 9999999999999999999999999999999999;
@@ -258,14 +276,14 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
         }
 
-        //now check if everything is there that we need...
+        // now check if everything is there that we need...
         $tablename = null;
         $sql = null;
         $queue = null;
         $errors = array();
 
         if (!isset($job->parameters['query']) || ($resource::$hasQueues === true && !isset($job->parameters['queue']))) {
-            //throw error
+            // throw error
             $job->addError("Incomplete job");
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
@@ -282,8 +300,8 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $queue = $job->parameters['queue']->value;
         }
 
-        //submit job
-        //validate query
+        // submit job
+        // validate query
         $job->resetErrors();
         $model = new Query_Model_Query();
         try {
@@ -298,7 +316,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 return;
             }
         } catch (Exception $e) {
-            //throw error
+            // throw error
             $job->addError($e->getMessage());
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
@@ -313,30 +331,17 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         }
 
         if ($response['status'] !== 'ok') {
-            //throw error
+            // throw error
             $job->addError($response['errors']);
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
             return;
         }
 
-        //clean up stuff (basically just remove the job in the temorary UWS job store - if we are here
-        //everything has been handeled by the queue)
+        // clean up stuff (basically just remove the job in the temorary UWS job store - if we are here
+        // everything has been handeled by the queue)
         $resource = new Uws_Model_Resource_UWSJobs();
         $resource->deleteRow($job->jobId);
     }
 
-    private function _getJob($jobId) {
-        // get the model
-        $model = Daiquiri_Proxy::factory('Query_Model_CurrentJobs');
-
-        try {
-            $job = $model->show($jobId);
-        } catch (Exception $e) {
-            return false;
-        }
-
-        return $job;
-    }
-
-}
+}        

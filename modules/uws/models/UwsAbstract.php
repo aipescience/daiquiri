@@ -1,23 +1,22 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 // @TODO: LIMITATIONS: Parameters by reference are not yet supported!!
@@ -29,6 +28,380 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
     public function __construct() {
         parent::__construct();
+    }
+
+    public function index($requestParams) {
+        $xmlDoc = new DOMDocument('1.0', "UTF-8");
+        $xmlDoc->formatOutput = true;
+
+        //build job list for current user
+        $jobs = $this->getJobList($requestParams);
+
+        //@TODO: REMOVE THIS DEBUG FLAG!
+        $jobs->validateSchema = false;
+
+        $jobs->toXML($xmlDoc);
+
+        return array(
+            'status' => 'ok',
+            'body' => $xmlDoc->saveXML(),
+            'headers' => array('Content-Type' => 'application/xml; charset=utf-8')
+        );
+    }
+
+    public function get($requestParams) {
+        // is this job pending?
+        $job = $this->getPendingJob($requestParams['wild0']);
+
+        if ($job === false) {
+            // get job information for this id
+            $job = $this->getJob($requestParams);
+        }
+
+        if ($job === false) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        // get the wildcard parameters
+        $params = array();
+        foreach ($requestParams as $key => $value) {
+            if (strstr($key, "wild") !== false) {
+                $params[$key] = $value;
+            }
+        }
+
+        if (count($params) == 1) {
+            //this is just a get on the object
+            $xmlDoc = new DOMDocument('1.0', "UTF-8");
+            $xmlDoc->formatOutput = true;
+
+            //@TODO: REMOVE THIS DEBUG FLAG!
+            $job->validateSchema = false;
+
+            $job->toXML($xmlDoc);
+
+            return array(
+                'status' => 'ok',
+                'body' => $xmlDoc->saveXML(),
+                'headers' => array('Content-Type' => 'application/xml; charset=utf-8')
+            );
+
+        } else {
+            $action = $params['wild1'];
+
+            switch ($action) {
+                case 'phase':
+                    return array(
+                        'status' => 'ok',
+                        'body' => $job->phase,
+                        'headers' => 'text/plain;'
+                    );
+                    break;
+                case 'executionduration':
+                    return array(
+                        'status' => 'ok',
+                        'body' => $job->executionDuration,
+                        'headers' => 'text/plain;'
+                    );
+                    break;
+                case 'destruction':
+                    return array(
+                        'status' => 'ok',
+                        'body' => $job->destruction,
+                        'headers' => 'text/plain;'
+                    );
+                    break;
+                case 'error':
+                    $errorInfo = $this->getError($job);
+                    return array(
+                        'status' => 'ok',
+                        'body' => $errorInfo,
+                        'headers' => 'text/plain;'
+                    );
+                    break;
+                case 'quote':
+                    return array(
+                        'status' => 'ok',
+                        'body' => $job->quote,
+                        'headers' => 'text/plain;'
+                    );
+                    break;
+                case 'results':
+                    // this is just a get on the object
+                    $xmlDoc = new DOMDocument('1.0', "UTF-8");
+                    $xmlDoc->formatOutput = true;
+
+                    //@TODO: REMOVE THIS DEBUG FLAG!
+                    $job->validateSchema = false;
+
+                    $results = $xmlDoc->createElementNS($job->nsUws, "uws:results");
+                    $xmlDoc->appendChild($results);
+
+                    foreach ($job->results as $result) {
+                        $result->toXML($xmlDoc, $results);
+                    }
+
+                    return array(
+                        'status' => 'ok',
+                        'body' => $xmlDoc->saveXML(),
+                        'headers' => array('Content-Type' => 'application/xml; charset=utf-8')
+                    );
+                    break;
+                case 'parameters':
+                    //this is just a get on the object
+                    $xmlDoc = new DOMDocument('1.0', "UTF-8");
+                    $xmlDoc->formatOutput = true;
+
+                    //@TODO: REMOVE THIS DEBUG FLAG!
+                    $job->validateSchema = false;
+
+                    $parameters = $xmlDoc->createElementNS($job->nsUws, "uws:parameters");
+                    $xmlDoc->appendChild($parameters);
+
+                    foreach ($job->parameters as $parameter) {
+                        $parameter->toXML($xmlDoc, $parameters);
+                    }
+
+                    return array(
+                        'status' => 'ok',
+                        'body' => $xmlDoc->saveXML(),
+                        'headers' => array('Content-Type' => 'application/xml; charset=utf-8')
+                    );
+                    break;
+                case 'owner':
+                    return array(
+                        'status' => 'ok', 
+                        'body' => $job->ownerId, 
+                        'headers' => array('Content-Type' => 'text/plain;')
+                    );
+                    break;
+                default:
+                    throw new Daiquiri_Exception_NotFound();
+                    break;
+            }
+        }
+    }
+
+    public function post($requestParams, $postParams) {
+        // get the wildcard parameters
+        $wildParams = array();
+        foreach ($requestParams as $key => $value) {
+            if (strstr($key, "wild") !== false) {
+                $wildParams[$key] = $value;
+            }
+        }
+
+        if (count($wildParams) == 0) {
+            // create a new job
+            // getting rid of everything that is not directly related with the POST parameters
+            unset($postParams['modulename']);
+            unset($postParams['module']);
+            unset($postParams['controller']);
+            unset($postParams['action']);
+
+            $phase = false;
+            if (isset($postParams['phase'])) {
+                $phase = $postParams['phase'];
+                unset($postParams['phase']);
+            }
+
+            $job = $this->createPendingJob($postParams, $this->createJobId());
+
+            if (strtolower($phase) === "run") {
+                $this->runJob($job);
+            }
+        } else {
+            // is this job pending?
+            $job = $this->getPendingJob($wildParams['wild0']);
+
+            if ($job === false) {
+                // get job information for this id
+                $job = $this->getJob($requestParams);
+            }
+
+            if ($job === false) {
+                throw new Daiquiri_Exception_NotFound();
+            }
+
+            if (!isset($wildParams['wild1'])) {
+                // this is a POST to the job and might be a request to add more data to the
+                // params part...
+                unset($postParams['modulename']);
+                unset($postParams['module']);
+                unset($postParams['controller']);
+                unset($postParams['action']);
+                unset($postParams['wild0']);
+
+                // check if this is a phase change
+                $phase = false;
+                if (isset($postParams['phase'])) {
+                    $phase = $postParams['phase'];
+                    unset($postParams['phase']);
+                }
+
+                // allow for ACTION=DELETE
+                if (isset($postParams['action'])) {
+                    $phase = $postParams['action'];
+                    unset($postParams['action']);
+                }
+
+                if (strtolower($phase) === "run") {
+                    $this->runJob($job);
+                } else if (strtolower($phase) === "abort") {
+                    $this->abortJob($job);
+                } else if (strtolower($phase) === "delete") {
+                    $this->deleteJob($job);
+                } else {
+                    if (isset($postParams['destruction'])) {
+                        $this->_model->setDestructTime($job, $postParams['destruction']);
+                        unset($postParams['destruction']);
+                    }
+
+                    if (isset($postParams['executionduration'])) {
+                        $this->_model->setExecutionDuration($job, $postParams['executionduration']);
+                        unset($postParams['executionduration']);
+                    }
+
+                    $this->setParameters($job, $postParams);
+                }
+            } else {
+                $action = $wildParams['wild1'];
+
+                switch ($action) {
+                    case 'destruction':
+                        if (isset($postParams['destruction'])) {
+                            $this->setDestructTime($job, $postParams['destruction']);
+                        } else {
+                            throw new Daiquiri_Exception_NotFound();
+                        }
+
+                        break;
+
+                    case 'executionduration':
+                        if (isset($postParams['executionduration'])) {
+                            $this->_model->setExecutionDuration($job, $postParams['executionduration']);
+                        } else {
+                            throw new Daiquiri_Exception_NotFound();
+                        }
+
+                        break;
+
+                    case 'parameters':
+                        // this is another path that might be foreseeable to set parameters (as mentioned in the
+                        // standard)
+                        // check if everything is sane
+                        if (isset($postParams['wild2'])) {
+                            throw new Daiquiri_Exception_NotFound();
+                        }
+
+                        unset($postParams['modulename']);
+                        unset($postParams['module']);
+                        unset($postParams['controller']);
+                        unset($postParams['action']);
+                        unset($postParams['wild0']);
+                        unset($postParams['wild1']);
+                        unset($postParams[$job->jobId]);
+
+                        $this->setParameters($job, $postParams);
+                        break;
+
+                    default:
+                        throw new Daiquiri_Exception_NotFound();
+                        break;
+                }
+            }
+        }
+        return array(
+            'status' => 'ok',
+            'jobId' => $job->jobId
+        );
+    }
+
+    public function put($requestParams, $putParams, $rawBody) {
+        // get the wildcard parameters
+        $wildParams = array();
+        foreach ($requestParams as $key => $value) {
+            if (strstr($key, "wild") !== false) {
+                $wildParams[$key] = $value;
+            }
+        }
+
+        if (count($wildParams) !== 3) {
+            throw new Daiquiri_Exception_BadRequest();
+        }
+
+        // is this job pending?
+        $job = $this->getPendingJob($wildParams['wild0']);
+
+        if ($job === false) {
+            // get job information for this id
+            $job = $this->getJob($requestParams);
+        }
+
+        if ($job === false) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        $action = $wildParams['wild1'];
+
+        switch ($action) {
+            case 'parameters':
+                // this is another path that might be foreseeable to set parameters 
+                // (as mentioned in the standard)
+                $newParam = array();
+                $newParam[$putParams['wild2']] = $rawBody;
+                $this->setParameters($job, $newParam);
+                break;
+            default:
+                throw new Daiquiri_Exception_BadRequest();
+                break;
+        }
+
+        return array(
+            'status' => 'ok',
+            'jobId' => $job->jobId
+        );
+    }
+
+    public function delete($requestParams) {
+        // get the wildcard parameters
+        $wildParams = array();
+        foreach ($requestParams as $key => $value) {
+            if (strstr($key, "wild") !== false) {
+                $wildParams[$key] = $value;
+            }
+        }
+
+        if (count($wildParams) !== 1) {
+            throw new Daiquiri_Exception_BadRequest();
+        }
+
+        // is this job pending?
+        $job = $this->getPendingJob($wildParams['wild0']);
+
+        if ($job === false) {
+            //get job information for this id
+            $job = $this->getJob($requestParams);
+        }
+
+        if ($job === false) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        $this->deleteJob($job);
+
+        return array(
+            'status' => 'ok'
+        );
+    }
+
+    public function options() {
+        return array(
+            'stautus' => 'ok',
+            'headers' => array(
+                'Allow' => 'OPTIONS, INDEX, GET, POST, PUT, DELETE'
+            )
+        );
     }
 
     abstract public function getJobList($params);

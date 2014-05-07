@@ -1,23 +1,22 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -49,13 +48,13 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         // get the acl class, this could be more general
         $this->_acl = new Daiquiri_Acl();
 
-        // get the roles
+        // store roles in auth object
         $roleModel = new Auth_Model_Roles();
-        $this->_roles = $roleModel->getValues();
+        $this->_roles = $roleModel->getResource()->fetchValues('role');
 
         // store status in auth object
         $statusModel = new Auth_Model_Status();
-        $this->_status = $statusModel->getValues();
+        $this->_status = $statusModel->getResource()->fetchValues('status');
 
         // get treatment from default crypt object
         try {
@@ -103,7 +102,7 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
      * singleton to its new state. Authentication is carried out using HASHing (using given
      * hash) and SALTing.
      */
-    public function authenticateUser($username, $password) {
+    public function authenticateUser($username, $password, $remember = false) {
 
         // first check if username or password are missing
         if (!$username) {
@@ -136,12 +135,8 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
             $storage = Zend_Auth::getInstance()->getStorage();
             $storage->write($row);
 
-            // get the timeout and use it for the namespace used by Zend_Auth
-            $timeout = Daiquiri_Config::getInstance()->auth->timeout;
-
-            if ($timeout) {
-                $authns = new Zend_Session_Namespace($storage->getNamespace());
-                $authns->setExpirationSeconds($timeout);
+            if ($remember) {
+                Zend_Session::rememberMe(1209600);
             }
 
             return true;
@@ -291,17 +286,16 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         // check in the data module first, if metadata exists and handle them
         // accordingly
         $databasesModel = new Data_Model_Databases();
-        $response = $databasesModel->show(false, $database);
-
-        if ($response['status'] === 'ok' && $databasesModel->checkACL($response['data']['id'], $permission)) {
+        $response = $databasesModel->show(array('db' => $database));
+        if ($response['status'] === 'ok' && $databasesModel->getResource()->checkACL($response['row']['id'], $permission)) {
             if ($table === false) {
                 return true;
             } else {
                 //access to database granted, so let's check for table access
                 $tablesModel = new Data_Model_Tables();
-                $response = $tablesModel->show(false, $database, $table);
+                $response = $tablesModel->show(array('db' => $database, 'table' => $table));
 
-                if ($response['status'] === 'ok' && $tablesModel->checkACL($response['data']['id'], $permission)) {
+                if ($response['status'] === 'ok' && $tablesModel->getResource()->checkACL($response['row']['id'], $permission)) {
                     return true;
                 }
             }
@@ -325,7 +319,6 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
 
         $currRole = $this->getCurrentRole();
         $publication_role = $this->getRole($publication_role_id);
-
 
         if ($currRole === $publication_role) {
             return true;
@@ -488,7 +481,11 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
     }
 
     public function getRole($id) {
-        return $this->_roles[$id];
+        if (array_key_exists($id,$this->_roles)) {
+            return $this->_roles[$id];
+        } else {
+           return false;
+        }
     }
 
     public function getRoleId($role) {

@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS `Data_Databases` (
   `order` INTEGER,
   `name` VARCHAR(256) NOT NULL,
   `description` TEXT,
-  `adapter` VARCHAR(256),
   `publication_select` BOOLEAN,
   `publication_update` BOOLEAN,
   `publication_insert` BOOLEAN,

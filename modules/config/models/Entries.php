@@ -1,60 +1,52 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Config_Model_Entries extends Daiquiri_Model_Abstract {
+class Config_Model_Entries extends Daiquiri_Model_Table {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource object and the database table.
      */
     public function __construct() {
-        $this->setResource('Daiquiri_Model_Resource_KeyValue');
-        $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
-        $this->getResource()->getTable()->setName('Config_Entries');
+        $this->setResource('Daiquiri_Model_Resource_Table');
+        $this->getResource()->setTablename('Config_Entries');
+        $this->_cols = array('key','value');
     }
 
     /**
-     * Returns all configuration entries as an array.
-     * @return array
+     * Returns all config entries.
+     * @return array $response
      */
     public function index() {
-        return $this->getResource()->fetchRows();
-    }
-
-    public function show($key) {
-        return $this->getResource()->fetchValue($key);
+        return $this->getModelHelper('CRUD')->index();
     }
 
     /**
-     * Creates config entry.
-     * @param string $key
-     * @param string $value
-     * @return array
+     * Creates a config entry.
+     * @param array $formParams
+     * @return array $response
      */
     public function create(array $formParams = array()) {
-
         // create the form object
-        $form = new Config_Form_CreateEntries();
+        $form = new Config_Form_Entries();
 
-        // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
 
@@ -62,16 +54,28 @@ class Config_Model_Entries extends Daiquiri_Model_Abstract {
                 $values = $form->getValues();
 
                 // check if the entry is already there
-                if ($this->getResource()->fetchValue($values['key']) !== null) {
-                    $form->setDescription('Key already stored');
-                    return array('status' => 'error', 'error' => 'key already stored');
-                } else {
+                $rows = $this->getResource()->fetchRows(array(
+                    'where' => array('`key` = ?' => $values['key'])
+                ));
+
+                if (empty($rows)) {
                     // store the details
-                    $this->getResource()->storeValue($values['key'], $values['value']);
+                    $this->getResource()->insertRow($values);
                     return array('status' => 'ok');
+                } else {
+                    $form->setDescription('Key already stored');
+                    return array(
+                        'form' => $form,
+                        'status' => 'error',
+                        'error' => 'Key already stored'
+                    );
                 }
             } else {
-                return array('form' => $form, 'status' => 'error', 'errors' => $form->getMessages());
+                return array(
+                    'form' => $form,
+                    'status' => 'error',
+                    'errors' => $form->getMessages(),
+                );
             }
         }
 
@@ -79,53 +83,34 @@ class Config_Model_Entries extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Edit an entry in the config table.
+     * Updates a config entry message.
+     * @param int $id
      * @param array $formParams
-     * @return array
+     * @return array $response
      */
-    public function update($key, array $formParams = array()) {
-        $value = $this->getResource()->fetchValue($key);
-
-        if ($value === null) {
-            return array('status' => 'error', 'error' => 'key not found');
-        }
-
-        // create the form object
-        $form = new Config_Form_EditEntries(array(
-                    'key' => $key,
-                    'value' => $value
-                ));
-
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-
-            // get the form values
-            $values = $form->getValues();
-
-            $this->getResource()->updateValue($key, $values['value']);
-            return array('status' => 'ok');
-        }
-
-        return array('form' => $form, 'status' => 'form');
+    public function update($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update entry');
     }
 
     /**
-     * Deletes an config entry.
-     * @param string $key
+     * Deletes a config entry message.
+     * @param int $id
      * @param array $formParams
-     * @return Array 
+     * @return array $response
      */
-    public function delete($key, array $formParams = array()) {
-        // create the form object
-        $form = new Config_Form_DeleteEntries();
+    public function delete($id, array $formParams = array()) {
+        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete entry');
+    }
 
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            $this->getResource()->deleteValue($key);
-            return array('status' => 'ok');
-        }
-
-        return array('form' => $form, 'status' => 'form');
+    /**
+     * Returns all config entries for export.
+     * @return array $response
+     */
+    public function export() {
+        return array(
+            'data' => array('config' => Daiquiri_Config::getInstance()->getConfig()->toArray()),
+            'status' => 'ok'
+        );
     }
 
 }

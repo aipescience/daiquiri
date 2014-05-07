@@ -1,0 +1,128 @@
+<?php
+
+/*
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+
+<div class="main">
+    <h2>Meetings management</h2>
+
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Begin</th>
+                <th>End</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($this->rows as $row): ?>
+                <tr>
+                    <td><?php echo $this->escape($row['title']); ?></td>
+                    <td><?php echo $this->escape($row['begin']); ?></td>
+                    <td><?php echo $this->escape($row['end']); ?></td>
+                    <td>
+                        <?php 
+                        echo $this->internalLink(array(
+                            'text' => 'Show',
+                            'href' => $this->base . 'show/id/' . $this->escape($row['id']),
+                            'resource' => $this->model,
+                            'permission' => 'show'));
+                        echo $this->internalLink(array(
+                            'text' => 'Update',
+                            'href' => $this->base . 'update/id/' . $this->escape($row['id']),
+                            'resource' => $this->model,
+                            'permission' => 'update',
+                            'prepend' => '&nbsp;'));
+                        echo $this->internalLink(array(
+                            'text' => 'Participants',
+                            'href' => '/meetings/participants/?meetingId=' . $this->escape($row['id']),
+                            'resource' => 'Meetings_Model_Participants',
+                            'permission' => 'index',
+                            'prepend' => '&nbsp;'));
+                        echo $this->internalLink(array(
+                            'text' => 'Contributions',
+                            'href' => '/meetings/contributions/?meetingId=' . $this->escape($row['id']),
+                            'resource' => 'Meetings_Model_Contributions',
+                            'permission' => 'index',
+                            'prepend' => '&nbsp;'));
+                        echo $this->internalLink(array(
+                            'text' => 'Delete',
+                            'href' => $this->base . 'delete/id/' . $this->escape($row['id']),
+                            'resource' => $this->model,
+                            'permission' => 'delete',
+                            'prepend' => '&nbsp;')); 
+                        ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <?php
+    echo $this->internalLink(array(
+        'text' => 'Create new meeting',
+        'href' => $this->base . 'create',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Show all participants',
+        'href' => '/meetings/participants',
+        'resource' => 'Meetings_Model_Participants',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Show all contributions',
+        'href' => '/meetings/contributions',
+        'resource' => 'Meetings_Model_Contributions',
+        'permission' => 'index', 
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Show all registrations',
+        'href' => '/meetings/registration',
+        'resource' => 'Meetings_Model_Registration',
+        'permission' => 'index', 
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Manage participant detail keys',
+        'href' => '/meetings/participant-detail-keys',
+        'resource' => 'Meetings_Model_ParticipantDetailKeys',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Manage participant status',
+        'href' => '/meetings/participant-status',
+        'resource' => 'Meetings_Model_ParticipantStatus',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Manage contribution types',
+        'href' => '/meetings/contribution-types',
+        'resource' => 'Meetings_Model_ContributionTypes',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
+</div>

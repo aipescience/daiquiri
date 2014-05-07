@@ -1,23 +1,22 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -30,51 +29,40 @@
  */
 abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
 
-    /**
-     * @brief   parsing request for sql options and generates array
-     * @return  array containing 'cols', 'options' and jqGrid keys of an sql 
-     *          request
-     * 
-     * This method parses the HTML request for any sql options needed to handle
-     * requests of the table viewer. It parses the columns, options and the 
-     * jqGrid parameters and stores them in an array. If a parameter is not
-     * found, it is set NULL.
-     * 
-     * jqGrid parameters that are handled: 
-     *  - <b>page</b>         requested page number
-     *  - <b>rows</b>         number of rows per page
-     *  - <b>sidx</b>         sort id, columns that are sorted
-     *  - <b>sord</b>         sort order
-     *  - <b>_search</b>      ???
-     *  - <b>searchField</b>  list of fields where a search should be performed
-     *  - <b>searchOper</b>   search operator for this field (boolean operators,
-     *                        arithmetic operators,...???)
-     *  - <b>searchString</b> search condition
-     * 
-     */
-    protected function _getTableParams() {
+    private $_controller_helper = array();
 
-        $params = array();
-
-        // get cols
-        $params['cols'] = $this->_getParam('cols');
-        if ($params['cols'] !== null) {
-            $params['cols'] = explode(',', $params['cols']);
-        }
-
-        // get options
-        $params['options'] = $this->_getParam('options');
-
-        // get jqGrid parameter
-        $keys = array(
-            'page', 'rows', 'sidx', 'sord',
-            '_search', 'searchField', 'searchOper', 'searchString'
-        );
-        foreach ($keys as $key) {
-            $params[$key] = $this->_getParam($key);
-        }
-
-        return $params;
+    public function getModel() {
+        return $this->_model;
     }
 
+    public function getControllerHelper($helper, array $options = array()) {
+        if (empty($this->_controller_helper[$helper])) {
+            $helperclass = 'Daiquiri_Controller_Helper_' . ucfirst($helper);
+            $this->_controller_helper[$helper] = new $helperclass($this, $options);
+        }
+
+        return $this->_controller_helper[$helper];
+    }
+
+    public function setViewElements($response, $redirect = null) {
+        if (!empty($redirect)) {
+            $this->view->redirect = $redirect;
+        }
+        foreach ($response as $key => $value) {
+            $this->view->$key = $value;
+        }
+    }
+
+    public function setFormAction($response, $url = null) {
+        if (array_key_exists('form', $response)) {
+            if ($url === null) {
+                $action = $this->getRequest()->getRequestUri();
+            } else {
+                $action = Daiquiri_Config::getInstance()->getBaseUrl() . $url;
+            }
+
+            $form = $response['form'];
+            $form->setAction($action);
+        }
+    }
 }

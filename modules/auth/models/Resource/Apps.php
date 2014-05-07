@@ -1,72 +1,65 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Resource class for the application management.
- */
 class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Table {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets tablename.
      */
     public function __construct() {
-        $this->setTable('Auth_Model_DbTable_Apps');
+        $this->setTablename('Auth_Apps');
     }
 
     /**
-     * Stores a new app.
-     * @param array $credentials
-     * @return int $id (id of the new app) 
+     * Inserts a new row into the App table and create the corresponding user table.
+     * @param array $data
+     * @throws Exception
+     * @return int $id id of the new app
      */
-    public function storeApp($credentials) {
-        // handle unencrypted password
-        if (!empty($credentials['newPassword'])) {
-            // crypt new password
-            $crypt = Daiquiri_Crypt_Abstract::factory();
-            $credentials['password'] = $crypt->encrypt($credentials['newPassword']);
+    public function insertRow(array $data = array()) {
+        if (empty($data)) {
+            throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        // get the user table
-        $table = $this->getTable('Auth_Model_DbTable_Apps');
+        // handle unencrypted password
+        $data['password'] = Daiquiri_Crypt_Abstract::factory()->encrypt($data['newPassword']);
 
         // insert the new row
-        $table->insert(array(
-            'appname' => $credentials['appname'],
-            'password' => $credentials['password'],
+        $this->getAdapter()->insert('Auth_Apps', array(
+            'appname' => $data['appname'],
+            'password' => $data['password'],
             'active' => 1
         ));
 
         // create database for app
-        if (Daiquiri_Config::getInstance()->query
-                && Daiquiri_Config::getInstance()->query->userDb) {
-            $userDb = Daiquiri_Config::getInstance()->getUserDbName($credentials['appname']);
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($credentials['appname'], '');
+        if (Daiquiri_Config::getInstance()->query) {
+            $userDb = Daiquiri_Config::getInstance()->getUserDbName($data['appname']);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $data['appname']);
 
             $sql = "CREATE DATABASE `{$userDb}`";
             $adapter->query($sql)->closeCursor();
         }
 
         // return the id of the newly created app
-        return $table->getAdapter()->lastInsertId();
+        return $this->getAdapter()->lastInsertId();
     }
 
 }

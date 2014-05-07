@@ -1,174 +1,78 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 class Data_FunctionsController extends Daiquiri_Controller_Abstract {
+
+    protected $_model;
 
     public function init() {
         $this->_model = Daiquiri_Proxy::factory('Data_Model_Functions');
     }
 
     public function indexAction() {
-        $this->view->functions = $this->_model->index();
-        $this->view->status = 'ok';
+        $response = $this->_model->index();
+        $this->setViewElements($response);
     }
 
     public function createAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->create($this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->create();
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/functions/create';
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->getControllerHelper('form')->create();
     }
 
     public function showAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $function = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->show($id);
         } else {
-            $id = false;
             $function = $this->_getParam('function');
-        }
-
-        $response = $this->_model->show($id, $function);
-        
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+            $this->getControllerHelper('form')->show(array('function' => $function));
         }
     }
-
+    
     public function updateAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $function = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->update($id);
         } else {
-            $id = false;
             $function = $this->_getParam('function');
-        }
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->update($id, $function, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->update($id, $function);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/functions/update';
-            if ($id !== false) {
-                $action .= '?id=' . $id;
-            } else {
-                $action .= '?function=' . $function;
-            }
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
+            $this->getControllerHelper('form')->update(array('function' => $function));
         }
     }
 
     public function deleteAction() {
-        // get params
-        $redirect = $this -> _getParam('redirect','/data/');
         if ($this->_hasParam('id')) {
-            $id = $this->_getParam('id');
-            $function = false;
+            $id = (int) $this->_getParam('id');
+            $this->getControllerHelper('form')->delete($id);
         } else {
-            $id = false;
             $function = $this->_getParam('function');
+            $this->getControllerHelper('form')->delete(array('function' => $function));
         }
+    }
 
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->delete($id, $function, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->delete($id, $function);
-        }
+    public function exportAction() {
+        $response = $this->_model->export();
+        $this->view->data = $response['data'];
+        $this->view->status = $response['status'];
 
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $action = Daiquiri_Config::getInstance()->getBaseUrl() . '/data/functions/delete';
-            if ($id !== false) {
-                $action .= '?id=' . $id;
-            } else {
-                $action .= '?function=' . $function;
-            }
-            $form->setAction($action);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        // disable layout
+        $this->_helper->layout->disableLayout();
     }
 
 }

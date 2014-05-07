@@ -1,21 +1,20 @@
 /*  
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 // daiquiri namespace
@@ -45,22 +44,22 @@ daiquiri.query.Query = function (siteUrl) {
     }
 
     this.url = {
-        'jobs': baseUrl + '/query/index/list-jobs',
-        'browser':baseUrl + '/query/index/database',
-        'query': baseUrl + '/query/index/query',
-        'download': baseUrl + '/query/index/download',
-        'plot': baseUrl + '/query/index/plot',
-        'show': baseUrl + '/query/index/show-job',
-        'kill': baseUrl + '/query/index/kill-job',
-        'remove': baseUrl + '/query/index/remove-job',
-        'rename': baseUrl + '/query/index/rename-job',
+        'jobs': baseUrl + '/query/account/list-jobs',
+        'browser':baseUrl + '/query/account/databases',
+        'query': baseUrl + '/query/form/',
+        'download': baseUrl + '/query/download/',
+        //'plot': baseUrl + '/query/index/plot',
+        'show': baseUrl + '/query/account/show-job',
+        'kill': baseUrl + '/query/account/kill-job',
+        'remove': baseUrl + '/query/account/remove-job',
+        'rename': baseUrl + '/query/account/rename-job',
         'results': {
             'cols': baseUrl + '/data/viewer/cols',
             'rows': baseUrl + '/data/viewer/rows',
             'base': baseUrl
         },
-        'fileDownload': baseUrl + '/files/index/row',
-        'sampStream': siteUrl + '/query/index/stream',
+        'fileDownload': baseUrl + '/data/files/row',
+        'sampStream': siteUrl + '/query/download/stream',
         'baseUrl': baseUrl
     }
 
@@ -181,11 +180,22 @@ daiquiri.query.Query.prototype.storeNewJob = function(job) {
     this.displayJobs();
     this.displayBrowser();
 
-    // prepare dialog
-    new daiquiri.Modal({
-        'html': '<h2>Query submitted</h2><p>Your query has been submitted as job ' + job.table + '.</p><p>When the job is done you can obtain the results via the job browser on the left side.</p><p><button class="btn btn-primary">Ok</button></p>',
-        'width': 600,
-    });
+    // old job tabs
+    this.header.details.hide();
+    this.header.results.hide();
+    this.header.plot.hide();
+    this.header.download.hide();
+
+    // load job if it was an instant success, like with direct (syncronous) querys
+    if (job.status === 'success') {
+        this.loadJob(job.id);
+    } else {
+        // prepare dialog
+        new daiquiri.Modal({
+            'html': '<h2>Query submitted</h2><p>Your query has been submitted as job ' + job.table + '.</p><p>When the job is done you can obtain the results via the job browser on the left side.</p><p><button class="btn btn-primary">Ok</button></p>',
+            'width': 600,
+        });
+    }
 };
 
 /**
@@ -200,7 +210,6 @@ daiquiri.query.Query.prototype.displayPlan = function(redirect){
         'success': function (json) {
             if (typeof json === 'undefined') {
                 // the mail button was clicked!
-                console.log($('.daiquiri-modal form'));
                 self.mailPlan($('.daiquiri-modal form'));
             } else {
                 // the form was submitted
@@ -222,7 +231,7 @@ daiquiri.query.Query.prototype.mailPlan = function(form){
     var values = $(form).serialize();
 
     $.ajax({
-        url: action + '?mail=1',
+        url: action + '&mail=1',
         type: 'POST',
         dataType: 'json',
         headers: {
@@ -256,7 +265,7 @@ daiquiri.query.Query.prototype.loadJob = function(jobId){
         error: daiquiri.common.ajaxError,
         success: function (json) {
             if (json.status == 'ok') {
-                self.job = json.data;
+                self.job = json.job;
 
                 // call display methods
                 self.displayDetails();
@@ -269,7 +278,7 @@ daiquiri.query.Query.prototype.loadJob = function(jobId){
                     self.displayDownload();
                     
                     if (! (self.tabs.details.hasClass('active') || self.tabs.results.hasClass('active') || self.tabs.plot.hasClass('active'))) {
-                        $('a', self.header.details).tab('show');
+                        $('a', self.header.results).tab('show');
                     }
 
                 } else {
@@ -303,7 +312,7 @@ daiquiri.query.Query.prototype.displayJobs = function(){
         },
         error: daiquiri.common.ajaxError,
         success: function (json){
-            self.jobs = json.data;
+            self.jobs = json.jobs;
 
             // clean up content
             if ($('#jobs').children().length != 0) {
@@ -313,7 +322,7 @@ daiquiri.query.Query.prototype.displayJobs = function(){
             // construct html string
             var html = '<ul class="nav nav-pills nav-stacked">';
             html += '<li class="nav-header">Jobs</li>';
-            $.each(json.data, function (key, value) {
+            $.each(self.jobs, function (key, value) {
                 if(typeof self.job.id != 'undefined' && self.job.id.value == value.id)  {
                     html += '<li class="nav-item active">';
                 } else {
@@ -777,14 +786,14 @@ daiquiri.query.Query.prototype.displayDownloadPendingMessage = function() {
 
 daiquiri.query.Query.prototype.displayDownloadErrors = function (error) {
     if(typeof error == 'undefined') {
-        error = '';
+        error = {'form': ''};
     } 
 
     $('#daiquiri-query-download-pending').remove();
     $('#daiquiri-query-download-link').remove();
     $('<div/>',{
         'id': 'daiquiri-query-download-pending',
-        'html' : '<p class="text-error">Your file cannot be created due to an error. Please contact support.<br />' + error + '</p>'
+        'html' : '<p class="text-error">Your file cannot be created due to an error. Please contact support.<br />' + error.form + '</p>'
     }).appendTo(this.tabs.download);
 };
 

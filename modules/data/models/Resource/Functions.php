@@ -1,96 +1,102 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Resource class ...
- */
 class Data_Model_Resource_Functions extends Daiquiri_Model_Resource_Table {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets tablename.
      */
     public function __construct() {
-        $this->setTable('Data_Model_DbTable_Functions');
+        $this->setTablename('Data_Functions');
     }
 
     /**
-     * Returns all functions that user has access permission
-     * @param type $id
-     * @throws Exception
-     * @return type 
+     * Fetches all function entries.
+     * @return array $rows
      */
-    public function fetchRows($sqloptions = array()) {
-        // roles starting at 1, therefore check for <=
-        $select = $this->getTable()->select();
-        $rows = $this->getTable()->fetchAll($select);
-
-        return $rows;
+    public function fetchRows(array $sqloptions = array()) {
+        $select = $this->select();
+        $select->from('Data_Functions');
+        $select->order('order ASC');
+        $select->order('name ASC');
+        
+        return $this->fetchAll($select);
     }
 
-    public function fetchId($function) {
-        // get the primary sql select object
-        $select = $this->getTable()->select();
+    /**
+     * Fetches the id of one function entry specified by the function name.
+     * @param string $function name of function
+     * @throws Exception
+     * @return int $id
+     */
+    public function fetchIdByName($function) {
+        if (empty($function)) {
+            throw new Exception('$function not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        $select = $this->select();
+        $select->from('Data_Functions');
         $select->where("`name` = ?", trim($function));
 
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current();
-
-        if ($row) {
-            return $row->id;
-        } else {
+        $row = $this->fetchOne($select);
+        if (empty($row)) {
             return false;
+        } else {
+            return (int) $row['id'];
         }
     }
 
     /**
-     * Returns a specific row from the (joined) Databases/Tables/Columns tables.
-     * @param type $id
+     * Fetches one function entry specified by its id.
+     * @param int $id id of the row
      * @throws Exception
-     * @return type 
+     * @return array $row
      */
     public function fetchRow($id) {
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect();
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        $select = $this->select();
+        $select->from('Data_Functions');
         $select->where("`id` = ?", $id);
         $select->order('order ASC');
         $select->order('name ASC');
 
-        $row = $this->getTable()->fetchAll($select)->current();
-
-        if ($row) {
-            return $row->toArray();
-        } else {
-            return array();
-        }
+        return $this->fetchOne($select);
     }
 
     /**
      * Checks whether the user can access this function
-     * @param int $id
+     * @param int $id id of the row
      * @param int $role
      * @param string $command SQL command
+     * @throws Exception
      * @return array
      */
     public function checkACL($id) {
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
         $row = $this->fetchRow($id);
         return Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id']);
     }

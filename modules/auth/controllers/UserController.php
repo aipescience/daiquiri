@@ -1,238 +1,64 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 class Auth_UserController extends Daiquiri_Controller_Abstract {
 
-    private $_model;
+    protected $_model;
 
-    /**
-     * Inititalizes the controller.
-     */
     public function init() {
         $this->_model = Daiquiri_Proxy::factory('Auth_Model_User');
     }
 
-    /**
-     * Displays the user table with a nice js table.
-     */
     public function indexAction() {
         if (Daiquiri_Auth::getInstance()->checkAcl('Auth_Model_User', 'rows')) {
             $this->view->status = 'ok';
         } else {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Unauthorized();
         }
     }
 
-    /**
-     * Displays the cols of the user table.
-     */
     public function colsAction() {
-        // call model functions
-        $response = $this->_model->cols($this->_request->getQuery());
-        
-        // assign to view
-        $this->view->cols = $response['cols'];
-        $this->view->redirect = $this->_getParam('redirect', '/auth/user/');
-        $this->view->status = 'ok';
+        $this->getControllerHelper('pagination')->cols();
     }
 
-    /**
-     * Displays the rows of the user table.
-     */
     public function rowsAction() {
-        // call model functions
-        $response = $this->_model->rows($this->_request->getQuery());
-
-        // assign to view
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-        $this->view->redirect = $this->_getParam('redirect', '/auth/user/');
-        $this->view->status = 'ok';
+        $this->getControllerHelper('pagination')->rows();
     }
 
-    /**
-     * Shows credentials for a given user.
-     */
     public function showAction() {
-        // get params from request
         $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', '/auth/user/');
-
-        // call model method
-        $this->view->redirect = $redirect;
-        $this->view->data = $this->_model->show($id);
-        $this->view->status = 'ok';
+        $this->getControllerHelper('table')->show($id);
     }
 
-    /**
-     * Creates a new user.
-     */
     public function createAction() {
-        $redirect = $this->_getParam('redirect', '/auth/user/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and create new user
-                $response = $this->_model->create($this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->create();
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/create/');
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $this->getControllerHelper('form')->create();
     }
 
-    /**
-     * Edits an existing user in the database.
-     */
     public function updateAction() {
-        // get the id of the user to be edited
-        $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', '/auth/user/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and edit user
-                $response = $this->_model->update($id, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->update($id);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/update/id/' . $id);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $id = $this->getParam('id');
+        $this->getControllerHelper('form')->update($id);
     }
 
-    /**
-     * Edits an the user which is currently logged in.
-     * Uses different form as updateAction (without status and role).
-     */
-    public function editAction() {
-        // get redirect url
-        $redirect = $this->_getParam('redirect', '/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and edit user
-                $response = $this->_model->edit($this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->edit();
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/edit');
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-    }
-
-    /**
-     * Shows the credentials of the user who is currently logged in
-     */
-    public function infoAction() {
-        // get params from request
-        $redirect = $this->_getParam('redirect', '/auth/user/');
-
-        // call model method
-        $this->view->redirect = $redirect;
-        $this->view->data = $this->_model->show(Daiquiri_Auth::getInstance()->getCurrentId());
-        $this->view->status = 'ok';
-    }
-
-    /**
-     * Deletes a user.
-     */
     public function deleteAction() {
-        // get the id of the user to be deleted
-        $id = $this->_getParam('id');
-        $redirect = $this->_getParam('redirect', '/auth/user/');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                // user clicked cancel
-                $this->_redirect($redirect);
-            } else {
-                // validate form and delete user
-                $response = $this->_model->delete($id, $this->_request->getPost());
-            }
-        } else {
-            // just display the form
-            $response = $this->_model->delete($id);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/user/delete/id/' . $id);
-        }
-
-        // assign to view
-        $this->view->redirect = $redirect;
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
+        $id = $this->getParam('id');
+        $this->getControllerHelper('form')->delete($id);
     }
-
 }

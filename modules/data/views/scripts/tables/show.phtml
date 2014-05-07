@@ -1,22 +1,21 @@
 <?php
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
 
@@ -27,11 +26,11 @@
                 <div class="box">
                     <p>
                         <span class="meta">TABLE</span>
-                        <strong><?php echo $this->escape($this->data['database']); ?>.<?php echo $this->escape($this->data['name']); ?></strong>
+                        <strong><?php echo $this->escape($this->row['database']); ?>.<?php echo $this->escape($this->row['name']); ?></strong>
                     </p>
                 </div>
                 <table class='table table-bordered'>
-                    <?php foreach($this->data as $key => $value): ?>
+                    <?php foreach($this->row as $key => $value): ?>
                         <?php if ($key !== 'columns'): ?>
                         <tr>
                             <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
@@ -41,12 +40,12 @@
                         </tr>
                         <?php endif; ?>
                     <?php endforeach ?>
-                    <?php if (!empty($this->data['columns'])): ?>
+                    <?php if (!empty($this->row['columns'])): ?>
                     <tr>
                         <td class="onehundredtwenty">Columns</td>
                         <td>
                             <ul class="unstyled">
-                                <?php foreach($this->data['columns'] as $column): ?>
+                                <?php foreach($this->row['columns'] as $column): ?>
                                 <li><?php echo $this->escape($column['name']); ?></li>
                                 <?php endforeach; ?>
                             </ul>
@@ -58,15 +57,16 @@
             <div class="span3">
                 <div class="box">
                     <?php
-                    $redirect = '/data/tables/show?id=' . $this->escape($this->data['id']);
                     echo $this->internalLink(array(
                         'text' => 'Update this table entry',
-                        'href' => '/data/tables/update?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'href' => '/data/tables/update?id=' . $this->escape($this->row['id']),
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Delete this table entry',
-                        'href' => '/data/tables/delete?id=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'href' => '/data/tables/delete?id=' . $this->escape($this->row['id']),
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     ?>
@@ -75,22 +75,26 @@
                     <?php
                     echo $this->internalLink(array(
                         'text' => 'Create new database entry',
-                        'href' => '/data/databases/create?redirect=' . $redirect,
+                        'href' => '/data/databases/create',
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Create new table entry',
-                        'href' => '/data/tables/create?databaseId=' . $this->escape($this->data['database_id']) . '&redirect=' . $redirect,
+                        'href' => '/data/tables/create?databaseId=' . $this->escape($this->row['database_id']),
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Create new column entry',
-                        'href' => '/data/columns/create?tableId=' . $this->escape($this->data['id']) . '&redirect=' . $redirect,
+                        'href' => '/data/columns/create?tableId=' . $this->escape($this->row['id']),
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     echo $this->internalLink(array(
                         'text' => 'Create new function entry',
-                        'href' => '/data/functions/create?redirect=' . $redirect,
+                        'href' => '/data/functions/create',
+                        'class' => 'daiquiri-modal-open',
                         'prepend' => '<p>',
                         'append' => '</p>'));
                     ?>

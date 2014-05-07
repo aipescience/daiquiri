@@ -1,106 +1,51 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 class Auth_SessionsController extends Daiquiri_Controller_Abstract {
 
-    private $_model;
+    protected $_model;
 
-    /**
-     * Inititalizes the controller.
-     */
     public function init() {
         $this->_model = Daiquiri_Proxy::factory('Auth_Model_Sessions');
     }
 
-    /**
-     * Displays the user table with a nice js table.
-     */
     public function indexAction() {
         if (Daiquiri_Auth::getInstance()->checkAcl('Auth_Model_Sessions', 'rows')) {
             $this->view->status = 'ok';
         } else {
-            throw new Daiquiri_Exception_AuthError();
+            throw new Daiquiri_Exception_Unauthorized();
         }
     }
 
-    /**
-     * Displays the cols of the user table.
-     */
     public function colsAction() {
-        // call model functions
-        $response = $this->_model->cols($this->_request->getQuery());
-        
-        // assign to view
-        $this->view->cols = $response['cols'];
-        $this->view->redirect = $this->_getParam('redirect', '/auth/sessions/');
-        $this->view->status = 'ok';
+        $this->getControllerHelper('pagination')->cols();
     }
 
-    /**
-     * Displays the rows of the user table.
-     */
     public function rowsAction() {
-        // call model functions
-        $response = $this->_model->rows($this->_request->getQuery());
-
-        // assign to view
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-        $this->view->redirect = $this->_getParam('redirect', '/auth/sessions/');
-        $this->view->status = 'ok';
+        $this->getControllerHelper('pagination')->rows();
     }
 
-    /**
-     * Destroys a given session
-     */
     public function destroyAction() {
-        // get the id of the session to be destroyed
         $session = $this->_getParam('session');
-
-        // check if POST or GET
-        if ($this->_request->isPost()) {
-            if ($this->_getParam('cancel')) {
-                $this->_redirect('/auth/sessions/');
-            } else {
-                // validate form and do stuff
-                $response = $this->_model->destroy($session, $this->_request->getPost());
-            }
-        }  else {
-            // just display the form
-            $response = $this->_model->destroy($session);
-        }
-
-        // set action for form
-        if (array_key_exists('form',$response)) {
-            $form = $response['form'];
-            $form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/auth/sessions/destroy/session/' . $session);
-        }
-
-        // assign to view
-        foreach ($response as $key => $value) {
-            $this->view->$key = $value;
-        }
-
+        $this->getControllerHelper('form')->destroy($session);
     }
 
 }

@@ -1,21 +1,20 @@
 /*  
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 // daiquiri namespace
@@ -49,11 +48,30 @@ daiquiri.Modal.prototype.show = function() {
             },
             error: daiquiri.common.ajaxError,
             success: function (html) {
-                self.html = html;
+                // remove main div
+                var main = html.indexOf('<div class="main">')
+                if (main != -1) {
+                    html = html.substring(main + '<div class="main">'.length ,html.lastIndexOf('</div>'));
+                }
+
+                // get title
+                var match = html.match(/\<h2\>(.*?)\<\/h2\>/g);
+                if (match && match.length) {
+                    self.title = match[0];
+
+                    // remove title
+                    html = html.substring(html.indexOf(self.title) + self.title.length);
+                } else {
+                    self.title = '';
+                }
+
+                self.html = html
+
                 self.display();
             }
         });
     } else if (typeof this.opt.html !== 'undefined') {
+        self.title = this.opt.title;
         self.html = this.opt.html;
         self.display();
     }
@@ -68,9 +86,14 @@ daiquiri.Modal.prototype.display = function () {
     // 'lock' body
     $('body').css('overflow','hidden');
 
+    // set title to empty string in nessesary
+    if (typeof(this.title) === 'undefined') {
+        this.title = ''
+    }
+
     // create diolog
     this.modal = $('<div />',{
-        'html': '<div class="daiquiri-modal-dialog"><div class="daiquiri-modal-close-container"><a class="daiquiri-modal-close" href="#">x</a></div><div class="daiquiri-modal-body">' + this.html + '</div></div>',
+        'html': '<div class="daiquiri-modal-dialog"><div class="daiquiri-modal-close-container"><a class="daiquiri-modal-close" href="#">x</a></div><div class="daiquiri-modal-title">' + this.title + '</div><div class="daiquiri-modal-body">' + this.html + '</div></div>',
         'class': 'daiquiri-modal'
     }).appendTo('body');
 

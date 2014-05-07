@@ -1,0 +1,48 @@
+<?php
+
+/*
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+
+<div class="main">
+    <h2>Contributions</h2>
+
+    <?php 
+    // this is nasty...
+    $flatArray = call_user_func_array('array_merge',$this->data);
+    ?>
+
+    <?php if (empty($flatArray)): ?>
+        <p>The list of contributions for this meeting is not available right now.</p>
+    <?php else: ?>
+        <?php echo $this->message; ?>
+
+        <?php foreach ($this->data as $contributionType => $contributions): ?>
+            <?php if (!empty($contributions)): ?>
+                <h2><?php echo $contributionType; ?></h2>
+
+                <?php foreach ($contributions as $contribution): ?>
+                    <h4><?php echo $contribution['title']; ?></h4>
+                    <h6><?php echo $contribution['participant_firstname'] . ' ' . $contribution['participant_lastname']; ?></h6>
+                    <p><?php echo $contribution['abstract']; ?></p>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>

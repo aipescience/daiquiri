@@ -1,109 +1,89 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Resource class ...
- */
 class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
 
     /**
-     * Constructor. Sets DbTable class.
+     * Constructor. Sets Tablename.
      */
     public function __construct() {
-        $this->addTables(array(
-            'Uws_Model_DbTable_UWSJobs',
-        ));
+        $this->setTablename('Uws_Jobs');
     }
 
     /**
-     * Returns a specific row from the (pending) job table
-     * @param type $id
+     * Fetches a specific row from the (pending) job table
+     * @param string $id UWSJobId of the job
      * @throws Exception
-     * @return type 
+     * @return array $row
      */
     public function fetchRow($id) {
-        $sqloptions = array();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`jobId` = ?", $id);
-        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->current();
-
-        $data = false;
-
-        if($row) {
-            $data = $row->toArray();
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        return $data;
+        $select = $this->select();
+        $select->from('Uws_Jobs');
+        $select->where("jobId = ?", $id);
+        $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
+
+        return $this->fetchOne($select);
     }
 
     /**
-     * Returns a specific row from the (pending) job table
-     * @param type $id
+     * Fetches a set of rows from the (pending) job table
      * @throws Exception
-     * @return type 
+     * @return array $rows
      */
-    public function fetchRows() {
-        $sqloptions = array();
+    public function fetchRows(array $sqloptions = array()) {
+        $select = $this->select();
+        $select->from('Uws_Jobs');
+        $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
 
-        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-        return $row;
+        return $this->fetchAll($select);
     }
 
     /**
-     * Returns the id of the job with a given UWS job id
-     * @param string $UWSJobId
+     * Returns the information of the job with a given UWS job id
+     * @param string $id UWSJobId of the job
      * @return array
      */
     public function fetchObjectWithId($id) {
-        $sqloptions = array();
-
-        // get the primary sql select object
-        $select = $this->getTable()->getSelect($sqloptions);
-
-        $select->where("`jobId` = ?", $id);
-        $select->where("`ownerId` = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
-
-        // get the rowset and return
-        $row = $this->getTable()->fetchAll($select)->toArray();
-
-        if ($row) {
-            //map information to an object
-            return $this->_objectFromRow($row[0]);
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        return false;
+        $row = $this->fetchRow($id);
+        if ($row) {
+            // map information to an object
+            return $this->_objectFromRow($row);
+        } else {
+            return false;
+        }
     }
 
+    /**
+     * Maps the information of a row in the UwsJobs table to an object
+     * @param array $row database row
+     * @return array$jobUWS
+     */
     private function _objectFromRow($row) {
         //create new job object
         $jobUWS = new Uws_Model_Resource_JobSummaryType("job");

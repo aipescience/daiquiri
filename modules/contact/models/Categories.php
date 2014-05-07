@@ -1,55 +1,41 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Model for the contact form categories.
- */
-class Contact_Model_Categories extends Daiquiri_Model_SimpleTable {
+class Contact_Model_Categories extends Daiquiri_Model_Table {
 
     /**
-     * Constructor. Sets resource object and primary field.
+     * Constructor. Sets resource and database table.
      */
     public function __construct() {
         $this->setResource('Daiquiri_Model_Resource_Table');
-        $this->getResource()->setTable('Daiquiri_Model_DbTable_Simple');
-        $this->getResource()->getTable()->setName('Contact_Categories');
-        $this->setValueField('category');
+        $this->getResource()->setTablename('Contact_Categories');
     }
 
+    /**
+     * Creates message category entry.
+     * @param array $formParams
+     * @return array $response
+     */
     public function create(array $formParams = array()) {
-        // create the form object
-        $form = new Contact_Form_Categories();
-
-        // valiadate the form if POST
-        if (!empty($formParams) && $form->isValid($formParams)) {
-            // get the form values
-            $values = $form->getValues();
-
-            $this->addValue($values['category']);
-
-            return array('status' => 'ok');
-        }
-
-        return array('form' => $form, 'status' => 'form');
+        return $this->getModelHelper('CRUD')->create($formParams,'Create message category','Contact_Form_Category');
     }
 
 }

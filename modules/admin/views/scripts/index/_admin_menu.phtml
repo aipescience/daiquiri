@@ -1,34 +1,33 @@
 <?php
 
 /*
- *  Copyright (c) 2012, 2013 Jochen S. Klar <jklar@aip.de>,
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  See the NOTICE file distributed with this work for additional
- *  information regarding copyright ownership. You may obtain a copy
- *  of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 $items = array(
     'index' => array(
-        'text' => 'Admin overview',
+        'text' => 'Overview',
         'href' => '/admin',
         'resource' => 'Auth_Model_User',
         'permission' => 'rows',
     ),
     'config' => array(
-        'text' => 'Configuration entries',
+        'text' => 'Configuration',
         'href' => '/config/entries',
         'resource' => 'Config_Model_Entries',
         'permission' => 'index'),
@@ -57,26 +56,31 @@ $items = array(
         'href' => '/data',
         'resource' => 'Data_Model_Databases',
         'permission' => 'show'),
-    'examples' => array(
-        'text' => 'Query examples',
-        'href' => '/query/examples',
-        'resource' => 'Query_Model_Examples',
+    'meetings' => array(
+        'text' => 'Meetings management',
+        'href' => '/meetings/',
+        'resource' => 'Meetings_Model_Meetings',
         'permission' => 'index'),
     'contact' => array(
         'text' => 'Contact messages',
         'href' => '/contact/messages',
         'resource' => 'Contact_Model_Messages',
         'permission' => 'rows'),
+    'examples' => array(
+        'text' => 'Examples',
+        'href' => '/query/examples',
+        'resource' => 'Query_Model_Examples',
+        'permission' => 'index'),
     'query' => array(
         'text' => 'Query jobs',
         'href' => '/query/jobs',
         'resource' => 'Query_Model_Jobs',
         'permission' => 'rows')
 );
-if (!empty(Daiquiri_Config::getInstance()->cms) && Daiquiri_Config::getInstance()->cms->enabled) {
+if (!empty(Daiquiri_Config::getInstance()->core->cms) && Daiquiri_Config::getInstance()->core->cms->enabled) {
     $items['wordpress'] = array(
         'text' => 'CMS Admin Interface',
-        'href' => Daiquiri_Config::getInstance()->cms->url . 'wp-admin/');
+        'href' => Daiquiri_Config::getInstance()->core->cms->url . 'wp-admin/');
 }
 
 foreach ($items as $key => $value) {
