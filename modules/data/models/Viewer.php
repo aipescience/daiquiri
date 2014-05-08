@@ -47,9 +47,9 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
         // get columns from params or from the database
         if (empty($params['cols'])) {
-            $params['cols'] = array_keys($this->getResource()->fetchCols());
+            $colnames = array_keys($this->getResource()->fetchCols());
         } else {
-            $params['cols'] = explode(',', $params['cols']);
+            $colnames = explode(',', $params['cols']);
         }
 
         // obtain table metadata
@@ -76,13 +76,13 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
         }
 
         // check if all colums are in the database
-        if (count(array_intersect($params['cols'],array_keys($meta))) != count($params['cols'])) {
+        if (count(array_intersect($colnames,array_keys($meta))) != count($colnames)) {
             throw new Exception('Some Columns are not in the database table');
         }
 
         // return columns ot this table
         $cols = array();
-        foreach ($params['cols'] as $colname) {
+        foreach ($colnames as $colname) {
             $col = array(
                 'id' => $meta[$colname]['id'],
                 'name' => $colname,
@@ -154,15 +154,31 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
         // get columns from params or from the database
         if (empty($params['cols'])) {
-            $params['cols'] = array_keys($this->getResource()->fetchCols());
+            $colnames = array_keys($this->getResource()->fetchCols());
         } else {
-            $params['cols'] = explode(',', $params['cols']);
+            $colnames = explode(',', $params['cols']);
         }
 
         // get the table from the resource
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
-        $rows = $this->getResource()->fetchRows($sqloptions);
-        $pk = $this->getResource()->fetchPrimary();
+        $dbRows = $this->getResource()->fetchRows($sqloptions);
+
+        // filter rows
+        $rows = array();
+        foreach($dbRows as $dbRow) {
+            $row = array();
+            foreach($colnames as $colname) {
+                $row[$colname] = $dbRow[$colname];
+            }
+            $rows[] = $row;
+        }
+
+        if (in_array('row_id', $cols)) {
+            $pk = 'row_id';
+        } else {
+            $pk = $this->getResource()->fetchPrimary();
+        }
+
         return $this->getModelHelper('pagination')->response($rows,$sqloptions,$pk);
     }
 

@@ -71,6 +71,7 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
                 return $colname;
             }
         }
+        return false;
     }
 
     /**
