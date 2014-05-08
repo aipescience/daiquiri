@@ -189,7 +189,7 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
         $sql .= ";";
         
         try {
-            $this->getAdapter()->query($sql)->fetch();
+            $this->getAdapter()->query($sql)->closeCursor();
         } catch (Exception $e) {
             // check if this is error 1051 Unknown table
             if (strpos($e->getMessage(), "1051") === false) {
@@ -204,9 +204,10 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
      * @param string $table name of the table
      */
     protected function _dropTable($db, $table) {
+        $sql = 'DROP TABLE ' . $this->quoteIdentifier($db,$table) . ';';
+
         try {
-            $sql = 'DROP TABLE ' . $this->quoteIdentifier($db,$table) . ';';
-            $this->getAdapter()->query($sql)->fetch();
+            $this->getAdapter()->query($sql)->closeCursor();
         } catch (Exception $e) {
             // check if this is error 1051 Unknown table
             if (strpos($e->getMessage(), "1051") === false) {
