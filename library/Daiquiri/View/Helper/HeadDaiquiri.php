@@ -31,13 +31,13 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
 
     // files to be included in this order, but css and js seperately
     public static $files = array(
-        // jquery and jquery ui
-        'lib/jquery-2.1.0.js',
+        // jquery
+        'lib/jquery-2.1.1.min.js',
         // bootstrap
         'lib/bootstrap/css/bootstrap.css',
         'lib/bootstrap/js/bootstrap.js',
         // flot
-        'lib/jquery.flot.js',
+        'lib/jquery.flot.min.js',
         // code mirror
         'lib/codemirror/css/codemirror.css',
         'lib/codemirror/js/codemirror.js',
