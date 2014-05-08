@@ -52,8 +52,8 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         $head = new Daiquiri_Form_Element_Note('head', array(
             'value' => "<h2>{$this->_formOptions['title']}</h2><p>{$this->_formOptions['help']}</p>"
         ));
-
         $this->addElement($head);
+        
         $this->addElement('textarea', 'sql_query', array(
             'filters' => array('StringTrim'),
             'validators' => array(

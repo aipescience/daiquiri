@@ -267,9 +267,10 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
 
             // check function ACL in metadata
             $functionModel = new Data_Model_Functions();
-            $response = $functionModel->show(false, $currNode['base_expr']);
-            if ($response['status'] === 'ok' && array_key_exists("data", $response) && 
-            			$functionModel->getResource()->checkACL($response['data']['id'])) {
+            $response = $functionModel->show(array('function' => $currNode['base_expr']));
+
+            if ($response['status'] === 'ok' && array_key_exists("row", $response) && 
+            			$functionModel->getResource()->checkACL($response['row']['id'])) {
                 return true;
             } else {
                 $error[] = "No permission to use function named " . $currNode['base_expr'];

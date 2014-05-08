@@ -766,7 +766,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
             }
 
             //only process colrefs
-            if(!$this->_isColref($node) && !isExpression($node)) {
+            if(!$this->_isColref($node) && !$this->_isExpression($node)) {
                 continue;
             }
 
@@ -1111,6 +1111,14 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
     function _isColref($node) {
         if(isset($node['expr_type']) && $node['expr_type'] === 'colref') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function _isExpression($node) {
+        if(isset($node['expr_type']) && $node['expr_type'] === 'expression') {
             return true;
         } else {
             return false;

@@ -25,21 +25,23 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         if (!isset($this->_formOptions['table'])) {
             throw new Exception('no table was specified');
         }
-	if (!isset($this->_formOptions['ra'])) {
+        if (!isset($this->_formOptions['raField'])) {
             throw new Exception('no ra field was specified');
         }
-	if (!isset($this->_formOptions['dec'])) {
+        if (!isset($this->_formOptions['decField'])) {
             throw new Exception('no dec field was specified');
         }
 
-	$ra     = $this->_escape($this->getValue($this->getFieldId('ra')));
-	$dec    = $this->_escape($this->getValue($this->getFieldId('dec')));
-	$radius = $this->_escape($this->getValue($this->getFieldId('radius')));
+        $ra     = $this->_escape($this->getValue($this->getFieldId('ra')));
+        $dec    = $this->_escape($this->getValue($this->getFieldId('dec')));
+        $radius = $this->_escape($this->getValue($this->getFieldId('radius')));
 
-	$sql = "SELECT angdist({$ra},{$dec},`{$this->_formOptions['ra']}`,`{$this->_formOptions['dec']}`)";
-	$sql .= " * 3600.0 AS distance_arcsec, s.* FROM {$this->_formOptions['table']} AS s";
-	$sql .= " WHERE angdist({$ra},{$dec},`{$this->_formOptions['ra']}`,`{$this->_formOptions['dec']}`)";
-	$sql .= " < {$radius} / 3600.0;";
+        $sql = "SELECT angdist({$ra},{$dec},`{$this->_formOptions['raField']}`,`{$this->_formOptions['decField']}`)";
+        $sql .= " * 3600.0 AS distance_arcsec, s.* FROM {$this->_formOptions['table']} AS s";
+        $sql .= " WHERE angdist({$ra},{$dec},`{$this->_formOptions['raField']}`,`{$this->_formOptions['decField']}`)";
+        $sql .= " < {$radius} / 3600.0;";
+
+    //Zend_Debug::dump($sql); die(0);
         return $sql;
     }
 
@@ -61,6 +63,11 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         $this->addCsrfElement($this->getFieldId('csrf'));
 
         // add fields
+        $head = new Daiquiri_Form_Element_Note('head', array(
+            'value' => "<h2>{$this->_formOptions['title']}</h2><p>{$this->_formOptions['help']}</p>"
+        ));
+        $this->addElement($head);
+
         $this->addElement('text', $this->getFieldId('ra'), array(
             'filters' => array('StringTrim'),
             'required' => true,
@@ -102,6 +109,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         $this->addPrimaryButtonElement($this->getFieldId('submit'), 'Submit new cone search');
 
         // add groups
+        $this->addParagraphGroup(array('head'), 'sql-head-group');
         $this->addHorizontalGroup(array($this->getFieldId('ra'), $this->getFieldId('dec'), $this->getFieldId('radius')));
         $this->addParagraphGroup(array($this->getFieldId('tablename')), 'table-group', false, true);
         $this->addInlineGroup(array($this->getFieldId('submit')), 'button-group');
@@ -110,9 +118,9 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             $this->setDefault($this->getFieldId('tablename'), $this->_tablename);
         }
 
-	$this->setDefault($this->getFieldId('ra'), '320.0');
-        $this->setDefault($this->getFieldId('dec'), '16.0');
-        $this->setDefault($this->getFieldId('radius'), '2.0');
+        $this->setDefault($this->getFieldId('ra'), $this->_formOptions['raDefault']);
+        $this->setDefault($this->getFieldId('dec'), $this->_formOptions['decDefault']);
+        $this->setDefault($this->getFieldId('radius'), $this->_formOptions['radiusDefault']);
     }
 
 }
