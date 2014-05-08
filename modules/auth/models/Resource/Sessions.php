@@ -29,16 +29,6 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Returns the colums of the sessions table.
-     * @return array $cols
-     */
-    // public function fetchCols() {
-    //     $cols = parent::fetchCols();
-    //     Zend_Debug::dump($cols); die(0);
-    //     return array('session', 'username', 'email', 'ip', 'userAgent', 'modified');
-    // }
-
-    /**
      * Fetches a set of rows of the sessions table specified by $sqloptions.
      * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows

@@ -135,8 +135,14 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
             $storage = Zend_Auth::getInstance()->getStorage();
             $storage->write($row);
 
+            // extend login to two weeks, i.e. 1209600 s
             if ($remember) {
+                // extend lifetime of the clients cookie
                 Zend_Session::rememberMe(1209600);
+
+                // extent the lifetime of the session in the database
+                $saveHandler = Zend_Session::getSaveHandler();
+                $saveHandler->setLifetime(1209600, true);
             }
 
             return true;

@@ -26,7 +26,7 @@ class Auth_Model_Sessions extends Daiquiri_Model_Table {
      */
     public function __construct() {
         $this->setResource('Auth_Model_Resource_Sessions');
-        $this->_cols = array('session','username','ip','userAgent','modified');
+        $this->_cols = array('session','modified','username','ip','userAgent');
     }
 
     /**
