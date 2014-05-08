@@ -36,7 +36,7 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
 
         return array(
             'status' => 'ok',
-            'row' => $this->getResource()->fetchRow($id)
+            'row' => $row
         );
     }
 

@@ -54,16 +54,13 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
 
         // obtain table metadata
         $tablesResource = new Data_Model_Resource_Tables();
-        $tableId = $tablesResource->fetchIdByName($db,$table);
-        if ($tableId === false) {
+        $tableMeta = $tablesResource->fetchRowByName($db,$table,true);
+        if ($tableMeta === false) {
             // this table is not in the metadata table - let's see if we can get
             // further information from the table itself
             $descResource = new Data_Model_Resource_Description();
             $descResource->init($params['db']);
             $tableMeta = $descResource->describeTable($params['table']);
-        } else {
-            // get the metadata from the metadata tables
-            $tableMeta =  $tablesResource->fetchRow($tableId, true);
         } 
 
         // construct metadata array

@@ -42,29 +42,6 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches the id of one database entry specified by the database name.
-     * @param string $db name of database
-     * @throws Exception
-     * @return int $id
-     */
-    public function fetchIdByName($db) {
-        if (empty($db)) {
-            throw new Exception('$db not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
-        }
-
-        $select = $this->select();
-        $select->from('Data_Databases');
-        $select->where("`name` = ?", trim($db));
-
-        $row = $this->fetchOne($select);
-        if (empty($row)) {
-            return false;
-        } else {
-            return (int) $row['id'];
-        }
-    }
-
-    /**
      * Fetches one database entry specified by its id.
      * @param int $id id of the row
      * @param bool $tables fetch table information
@@ -77,10 +54,57 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
             throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        // get the primary sql select object
         $select = $this->select();
         $select->from('Data_Databases');
         $select->where("`id` = ?", $id);
+        $select->order('order ASC');
+        $select->order('name ASC');
+
+        $row = $this->fetchOne($select);
+
+        if ($tables === true) {
+            $select = $this->select();
+            $select->from('Data_Tables');
+            $select->where('database_id = ?', $row['id']);
+            $select->order('order ASC');
+            $select->order('name ASC');
+
+            $tables = $this->fetchAll($select);
+
+            foreach ($tables as &$table) {
+                if ($columns === true) {
+                    $select = $this->select();
+                    $select->from('Data_Columns');
+                    $select->where('table_id = ?', $table['id']);
+                    $select->order('order ASC');
+                    $select->order('name ASC');
+
+                    $table['columns'] = $this->fetchAll($select);
+                }
+            }
+
+            $row['tables'] = $tables;
+        }
+
+        return $row;
+    }
+
+    /**
+     * Fetches one database entry specified by the database name.
+     * @param string $db name of database
+     * @param bool $tables fetch table information
+     * @param bool $columns fetch colums information
+     * @throws Exception
+     * @return int $id
+     */
+    public function fetchRowByName($db, $tables = false, $columns = false) {
+        if (empty($db)) {
+            throw new Exception('$db not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        $select = $this->select();
+        $select->from('Data_Databases');
+        $select->where("`name` = ?", trim($db));
         $select->order('order ASC');
         $select->order('name ASC');
 
@@ -194,17 +218,24 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
 
     /**
      * Checks whether the user can access this database
-     * @param int $id id of the row
-     * @param int $role
+     * @param string $database name of the database
      * @param string $command SQL command
-     * @return array
+     * @return bool
      */
-    public function checkACL($id, $command) {
-        if (empty($id) || empty($command)) {
-            throw new Exception('$id or $command not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+    public function checkACL($database, $command) {
+        if (empty($database) || empty($command)) {
+            throw new Exception('$database or $command not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        $row = $this->fetchRow($id);
+        $select = $this->select();
+        $select->from('Data_Databases');
+        $select->where("`name` = ?", trim($database));
+
+        $row = $this->fetchOne($select);
+        if (empty($row)) {
+            return false;
+        }
+
         $command = strtolower($command);
 
         // check if the database is published for this role

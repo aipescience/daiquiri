@@ -42,31 +42,6 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches the id of one table entry specified by the database and the table name.
-     * @param string $db name of the database
-     * @param string $table name of the table
-     * @return int $id
-     */
-    public function fetchIdByName($db, $table) {
-        if (empty($db) || empty($table)) {
-            throw new Exception('$db or $table not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
-        }
-
-        $select = $this->select();
-        $select->from('Data_Tables');
-        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`', array());
-        $select->where("`Data_Databases`.`name` = ?", trim($db));
-        $select->where("`Data_Tables`.`name` = ?", trim($table));
-
-        $row = $this->fetchOne($select);
-        if (empty($row)) {
-            return false;
-        } else {
-            return (int) $row['id'];
-        }
-    }
-
-    /**
      * Fetches one table entry specified by its id.
      * @param int $id id of the row
      * @param bool $columns fetch colums information
@@ -84,6 +59,43 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
             'database' => 'name', 'database_id' => 'id'
         ));
         $select->where("`Data_Tables`.`id` = ?", $id);
+        $select->order('order ASC');
+        $select->order('name ASC');
+
+        $row = $this->fetchOne($select);
+
+        if ($columns === true) {
+            $select = $this->select();
+            $select->from('Data_Columns');
+            $select->where('table_id = ?', $row['id']);
+            $select->order('order ASC');
+            $select->order('name ASC');
+
+            $row['columns'] = $this->getAdapter()->fetchAll($select);
+        }
+
+        return $row;
+    }
+
+    /**
+     * Fetches one table entry specified by the database and the table name.
+     * @param string $db name of the database
+     * @param string $table name of the table
+     * @param bool $columns fetch colums information
+     * @return int $id
+     */
+    public function fetchRowByName($db, $table, $columns = false) {
+        if (empty($db) || empty($table)) {
+            throw new Exception('$db or $table not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        $select = $this->select();
+        $select->from('Data_Tables');
+        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`', array(
+            'database' => 'name', 'database_id' => 'id'
+        ));
+        $select->where("`Data_Databases`.`name` = ?", trim($db));
+        $select->where("`Data_Tables`.`name` = ?", trim($table));
         $select->order('order ASC');
         $select->order('name ASC');
 
@@ -208,17 +220,27 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
 
     /**
      * Checks whether the user can access this table
-     * @param int $id id of the row
-     * @param int $role
+     * @param string $database the name of the database
+     * @param string $table the name of the table
      * @param string $command SQL command
-     * @return array
+     * @return bool
      */
-    public function checkACL($id, $command) {
-        if (empty($id) || empty($command)) {
-            throw new Exception('$id or $command not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+    public function checkACL($database, $table, $command) {
+        if (empty($database) || empty($table) || empty($command)) {
+            throw new Exception('$database, $table or $command not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        $row = $this->fetchRow($id, false);
+        $select = $this->select();
+        $select->from('Data_Tables');
+        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`', array());
+        $select->where("`Data_Databases`.`name` = ?", trim($database));
+        $select->where("`Data_Tables`.`name` = ?", trim($table));
+
+        $row = $this->fetchOne($select);
+        if (empty($row)) {
+            return false;
+        }
+
         $command = strtolower($command);
 
         // check if the database is published for this role

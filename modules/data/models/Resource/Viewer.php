@@ -23,45 +23,35 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
 
     /**
      * Sets the adapter and the tablename of the resource retroactively.
-     * @param string $db name of the database
+     * @param string $database name of the database
      * @param string $table name of the table
      */
-    public function init($db, $table = null) {
+    public function init($database, $table = null) {
         // get the user adapter
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
 
-        // check if this db is the user datasbase
-        if ($db === Daiquiri_Config::getInstance()->getUserDbName($username)) {
+        // check if this database is the user datasbase
+        if ($database === Daiquiri_Config::getInstance()->getUserDbName($username)) {
             $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter();
         } else {
             // get the database id and check permission on database
             $databasesResource = new Data_Model_Resource_Databases();
-            $databaseId = $databasesResource->fetchIdByName($db);
-            if ($databaseId === false) {
-                throw new Exception("Requested database not available");
-            }
-
-            $result = $databasesResource->checkACL($databaseId,'select');
+            $result = $databasesResource->checkACL($database,'select');
             if ($result !== true) {
-                throw new Exception("Requested database not available");
+                throw new Daiquiri_Exception_NotFound();
             }
 
             // check permission on table access
             if ($table) {
                 $tablesResource = new Data_Model_Resource_Databases();
-                $tableId = $tablesResource->fetchIdByName($db, $table);
-                if ($databaseId === false) {
-                    throw new Exception("Requested table not available");
-                }
-
-                $result = $tablesResource->checkACL($tableId,'select');
+                $result = $tablesResource->checkACL($database,$table,'select');
                 if ($result !== true) {
-                    throw new Exception("Requested table not available");
+                    throw new Daiquiri_Exception_NotFound();
                 }
             }
 
             // if everything went ok get adapter
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($db);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter($database);
         }
 
         // set adapter and table

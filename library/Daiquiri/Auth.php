@@ -270,10 +270,6 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
      * Checks whether the user has access to the given database and table with the desired
      * permission. This uses the Data module for ACLing of the databases and tables. The information
      * stored in the database meta data store is needed for this. 
-     *
-     * BACKWARD COMPATIBILITY: DEPRECATED: For backward compatibility, ACLs can also be specified
-     * in the config file as rules. However since this functionality only remains for backward
-     * compatibility with old development versions. Expect this to be removed soon.
      */
     public function checkDbTable($database, $table, $permission) {
         // switch of security for debugging
@@ -281,9 +277,7 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
             return true;
         }
 
-        // get the current role
-        $role = $this->getCurrentRole();
-
+        // check if this is the users database
         $userDB = Daiquiri_Config::getInstance()->getUserDbName($this->getCurrentUsername());
         if ($database === $userDB) {
             return true;
@@ -291,17 +285,14 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
 
         // check in the data module first, if metadata exists and handle them
         // accordingly
-        $databasesModel = new Data_Model_Databases();
-        $response = $databasesModel->show(array('db' => $database));
-        if ($response['status'] === 'ok' && $databasesModel->getResource()->checkACL($response['row']['id'], $permission)) {
+        $databasesResource = new Data_Model_Resource_Databases();
+        if ($databasesResource->checkACL($database,$permission)) {
             if ($table === false) {
                 return true;
             } else {
-                //access to database granted, so let's check for table access
-                $tablesModel = new Data_Model_Tables();
-                $response = $tablesModel->show(array('db' => $database, 'table' => $table));
-
-                if ($response['status'] === 'ok' && $tablesModel->getResource()->checkACL($response['row']['id'], $permission)) {
+                // access to database granted, so let's check for table access
+                $tablesResource = new Data_Model_Resource_Tables();
+                if ($tablesResource->checkACL($database,$table,$permission)) {
                     return true;
                 }
             }
@@ -309,13 +300,24 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
 
         // scratch database has read access
         $scratchDB = Daiquiri_Config::getInstance()->query->scratchdb;
-
-        if (!empty($scratchDB) && $database === $scratchDB && ($permission === "select" ||
-                $permission === "set" )) {
+        if (!empty($scratchDB) && $database === $scratchDB 
+            && ($permission === "select" || $permission === "set" )) {
             return true;
         }        
 
         return false;
+    }
+
+    public function checkDbFunction($function) {
+        // switch of security for debugging
+        if (Daiquiri_Config::getInstance()->auth->debug === '1') {
+            return true;
+        }
+
+        // check in the data module, if metadata exists and handle them
+        // accordingly
+        $functionsResource = new Data_Model_Resource_Functions();
+        return $functionsResource->checkACL($function);
     }
 
     function checkPublicationRoleId($publication_role_id) {

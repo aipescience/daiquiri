@@ -42,35 +42,6 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches the id of one column entry specified by the database, the table and the column name.
-     * @param string $db name of the database
-     * @param string $table name of the table
-     * @param string $table name of the column
-     * @throws Exception
-     * @return int $id
-     */
-    public function fetchIdByName($db, $table, $column) {
-        if (empty($db) || empty($table) || empty($column)) {
-            throw new Exception('$db, $table or $column not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
-        }
-
-        $select = $this->select();
-        $select->from('Data_Columns');
-        $select->join('Data_Tables','`Data_Tables`.`id` = `Data_Columns`.`table_id`', array());
-        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`', array());
-        $select->where("`Data_Databases`.`name` = ?", trim($db));
-        $select->where("`Data_Tables`.`name` = ?", trim($table));
-        $select->where("`Data_Columns`.`name` = ?", trim($column));
-
-        $row = $this->fetchOne($select);
-        if (empty($row)) {
-            return false;
-        } else {
-            return (int) $row['id'];
-        }
-    }
-
-    /**
      * Fetches one column entry specified by its id.
      * @param int $id id of the row
      * @param bool $columns fetch colums information
@@ -91,6 +62,36 @@ class Data_Model_Resource_Columns extends Daiquiri_Model_Resource_Table {
             'database' => 'name', 'database_id' => 'id'
         ));
         $select->where("`Data_Columns`.`id` = ?", $id);
+        $select->order('order ASC');
+        $select->order('name ASC');
+
+        return $this->fetchOne($select);
+    }
+
+    /**
+     * Fetches the id of one column entry specified by the database, the table and the column name.
+     * @param string $db name of the database
+     * @param string $table name of the table
+     * @param string $column name of the column
+     * @throws Exception
+     * @return int $id
+     */
+    public function fetchRowByName($db, $table, $column) {
+        if (empty($db) || empty($table) || empty($column)) {
+            throw new Exception('$db, $table or $column not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        $select = $this->select();
+        $select->from('Data_Columns');
+        $select->join('Data_Tables','`Data_Tables`.`id` = `Data_Columns`.`table_id`', array(
+            'table' => 'name', 'table_id' => 'id'
+        ));
+        $select->join('Data_Databases','`Data_Databases`.`id` = `Data_Tables`.`database_id`', array(
+            'database' => 'name', 'database_id' => 'id'
+        ));
+        $select->where("`Data_Databases`.`name` = ?", trim($db));
+        $select->where("`Data_Tables`.`name` = ?", trim($table));
+        $select->where("`Data_Columns`.`name` = ?", trim($column));
         $select->order('order ASC');
         $select->order('name ASC');
 
