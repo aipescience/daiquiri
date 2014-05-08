@@ -64,17 +64,21 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
 
         $row = $this->fetchOne($select);
 
-        if ($columns === true) {
-            $select = $this->select();
-            $select->from('Data_Columns');
-            $select->where('table_id = ?', $row['id']);
-            $select->order('order ASC');
-            $select->order('name ASC');
+        if (empty($row)) {
+            return false;
+        } else {
+            if ($columns === true) {
+                $select = $this->select();
+                $select->from('Data_Columns');
+                $select->where('table_id = ?', $row['id']);
+                $select->order('order ASC');
+                $select->order('name ASC');
 
-            $row['columns'] = $this->getAdapter()->fetchAll($select);
+                $row['columns'] = $this->getAdapter()->fetchAll($select);
+            }
+
+            return $row;
         }
-
-        return $row;
     }
 
     /**
@@ -101,17 +105,21 @@ class Data_Model_Resource_Tables extends Daiquiri_Model_Resource_Table {
 
         $row = $this->fetchOne($select);
 
-        if ($columns === true) {
-            $select = $this->select();
-            $select->from('Data_Columns');
-            $select->where('table_id = ?', $row['id']);
-            $select->order('order ASC');
-            $select->order('name ASC');
+        if (empty($row)) {
+            return false;
+        } else {
+            if ($columns === true) {
+                $select = $this->select();
+                $select->from('Data_Columns');
+                $select->where('table_id = ?', $row['id']);
+                $select->order('order ASC');
+                $select->order('name ASC');
 
-            $row['columns'] = $this->getAdapter()->fetchAll($select);
+                $row['columns'] = $this->getAdapter()->fetchAll($select);
+            }
+
+            return $row;
         }
-
-        return $row;
     }
 
     /**

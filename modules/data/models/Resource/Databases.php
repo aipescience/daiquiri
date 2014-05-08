@@ -62,31 +62,35 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
 
         $row = $this->fetchOne($select);
 
-        if ($tables === true) {
-            $select = $this->select();
-            $select->from('Data_Tables');
-            $select->where('database_id = ?', $row['id']);
-            $select->order('order ASC');
-            $select->order('name ASC');
+        if (empty($row)) {
+            return false;
+        } else {
+            if ($tables === true) {
+                $select = $this->select();
+                $select->from('Data_Tables');
+                $select->where('database_id = ?', $row['id']);
+                $select->order('order ASC');
+                $select->order('name ASC');
 
-            $tables = $this->fetchAll($select);
+                $tables = $this->fetchAll($select);
 
-            foreach ($tables as &$table) {
-                if ($columns === true) {
-                    $select = $this->select();
-                    $select->from('Data_Columns');
-                    $select->where('table_id = ?', $table['id']);
-                    $select->order('order ASC');
-                    $select->order('name ASC');
+                foreach ($tables as &$table) {
+                    if ($columns === true) {
+                        $select = $this->select();
+                        $select->from('Data_Columns');
+                        $select->where('table_id = ?', $table['id']);
+                        $select->order('order ASC');
+                        $select->order('name ASC');
 
-                    $table['columns'] = $this->fetchAll($select);
+                        $table['columns'] = $this->fetchAll($select);
+                    }
                 }
+
+                $row['tables'] = $tables;
             }
 
-            $row['tables'] = $tables;
+            return $row;
         }
-
-        return $row;
     }
 
     /**
@@ -110,31 +114,35 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
 
         $row = $this->fetchOne($select);
 
-        if ($tables === true) {
-            $select = $this->select();
-            $select->from('Data_Tables');
-            $select->where('database_id = ?', $row['id']);
-            $select->order('order ASC');
-            $select->order('name ASC');
+        if (empty($row)) {
+            return false;
+        } else {
+            if ($tables === true) {
+                $select = $this->select();
+                $select->from('Data_Tables');
+                $select->where('database_id = ?', $row['id']);
+                $select->order('order ASC');
+                $select->order('name ASC');
 
-            $tables = $this->fetchAll($select);
+                $tables = $this->fetchAll($select);
 
-            foreach ($tables as &$table) {
-                if ($columns === true) {
-                    $select = $this->select();
-                    $select->from('Data_Columns');
-                    $select->where('table_id = ?', $table['id']);
-                    $select->order('order ASC');
-                    $select->order('name ASC');
+                foreach ($tables as &$table) {
+                    if ($columns === true) {
+                        $select = $this->select();
+                        $select->from('Data_Columns');
+                        $select->where('table_id = ?', $table['id']);
+                        $select->order('order ASC');
+                        $select->order('name ASC');
 
-                    $table['columns'] = $this->fetchAll($select);
+                        $table['columns'] = $this->fetchAll($select);
+                    }
                 }
+
+                $row['tables'] = $tables;
             }
 
-            $row['tables'] = $tables;
+            return $row;
         }
-
-        return $row;
     }
 
     /**
