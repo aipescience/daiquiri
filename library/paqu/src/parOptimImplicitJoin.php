@@ -1,7 +1,7 @@
 <?php
 
 /*
-	Copyright (c) 2012, Adrian Partl @ Leibniz Inst. for Astrophysics Potsdam
+	Copyright (c) 2012-2014, Adrian Partl @ Leibniz Inst. for Astrophysics Potsdam
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -113,7 +113,6 @@ function PHPSQLbuildShardQuery($sqlTree, $headNodeTables = array()) {
 	#check for subqueries
 	#this handles nested subqueries that the user already provided. no idea how to handle these
 	#together with the automatic joins found below...
-//var_dump($sqlTree); die(0);
 
 	//before we start with anything, we are going to rewrite any possitional argument in order by 
 	//with the corresponding given column
@@ -132,29 +131,21 @@ function PHPSQLbuildShardQuery($sqlTree, $headNodeTables = array()) {
 		$subQuery['sub_tree'] = PHPSQLbuildShardQuery($subQuery['sub_tree']);
 	}
 
-//var_dump($sqlTree); die(0);
 	$newSqlTree = PHPSQLGroupWhereTerms($sqlTree);
-//var_dump($newSqlTree); die(0);
+
 	$listOfTables = array();
 	PHPSQLGroupTablesAndCols($newSqlTree, $listOfTables);
-//var_dump($listOfTables); die(0);
+
 	$dependantList = PHPSQLGroupWhereCond($newSqlTree, $listOfTables);
-//var_dump($listOfTables); die(0);
-//var_dump($dependantList); die(0);
 
 	PHPSQLCountWhereConditions($listOfTables);
-//var_dump($listOfTables); die(0);
 	$listOfTables = PHPSQLdetStartTable($listOfTables, $headNodeTables, $dependantList);
-//var_dump($listOfTables);
-//var_dump($dependantList); //die(0);
 
 	$nestedQuery = PHPSQLbuildNestedQuery($newSqlTree, $listOfTables, $dependantList, 0);
-//var_dump($nestedQuery); //die(0);
+
 	#link subqueries
 	linkSubqueriesToTree($nestedQuery, $subQueries);
-//var_dump($nestedQuery); //die(0);
 	linkNestedWheresToTree($nestedQuery, $subQueries);
-//var_dump($nestedQuery); //die(0);
 
 	return $nestedQuery;
 }
@@ -542,7 +533,7 @@ function linkInnerQueryToOuter(&$currOuterQuery, &$currInnerNode, &$tableList, $
 			//this expression is now to be treated as a normal column, so apply changes
 			$node['expr_type'] = 'colref';
 			$node['sub_tree'] = false;
-			$node['no_quotes'] = array("delim" => ".", "parts" => array($tblAlias['name'], extractColumnAlias($node)));
+			$node['no_quotes'] = array("delim" => ".", "parts" => array(trim($tblAlias['name'], "`"), extractColumnAlias($node)));
 			$node['base_expr'] = getBaseExpr($node);
 		}
 
@@ -551,13 +542,13 @@ function linkInnerQueryToOuter(&$currOuterQuery, &$currInnerNode, &$tableList, $
 		if ($tblAlias !== false && strpos($tblAlias['no_quotes']['parts'][0], 'agr_')) {
 			continue 1;
 		} else if(hasAlias($node)) {
-			setNoQuotes($node, array($tblAlias['name'], implodeNoQuotes($node['alias']['no_quotes'])));
+			setNoQuotes($node, array(trim($tblAlias['name'], "`"), implodeNoQuotes($node['alias']['no_quotes'])));
 		} else {
 			//if this is a node with a subtree, create an alias for it
 			if(hasSubtree($node)) {
-				setNoQuotes($node, array($tblAlias['name'], buildEscapedString(array($node))));
+				setNoQuotes($node, array(trim($tblAlias['name'], "`"), buildEscapedString(array($node))));
 			} else {
-				setNoQuotes($node, array($tblAlias['name'], implodeNoQuotes($node['no_quotes'])));
+				setNoQuotes($node, array(trim($tblAlias['name'], "`"), implodeNoQuotes($node['no_quotes'])));
 			}
 		}
 
@@ -1368,7 +1359,19 @@ function PHPSQLcollectColumns($sqlSelect, $tblDb, $tblName, $tblAlias, &$returnA
 					}
 				}
 
-				array_push($returnArray, $node);
+				//if this is a function/aggregate that applies to a '*' "column", then only apply this at the
+				//outermost level (i.e. reclevel=0) and not before (see Test40 for case where this applies)
+				$canAddThisNode = true;
+				foreach($currColArray as $column) {
+					if($column['base_expr'] === "*" && $recLevel != 0) {
+						$canAddThisNode = false;
+						break;
+					}
+				}
+
+				if($canAddThisNode === true) {
+					array_push($returnArray, $node);
+				}
 			}
 
 			//add columns if not yet added, but only if there are dependant columns evolved
@@ -1398,9 +1401,7 @@ function PHPSQLcollectColumns($sqlSelect, $tblDb, $tblName, $tblAlias, &$returnA
 
 			if ($currTable === $tblAlias || ($currTable === false) || $currTable === $tblName || 
 						 $tblAlias === $currDB . "." . $currTable) {
-				//if ($startBranch === true) {
 					array_push($returnArray, $node);
-				//}
 			} else {
 				#check if this table has already been selected and processed. if yes, we can already process it and
 				#donot need to wait

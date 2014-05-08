@@ -1048,7 +1048,13 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
         $tableResource = new Data_Model_Resource_Tables();
 
-        $tableData = $tableResource->fetchRow($tableResource->fetchIdByName($resParts[1], $resParts[2]), true);
+        $tableId = $tableResource->fetchIdByName($resParts[1], $resParts[2]);
+
+        if($tableId === false) {
+            throw new Exception("Table {$table} does not exist.");
+        }
+
+        $tableData = $tableResource->fetchRow($tableId, true);
 
         foreach($tableData['columns'] as $count => $row) {
             if($count == 0) {
