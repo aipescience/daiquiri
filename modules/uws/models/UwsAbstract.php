@@ -94,21 +94,21 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
                     return array(
                         'status' => 'ok',
                         'body' => $job->phase,
-                        'headers' => 'text/plain;'
+                        'headers' => array('Content-Type' => 'text/plain;')
                     );
                     break;
                 case 'executionduration':
                     return array(
                         'status' => 'ok',
                         'body' => $job->executionDuration,
-                        'headers' => 'text/plain;'
+                        'headers' => array('Content-Type' => 'text/plain;')
                     );
                     break;
                 case 'destruction':
                     return array(
                         'status' => 'ok',
                         'body' => $job->destruction,
-                        'headers' => 'text/plain;'
+                        'headers' => array('Content-Type' => 'text/plain;')
                     );
                     break;
                 case 'error':
@@ -116,14 +116,14 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
                     return array(
                         'status' => 'ok',
                         'body' => $errorInfo,
-                        'headers' => 'text/plain;'
+                        'headers' => array('Content-Type' => 'text/plain;')
                     );
                     break;
                 case 'quote':
                     return array(
                         'status' => 'ok',
                         'body' => $job->quote,
-                        'headers' => 'text/plain;'
+                        'headers' => array('Content-Type' => 'text/plain;')
                     );
                     break;
                 case 'results':
@@ -253,12 +253,12 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
                     $this->deleteJob($job);
                 } else {
                     if (isset($postParams['destruction'])) {
-                        $this->_model->setDestructTime($job, $postParams['destruction']);
+                        $this->setDestructTime($job, $postParams['destruction']);
                         unset($postParams['destruction']);
                     }
 
                     if (isset($postParams['executionduration'])) {
-                        $this->_model->setExecutionDuration($job, $postParams['executionduration']);
+                        $this->setExecutionDuration($job, $postParams['executionduration']);
                         unset($postParams['executionduration']);
                     }
 
@@ -272,16 +272,16 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
                         if (isset($postParams['destruction'])) {
                             $this->setDestructTime($job, $postParams['destruction']);
                         } else {
-                            throw new Daiquiri_Exception_NotFound();
+                            throw new Daiquiri_Exception_BadRequest();
                         }
 
                         break;
 
                     case 'executionduration':
                         if (isset($postParams['executionduration'])) {
-                            $this->_model->setExecutionDuration($job, $postParams['executionduration']);
+                            $this->setExecutionDuration($job, $postParams['executionduration']);
                         } else {
-                            throw new Daiquiri_Exception_NotFound();
+                            throw new Daiquiri_Exception_BadRequest();
                         }
 
                         break;
@@ -291,7 +291,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
                         // standard)
                         // check if everything is sane
                         if (isset($postParams['wild2'])) {
-                            throw new Daiquiri_Exception_NotFound();
+                            throw new Daiquiri_Exception_BadRequest();
                         }
 
                         unset($postParams['modulename']);
@@ -306,7 +306,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
                         break;
 
                     default:
-                        throw new Daiquiri_Exception_NotFound();
+                        throw new Daiquiri_Exception_BadRequest();
                         break;
                 }
             }
@@ -380,7 +380,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         $job = $this->getPendingJob($wildParams['wild0']);
 
         if ($job === false) {
-            //get job information for this id
+            // get job information for this id
             $job = $this->getJob($requestParams);
         }
 
@@ -398,9 +398,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
     public function options() {
         return array(
             'stautus' => 'ok',
-            'headers' => array(
-                'Allow' => 'OPTIONS, INDEX, GET, POST, PUT, DELETE'
-            )
+            'headers' => array('Allow' => 'OPTIONS, INDEX, GET, POST, PUT, DELETE')
         );
     }
 

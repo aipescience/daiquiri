@@ -148,7 +148,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // add link to results if needed
         if ($jobUWS->phase === "COMPLETED") {
             // we have results!
-            $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/query/index/stream/table/" .
+            $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/query/download/stream/table/" .
                     urlencode($job['table']) . "/format/csv";
             $jobUWS->addResult($job['table'], $href);
         } else if ($jobUWS->phase === "ERROR") {
