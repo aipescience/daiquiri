@@ -1,8 +1,7 @@
 Daiquiri
 ========
 
-A framework for the publication of scientific databases
--------------------------------------------------------
+**A framework for the publication of scientific databases**
 
 Today, the publication of research data plays an important role in astronomy and 
 astrophysics. On the one hand, dedicated programs, such as surveys like SDSS and 
@@ -65,6 +64,12 @@ The advanced features though are tightly integrated with MySQL extensions that w
 built for use with Daiquiri. These are the MySQL query queue, PaQu, and the IVOA 
 MySQL VOTable dumper. The asynchronous data export relies on Gearman. The user 
 interface makes use of jQuery, bootstrap, CodeMirror and flot.
+
+More
+----
+
+For more information about Daiquiri and the documentation, please visit 
+[escience.aip.de/daiquiri](https://escience.aip.de/daiquiri).
 
 Credits
 -------

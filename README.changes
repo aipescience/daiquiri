@@ -23,7 +23,7 @@ In init.php $options['data']['database'], $options['data']['tables'], $options['
 2013/12/04
 ==========
 
-Table `Config_Messages` added. Ressource 'Config_Model_Messages' with permission 'index,show,create,update,delete' for admin and 'show' for guest/user added.
+Table `Config_Messages` added. Resource 'Config_Model_Messages' with permission 'index,show,create,update,delete' for admin and 'show' for guest/user added.
 
 Re-Init or manual fix needed:
 
@@ -35,16 +35,16 @@ CREATE TABLE IF NOT EXISTS `Config_Messages` (
 
 INSERT INTO `Auth_Resources` VALUES (NULL,'Config_Model_Messages');
 
-SET @ressource_id := (SELECT id FROM `Auth_Ressources` WHERE `ressource`='Auth_Resources');
+SET @resource_id := (SELECT id FROM `Auth_Resources` WHERE `resource`='Auth_Resources');
 
 SET @role_id := (SELECT id FROM `Auth_Roles` WHERE `role`='admin');
-INSERT INTO `Auth_Rules` VALUES (NULL,@role_id,@ressource_id,'index,create,show,update,delete');
+INSERT INTO `Auth_Rules` VALUES (NULL,@role_id,@resource_id,'index,create,show,update,delete');
 
 SET @role_id := (SELECT id FROM `Auth_Roles` WHERE `role`='user');
 or
 SET @role_id := (SELECT id FROM `Auth_Roles` WHERE `role`='guest');
 
-INSERT INTO `Auth_Rules` VALUES (NULL,@role_id,@ressource_id,'show');
+INSERT INTO `Auth_Rules` VALUES (NULL,@role_id,@resource_id,'show');
 
 
 2013/12/03
