@@ -157,7 +157,12 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
 
                 $values['database'] = $entry['database'];
                 $values['table'] = $entry['table'];
-                $this->getResource()->updateRow($entry['id'], $values);
+
+                try {
+                    $this->getResource()->updateRow($entry['id'], $values);
+                } catch (Exception $e) {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form, $e->getMessage());
+                } 
 
                 return array('status' => 'ok');
             } else {

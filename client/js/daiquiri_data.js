@@ -22,6 +22,11 @@ var daiquiri = daiquiri || {};
 daiquiri.data = {};
 
 /**
+ * Object to hold some options.
+ */
+daiquiri.data.opt = {};
+
+/**
  * Displays the main table of the user management and ajaxifies the option links.
  */ 
 daiquiri.data.Data = function (baseUrl) {
@@ -29,7 +34,9 @@ daiquiri.data.Data = function (baseUrl) {
     self.url = false;
     this.idle = true;
     this.baseUrl = baseUrl;
+}
 
+daiquiri.data.Data.prototype.init = function () {
     $('.daiquiri-modal-open').click(function(){
         new daiquiri.Modal({
             'url': this.href,
@@ -41,50 +48,60 @@ daiquiri.data.Data = function (baseUrl) {
     });
 
     $('#database-browser','#data').daiquiri_browser({
-        'url': baseUrl + "/data/databases",
+        'url': this.baseUrl + "/data/databases",
         'columns': ['databases','tables','columns'],
         'click': function(opt) {
-            daiquiri.data.item.show('database-browser',opt);
+            daiquiri.data.item.opt = opt;
+            daiquiri.data.item.show('database-browser');
         },
         'dblclick': function(opt) {
-            daiquiri.data.item.show('database-browser',opt);
+            daiquiri.data.item.opt = opt;
+            daiquiri.data.item.show('database-browser');
         },
     });
     $('#function-browser','#data').daiquiri_browser({
-        'url': baseUrl + "/data/functions",
+        'url': this.baseUrl + "/data/functions",
         'columns': ['functions'],
         'click': function(opt) {
-            daiquiri.data.item.show('function-browser',opt);
+            daiquiri.data.item.opt = opt;
+            daiquiri.data.item.show('function-browser');
         },
         'dblclick': function(opt) {
-            daiquiri.data.item.show('function-browser',opt);
+            daiquiri.data.item.opt = opt;
+            daiquiri.data.item.show('function-browser');
         },
     });
 }
 
-daiquiri.data.Data.prototype.show = function (id, opt) {
+daiquiri.data.Data.prototype.show = function (id) {
     var self = daiquiri.data.item;
 
-    // default is to reload old
-    var url = self.url;
+    // get url
+    var url;
     if (typeof id !== 'undefined') {
         if (id == 'database-browser') {
-            if (typeof opt.left !== 'undefined') {
-                if (typeof opt.center === 'undefined' ) {
-                     url = self.baseUrl + '/data/databases/show/?db=' + opt.left;
+            if (typeof self.opt.left !== 'undefined') {
+                if (typeof self.opt.center === 'undefined' ) {
+                     url = self.baseUrl + '/data/databases/show/?db=' + self.opt.left;
                 } else {
-                    if (typeof opt.right === 'undefined' ) {
-                        url = self.baseUrl + '/data/tables/show/?db=' + opt.left + '&table=' + opt.center;
+                    if (typeof self.opt.right === 'undefined' ) {
+                        url = self.baseUrl + '/data/tables/show/?db=' + self.opt.left + '&table=' + self.opt.center;
                     } else {
-                        url = self.baseUrl + '/data/columns/show/?db=' + opt.left + '&table=' + opt.center + '&column=' + opt.right;
+                        url = self.baseUrl + '/data/columns/show/?db=' + self.opt.left + '&table=' + self.opt.center + '&column=' + self.opt.right;
                     }
                 }
             } 
         } else if (id == 'function-browser') {
             url = self.baseUrl + '/data/';
-            if (typeof opt.left !== 'undefined') {
-                url = self.baseUrl + '/data/functions/show/?function=' + opt.left;
+            if (typeof self.opt.left !== 'undefined') {
+                url = self.baseUrl + '/data/functions/show/?function=' + self.opt.left;
             }
+        }
+    } else {
+        if (typeof self.opt.action !== 'undefined') {
+            url = self.opt.action;
+        } else {
+            url = self.url;
         }
     }
 
@@ -109,7 +126,11 @@ daiquiri.data.Data.prototype.show = function (id, opt) {
                         'url': this.href,
                         'width': 725,
                         'class': 'daiquiri-user-table-modal',
-                        'success': daiquiri.data.item.show
+                        'success': function (json, action) {
+                            daiquiri.data.item.opt.action = action.replace('update','show');
+                            daiquiri.data.item.init();
+                            daiquiri.data.item.show();
+                        }
                     });
                     return false;
                 });

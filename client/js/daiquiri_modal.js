@@ -176,7 +176,7 @@ daiquiri.Modal.prototype.display = function () {
 
                         // call success function
                         if (typeof self.opt.success!== 'undefined') {
-                            self.opt.success(json);
+                            self.opt.success(json, action);
                         }
                     } else if (json.status == 'error') {
                         daiquiri.common.updateCsrf(form, json.csrf);

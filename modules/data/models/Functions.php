@@ -153,7 +153,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
-                $this->getResource()->updateRow($row['id'], $values);
+                $this->getResource()->updateRow($entry['id'], $values);
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);

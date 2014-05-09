@@ -21,7 +21,8 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        new daiquiri.data.Data('<?php echo $this->baseUrl(); ?>');
+        var data = new daiquiri.data.Data('<?php echo $this->baseUrl(); ?>');
+        data.init();
     });
 </script>
 

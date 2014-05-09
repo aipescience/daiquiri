@@ -151,7 +151,7 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
-                $this->getResource()->updateRow($row['id'], $values);
+                $this->getResource()->updateRow($entry['id'], $values);
 
                 return array('status' => 'ok');
             } else {
