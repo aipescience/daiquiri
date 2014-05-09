@@ -36,10 +36,22 @@ class Data_IndexController extends Daiquiri_Controller_Abstract {
 
     public function exportAction() {
         $databasesModel = Daiquiri_Proxy::factory('Data_Model_Databases');
-        $functionsModel = Daiquiri_Proxy::factory('Data_Model_Functions');
+        $databases = $databasesModel->export();
 
-        $this->view->databases = $databasesModel->index(true);
-        $this->view->functions = $functionsModel->index();
+        $tablesModel = Daiquiri_Proxy::factory('Data_Model_Tables');
+        $tables = $tablesModel->export();
+
+        $columnsModel = Daiquiri_Proxy::factory('Data_Model_Columns');
+        $columns = $columnsModel->export();
+
+        $functionsModel = Daiquiri_Proxy::factory('Data_Model_Functions');
+        $functions = $functionsModel->export();
+
+        $this->view->data = array_merge($databases['data'],$tables['data'],$columns['data'],$functions['data']);
+        $this->view->status = 'ok';
+
+        // disable layout
+        $this->_helper->layout->disableLayout();
     }
 
 }
