@@ -39,13 +39,14 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         if ($this->_hasParam('id')) {
             $id = (int) $this->_getParam('id');
-            $this->getControllerHelper('form')->show($id);
+            $response = $this->_model->show($id);
         } else {
             $db = $this->_getParam('db');
             $table = $this->_getParam('table');
             $column = $this->_getParam('column');
-            $this->getControllerHelper('form')->show(array('db' => $db, 'table' => $table, 'column' => $column));
+            $response = $this->_model->show(array('db' => $db, 'table' => $table, 'column' => $column));
         }
+        $this->view->assign($response);
     }
 
     public function updateAction() {

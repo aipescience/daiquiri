@@ -27,7 +27,7 @@ class Data_FilesController extends Daiquiri_Controller_Abstract {
 
     public function indexAction() {
         $response = $this->_model->index();
-        $this->setViewElements($response);
+        $this->view->assign($response);
     }
 
     public function singleAction() {
@@ -50,7 +50,7 @@ class Data_FilesController extends Daiquiri_Controller_Abstract {
 
         $response = $this->_model->singleSize($name);
 
-        $this->setViewElements($response);
+        $this->view->assign($response);
     }
 
     public function multiAction() {
@@ -75,7 +75,7 @@ class Data_FilesController extends Daiquiri_Controller_Abstract {
 
         $response = $this->_model->multiSize($table, $column);
 
-        $this->setViewElements($response);
+        $this->view->assign($response);
     }
 
     public function rowAction() {
@@ -101,7 +101,7 @@ class Data_FilesController extends Daiquiri_Controller_Abstract {
 
         $response = $this->_model->rowSize($table, $row_ids);
 
-        $this->setViewElements($response);
+        $this->view->assign($response);
     }
 
 }

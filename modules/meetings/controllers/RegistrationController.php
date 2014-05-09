@@ -28,12 +28,15 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $this->getControllerHelper('table')->index();
+        $response = $this->_model->index();
+        $this->view->assign($response);
     }
 
     public function showAction() {
         $id = $this->getParam('id');
-        $this->getControllerHelper('table')->show($id);
+        $response = $this->_model->show($id);
+        $this->view->redirect = $this->_getParam('redirect','/meetings/registration/');
+        $this->view->assign($response);
     }
 
     public function deleteAction() {
@@ -67,7 +70,8 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
         }
 
         // assign to view
-        $this->setViewElements($response, $redirect);
+        $this->view->redirect = $redirect;
+        $this->view->assign($response);
     }
 
     public function validateAction() {
@@ -78,6 +82,6 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
         $response = $this->_model->validate($id, $code);
 
         // assign to view
-        $this->setViewElements($response);
+        $this->view->assign($response);
     }
 }

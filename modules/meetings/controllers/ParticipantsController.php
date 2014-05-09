@@ -47,7 +47,9 @@ class Meetings_ParticipantsController extends Daiquiri_Controller_Abstract {
 
     public function showAction() {
         $id = $this->getParam('id');
-        $this->getControllerHelper('table')->show($id);
+        $response = $this->_model->show($id);
+        $this->view->redirect = $this->_getParam('redirect','/meetings/participants/');
+        $this->view->assign($response);
     }
 
     public function createAction() {

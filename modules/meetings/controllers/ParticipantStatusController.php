@@ -28,12 +28,15 @@ class Meetings_ParticipantStatusController extends Daiquiri_Controller_Abstract 
     }
 
     public function indexAction() {
-        $this->getControllerHelper('table', array('object' => 'participant status'))->index();
+        $response = $this->_model->index();
+        $this->view->assign($response);
     }
 
     public function showAction() {
         $id = $this->getParam('id');
-        $this->getControllerHelper('table')->show($id);
+        $response = $this->_model->show($id);
+        $this->view->redirect = $this->_getParam('redirect','/meetings/participant-status/');
+        $this->view->assign($response);
     }
 
     public function createAction() {

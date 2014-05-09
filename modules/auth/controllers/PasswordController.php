@@ -30,7 +30,8 @@ class Auth_PasswordController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         $id = $this->_getParam('id');
         $type = $this->_getParam('type', 'default');
-        $this->getControllerHelper('table')->show($id, $type);
+        $response = $this->_model->show($id, $type);
+        $this->view->assign($response);
     }
 
     public function changeAction() {

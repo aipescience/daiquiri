@@ -66,6 +66,7 @@ class Daiquiri_Controller_Helper_Form extends Daiquiri_Controller_Helper_Abstrac
 
         // assign to view
         $response['title'] = $this->_options['title'];
-        $this->getController()->setViewElements($response, $redirect);
+        $response['redirect'] = $redirect;
+        $this->getView()->assign($response);
     }
 }

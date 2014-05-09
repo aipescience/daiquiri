@@ -30,7 +30,8 @@ class Auth_DetailsController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         $id = $this->_getParam('id');
         $key = $this->_getParam('key');
-        $this->getControllerHelper('table')->show($id, $key);
+        $response = $this->_model->show($id, $key);
+        $this->view->assign($response);
     }
 
     public function createAction() {

@@ -35,7 +35,7 @@ class Meetings_InfoController extends Daiquiri_Controller_Abstract {
         $response = $model->info($this->_meetingId);
 
         // assign to view
-        $this->setViewElements($response);
+        $this->view->assign($response);
     }
 
     public function contributionsAction() {
@@ -43,6 +43,6 @@ class Meetings_InfoController extends Daiquiri_Controller_Abstract {
         $response = $model->info($this->_meetingId);
 
         // assign to view
-        $this->setViewElements($response);
+        $this->view->assign($response);
     }
 }

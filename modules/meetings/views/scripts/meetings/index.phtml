@@ -42,13 +42,13 @@
                         <?php 
                         echo $this->internalLink(array(
                             'text' => 'Show',
-                            'href' => $this->base . 'show/id/' . $this->escape($row['id']),
-                            'resource' => $this->model,
+                            'href' => '/meetings/meetings/show/id/' . $this->escape($row['id']),
+                            'resource' => 'Meetings_Model_Meetings',
                             'permission' => 'show'));
                         echo $this->internalLink(array(
                             'text' => 'Update',
-                            'href' => $this->base . 'update/id/' . $this->escape($row['id']),
-                            'resource' => $this->model,
+                            'href' => '/meetings/meetings/update/id/' . $this->escape($row['id']),
+                            'resource' => 'Meetings_Model_Meetings',
                             'permission' => 'update',
                             'prepend' => '&nbsp;'));
                         echo $this->internalLink(array(
@@ -65,8 +65,8 @@
                             'prepend' => '&nbsp;'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
-                            'href' => $this->base . 'delete/id/' . $this->escape($row['id']),
-                            'resource' => $this->model,
+                            'href' => '/meetings/meetings/delete/id/' . $this->escape($row['id']),
+                            'resource' => 'Meetings_Model_Meetings',
                             'permission' => 'delete',
                             'prepend' => '&nbsp;')); 
                         ?>
@@ -79,7 +79,9 @@
     <?php
     echo $this->internalLink(array(
         'text' => 'Create new meeting',
-        'href' => $this->base . 'create',
+        'href' => '/meetings/meetings/create',
+        'resource' => 'Meetings_Model_Meetings',
+        'permission' => 'create',
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->internalLink(array(

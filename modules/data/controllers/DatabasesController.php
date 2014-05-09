@@ -28,8 +28,8 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $response = $this->_model->index(true);
-        $this->setViewElements($response);
+        $response = $this->_model->index();
+        $this->view->assign($response);
     }
 
     public function createAction() {
@@ -40,11 +40,12 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         if ($this->_hasParam('id')) {
             $id = (int) $this->_getParam('id');
-            $this->getControllerHelper('form')->show($id);
+            $response = $this->_model->show($id);
         } else {
             $db = $this->_getParam('db');
-            $this->getControllerHelper('form')->show(array('db' => $db));
+            $response = $this->_model->show(array('db' => $db));
         }
+        $this->view->assign($response);
     }
     
     public function updateAction() {

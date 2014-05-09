@@ -21,7 +21,7 @@
 ?>
 
 <div class="main">
-    <h2><?php echo ucfirst($this->escape($this->objects)); ?></h2>
+    <h2>Manage participant detail keys</h2>
 
     <table class="table table-condensed">
         <thead>
@@ -41,19 +41,19 @@
                         <?php 
                         echo $this->internalLink(array(
                             'text' => 'Show',
-                            'href' => $this->base . 'show/id/' . $this->escape($row['id']),
-                            'resource' => $this->model,
+                            'href' => '/meetings/participant-detail-keys/show/id/' . $this->escape($row['id']),
+                            'resource' => 'Meetings_Model_ParticipantDetailKeys',
                             'permission' => 'show'));
                         echo $this->internalLink(array(
                             'text' => 'Update',
-                            'href' => $this->base . 'update/id/' . $this->escape($row['id']),
-                            'resource' => $this->model,
+                            'href' => '/meetings/participant-detail-keys/update/id/' . $this->escape($row['id']),
+                            'resource' => 'Meetings_Model_ParticipantDetailKeys',
                             'permission' => 'update',
                             'prepend' => '&nbsp;'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
-                            'href' => $this->base . 'delete/id/' . $this->escape($row['id']),
-                            'resource' => $this->model,
+                            'href' => '/meetings/participant-detail-keys/delete/id/' . $this->escape($row['id']),
+                            'resource' => 'Meetings_Model_ParticipantDetailKeys',
                             'permission' => 'delete',
                             'prepend' => '&nbsp;')); 
                         ?>
@@ -65,13 +65,13 @@
 
     <?php
     echo $this->internalLink(array(
-        'text' => 'Create ' . $this->object,
-        'href' => $this->base . 'create',
+        'text' => 'Create Participant Detail Key',
+        'href' => '/meetings/participant-detail-keys/create',
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->internalLink(array(
         'text' => 'Back to meetings management',
-        'href' => $this->redirect,
+        'href' => '/meetings/',
         'prepend' => '<p>',
         'append' => '</p>'));
     ?>

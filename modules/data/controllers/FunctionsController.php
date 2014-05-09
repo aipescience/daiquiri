@@ -29,7 +29,7 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
 
     public function indexAction() {
         $response = $this->_model->index();
-        $this->setViewElements($response);
+        $this->view->assign($response);
     }
 
     public function createAction() {
@@ -39,11 +39,12 @@ class Data_FunctionsController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         if ($this->_hasParam('id')) {
             $id = (int) $this->_getParam('id');
-            $this->getControllerHelper('form')->show($id);
+            $response = $this->_model->show($id);
         } else {
             $function = $this->_getParam('function');
-            $this->getControllerHelper('form')->show(array('function' => $function));
+            $response = $this->_model->show(array('function' => $function));
         }
+        $this->view->assign($response);
     }
     
     public function updateAction() {

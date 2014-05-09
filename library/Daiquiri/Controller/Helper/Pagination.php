@@ -28,7 +28,7 @@ class Daiquiri_Controller_Helper_Pagination extends Daiquiri_Controller_Helper_A
         $response = $this->getModel()->cols($queryParams);
 
         // assign to view
-        $this->getController()->setViewElements($response);
+        $this->getView()->view->assign($response);
     }    
 
     public function rows() {
@@ -39,7 +39,7 @@ class Daiquiri_Controller_Helper_Pagination extends Daiquiri_Controller_Helper_A
         $response = $this->getModel()->rows($queryParams);
 
         // assign to view
-        $this->getController()->setViewElements($response);
+        $this->getView()->assign($response);
     }    
 
 }

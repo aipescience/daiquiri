@@ -46,6 +46,10 @@ class Daiquiri_Controller_Helper_Abstract {
         return $this->_controller->getRequest();
     }
 
+    public function getView() {
+        return $this->_controller->view;
+    }
+
     public function getModel() {
         return $this->_model;
     }

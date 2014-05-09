@@ -28,7 +28,8 @@ class Auth_AccountController extends Daiquiri_Controller_Abstract {
     }
 
     public function showAction() {
-        $this->getControllerHelper('table')->show();
+        $response = $this->_model->show();
+        $this->view->assign($response);
     }
 
     public function updateAction() {

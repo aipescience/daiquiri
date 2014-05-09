@@ -28,7 +28,8 @@ class Core_MessagesController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $this->getControllerHelper('table')->index();
+        $response = $this->_model->index();
+        $this->view->assign($response);
     }
 
     public function createAction() {
