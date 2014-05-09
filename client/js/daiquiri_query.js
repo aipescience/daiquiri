@@ -377,8 +377,8 @@ daiquiri.query.Query.prototype.createStatusIcon = function(status){
         return '<i class="icon-remove pull-right" rel="tooltip" title="Job was killed." data-placement="right"></i>';
     } else if (status == 'deleted') {
         return '<i class="icon-trash pull-right" rel="tooltip" title="Job was deleted." data-placement="right"></i>';
-    } else if (status == 'pending') {
-        return '<i class="icon-pause pull-right" rel="tooltip" title="Job is pending." data-placement="right"></i>';
+    } else if (status == 'queued') {
+        return '<i class="icon-pause pull-right" rel="tooltip" title="Job is queued." data-placement="right"></i>';
     } else if (status == 'timeout') {
         return '<i class="icon-ban-circle pull-right" rel="tooltip" title="Job timed out." data-placement="right"></i>';
     } else {

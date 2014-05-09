@@ -38,7 +38,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      * @var array $_status
      */
     protected static $_status = array(
-        'pending' => 0,
+        'queued' => 0,
         'running' => 1,
         'removed' => 2,
         'error' => 3,
@@ -276,7 +276,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      * @return bool
      */
     public function isStatusKillable($status) {
-        if (($status === "pending") || ($status === "running"))
+        if (($status === "queued") || ($status === "running"))
             return true;
         else
             return false;
