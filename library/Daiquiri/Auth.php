@@ -336,22 +336,6 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
     }
 
     /**
-     * @brief   isAdmin method - checks if the role of the currently authenticated user is 'admin'
-     * @return  bool
-     * 
-     * Returns if the role of the currently authenticated user is 'admin'.
-     */
-    public function isAdmin() {
-        $role = $this->_getCurrentProperty('role');
-        if ($role === 'admin') {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    /**
      * @brief   getCurrentUsername method - get user name of currently authenticated user
      * @return  string user name
      * 

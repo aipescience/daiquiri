@@ -34,13 +34,13 @@
 class Daiquiri_Init {
 
     protected static $_modules = array(
-        'config' => array(),
-        'auth' => array('config'),
-        'contact' => array('config'),
-        'data' => array('auth','config'),
-        'meetings' => array('auth','config'),
-        'query' => array('data','auth','config'),
-        'uws' => array('config')
+        'core' => array(),
+        'auth' => array('core'),
+        'contact' => array('core'),
+        'data' => array('auth','core'),
+        'meetings' => array('auth','core'),
+        'query' => array('data','auth','core'),
+        'uws' => array('core')
     );
 
     protected static $_commandline_options = array(

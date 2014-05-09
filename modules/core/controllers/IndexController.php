@@ -19,32 +19,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Query_IndexController extends Daiquiri_Controller_Abstract {
-
-    protected $_model;
+class Core_IndexController extends Daiquiri_Controller_Abstract {
 
     public function init() {
-        // check acl
-        if (Daiquiri_Auth::getInstance()->checkAcl('Query_Model_Form', 'submit')) {
-            $this->view->status = 'ok';
-        } else {
-            throw new Daiquiri_Exception_Unauthorized();
-        }
+        
     }
 
     public function indexAction() {
-        $this->view->status = 'ok';
-
-        // get the query message
-        $messagesModel = new Core_Model_Messages();
-        $response = $messagesModel->show('query');
-        $this->view->message = $response['row']['value'];
-
-        // get the forms to display
-        if (Daiquiri_Config::getInstance()->query->forms) {
-            $this->view->forms = Daiquiri_Config::getInstance()->query->forms->toArray();
-        } else {
-            $this->view->forms = array();
-        }
+        $this->_redirect('/core/config');
     }
+
 }

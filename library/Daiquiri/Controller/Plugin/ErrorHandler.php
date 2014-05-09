@@ -25,7 +25,7 @@ class Daiquiri_Controller_Plugin_ErrorHandler extends Zend_Controller_Plugin_Err
      * Module to use for errors.
      * @var string
      */
-    protected $_errorModule = 'config';
+    protected $_errorModule = 'core';
 
     /**
      * Controller to use for errors.

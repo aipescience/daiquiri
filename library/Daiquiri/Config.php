@@ -61,7 +61,7 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         if ($config === null) {
             // init the databases resource
             $resource = new Daiquiri_Model_Resource_Table();
-            $resource->setTablename('Config_Entries');
+            $resource->setTablename('Core_Config');
 
             $rows = $resource->fetchRows();
 

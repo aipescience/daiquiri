@@ -19,32 +19,20 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Query_IndexController extends Daiquiri_Controller_Abstract {
+class Daiquiri_View_Helper_AdminLink extends Zend_View_Helper_Abstract {
 
-    protected $_model;
+    public $view;
 
-    public function init() {
-        // check acl
-        if (Daiquiri_Auth::getInstance()->checkAcl('Query_Model_Form', 'submit')) {
-            $this->view->status = 'ok';
-        } else {
-            throw new Daiquiri_Exception_Unauthorized();
-        }
+    public function setView(Zend_View_Interface $view) {
+        $this->view = $view;
     }
 
-    public function indexAction() {
-        $this->view->status = 'ok';
-
-        // get the query message
-        $messagesModel = new Core_Model_Messages();
-        $response = $messagesModel->show('query');
-        $this->view->message = $response['row']['value'];
-
-        // get the forms to display
-        if (Daiquiri_Config::getInstance()->query->forms) {
-            $this->view->forms = Daiquiri_Config::getInstance()->query->forms->toArray();
-        } else {
-            $this->view->forms = array();
-        }
+    public function adminLink($text = 'Back to Administration') {
+        return $this->view->internalLink(array(
+            'href' => '/core/admin',
+            'text' => 'Back to Administration',
+            'prepend' => '<p>',
+            'append' => '</p>'));
     }
+
 }

@@ -159,7 +159,7 @@ class Meetings_Model_Meetings extends Daiquiri_Model_Table {
     //     ));
 
     //     // get mail templates
-    //     $templateModel = new Config_Model_Templates();
+    //     $templateModel = new Core_Model_Templates();
     //     $acceptTemplate = $templateModel->getResource()->fetchRow('meetings.accept');
     //     $rejectTemplate = $templateModel->getResource()->fetchRow('meetings.reject');
 

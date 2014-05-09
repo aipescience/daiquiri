@@ -20,32 +20,37 @@
 ?>
 
 <div class="main">
-    <h2>Examples</h2>
+    <h2>Configuration</h2>
 
+    <p class="text-warning">
+        Warning! 
+        Changing these parameters can make the application unusable. 
+        Proceed only if you are sure what you are doing!
+    </p>
     <table class="table table-condensed">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Published for</th>
+                <th>Key</th>
+                <th>Value</th>
                 <th>Options</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($this->rows as $example): ?>
+            <?php foreach ($this->rows as $row): ?>
                 <tr>
-                    <td><?php echo $this->escape($example['name']); ?></td>
-                    <td><?php echo $this->escape($example['publication_role']); ?></td>
+                    <td><?php echo $this->escape($row['key']); ?></td>
+                    <td><?php echo $this->escape($row['value']); ?></td>
                     <td>
                         <?php
                         echo $this->internalLink(array(
-                            'text' => 'Edit',
-                            'href' => '/query/examples/update/id/' . $this->escape($example['id']),
-                            'resource' => 'Query_Model_Examples',
+                            'text' => 'Update',
+                            'href' => '/core/config/update/id/' . $this->escape($row['id']),
+                            'resource' => 'Core_Model_Config',
                             'permission' => 'update'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
-                            'href' => '/query/examples/delete/id/' . $this->escape($example['id']),
-                            'resource' => 'Query_Model_Examples',
+                            'href' => '/core/config/delete/id/' . $this->escape($row['id']),
+                            'resource' => 'Core_Model_Config',
                             'permission' => 'delete',
                             'prepend' => '&nbsp;'));
                         ?>
@@ -58,15 +63,13 @@
 
     <?php
     echo $this->internalLink(array(
-        'text' => 'Create new example',
-        'href' => '/query/examples/create',
-        'resource' => 'Query_Model_Examples',
-        'permission' => 'create',
+        'text' => 'Create new configuration entry',
+        'href' => '/core/config/create',
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->internalLink(array(
         'text' => 'Export to init.php syntax',
-        'href' => '/query/examples/export',
+        'href' => '/core/config/export',
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->adminLink();

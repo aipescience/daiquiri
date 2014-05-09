@@ -20,55 +20,56 @@
 ?>
 
 <div class="main">
-    <h2>Examples</h2>
+    <h2>Template configuration</h2>
 
     <table class="table table-condensed">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Published for</th>
-                <th>Options</th>
+                <th style="width: 30%">Template</th>
+                <th style="width: 65%">Subject</th>
+                <th style="width: 5%">Options</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($this->rows as $example): ?>
+            <?php foreach ($this->rows as $row): ?>
                 <tr>
-                    <td><?php echo $this->escape($example['name']); ?></td>
-                    <td><?php echo $this->escape($example['publication_role']); ?></td>
-                    <td>
+                    <td style="width: 30%"><?php echo $this->escape($row['template']); ?></td>
+                    <td style="width: 65%"><?php echo $this->escape($row['subject']); ?></td>
+                    <td style="width: 5%">
                         <?php
                         echo $this->internalLink(array(
-                            'text' => 'Edit',
-                            'href' => '/query/examples/update/id/' . $this->escape($example['id']),
-                            'resource' => 'Query_Model_Examples',
+                            'text' => 'Update',
+                            'href' => '/core/templates/update/id/' . $this->escape($row['id']),
+                            'resource' => 'Core_Model_Templates',
                             'permission' => 'update'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
-                            'href' => '/query/examples/delete/id/' . $this->escape($example['id']),
-                            'resource' => 'Query_Model_Examples',
+                            'href' => '/core/templates/delete/id/' . $this->escape($row['id']),
+                            'resource' => 'Core_Model_Templates',
                             'permission' => 'delete',
                             'prepend' => '&nbsp;'));
                         ?>
                     </td>
                 </tr>
-            <?php endforeach;
-            ?>
+            <?php endforeach; ?>
         </tbody>
     </table>
 
     <?php
-    echo $this->internalLink(array(
-        'text' => 'Create new example',
-        'href' => '/query/examples/create',
-        'resource' => 'Query_Model_Examples',
+        echo $this->internalLink(array(
+        'text' => 'Create new mail template',
+        'href' => '/core/templates/create',
+        'resource' => 'Core_Model_Templates',
         'permission' => 'create',
         'prepend' => '<p>',
         'append' => '</p>'));
     echo $this->internalLink(array(
         'text' => 'Export to init.php syntax',
-        'href' => '/query/examples/export',
+        'href' => '/core/templates/export',
+        'resource' => 'Core_Model_Templates',
+        'permission' => 'export',
         'prepend' => '<p>',
         'append' => '</p>'));
-    echo $this->adminLink();
+    echo $this->adminLink(); 
     ?>
 </div>

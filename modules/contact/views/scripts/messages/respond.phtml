@@ -22,13 +22,7 @@
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
         <p>The response has been send to the user.</p>
-        <?php
-        echo $this->internalLink(array(
-            'href' => '/admin',
-            'text' => 'Back to Administration',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        ?>
+        <?php echo $this->adminLink(); ?>
     <?php else: ?>
         <h2>
             Contact message by 

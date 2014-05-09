@@ -23,7 +23,7 @@ class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
 
     public function template($template) {
         // get the template
-        $templateModel = new Config_Model_Templates();
+        $templateModel = new Core_Model_Templates();
         return $templateModel->show($template);
     }
 
@@ -32,7 +32,7 @@ class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
         $mail = new Zend_Mail('UTF-8');
 
         // get the template
-        $templateModel = new Config_Model_Templates();
+        $templateModel = new Core_Model_Templates();
         $data = $templateModel->show($template, $values, $templateData);
 
         if (isset($values['to'])) {

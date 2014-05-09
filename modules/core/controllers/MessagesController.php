@@ -19,32 +19,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Query_IndexController extends Daiquiri_Controller_Abstract {
+class Core_MessagesController extends Daiquiri_Controller_Abstract {
 
     protected $_model;
 
     public function init() {
-        // check acl
-        if (Daiquiri_Auth::getInstance()->checkAcl('Query_Model_Form', 'submit')) {
-            $this->view->status = 'ok';
-        } else {
-            throw new Daiquiri_Exception_Unauthorized();
-        }
+        $this->_model = Daiquiri_Proxy::factory('Core_Model_Messages');
     }
 
     public function indexAction() {
-        $this->view->status = 'ok';
+        $this->getControllerHelper('table')->index();
+    }
 
-        // get the query message
-        $messagesModel = new Core_Model_Messages();
-        $response = $messagesModel->show('query');
-        $this->view->message = $response['row']['value'];
+    public function createAction() {
+        $this->getControllerHelper('form')->create();
+    }
 
-        // get the forms to display
-        if (Daiquiri_Config::getInstance()->query->forms) {
-            $this->view->forms = Daiquiri_Config::getInstance()->query->forms->toArray();
-        } else {
-            $this->view->forms = array();
-        }
+    public function updateAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->update($id);
+    }
+
+    public function deleteAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->delete($id);
+    }
+
+    public function exportAction() {
+        $response = $this->_model->export();
+        $this->view->data = $response['data'];
+        $this->view->status = $response['status'];
+        
+        // disable layout
+        $this->_helper->layout->disableLayout();
     }
 }

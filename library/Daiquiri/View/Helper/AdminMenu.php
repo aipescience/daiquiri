@@ -35,7 +35,7 @@ class Daiquiri_View_Helper_AdminMenu extends Zend_View_Helper_Abstract {
                 $html .= '<a class="dropdown-toggle" data-toggle="dropdown" href="#">Admin</a>';
                 $html .= '<ul class = "dropdown-menu">';
             }
-            $html .= $this->view->partial('index/_admin_menu.phtml', 'admin');
+            $html .= $this->view->action('menu','admin','core');
             if ($listOnly === true) {
                 $html .= '</ul></li>';
             }

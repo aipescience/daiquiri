@@ -65,4 +65,12 @@ abstract class Daiquiri_Controller_Abstract extends Zend_Controller_Action {
             $form->setAction($action);
         }
     }
+
+    public function internalLink(array $options) {
+        // get the view object
+        $view = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('view');
+
+        // return the link
+        return $view->internalLink($options);
+    }
 }

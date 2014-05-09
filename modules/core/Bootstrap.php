@@ -19,19 +19,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Controller_Plugin_Modules extends Zend_Controller_Plugin_Abstract {
-
-    public function preDispatch(Zend_Controller_Request_Abstract $request) {
-        // get active modules from application configuration
-        $modules = Daiquiri_Config::getInstance()->getApplication()->resources->modules->toArray();
-        
-        // add the default and admin modules
-        $modules[] = 'default';
-
-        // check module in url
-        if (!in_array($request->getModuleName(),$modules)) {
-            throw new Daiquiri_Exception_NotFound();
-        }
-    }
-
+class Core_Bootstrap extends Zend_Application_Module_Bootstrap {
+    
 }

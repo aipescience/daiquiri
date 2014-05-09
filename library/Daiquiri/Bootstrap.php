@@ -40,7 +40,7 @@ class Daiquiri_Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
         // exchange error helper
         $frontController->setParam('noErrorHandler', true);
-        $frontController->registerPlugin(new Daiquiri_Controller_Plugin_ErrorHandler());
+        $frontController->registerPlugin(new Daiquiri_Controller_Plugin_ErrorHandler(), 100);
     }
 
     protected function _initConfig() {

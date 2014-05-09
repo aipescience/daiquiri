@@ -19,32 +19,18 @@
  */
 ?>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        // create the table inside the div
-        $('#table').daiquiri_table({
-            'rowsurl': "<?php echo $this->baseUrl('/query/jobs/rows') ?>",
-            'colsurl': "<?php echo $this->baseUrl('/query/jobs/cols') ?>",
-            'success': function() {
-                $('a','tbody','#table').click(function(){
-                    new daiquiri.Modal({
-                        'url': this.href,
-                        'width': 700,
-                        'success': function() {
-                            daiquiri.table.items['table'].rows();
-                        }
-                    });
-                    return false;
-                });
-            }
-        });
-    });
-</script>
-
 <div class="main">
-    <h2>Query jobs management</h2>
-
-    <p id="table"></p>
-
-    <?php echo $this->adminLink(); ?>
+    <?php if ($this->status === 'ok'): ?>
+        <p>Status message updated.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back to status messages overview',
+            'href' => '/core/messages',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Update status message</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
 </div>
