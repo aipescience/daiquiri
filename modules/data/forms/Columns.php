@@ -23,6 +23,7 @@ class Data_Form_Columns extends Daiquiri_Form_Abstract {
 
     protected $_tables = array();
     protected $_table_id;
+    protected $_roles = array();
     protected $_ucds = array();
     protected $_entry = array();
     protected $_submit;
@@ -36,6 +37,10 @@ class Data_Form_Columns extends Daiquiri_Form_Abstract {
         $this->_table_id = $table_id;
     }
 
+    public function setRoles($roles) {
+        $this->_roles = $roles;
+    }
+    
     public function setUcds($ucds) {
         $this->_ucds = $ucds;
     }
@@ -90,7 +95,6 @@ class Data_Form_Columns extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'unit', array(
             'label' => 'Column unit',
-            'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
@@ -98,11 +102,27 @@ class Data_Form_Columns extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('text', 'ucd', array(
             'label' => 'Column UCD',
-            'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
+        ));
+        $this->addElement('select', 'publication_role_id', array(
+            'label' => 'Published for: ',
+            'multiOptions' => $this->_roles,
+        ));
+        $this->addElement('checkbox', 'publication_select', array(
+            'label' => 'Allow SELECT',
+            'value' => '1',
+            'class' => 'checkbox'
+        ));
+        $this->addElement('checkbox', 'publication_update', array(
+            'label' => 'Allow UPDATE',
+            'class' => 'checkbox'
+        ));
+        $this->addElement('checkbox', 'publication_insert', array(
+            'label' => 'Allow INSERT',
+            'class' => 'checkbox'
         ));
 
         // obtain UCD data and provide a usable form (but only if called from a non scriptable context)
@@ -131,11 +151,12 @@ class Data_Form_Columns extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('table_id', 'name', 'order', 'type', 'unit', 'ucd', 'ucd_list', 'description'));
+        $this->addHorizontalGroup(array('table_id', 'name', 'order', 'type', 'unit', 'ucd', 'ucd_list', 'description', 'publication_role_id', 'publication_select', 'publication_update', 'publication_insert'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('table_id', 'order', 'name', 'type', 'unit', 'ucd', 'description') as $element) {
+        foreach (array('table_id', 'order', 'name', 'type', 'unit', 'ucd', 'description', 'publication_role_id', 'publication_select',
+    'publication_update', 'publication_insert') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

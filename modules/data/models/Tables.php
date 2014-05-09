@@ -85,14 +85,14 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
      * @param mixed $input int id or array with "db" and "table" keys
      * @return array $response
      */
-    public function show($input, $fullData = false) {
+    public function show($input) {
         if (is_int($input)) {
-            $row = $this->getResource()->fetchRow($id, $fullData);
+            $row = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db']) || empty($input['table'])) {
                 throw new Exception('Either int id or array with "db" and "table" keys must be provided as $input');
             }
-            $row = $this->getResource()->fetchRowByName($input['db'],$input['table'], $fullData);
+            $row = $this->getResource()->fetchRowByName($input['db'],$input['table']);
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -111,7 +111,7 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
      */
     public function update($input, array $formParams = array()) {
         if (is_int($input)) {
-            $id = $input;
+            $entry = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db']) || empty($input['table'])) {
                 throw new Exception('Either $id or $db and $table must be provided.');
@@ -151,7 +151,7 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
-                $this->getResource()->updateRow($id, $values);
+                $this->getResource()->updateRow($row['id'], $values);
 
                 return array('status' => 'ok');
             } else {
@@ -169,18 +169,21 @@ class Data_Model_Tables extends Daiquiri_Model_Table {
      */
     public function delete($input, array $formParams = array()) {
         if (is_int($input)) {
-            $id = $input;
+            $row = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db']) || empty($input['table'])) {
                 throw new Exception('Either int id or array with "db" and "table" keys must be provided as $input');
             }
             $row = $this->getResource()->fetchRowByName($input['db'],$input['table']);
-            $id = $row['id'];
         } else {
             throw new Exception('$input has wrong type.');
         }
 
-        return $this->getModelHelper('CRUD')->delete($id, $formParams);
+        if (empty($row)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        return $this->getModelHelper('CRUD')->delete($row['id'], $formParams);
     }
 
     /**

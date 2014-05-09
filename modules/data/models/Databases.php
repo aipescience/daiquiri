@@ -99,14 +99,14 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
      * @param mixed $input int id or array with "db" key
      * @return array $response
      */
-    public function show($input, $fullData = false) {
+    public function show($input) {
         if (is_int($input)) {
-            $row = $this->getResource()->fetchRow($id);
+            $row = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db'])) {
                 throw new Exception('Either int id or array with "db" key must be provided as $input');
             }
-            $entry = $this->getResource()->fetchRowByName($input['db']);
+            $row = $this->getResource()->fetchRowByName($input['db']);
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -125,12 +125,12 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
      */
     public function update($input, array $formParams = array()) {
         if (is_int($input)) {
-            $entry = $this->getResource()->fetchRow($id);
+            $entry = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db'])) {
                 throw new Exception('Either int id or array with "db" key must be provided as $input');
             }
-            $row = $this->getResource()->fetchRowByName($input['db']);
+            $entry = $this->getResource()->fetchRowByName($input['db']);
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -159,7 +159,7 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
-                $this->getResource()->updateRow($id, $values);
+                $this->getResource()->updateRow($entry['id'], $values);
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
@@ -176,18 +176,21 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
      */
     public function delete($input, array $formParams = array()) {
         if (is_int($input)) {
-            $id = $input;
+            $row = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db'])) {
                 throw new Exception('Either int id or array with "db" key must be provided as $input');
             }
             $row = $this->getResource()->fetchRowByName($input['db']);
-            $id = $row['id'];
         } else {
             throw new Exception('$input has wrong type.');
         }
 
-        return $this->getModelHelper('CRUD')->delete($id, $formParams);
+        if (empty($row)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        return $this->getModelHelper('CRUD')->delete($row['id'], $formParams);
     }
 
     /**

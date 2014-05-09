@@ -81,7 +81,7 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
     public function update($id, array $formParams = array()) {
         // get example from database
         $row = $this->getResource()->fetchRow($id);
-        if ($row === false) {
+        if (empty($row)) {
             throw new Daiquiri_Exception_NotFound();
         }
 

@@ -53,7 +53,6 @@ class Data_Form_Functions extends Daiquiri_Form_Abstract {
         $this->addElement('textarea', 'description', array(
             'label' => 'Function description',
             'rows' => '4',
-            'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),

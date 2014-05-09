@@ -105,7 +105,7 @@ class Daiquiri_Model_Resource_Adapter extends Daiquiri_Model_Resource_Abstract {
     public function fetchOne(Daiquiri_Db_Select $select = null) {
         $rows = $this->getAdapter()->fetchAll($select);
         if (empty($rows)) {
-            return array();
+            return false;
         } else if (count($rows) > 1) {
             throw new Exception('More than one row returned in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         } else {

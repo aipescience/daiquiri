@@ -38,7 +38,11 @@ CREATE TABLE IF NOT EXISTS `Data_Columns` (
   `type` VARCHAR(256) NOT NULL,
   `unit` VARCHAR(256),
   `ucd` VARCHAR(256),
-  `description` TEXT
+  `description` TEXT,
+  `publication_select` BOOLEAN,
+  `publication_update` BOOLEAN,
+  `publication_insert` BOOLEAN,
+  `publication_role_id` INTEGER
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Data_UCD` (

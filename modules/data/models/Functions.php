@@ -76,7 +76,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
                 }
 
                 // store the values in the database
-                $function_id = $this->getResource()->insertRow($values);
+                $this->getResource()->insertRow($values);
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
@@ -93,7 +93,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
      */
     public function show($input) {
         if (is_int($input)) {
-            $row = $this->getResource()->fetchRow($id);
+            $row = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['function'])) {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
@@ -118,12 +118,12 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
      */
     public function update($input, array $formParams = array()) {
         if (is_int($input)) {
-            $entry = $this->getResource()->fetchRow($id);
+            $entry = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['function'])) {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $row = $this->getResource()->fetchRowByName($input['function']);
+            $entry = $this->getResource()->fetchRowByName($input['function']);
         } else {
             throw new Exception('$input has wrong type.');
         }
@@ -153,7 +153,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
                     $values['order'] = NULL;
                 }
 
-                $this->getResource()->updateRow($id, $values);
+                $this->getResource()->updateRow($row['id'], $values);
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
@@ -171,18 +171,21 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
      */
     public function delete($input, array $formParams = array()) {
         if (is_int($input)) {
-            $id = $input;
+            $row = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['function'])) {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $row = $this->getResource()->fetchRowByName($input['function']);
-            $id = $row['id'];
+            $entry = $this->getResource()->fetchRowByName($input['function']);
         } else {
             throw new Exception('$input has wrong type.');
         }
 
-        return $this->getModelHelper('CRUD')->delete($id, $formParams);
+        if (empty($row)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        return $this->getModelHelper('CRUD')->delete($row['id'], $formParams);
     }
 
     /**

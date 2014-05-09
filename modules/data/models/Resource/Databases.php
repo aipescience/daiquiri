@@ -166,7 +166,7 @@ class Data_Model_Resource_Databases extends Daiquiri_Model_Resource_Table {
         $this->getAdapter()->insert('Data_Databases', $data);
         $id = $this->getAdapter()->lastInsertId();
 
-        if (isset($autofill) && $autofill = true) {
+        if (isset($autofill) && !empty($autofill)) {
             // get the additional resources
             $descResource = new Data_Model_Resource_Description();
             $tableResource = new Data_Model_Resource_Tables();

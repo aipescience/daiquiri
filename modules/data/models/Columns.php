@@ -40,9 +40,13 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
         $ucdsResource = new Daiquiri_Model_Resource_Table();
         $ucdsResource->setTablename('Data_UCD');
 
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
+
         $form = new Data_Form_Columns(array(
             'tables' => $tablesResource->fetchValues('name'),
             'tableId' => $tableId,
+            'roles' => $roles,
             'ucds' => $ucdsResource->fetchRows(),
             'submit' => 'Create column entry'
         ));
@@ -86,7 +90,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
      */
     public function show($input) {
         if (is_int($input)) {
-            $row = $this->getResource()->fetchRow($id);
+            $row = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db']) || empty($input['table']) || empty($input['column'])) {
                 throw new Exception('Either int id or array with "db","table" and "column" keys must be provided as $input');
@@ -111,7 +115,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
      */
     public function update($input, array $formParams = array()) {
         if (is_int($input)) {
-            $entry = $this->getResource()->fetchRow($id);
+            $entry = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db']) || empty($input['table']) || empty($input['column'])) {
                 throw new Exception('Either int id or array with "db","table" and "column" keys must be provided as $input');
@@ -153,7 +157,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
 
                 $values['database'] = $entry['database'];
                 $values['table'] = $entry['table'];
-                $this->getResource()->updateRow($id, $values);
+                $this->getResource()->updateRow($entry['id'], $values);
 
                 return array('status' => 'ok');
             } else {
@@ -172,18 +176,21 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
      */
     public function delete($input, array $formParams = array()) {
         if (is_int($input)) {
-            $id = $input;
+            $row = $this->getResource()->fetchRow($input);
         } elseif (is_array($input)) {
             if (empty($input['db']) || empty($input['table']) || empty($input['column'])) {
                 throw new Exception('Either int id or array with "db","table" and "column" keys must be provided as $input');
             }
             $row = $this->getResource()->fetchRowByName($input['db'],$input['table'],$input['column']);
-            $id = $row['id'];
         } else {
             throw new Exception('$input has wrong type.');
         }
 
-        return $this->getModelHelper('CRUD')->delete($id, $formParams);
+        if (empty($row)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        return $this->getModelHelper('CRUD')->delete($row['id'], $formParams);
     }
 
     /**

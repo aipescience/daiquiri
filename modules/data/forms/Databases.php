@@ -53,7 +53,6 @@ class Data_Form_Databases extends Daiquiri_Form_Abstract {
         $this->addElement('textarea', 'description', array(
             'label' => 'Database description',
             'rows' => '4',
-            'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
@@ -68,33 +67,29 @@ class Data_Form_Databases extends Daiquiri_Form_Abstract {
         ));
         $this->addElement('select', 'publication_role_id', array(
             'label' => 'Published for',
-            'required' => true,
             'multiOptions' => $this->_roles,
         ));
         $this->addElement('checkbox', 'publication_select', array(
             'label' => 'Allow SELECT',
-            'required' => true,
+            'value' => '1',
             'class' => 'checkbox'
         ));
         $this->addElement('checkbox', 'publication_update', array(
             'label' => 'Allow UPDATE',
-            'required' => true,
             'class' => 'checkbox'
         ));
         $this->addElement('checkbox', 'publication_insert', array(
             'label' => 'Allow INSERT',
-            'required' => true,
             'class' => 'checkbox'
         ));
         $this->addElement('checkbox', 'publication_show', array(
             'label' => 'Allow SHOW TABLES',
-            'required' => true,
+            'value' => '1',
             'class' => 'checkbox'
         ));
         if (empty($this->_entry)) {
             $this->addElement('checkbox', 'autofill', array(
                 'label' => 'Autofill tables',
-                'required' => false,
                 'class' => 'checkbox'
             ));
         }
