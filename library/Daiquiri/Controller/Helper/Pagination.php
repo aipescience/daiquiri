@@ -28,7 +28,7 @@ class Daiquiri_Controller_Helper_Pagination extends Daiquiri_Controller_Helper_A
         $response = $this->getModel()->cols($queryParams);
 
         // assign to view
-        $this->getView()->view->assign($response);
+        $this->getView()->assign($response);
     }    
 
     public function rows() {
