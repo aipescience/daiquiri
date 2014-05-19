@@ -422,7 +422,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                 $sqloptionsPending['where'] = array();
                 $sqloptionsHistory['where'] = array();
 
-                foreach($sqloptions['where'] as  => $value) {
+                foreach($sqloptions['where'] as $key => $value) {
                     if (is_int($key)) {
                         if (strpos($value,$fieldStringPending) === 0) {
                             $sqloptionsPending['where'][] = $value;
