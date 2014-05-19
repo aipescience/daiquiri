@@ -340,7 +340,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                             $sqloptionsHistory['where'][] = $value;
                         }
                     } else {
-                        $dbKey = Query_Model_Resource_QQueueQuery::$_cols[$key];
+                        $dbKey = str_replace(
+                            array_keys(Query_Model_Resource_QQueueQuery::$_cols),
+                            Query_Model_Resource_QQueueQuery::$_cols,
+                            $key
+                        );
                         if (strpos($key,$fieldStringPending) === 0) {
                             $sqloptionsPending['where'][$dbKey] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
@@ -370,7 +374,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                             $sqloptionsHistory['orWhere'][] = $value;
                         }
                     } else {
-                        $dbKey = Query_Model_Resource_QQueueQuery::$_cols[$key];
+                        $dbKey = str_replace(
+                            array_keys(Query_Model_Resource_QQueueQuery::$_cols),
+                            Query_Model_Resource_QQueueQuery::$_cols,
+                            $key
+                        );
                         if (strpos($key,$fieldStringPending) === 0) {
                             $sqloptionsPending['orWhere'][$dbKey] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
@@ -435,7 +443,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                             $sqloptionsHistory['where'][] = $value;
                         }
                     } else {
-                        $dbKey = Query_Model_Resource_QQueueQuery::$_cols[$key];
+                        $dbKey = str_replace(
+                            array_keys(Query_Model_Resource_QQueueQuery::$_cols),
+                            Query_Model_Resource_QQueueQuery::$_cols,
+                            $key
+                        );
                         if (strpos($key,$fieldStringPending) === 0) {
                             $sqloptionsPending['where'][$dbKey] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
@@ -465,7 +477,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                             $sqloptionsHistory['orWhere'][] = $value;
                         }
                     } else {
-                        $dbKey = Query_Model_Resource_QQueueQuery::$_cols[$key];
+                        $dbKey = str_replace(
+                            array_keys(Query_Model_Resource_QQueueQuery::$_cols),
+                            Query_Model_Resource_QQueueQuery::$_cols,
+                            $key
+                        );
                         if (strpos($key,$fieldStringPending) === 0) {
                             $sqloptionsPending['orWhere'][$dbKey] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
