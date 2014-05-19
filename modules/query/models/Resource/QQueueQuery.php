@@ -422,7 +422,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                 $sqloptionsPending['where'] = array();
                 $sqloptionsHistory['where'] = array();
 
-                foreach($sqloptions['where'] as $key => $value) {
+                foreach($sqloptions['where'] as  => $value) {
                     if (is_int($key)) {
                         if (strpos($value,$fieldStringPending) === 0) {
                             $sqloptionsPending['where'][] = $value;
@@ -434,12 +434,12 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                         }
                     } else {
                         if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['where'][] = $value;
+                            $sqloptionsPending['where'][$key] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['where'][] = $value;
+                            $sqloptionsHistory['where'][$key] = $value;
                         } else {
-                            $sqloptionsPending['where'][] = $value;
-                            $sqloptionsHistory['where'][] = $value;
+                            $sqloptionsPending['where'][$key] = $value;
+                            $sqloptionsHistory['where'][$key] = $value;
                         }
                     }
                 }
@@ -463,12 +463,12 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                         }
                     } else {
                         if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['orWhere'][] = $value;
+                            $sqloptionsPending['orWhere'][$key] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['orWhere'][] = $value;
+                            $sqloptionsHistory['orWhere'][$key] = $value;
                         } else {
-                            $sqloptionsPending['orWhere'][] = $value;
-                            $sqloptionsHistory['orWhere'][] = $value;
+                            $sqloptionsPending['orWhere'][$key] = $value;
+                            $sqloptionsHistory['orWhere'][$key] = $value;
                         }
                     }
                 }

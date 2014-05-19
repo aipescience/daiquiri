@@ -210,7 +210,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             if (is_array($input['resources'])) {
                 $output['resources'] = array_merge($output['resources'], $input['resources']);
             } else {
-                $this->_error("Auth option 'apps' needs to be an array.");
+                $this->_error("Auth option 'resources' needs to be an array.");
             }
         }
 

@@ -1,3 +1,29 @@
+2014/05/19
+==========
+
+Big refactoring, a lot of things to change:
+
+* update init to new layout, especially $options['init'] key
+
+* update database schema
+
+in the database:
+
+DROP TABLE Auth_Resources;
+DROP TABLE Auth_Rules;
+DROP TABLE Config_Entries;
+RENAME TABLE Config_Messages TO Core_Messages;
+RENAME TABLE Config_Templates TO Core_Templates;
+ALTER TABLE Data_Columns ADD COLUMN `publication_select` BOOLEAN;
+ALTER TABLE Data_Columns ADD COLUMN `publication_update` BOOLEAN;
+ALTER TABLE Data_Columns ADD COLUMN `publication_insert` BOOLEAN;
+ALTER TABLE Data_Columns ADD COLUMN `publication_role_id` INTEGER;
+DELETE FROM Auth_Sessions;
+
+in the app directory:
+
+./init.php -si
+
 2014/02/20
 ==========
 
