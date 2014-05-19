@@ -445,17 +445,9 @@ class Daiquiri_Init {
         $links = array(
             $this->application_path . '/library' => $this->daiquiri_path . '/library',
             $this->application_path . '/modules' => $this->daiquiri_path . '/modules',
-            $this->application_path . '/public/captcha' => $this->options['config']['core']['captcha']['dir']
+            $this->application_path . '/public/captcha' => $this->options['config']['core']['captcha']['dir'],
+            $this->application_path . '/public/daiquiri' => $links[$client] = $this->daiquiri_path . '/client'
         );
-
-        // client js and css directory
-        $client = $this->application_path . '/public/daiquiri';
-        if (!empty($this->options['config']['core']['minify'])
-            && $this->options['config']['core']['minify']['enabled'] == true) {
-            $links[$client] = null;
-        } else {
-            $links[$client] = $this->daiquiri_path . '/client';
-        }
 
         // cms (word press directory)
         $cms = $this->application_path . '/public' . $this->options['config']['core']['cms']['url'];
@@ -489,8 +481,11 @@ class Daiquiri_Init {
     private function _minify() {
         $client = $this->daiquiri_path . '/client/';
 
-        if (!file_exists('public/min')) {
-            mkdir('public/min');
+        if (!file_exists('public/min/js')) {
+            mkdir('public/min/js',0755,true);
+        }
+        if (!file_exists('public/min/css')) {
+            mkdir('public/min/css',0755,true);
         }
 
         echo "minifing js and css files.";
@@ -501,16 +496,16 @@ class Daiquiri_Init {
         foreach (Daiquiri_View_Helper_HeadDaiquiri::$files as $file) {
             $ext = pathinfo($file, PATHINFO_EXTENSION);
             if ($ext === 'js') {
-                exec("yui-compressor " . $client . "/" . $file . " >> public/min/daiquiri.js");
+                exec("yui-compressor " . $client . "/" . $file . " >> public/min/js/daiquiri.js");
             } else if ($ext === 'css') {
-                exec("yui-compressor " . $client . "/" . $file . " >> public/min/daiquiri.css");
+                exec("yui-compressor " . $client . "/" . $file . " >> public/min/css/daiquiri.css");
             }
         }
 
         // take care of images
         foreach (Daiquiri_View_Helper_HeadDaiquiri::$links as $key => $value) {
             $target = $client . $value;
-            $link = $this->application_path . '/public/' . $key;
+            $link = $this->application_path . '/public/min/' . $key;
             if (is_link($link)) {
                 unlink($link);
             }

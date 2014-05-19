@@ -83,15 +83,6 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
     public static $links = array(
         'img/glyphicons-halflings.png' => 'lib/bootstrap/img/glyphicons-halflings.png',
         'img/glyphicons-halflings-white.png' => 'lib/bootstrap/img/glyphicons-halflings-white.png',
-        'font/DroidSans.ttf' => 'font/DroidSans.ttf',
-        'font/DroidSans-Bold.ttf' => 'font/DroidSans-Bold.ttf',
-        'font/DroidSansMono.ttf' => 'font/DroidSansMono.ttf'
-    );
-
-    // font files, which need to be taken care of when minifying
-    public static $img = array(
-        'lib/bootstrap/img/glyphicons-halflings.png',
-        'lib/bootstrap/img/glyphicons-halflings-white.png'
     );
 
     public $view;
@@ -120,8 +111,8 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         $js = array();
         $css = array();
         if (Daiquiri_Config::getInstance()->core->minify->enabled == true) {
-            $js[] = 'min/daiquiri.js';
-            $css[] =  'min/daiquiri.css';
+            $js[] = 'min/js/daiquiri.js';
+            $css[] =  'min/css/daiquiri.css';
         } else {
             foreach (Daiquiri_View_Helper_HeadDaiquiri::$files as $file) {
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
