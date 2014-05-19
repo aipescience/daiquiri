@@ -508,9 +508,9 @@ class Daiquiri_Init {
         }
 
         // take care of images
-        foreach (Daiquiri_View_Helper_HeadDaiquiri::$img as $img) {
-            $target = $client . $img;
-            $link = $this->application_path . '/public/img/' . basename($img);
+        foreach (Daiquiri_View_Helper_HeadDaiquiri::$dir as $key => $dir) {
+            $target = $client . $dir;
+            $link = $this->application_path . '/public/' . $key;
             if (is_link($link)) {
                 unlink($link);
             }

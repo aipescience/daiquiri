@@ -79,10 +79,10 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         'js/daiquiri_samp.js'
     );
 
-    // image files, which need to be taken car of when minifying
-    public static $img = array(
-        'lib/bootstrap/img/glyphicons-halflings.png',
-        'lib/bootstrap/img/glyphicons-halflings-white.png'
+    // directories, which need to be taken care of when minifying
+    public static $dir = array(
+        'img' => 'lib/bootstrap/img',
+        'font' => 'font/'
     );
 
     public $view;
