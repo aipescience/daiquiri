@@ -340,13 +340,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                             $sqloptionsHistory['where'][] = $value;
                         }
                     } else {
+                        $dbKey = Query_Model_Resource_QQueueQuery::$_cols[$key];
                         if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['where'][] = $value;
+                            $sqloptionsPending['where'][$dbKey] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['where'][] = $value;
+                            $sqloptionsHistory['where'][$dbKey] = $value;
                         } else {
-                            $sqloptionsPending['where'][] = $value;
-                            $sqloptionsHistory['where'][] = $value;
+                            $sqloptionsPending['where'][$dbKey] = $value;
+                            $sqloptionsHistory['where'][$dbKey] = $value;
                         }
                     }
                 }
@@ -369,13 +370,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                             $sqloptionsHistory['orWhere'][] = $value;
                         }
                     } else {
+                        $dbKey = Query_Model_Resource_QQueueQuery::$_cols[$key];
                         if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['orWhere'][] = $value;
+                            $sqloptionsPending['orWhere'][$dbKey] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['orWhere'][] = $value;
+                            $sqloptionsHistory['orWhere'][$dbKey] = $value;
                         } else {
-                            $sqloptionsPending['orWhere'][] = $value;
-                            $sqloptionsHistory['orWhere'][] = $value;
+                            $sqloptionsPending['orWhere'][$dbKey] = $value;
+                            $sqloptionsHistory['orWhere'][$dbKey] = $value;
                         }
                     }
                 }
@@ -433,13 +435,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                             $sqloptionsHistory['where'][] = $value;
                         }
                     } else {
+                        $dbKey = Query_Model_Resource_QQueueQuery::$_cols[$key];
                         if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['where'][$key] = $value;
+                            $sqloptionsPending['where'][$dbKey] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['where'][$key] = $value;
+                            $sqloptionsHistory['where'][$dbKey] = $value;
                         } else {
-                            $sqloptionsPending['where'][$key] = $value;
-                            $sqloptionsHistory['where'][$key] = $value;
+                            $sqloptionsPending['where'][$dbKey] = $value;
+                            $sqloptionsHistory['where'][$dbKey] = $value;
                         }
                     }
                 }
@@ -462,13 +465,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                             $sqloptionsHistory['orWhere'][] = $value;
                         }
                     } else {
+                        $dbKey = Query_Model_Resource_QQueueQuery::$_cols[$key];
                         if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['orWhere'][$key] = $value;
+                            $sqloptionsPending['orWhere'][$dbKey] = $value;
                         } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['orWhere'][$key] = $value;
+                            $sqloptionsHistory['orWhere'][$dbKey] = $value;
                         } else {
-                            $sqloptionsPending['orWhere'][$key] = $value;
-                            $sqloptionsHistory['orWhere'][$key] = $value;
+                            $sqloptionsPending['orWhere'][$dbKey] = $value;
+                            $sqloptionsHistory['orWhere'][$dbKey] = $value;
                         }
                     }
                 }
