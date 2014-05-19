@@ -446,7 +446,7 @@ class Daiquiri_Init {
             $this->application_path . '/library' => $this->daiquiri_path . '/library',
             $this->application_path . '/modules' => $this->daiquiri_path . '/modules',
             $this->application_path . '/public/captcha' => $this->options['config']['core']['captcha']['dir'],
-            $this->application_path . '/public/daiquiri' => $links[$client] = $this->daiquiri_path . '/client'
+            $this->application_path . '/public/daiquiri' => $this->daiquiri_path . '/client'
         );
 
         // cms (word press directory)
