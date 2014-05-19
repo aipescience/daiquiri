@@ -498,14 +498,14 @@ class Daiquiri_Init {
         exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/daiquiri.js" );
         exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/daiquiri.css");
 
-        // foreach (Daiquiri_View_Helper_HeadDaiquiri::$files as $file) {
-        //     $ext = pathinfo($file, PATHINFO_EXTENSION);
-        //     if ($ext === 'js') {
-        //         exec("yui-compressor " . $client . "/" . $file . " >> public/min/daiquiri.js");
-        //     } else if ($ext === 'css') {
-        //         exec("yui-compressor " . $client . "/" . $file . " >> public/min/daiquiri.css");
-        //     }
-        // }
+        foreach (Daiquiri_View_Helper_HeadDaiquiri::$files as $file) {
+            $ext = pathinfo($file, PATHINFO_EXTENSION);
+            if ($ext === 'js') {
+                exec("yui-compressor " . $client . "/" . $file . " >> public/min/daiquiri.js");
+            } else if ($ext === 'css') {
+                exec("yui-compressor " . $client . "/" . $file . " >> public/min/daiquiri.css");
+            }
+        }
 
         // take care of images
         foreach (Daiquiri_View_Helper_HeadDaiquiri::$links as $key => $value) {
