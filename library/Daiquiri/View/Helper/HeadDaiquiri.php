@@ -79,10 +79,19 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         'js/daiquiri_samp.js'
     );
 
-    // directories, which need to be taken care of when minifying
-    public static $dir = array(
-        'img' => 'lib/bootstrap/img',
-        'font' => 'font/'
+    // files, which need to be linked when minifying
+    public static $links = array(
+        'img/glyphicons-halflings.png' => 'lib/bootstrap/img/glyphicons-halflings.png',
+        'img/glyphicons-halflings-white.png' => 'lib/bootstrap/img/glyphicons-halflings-white.png',
+        'font/DroidSans.ttf' => 'font/DroidSans.ttf',
+        'font/DroidSans-Bold.ttf' => 'font/DroidSans-Bold.ttf',
+        'font/DroidSansMono.ttf' => 'font/DroidSansMono.ttf'
+    );
+
+    // font files, which need to be taken care of when minifying
+    public static $img = array(
+        'lib/bootstrap/img/glyphicons-halflings.png',
+        'lib/bootstrap/img/glyphicons-halflings-white.png'
     );
 
     public $view;
