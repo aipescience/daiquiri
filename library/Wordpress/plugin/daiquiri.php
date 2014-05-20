@@ -77,8 +77,8 @@ function daiquiri_auto_login()
             $remoteUser = json_decode($response->getBody());
             $daiquiriUser = array();
             foreach(array('id','username','firstname','lastname','email','website','role') as $key) {
-                if (isset($remoteUser->data->$key)) {
-                    $daiquiriUser[$key] = $remoteUser->data->$key;
+                if (isset($remoteUser->row->$key)) {
+                    $daiquiriUser[$key] = $remoteUser->row->$key;
                 }
             }
 
