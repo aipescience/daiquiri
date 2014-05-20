@@ -44,7 +44,7 @@ class Daiquiri_Layout {
     private function __construct() {
         // sanity check
         $siteUrl = get_option('siteurl');
-        $layoutUrl = get_option('daiquiri_url') . '/layout/';
+        $layoutUrl = get_option('daiquiri_url') . '/core/layout/';
         if (strpos($layoutUrl, $siteUrl) !== false) {
             echo '<h1>Error with theme</h1><p>Layout URL is below CMS URL.</p>';
             die(0);
