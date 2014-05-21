@@ -55,7 +55,7 @@ class Core_Form_Config extends Daiquiri_Form_Abstract {
                 array('StringLength' => new Zend_Validate_StringLength(array('max' => 256)))
             )
         ));
-        $this->addPrimaryButtonElement('submit', 'Create config entry');
+        $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

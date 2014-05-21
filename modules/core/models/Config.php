@@ -45,7 +45,9 @@ class Core_Model_Config extends Daiquiri_Model_Table {
      */
     public function create(array $formParams = array()) {
         // create the form object
-        $form = new Core_Form_Config();
+        $form = new Core_Form_Config(array(
+            'submit' => 'Create config entry'
+        ));
 
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
