@@ -455,7 +455,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         $resource->getAdapter()->setFetchMode(Zend_Db::FETCH_ASSOC);
 
         try {
-            $pluginAvail = $resource->plainQuery('select name from mysql.func where name="paqu_validateSQL";');
+            $pluginAvail = $resource->getAdapter()->query('SELECT name FROM mysql.func WHERE name="paqu_validateSQL";')->fetchAll();
         } catch (Exception $e) {
             throw new Exception('PaQu Validate SQL plugin not installed.');
         }
