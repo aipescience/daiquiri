@@ -56,9 +56,6 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         
         $this->addElement('textarea', 'sql_query', array(
             'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => 'StringLength', 'options' => array(3, 1024))
-            ),
             'required' => true,
             'label' => 'Query:',
             'class' => 'span9 mono',

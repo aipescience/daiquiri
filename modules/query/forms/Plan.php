@@ -43,9 +43,6 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
 
         $this->addElement('textarea', 'plan_query', array(
             'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => 'StringLength', 'options' => array(3, 1024))
-            ),
             'required' => true,
             'rows' => 12,
             'label' => 'Query:',
