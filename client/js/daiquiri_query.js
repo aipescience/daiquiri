@@ -590,12 +590,12 @@ daiquiri.query.Query.prototype.displayPlot = function(){
  */
 daiquiri.query.Query.prototype.displayDownload = function(){
     var self = this;
-    
+    self.tabs.download.children().remove();
+
     if (self.job.status.value != 'success') {
         self.header.download.hide();
     } else {
         self.header.download.show();
-        self.tabs.download.children().remove();
 
         // make ajax call for the download form
         $.ajax({
@@ -610,6 +610,7 @@ daiquiri.query.Query.prototype.displayDownload = function(){
             },
             error: daiquiri.common.ajaxError,
             success: function (html) {
+                self.tabs.download.children().remove();
 
                 var div = $('<div/>',{
                     'html' : html
@@ -701,7 +702,7 @@ daiquiri.query.Query.prototype.pollDownload = function(){
             data: self.pendingDownload.data,
             error: daiquiri.common.ajaxError,
             success: function(json) {
-		daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
+		        daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
                 self.initDownload(json);
             }
         });
