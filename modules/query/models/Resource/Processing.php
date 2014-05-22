@@ -139,14 +139,14 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      * @param array &$error       return array for error output
      * @return array multiline parse tree 
      */
-    function multilineProcessQueryWildcard($multilineSqlTree, array &$error) {
+    function multilineProcessQueryWildcard($multilineSqlTree, $multiLineUsedDBs, array &$error) {
         // get the resource
         $resource = Query_Model_Resource_AbstractQuery::factory();
         $adapter = $resource->getAdapter();
 
         foreach ($multilineSqlTree as $key => $currSqlTree) {
             try {
-                $tmpParseObj = $this->processQueryWildcard($currSqlTree, false, $adapter);
+                $tmpParseObj = $this->processQueryWildcard($currSqlTree, $multiLineUsedDBs[$key]);
             } catch (UnsupportedFeatureException $e) {
                 $error['parseError'] = $e->getMessage();
                 return false;
@@ -703,6 +703,11 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      * SELECT statement.
      */
     function processQueryWildcard($sqlTree, $defaultDB = false) {
+        //check if this is a SELECT statement (could be something else like a USE or something)
+        if(!array_key_exists("SELECT", $sqlTree)) {
+            return $sqlTree;
+        }
+
         $this->_parseSqlAll_FROM($sqlTree, $defaultDB);
         $this->_parseSqlAll_WHERE($sqlTree);
         $this->_parseSqlAll_SELECT($sqlTree);
@@ -820,7 +825,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         
         foreach($sqlTree['FROM'] as &$node) {
             if($this->_isSubquery($node) && $node['sub_tree'] != NULL) {
-                $tree = $this->processQueryWildcard($node['sub_tree'], $mysqlConn, $zendAdapter);
+                $tree = $this->processQueryWildcard($node['sub_tree'], $defaultDB);
                 $node['sub_tree'] = $tree;
             }
         }
@@ -854,7 +859,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
         foreach($sqlTree['WHERE'] as &$node) {
             if($this->_isSubquery($node)) {
-                $tree = $this->processQueryWildcard($node['sub_tree'], $mysqlConn, $zendAdapter);
+                $tree = $this->processQueryWildcard($node['sub_tree'], $defaultDB);
                     $node['sub_tree'] = $tree->parsed;
             }
         }
@@ -1026,6 +1031,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
     }
 
     function _parseSqlAll_getColsDaiquiri(&$sqlTree, &$node, $zendAdapter, $table, $alias) {
+        //Zend_Debug::dump($table); die(0);
         $resParts = $this->_parseSqlAll_parseResourceName($table);
         
         //process the alias name

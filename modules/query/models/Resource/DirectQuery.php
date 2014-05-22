@@ -165,6 +165,9 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
             return Query_Model_Resource_DirectQuery::$_status['error'];
         }
 
+        // switch to user adapter (it could have been changed by the query, due to a "USE" statement)
+        $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
+
         // check if it worked
         if (in_array($table, $this->getAdapter()->listTables())) {
             // set status
