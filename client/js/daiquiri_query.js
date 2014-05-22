@@ -250,7 +250,8 @@ daiquiri.query.Query.prototype.mailPlan = function(form){
  */
 daiquiri.query.Query.prototype.loadJob = function(jobId){ 
     var self = this;
-    
+    self.tabs.download.children().remove();
+
     // make ajax request for the job
     $.ajax({
         url: self.url.show,
@@ -590,7 +591,6 @@ daiquiri.query.Query.prototype.displayPlot = function(){
  */
 daiquiri.query.Query.prototype.displayDownload = function(){
     var self = this;
-    self.tabs.download.children().remove();
 
     if (self.job.status.value != 'success') {
         self.header.download.hide();
@@ -611,7 +611,6 @@ daiquiri.query.Query.prototype.displayDownload = function(){
             error: daiquiri.common.ajaxError,
             success: function (html) {
                 self.tabs.download.children().remove();
-
                 var div = $('<div/>',{
                     'html' : html
                 }).appendTo(self.tabs.download);
