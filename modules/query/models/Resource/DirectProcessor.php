@@ -54,7 +54,7 @@ class Query_Model_Resource_DirectProcessor extends Query_Model_Resource_Abstract
 
         $multiLineUsedDBs = $this->_processing->multilineUsedDB($multiLineParseTrees, $this->_userDb);
 
-        $multiLineParseTrees = $this->_processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+        $multiLineParseTrees = $this->_processing->multilineProcessQueryWildcard($multiLineParseTrees, $multiLineUsedDBs, $errors);
 
         if (!empty($errors)) {
             return false;
@@ -125,7 +125,7 @@ class Query_Model_Resource_DirectProcessor extends Query_Model_Resource_Abstract
 
         $multiLineUsedDBs = $this->_processing->multilineUsedDB($multiLineParseTrees, $this->_userDb);
 
-        $multiLineParseTrees = $this->_processing->multilineProcessQueryWildcard($multiLineParseTrees, $errors);
+        $multiLineParseTrees = $this->_processing->multilineProcessQueryWildcard($multiLineParseTrees, $multiLineUsedDBs, $errors);
 
         if (!empty($errors)) {
             return false;
