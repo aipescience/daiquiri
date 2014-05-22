@@ -344,22 +344,7 @@ Best Regards'
             $input = $this->_init->options['init']['messages'];
         }
 
-        // create default config
-        $defaults = array(
-            'query' => ''
-        );
-
-        $output = array();
-
-        foreach ($defaults as $key => $value) {
-            if (array_key_exists($key, $input)) {
-                $output[$key] = $input[$key];
-            } else {
-                $output[$key] = $value;
-            }
-        }
-
-        $this->_init->options['init']['messages'] = $output;
+        $this->_init->options['init']['messages'] = $input;
     }
 
     /**

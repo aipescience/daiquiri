@@ -37,8 +37,12 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
 
         // get the query message
         $messagesModel = new Core_Model_Messages();
-        $response = $messagesModel->show('query');
-        $this->view->message = $response['row']['value'];
+        try {
+            $response = $messagesModel->show('query');
+            $this->view->message = $response['row']['value'];
+        } catch (Daiquiri_Exception_NotFound $e) {
+            $this->view->message = false;
+        }
 
         // get the forms to display
         if (Daiquiri_Config::getInstance()->query->forms) {
