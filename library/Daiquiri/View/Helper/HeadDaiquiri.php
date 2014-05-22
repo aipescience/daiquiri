@@ -67,15 +67,17 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         // daiquiri data management
         'css/daiquiri_data.css',
         'js/daiquiri_data.js',
-        // daiquiri head
+        // daiquiri modal
         'css/daiquiri_modal.css',
         'js/daiquiri_modal.js',
+        // daiquiri codemirror
+        'css/daiquiri_codemirror.css',
+        'js/daiquiri_codemirror.js',
         // daiquiri wordpress stylesheet
         'css/daiquiri_wp.css',
         // daiquiri misc
         'js/daiquiri_plot.js',
         'js/daiquiri_query_buttons.js',
-        'js/daiquiri_codemirror.js',
         'js/daiquiri_samp.js'
     );
 

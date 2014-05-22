@@ -34,55 +34,6 @@
     /*height: 438px;*/
     height: 330px; 
 }
-#query .CodeMirror {
-    line-height: 1.3em;
-    font-family: monospace;
-
-    /* Necessary so the scrollbar can be absolutely positioned within the wrapper on Lion. */
-    position: relative;
-    /* This prevents unwanted scrollbars from showing up on the body and wrapper in IE. */
-    overflow: hidden;
-    background-color: white;
-    width: 530px;
-
-    height: 200px;
-
-    /* Copied from Bootstrap's textarea */
-    display: inline-block;
-    padding: 0px 6px;
-    margin-bottom: 9px;
-    color: #555555;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
-    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
-    -ms-transition: border linear 0.2s, box-shadow linear 0.2s;
-    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
-    transition: border linear 0.2s, box-shadow linear 0.2s;  
-}
-#query .CodeMirror-focused {
-    /* Copied from Bootstrap's textarea */
-    border-color: rgba(82, 168, 236, 0.8);
-    outline: 0;
-    outline: thin dotted \9;
-    /* IE6-9 */
-
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
-    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);  
-}
-#query .CodeMirror-gutters {
-    border-right-color: #ccc;
-    background-color: white;
-}
-#query .CodeMirror-linenumber {
-    color: #333;
-}
 #query .daiquiri-samp-clients td {
     margin-right: 20px;
 }

@@ -44,11 +44,13 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
         $this->addElement('textarea', 'plan_query', array(
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => 'StringLength', 'options' => array(3, 32768))
+                array('validator' => 'StringLength', 'options' => array(3, 1024))
             ),
+            'required' => true,
+            'rows' => 12,
             'label' => 'Query:',
-            'rows' => '15',
             'class' => 'span9 mono',
+            'style' => "resize: none;"
         ));
 
         if ($this->_mail) {
