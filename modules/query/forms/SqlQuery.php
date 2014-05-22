@@ -58,7 +58,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             'filters' => array('StringTrim'),
             'required' => true,
             'label' => 'Query:',
-            'class' => 'span9 mono',
+            'class' => 'span9 mono codemirror',
             'style' => "resize: none;"
         ));
         $this->addElement('text', 'sql_tablename', array(

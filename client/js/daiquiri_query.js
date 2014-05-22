@@ -124,7 +124,7 @@ daiquiri.query.Query.prototype.submitQuery= function(form){
     var self = this;
 
     // if the code mirror plugin is present, save its content to the form
-    $('textarea', form).daiquiri_codemirror_save();
+    $('.codemirror', form).daiquiri_codemirror_save();
 
     // get the action url and the values from the form
     var action = $(form).attr('action');

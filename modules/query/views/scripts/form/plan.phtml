@@ -21,29 +21,9 @@
 
 <script type="text/javascript">      
     $(document).ready(function() {
-        $('#sql_query').daiquiri_codemirror();
-
-        $('#daiquiri-form-query-sql').daiquiri_query_buttons();
-
-        $('.daiquiri-query-example').click(function() {
-            var string = $(this).attr('data-toggle');
-
-            // clear textarea
-            $('#sql_query').val('');
-            $('#sql_query').daiquiri_codemirror_clear();
-
-            // insert query
-            $('#sql_query').insertAtCaret(string);
-            $('#sql_query').daiquiri_codemirror_insertAtCaret(string);
-        });
-
-        $('#sql_clear').click(function(){
-            $('#sql_query').val('');
-            $('#sql_query').daiquiri_codemirror_clear();
-        });
+        $('#plan_query').daiquiri_codemirror();
     });
 </script>
-
 
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
@@ -69,10 +49,5 @@
                 <?php endforeach ?>
             </ul>
         <?php endif ?>
-        <script type="text/javascript">      
-            $(document).ready(function() {
-                $('#plan_query').daiquiri_codemirror();
-            });
-        </script>
     <?php endif ?>
 </div>

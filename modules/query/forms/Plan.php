@@ -46,7 +46,7 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
             'required' => true,
             'rows' => 12,
             'label' => 'Query:',
-            'class' => 'span9 mono',
+            'class' => 'span9 mono codemirror',
             'style' => "resize: none;"
         ));
 
@@ -55,7 +55,7 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
         }
 
         if (!$this->_editable) {
-            $this->getElement('plan_query')->setAttrib('readonly', 'readonly');
+            //$this->getElement('plan_query')->setAttrib('readonly', 'readonly');
         }
 
         $this->addPrimaryButtonElement('plan_submit', 'Submit this plan');

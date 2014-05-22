@@ -33,10 +33,12 @@ daiquiri.codemirror = {};
             return this.each(function() {
                 var id = $(this).attr('id');
                 // check if table is already set
-                if (typeof daiquiri.codemirror.items[id] === 'undefined') {
-                    if ($(this).attr('readonly') != 'readonly') {
-                        daiquiri.codemirror.items[id] = new daiquiri.codemirror.CodeMirror($(this));
-                    }
+                if (typeof daiquiri.codemirror.items[id] !== 'undefined') {
+                    delete daiquiri.codemirror.items[id];
+                }
+
+                if ($(this).attr('readonly') != 'readonly') {
+                    daiquiri.codemirror.items[id] = new daiquiri.codemirror.CodeMirror($(this));
                 }
             });
         },

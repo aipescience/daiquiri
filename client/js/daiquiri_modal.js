@@ -208,5 +208,5 @@ daiquiri.Modal.prototype.display = function () {
     });
 
     // refresh a possible code mirror textarea
-    $('textarea', this.dialog).daiquiri_codemirror_refresh();
+    $('.daiquiri-modal .codemirror').daiquiri_codemirror();
 };
