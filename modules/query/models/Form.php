@@ -120,11 +120,21 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                         return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
                     }
 
+                    // construct response with redirect to plan
                     $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
-                    return array(
+                    $response = array(
                         'status' => 'plan',
                         'redirect' => $baseurl . '/query/form/plan?form=' . $formstring,
                     );
+
+                    // re-init csrf
+                    $csrf = $form->getCsrf();
+                    if (!empty($csrf)) {
+                        $csrf->initCsrfToken();
+                        $response['csrf'] = $csrf->getHash();
+                    }
+
+                    return $response;
                 } else {
                     // submit query
                     $response = $model->query($sql, false, $tablename, $options);
