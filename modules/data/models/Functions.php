@@ -98,11 +98,11 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
             if (empty($input['function'])) {
                 throw new Exception('Either int id or array with "function" key must be provided as $input');
             }
-            $entry = $this->getResource()->fetchRowByName($input['function']);
+            $row = $this->getResource()->fetchRowByName($input['function']);
         } else {
             throw new Exception('$input has wrong type.');
         }
-
+        
         if (empty($row)) {
             throw new Daiquiri_Exception_NotFound();
         }
