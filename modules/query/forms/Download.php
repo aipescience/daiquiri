@@ -34,7 +34,6 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
 
     public function init() {
         $this->setFormDecorators();
-        $this->addCsrfElement('download_csrf');
 
         $this->addElement('select', 'download_format', array(
             'required' => true,
@@ -43,7 +42,10 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
             'decorators' => array('ViewHelper'),
             'class' => 'span4'
         ));
-        $this->addPrimaryButtonElement('download_submit', 'Download');
+        $this->addElement('button','download_submit',array(
+            'label' => 'Download',
+            'class' => 'btn btn-primary'
+        ));
 
         $this->addHorizontalGroup(array('download_format'));
         $this->addActionGroup(array('download_submit'));

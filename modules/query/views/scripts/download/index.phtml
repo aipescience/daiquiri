@@ -30,16 +30,6 @@
             </a>
         </p>
     <?php else: ?>
-        <?php if(isset($this->form)): ?> 
-            <h4>Download table</h4>
-            <p>
-                Please select the format for your download:
-            </p>
-            <p>
-                <?php echo $this->form; ?>
-            </p>
-        <?php else: ?>
-            <p class="text-error"><?php echo $this->error; ?></p>
-        <?php endif; ?>
+        <p class="text-error"><?php echo $this->errors; ?></p>
     <?php endif; ?>
 </div>

@@ -170,7 +170,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
             $rows[] = $row;
         }
 
-        if (in_array('row_id', $cols)) {
+        if (in_array('row_id', $colnames)) {
             $pk = 'row_id';
         } else {
             $pk = $this->getResource()->fetchPrimary();

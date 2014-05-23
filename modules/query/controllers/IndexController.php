@@ -44,6 +44,16 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
             $this->view->message = false;
         }
 
+        // get the different download formats
+        $formats = array();
+        $adapter = Daiquiri_Config::getInstance()->query->download->adapter->toArray();
+        foreach ($adapter['enabled'] as $key) {
+            $formats[$key] = $adapter['config'][$key]['name'];
+        }
+        $this->view->downloadForm = new Query_Form_Download(array(
+            'formats' => $formats
+        ));
+
         // get the forms to display
         if (Daiquiri_Config::getInstance()->query->forms) {
             $this->view->forms = Daiquiri_Config::getInstance()->query->forms->toArray();

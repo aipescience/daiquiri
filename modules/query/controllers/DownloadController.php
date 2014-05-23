@@ -29,13 +29,16 @@ class Query_DownloadController extends Daiquiri_Controller_Abstract {
 
     public function indexAction() {
         $table = $this->_getParam('table');
-        $this->getControllerHelper('form')->download($table);
+        $format = $this->_getParam('format');
+        $response = $this->_model->download($table, $format);
+        $this->view->assign($response);
     }
 
     public function regenAction() {
         $table = $this->_getParam('table');
         $format = $this->_getParam('format');
-        $this->getControllerHelper('form')->regen($table, $format);
+        $response = $this->_model->regen($table, $format);
+        $this->view->assign($response);
     }
 
     public function fileAction() {

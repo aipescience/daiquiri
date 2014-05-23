@@ -49,7 +49,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         'username' => 'User name',
         'database' => 'Database name',
         'table' => 'Table name',
-        'timeSubmit' => 'Job submission time',
+        'time' => 'Job submission time',
         'query' => 'Original query',
         'actualQuery' => 'Actual query',
         'status_id' => 'Job status',

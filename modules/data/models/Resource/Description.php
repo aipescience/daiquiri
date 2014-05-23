@@ -76,12 +76,12 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
         }
 
         // return empty if the table is locked
-        $lockedTables = $this->getAdapter()->fetchAll('SHOW OPEN TABLES IN `' . $this->getDb() . '` WHERE In_use > 0');
-        foreach ($lockedTables as $lockedTable) {
-            if ($lockedTable['Table'] == $table) {
-                return array();
-            }
-        }
+        // $lockedTables = $this->getAdapter()->fetchAll('SHOW OPEN TABLES IN `' . $this->getDb() . '` WHERE In_use > 0');
+        // foreach ($lockedTables as $lockedTable) {
+        //     if ($lockedTable['Table'] == $table) {
+        //         return array();
+        //     }
+        // }
 
         // prepare table description array
         $tableDescription = array(

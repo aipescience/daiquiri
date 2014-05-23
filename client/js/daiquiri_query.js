@@ -113,6 +113,12 @@ daiquiri.query.Query = function (siteUrl) {
         return false;
     });
 
+    // overide the button of the download form
+    $('button', this.tabs.download).on('click',function(){
+        self.submitDownload();
+        return false;
+    });
+
     // set active
     this.idle = true;
 };
@@ -250,7 +256,9 @@ daiquiri.query.Query.prototype.mailPlan = function(form){
  */
 daiquiri.query.Query.prototype.loadJob = function(jobId){ 
     var self = this;
-    self.tabs.download.children().remove();
+
+    // remove old download link
+    $('#daiquiri-query-download-link').remove();
 
     // make ajax request for the job
     $.ajax({
@@ -271,12 +279,14 @@ daiquiri.query.Query.prototype.loadJob = function(jobId){
                 // call display methods
                 self.displayDetails();
 
+                // show the download tab
+                self.header.download.show();
+
                 // switch to the details tab
                 if (self.job.status.value == 'success') {
                     // call display methods
                     self.displayResults();
                     self.displayPlot();
-                    self.displayDownload();
                     
                     if (! (self.tabs.details.hasClass('active') || self.tabs.results.hasClass('active') || self.tabs.plot.hasClass('active'))) {
                         $('a', self.header.results).tab('show');
@@ -586,64 +596,27 @@ daiquiri.query.Query.prototype.displayPlot = function(){
     }
 };
 
-/**
- * Displays the download form.
- */
-daiquiri.query.Query.prototype.displayDownload = function(){
-    var self = this;
-
-    if (self.job.status.value != 'success') {
-        self.header.download.hide();
-    } else {
-        self.header.download.show();
-
-        // make ajax call for the download form
-        $.ajax({
-            url: self.url.download,
-            type: 'GET',
-            dataType: 'html',
-            headers: {
-                'Accept': 'application/html'
-            },
-            data: {
-                'table': self.job.table.value
-            },
-            error: daiquiri.common.ajaxError,
-            success: function (html) {
-                self.tabs.download.children().remove();
-                var div = $('<div/>',{
-                    'html' : html
-                }).appendTo(self.tabs.download);
-
-                // emulate the form's action with an ajax request
-                $('form', div).submit(function(){
-                    self.submitDownload(this);
-                    return false
-                });
-            }
-        });
-    }
-};
-
-daiquiri.query.Query.prototype.submitDownload = function(form) {
+daiquiri.query.Query.prototype.submitDownload = function() {
     var self = this;
 
     // get the values from the form
-    var values = $(form).serialize() + '&table=' + self.job.table.value;
+    var table = self.job.table.value;
+    var format = $('#download_format').val();
 
     if (self.idle) {
         self.idle = false;
         $.ajax({
             url: self.url.download,
-            type: 'POST',
             dataType: 'json',
             headers: {
                 'Accept': 'application/json'
             },
-            data: values,
+            data: {
+                'table': table,
+                'format': format
+            },
             error: daiquiri.common.ajaxError,
             success: function(json) {
-                daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
                 self.initDownload(json);
             }
         });
@@ -685,9 +658,6 @@ daiquiri.query.Query.prototype.pollDownload = function(){
         return;
     }
 
-    // get the csrf from the form
-    self.pendingDownload.data.download_csrf = $('#download_csrf', 'form', self.tabs.download).val();
-
     // make an ajax call to get the updated status of the download
     if (self.idle) {
         self.idle = false;
@@ -701,7 +671,6 @@ daiquiri.query.Query.prototype.pollDownload = function(){
             data: self.pendingDownload.data,
             error: daiquiri.common.ajaxError,
             success: function(json) {
-		        daiquiri.common.updateCsrf($('form', self.tabs.download), json.csrf);
                 self.initDownload(json);
             }
         });
@@ -718,9 +687,8 @@ daiquiri.query.Query.prototype.initDownload = function(json) {
         if(self.pendingDownload == null) {
             self.pendingDownload = {
                 'data': {
-                    'download_format': $('#download_format', 'form', self.tabs.download).val(),
-		    'download_csrf': $('#download_csrf', 'form', self.tabs.download).val(),
-                    'table': self.job.table.value
+                    'table': self.job.table.value,
+                    'format': $('#download_format').val()
                 }
             };
 
@@ -740,9 +708,6 @@ daiquiri.query.Query.prototype.initDownload = function(json) {
     self.idle = true;
 }
 
-/**
- * Formats the successfull retrieval of a download link.
- */
 daiquiri.query.Query.prototype.createDownloadLink = function (link) { 
     var html = '<p>You can now download the file using:</p>';
     html += '<p><a target="_blank" href="' + link + '">';

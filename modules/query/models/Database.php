@@ -26,62 +26,18 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
     /**
      * Creates the file to download.
      * @param string $table table in the users database
-     * @param array $formParams
+     * @param string $format format for the download
      * @return array $response
      */
-    public function download($table, array $formParams = array()) {
+    public function download($table, $format) {
         if (empty($table)) {
             return array('status' => 'error', 'errors' => 'Table is not set');
         }
-
-        // create the form object
-        $formats = array();
-        $adapter = Daiquiri_Config::getInstance()->query->download->adapter->toArray();
-        foreach ($adapter['enabled'] as $key) {
-            $formats[$key] = $adapter['config'][$key]['name'];
-        }
-        $form = new Query_Form_Download(array(
-            'formats' => $formats
-        ));
-        
-        // init errors array
-        $errors = array();
-
-        // validate form
-        if (!empty($formParams)) {
-            if ($form->isValid($formParams)) {
-                // get the form values
-                $values = $form->getValues();
-                $format = $values['download_format'];
-
-                $response = $this->_createDownloadFile($table, $format);
-                if ($response['status'] == 'ok' || $response['status'] == 'pending')  {
-                    $csrf = $form->getCsrf();
-                    if (!empty($csrf)) {
-                        $csrf->initCsrfToken();
-                        $response['csrf'] = $csrf->getHash();
-                    }
-
-                    return $response;
-                } else {
-                    return $this->getModelHelper('CRUD')->validationErrorResponse($form,$response['errors']);
-                }                
-            } else {
-                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
-            }
+        if (empty($format)) {
+            return array('status' => 'error', 'errors' => 'Format is not set');
         }
 
-        // re-init csrf and return
-        $response = array(
-            'form' => $form,
-            'status' => 'form'
-        );
-        $csrf = $form->getCsrf();
-        if (!empty($csrf)) {
-            $csrf->initCsrfToken();
-            $response['csrf'] = $csrf->getHash();
-        }
-        return $response;
+        return $this->_createDownloadFile($table, $format);
     }
 
     /**
@@ -92,8 +48,11 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function regen($table, $format) {
-        if (empty($format) || empty($table)) {
-            throw new Daiquiri_Exception_Forbidden();
+        if (empty($table)) {
+            return array('status' => 'error', 'errors' => 'Table is not set');
+        }
+        if (empty($format)) {
+            return array('status' => 'error', 'errors' => 'Format is not set');
         }
 
         // create link and file sysytem path for table dump
