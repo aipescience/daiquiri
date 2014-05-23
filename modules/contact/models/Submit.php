@@ -43,7 +43,7 @@ class Contact_Model_Submit extends Daiquiri_Model_Abstract {
         if ($userId > 0) {
             // get the user model for getting user details
             $userModel = new Auth_Model_User();
-            $user = $userModel->show($userId);
+            $user = $userModel->getResource()->fetchRow($userId);
         } else {
             $user = array();
         }
@@ -51,8 +51,8 @@ class Contact_Model_Submit extends Daiquiri_Model_Abstract {
         // create the form object
         $form = new Contact_Form_Submit(array(
             'categories' => $categories,
-            'user' => $user)
-        );
+            'user' => $user
+        ));
 
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
