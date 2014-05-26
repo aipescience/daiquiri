@@ -709,13 +709,17 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         // get adapter config
         $config = $this->getAdapter()->getConfig();
 
+        // get the user db
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $userDb = Daiquiri_Config::getInstance()->getUserDbName($username);
+
         // first check for pending jobs that might already write to the requested table (bug #209)
         $select = $this->select();
         $select->from('qqueue_jobs', array('id'));
         $select->where('mysqlUserName = ?', $config['username']);
         $select->where('status != 2');
         $select->where('resultTableName = ?', $table);
-        $select->where('resultDBName = ?', $config['dbname']);
+        $select->where('resultDBName = ?', $userDb);
 
         $rows = $this->fetchAll($select);
 
@@ -724,20 +728,8 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         }
 
         // then check if table is already there...
-        $sql = "SHOW TABLES LIKE '{$table}';";
-
-        try {
-            $stmt = $this->getAdapter()->query($sql);
-        } catch (Exception $e) {
-            // check if this is error 1051 Unknown table
-            if (strpos($e->getMessage(), "1051") === false) {
-                throw $e;
-            }
-        }
-
-        $rows = $stmt->fetchAll();
-
-        if (!empty($rows)) {
+        $userTables = Daiquiri_Config::getInstance()->getUserDbAdapter($userDb)->listTables();
+        if (in_Array($table,$userTables)) {
             return true;
         }
 

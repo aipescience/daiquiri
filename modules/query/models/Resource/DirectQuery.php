@@ -417,21 +417,10 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return bool
      */
     protected function _tableExists($table) {
-        $sql = "SHOW TABLES LIKE '{$table}';";
-
-        try {
-            $rows = $this->getAdapter()->query($sql)->fetchAll();
-        } catch (Exception $e) {
-            // check if this is error 1051 Unknown table
-            if (strpos($e->getMessage(), "1051") === false) {
-                throw $e;
-            }
-        }
-
-        if (!empty($rows)) {
+        $userTables = $this->getAdapter()->listTables();
+        if (in_Array($table,$userTables)) {
             return true;
         }
-
         return false;
     }
 
