@@ -74,7 +74,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             'validators' => array(
                 array('validator' => 'float')
             ),
-            'label' => 'RA'
+            'label' => 'RA<sub>deg</sub>'
         ));
         $this->addElement('text', $this->getFieldId('dec'), array(
             'filters' => array('StringTrim'),
@@ -82,7 +82,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             'validators' => array(
                 array('validator' => 'float')
             ),
-            'label' => 'DEC'
+            'label' => 'DEC<sub>deg</sub>'
         ));
         $this->addElement('text', $this->getFieldId('radius'), array(
             'filters' => array('StringTrim'),
@@ -90,7 +90,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             'validators' => array(
                 array('validator' => 'float')
             ),
-            'label' => 'Radius'
+            'label' => 'Radius<sub>arcsec</sub>'
         ));
         $this->addElement('text', $this->getFieldId('tablename'), array(
             'filters' => array(
