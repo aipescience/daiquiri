@@ -43,7 +43,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
 
             // check permission on table access
             if ($table) {
-                $tablesResource = new Data_Model_Resource_Databases();
+                $tablesResource = new Data_Model_Resource_Tables();
                 $result = $tablesResource->checkACL($database,$table,'select');
                 if ($result !== true) {
                     throw new Daiquiri_Exception_NotFound();
