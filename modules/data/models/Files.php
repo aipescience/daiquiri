@@ -28,7 +28,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function index() {
-        $directories = Daiquiri_Config::getInstance()->files->static->toArray();
+        $directories = Daiquiri_Config::getInstance()->data->files->static->toArray();
 
         $filesTmp = array();
         foreach ($directories as $dir) {
@@ -261,7 +261,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      * @return array $file
      */
     private function _findFile($name) {
-        $directories = Daiquiri_Config::getInstance()->files->static->toArray();
+        $directories = Daiquiri_Config::getInstance()->data->files->static->toArray();
 
         $file = array();
         foreach ($directories as $dir) {
