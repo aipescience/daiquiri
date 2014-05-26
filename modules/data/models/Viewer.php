@@ -100,7 +100,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
                     $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
                     $col['format'] = array(
                         'type' => 'filelink',
-                        'base' => $baseurl . '/files/index/single',
+                        'base' => $baseurl . '/data/files/single',
                     );
                 } else {
                     // we just show this as a link - meta.ref.url also ends up here
