@@ -68,7 +68,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
         foreach ($tableMeta['columns'] as $key => $colMeta) {
             $meta[$colMeta['name']] = array(
                 'id' => $key,
-                'ucd' => explode(';',$colMeta['ucd'])
+                'ucd' => explode(';',str_replace(' ','',$colMeta['ucd']))
             );
         }
 
