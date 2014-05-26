@@ -29,7 +29,7 @@ class Daiquiri_View_Helper_Export extends Zend_View_Helper_Abstract {
 
     public function export($data) {
         $output = "<pre>\n";
-        $this->_buildExport_r($data, 0, $output);
+        $this->_buildExport_r($data, 4, $output);
         $output .= "</pre>";
         return $output;
     }
