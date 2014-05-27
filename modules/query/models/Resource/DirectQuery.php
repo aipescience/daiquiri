@@ -487,6 +487,8 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
                 $sqloptions['orWhere'] = $orWhere;
             }
         }
+
+        return $sqloptions;
     }
 
 }
