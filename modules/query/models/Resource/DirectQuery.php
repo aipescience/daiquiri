@@ -19,6 +19,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/lexer/PHPSQLLexer.php');
+
 class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuery {
 
     /**
@@ -71,9 +73,15 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         'query' => 'query',
         'actualQuery' => 'actualQuery',
         'user_id' => 'user_id',
-        'status_id' => 'status_id',
+        'status_id' => 'Query_Jobs.status_id',
         'time' => 'time'
     );
+
+    /**
+     * Field that used best as a timestamp.
+     * @var string $_timeField
+     */ 
+    protected static $_timeField = 'time';
 
     /**
      * Creates a new table in the database with the given sql query.
@@ -270,15 +278,6 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Return job status.
-     * @param type $input id OR name of the job
-     */
-    public function fetchJobStatus($id) {
-        $row = $this->fetchRow($id);
-        return $row['status_id'];
-    }
-
-    /**
      * Returns the columns of the jobs table.
      * @return array $cols
      */
@@ -298,6 +297,9 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return int $count
      */
     public function countRows(array $sqloptions = null) {
+        // rewrite sqloptions especially where
+        $sqloptions = $this->_processWhere($sqloptions);
+
         $select = $this->select();
         $select->from('Query_Jobs', 'COUNT(*) as count');
         $select->join('Auth_User','Query_Jobs.user_id = Auth_User.id','username');
@@ -326,6 +328,9 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return array $rows
      */
     public function fetchRows(array $sqloptions = array()) {
+        // rewrite sqloptions especially where
+        $sqloptions = $this->_processWhere($sqloptions);
+
         // get the primary sql select object
         $select = $this->select($sqloptions);
         $select->from('Query_Jobs', Query_Model_Resource_DirectQuery::$_cols);
@@ -422,6 +427,66 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns rewritten sqloptions array.
+     * @param array $sqloptions
+     * @return array $sqloptions
+     */
+    protected function _processWhere($sqloptions) {
+        if ($sqloptions) {
+            $lexer = new PHPSQLParser\lexer\PHPSQLLexer();
+
+            if (isset($sqloptions['where'])) {
+                $where = array();
+                foreach($sqloptions['where'] as $key => $value) {
+                    if (is_int($key)) {
+                        $split = $lexer->split(trim($value));
+                    } else {
+                        $split = $lexer->split(trim($key));
+                    }
+
+                    // replace field
+                    $split[0] = str_replace(
+                        array_keys(Query_Model_Resource_DirectQuery::$_cols),
+                        Query_Model_Resource_DirectQuery::$_cols,
+                        $split[0]
+                    );
+
+                    if (is_int($key)) {
+                        $where[$key] = implode($split);
+                    } else {
+                        $where[implode($split)] = $value;
+                    }
+                }
+                $sqloptions['where'] = $where;
+            }
+            if (isset($sqloptions['orWhere'])) {
+                $orWhere = array();
+                foreach($sqloptions['orWhere'] as $key => $value) {
+                    if (is_int($key)) {
+                        $split = $lexer->split(trim($value));
+                    } else {
+                        $split = $lexer->split(trim($key));
+                    }
+
+                    // replace field
+                    $split[0] = str_replace(
+                        array_keys(Query_Model_Resource_DirectQuery::$_cols),
+                        Query_Model_Resource_DirectQuery::$_cols,
+                        $split[0]
+                    );
+
+                    if (is_int($key)) {
+                        $orWhere[$key] = implode($split);
+                    } else {
+                        $orWhere[implode($split)] = $value;
+                    }
+                }
+                $sqloptions['orWhere'] = $orWhere;
+            }
+        }
     }
 
 }

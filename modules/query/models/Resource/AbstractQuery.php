@@ -167,12 +167,45 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     }
 
     /**
-     * Returns the status array for the query interface.
-     * @return array $status
+     * Returns the status_id for a given status.
+     * @param string $status
+     * @return int $status_id
      */
-    public function getStatus() {
+    public function getStatusId($status) {
         $classname = get_class($this);
-        return $classname::$_status;
+        if (isset($classname::$_status[$status])) {
+            return $classname::$_status[$status];
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns the field used best as a timestamp.
+     * returns string $timeField
+     */ 
+    public function getTimeField() {
+        $classname = get_class($this);
+        return $classname::$_timeField;
+    }
+
+    /**
+     * Returns the status for a given status_id.
+     * @param int $status_id
+     * @return string $status
+     */
+    public function getStatus($statusId) {
+        $classname = get_class($this);
+        return array_search($statusId, $classname::$_status);
+    }
+
+    /**
+     * Return job status.
+     * @param type $input job id
+     */
+    public function fetchJobStatus($id) {
+        $row = $this->fetchRow($id);
+        return $row['status'];
     }
 
     /**

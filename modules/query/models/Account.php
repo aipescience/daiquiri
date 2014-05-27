@@ -34,14 +34,12 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         // get rows and return
         $rows = array();
-        if (get_class($this->getResource()) == 'Query_Model_Resource_QQueueQuery') {
-            $order = 'timeSubmit DESC';
-        } else {
-            $order = 'time DESC';
-        }
         $dbRows = $this->getResource()->fetchRows(array(
-            'where' => array('user_id = ?' => $userId),
-            'order' => array($order)
+            'where' => array(
+                'user_id = ?' => $userId,
+                'status_id != ?' => $this->getResource()->getStatusId('removed'),
+            ),
+            'order' => array($this->getResource()->getTimeField() . ' DESC'),
         ));
         foreach ($dbRows as $dbRow) {
             $row = array();

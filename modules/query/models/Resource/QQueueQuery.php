@@ -19,6 +19,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/lexer/PHPSQLLexer.php');
+
 class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuery {
 
     /**
@@ -86,9 +88,15 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         'query' => 'query',
         'actualQuery' => 'actualQuery',
         'queue' => 'queue',
-        'status' => 'status',
+        'status_id' => 'status',
         'error' => 'error'
     );
+
+    /**
+     * Field that used best as a timestamp.
+     * @var string $_timeField
+     */ 
+    protected static $_timeField = 'timeSubmit';
 
     /**
      * Construtor. Sets adapter to the user adapter and the `mysql` database. 
@@ -283,15 +291,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Return job status.
-     * @param int $id id of the job
-     */
-    public function fetchJobStatus($id) {
-        $row = $this->fetchRow($id);
-        return $row['status'];
-    }
-
-    /**
      * Returns the columns of the jobs table.
      * @return array $cols
      */
@@ -316,81 +315,8 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         // get adapter config
         $config = $this->getAdapter()->getConfig();
 
-        // prepare sqloptions
-        $sqloptionsPending = array();
-        $sqloptionsHistory = array();
-
-        if ($sqloptions) {
-
-            $fieldStringPending = $this->quoteIdentifier('qqueue_jobs');
-            $fieldStringHistory = $this->quoteIdentifier('qqueue_history');
-
-            if (isset($sqloptions['where'])) {
-                $sqloptionsPending['where'] = array();
-                $sqloptionsHistory['where'] = array();
-
-                foreach($sqloptions['where'] as $key => $value) {
-                    if (is_int($key)) {
-                        if (strpos($value,$fieldStringPending) === 0) {
-                            $sqloptionsPending['where'][] = $value;
-                        } else if (strpos($value,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['where'][] = $value;
-                        } else {
-                            $sqloptionsPending['where'][] = $value;
-                            $sqloptionsHistory['where'][] = $value;
-                        }
-                    } else {
-                        $dbKey = str_replace(
-                            array_keys(Query_Model_Resource_QQueueQuery::$_cols),
-                            Query_Model_Resource_QQueueQuery::$_cols,
-                            $key
-                        );
-                        if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['where'][$dbKey] = $value;
-                        } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['where'][$dbKey] = $value;
-                        } else {
-                            $sqloptionsPending['where'][$dbKey] = $value;
-                            $sqloptionsHistory['where'][$dbKey] = $value;
-                        }
-                    }
-                }
-
-                unset($sqloptions['where']);
-            }
-
-            if (isset($sqloptions['orWhere'])) {
-                $sqloptionsPending['orWhere'] = array();
-                $sqloptionsHistory['orWhere'] = array();
-
-                foreach($sqloptions['orWhere'] as $key => $value) {
-                    if (is_int($key)) {
-                        if (strpos($value,$fieldStringPending) === 0) {
-                            $sqloptionsPending['orWhere'][] = $value;
-                        } else if (strpos($value,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['orWhere'][] = $value;
-                        } else {
-                            $sqloptionsPending['orWhere'][] = $value;
-                            $sqloptionsHistory['orWhere'][] = $value;
-                        }
-                    } else {
-                        $dbKey = str_replace(
-                            array_keys(Query_Model_Resource_QQueueQuery::$_cols),
-                            Query_Model_Resource_QQueueQuery::$_cols,
-                            $key
-                        );
-                        if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['orWhere'][$dbKey] = $value;
-                        } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['orWhere'][$dbKey] = $value;
-                        } else {
-                            $sqloptionsPending['orWhere'][$dbKey] = $value;
-                            $sqloptionsHistory['orWhere'][$dbKey] = $value;
-                        }
-                    }
-                }
-            }
-        }
+        // rewrite sqloptions especially where
+        $sqloptions = $this->_processWhere($sqloptions);
 
         // get the sql select object for the running jobs
         $selectPending = $this->select($sqloptionsPending);
@@ -419,91 +345,16 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         // get adapter config
         $config = $this->getAdapter()->getConfig();
 
-        // prepare sqloptions
-        $sqloptionsPending = array();
-        $sqloptionsHistory = array();
-
-        if ($sqloptions) {
-
-            $fieldStringPending = $this->quoteIdentifier('qqueue_jobs');
-            $fieldStringHistory = $this->quoteIdentifier('qqueue_history');
-
-            if (isset($sqloptions['where'])) {
-                $sqloptionsPending['where'] = array();
-                $sqloptionsHistory['where'] = array();
-
-                foreach($sqloptions['where'] as $key => $value) {
-                    if (is_int($key)) {
-                        if (strpos($value,$fieldStringPending) === 0) {
-                            $sqloptionsPending['where'][] = $value;
-                        } else if (strpos($value,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['where'][] = $value;
-                        } else {
-                            $sqloptionsPending['where'][] = $value;
-                            $sqloptionsHistory['where'][] = $value;
-                        }
-                    } else {
-                        $dbKey = str_replace(
-                            array_keys(Query_Model_Resource_QQueueQuery::$_cols),
-                            Query_Model_Resource_QQueueQuery::$_cols,
-                            $key
-                        );
-                        if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['where'][$dbKey] = $value;
-                        } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['where'][$dbKey] = $value;
-                        } else {
-                            $sqloptionsPending['where'][$dbKey] = $value;
-                            $sqloptionsHistory['where'][$dbKey] = $value;
-                        }
-                    }
-                }
-
-                unset($sqloptions['where']);
-            }
-
-            if (isset($sqloptions['orWhere'])) {
-                $sqloptionsPending['orWhere'] = array();
-                $sqloptionsHistory['orWhere'] = array();
-
-                foreach($sqloptions['orWhere'] as $key => $value) {
-                    if (is_int($key)) {
-                        if (strpos($value,$fieldStringPending) === 0) {
-                            $sqloptionsPending['orWhere'][] = $value;
-                        } else if (strpos($value,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['orWhere'][] = $value;
-                        } else {
-                            $sqloptionsPending['orWhere'][] = $value;
-                            $sqloptionsHistory['orWhere'][] = $value;
-                        }
-                    } else {
-                        $dbKey = str_replace(
-                            array_keys(Query_Model_Resource_QQueueQuery::$_cols),
-                            Query_Model_Resource_QQueueQuery::$_cols,
-                            $key
-                        );
-                        if (strpos($key,$fieldStringPending) === 0) {
-                            $sqloptionsPending['orWhere'][$dbKey] = $value;
-                        } else if (strpos($key,$fieldStringHistory) === 0) {
-                            $sqloptionsHistory['orWhere'][$dbKey] = $value;
-                        } else {
-                            $sqloptionsPending['orWhere'][$dbKey] = $value;
-                            $sqloptionsHistory['orWhere'][$dbKey] = $value;
-                        }
-                    }
-                }
-
-                unset($sqloptions['orWhere']);
-            }
-        }
+        // rewrite sqloptions especially where
+        $sqloptions = $this->_processWhere($sqloptions);
 
         // get the sql select object for the running jobs
-        $selectPending = $this->select($sqloptionsPending);
+        $selectPending = $this->select($sqloptions['pending']);
         $selectPending->from('qqueue_jobs', Query_Model_Resource_QQueueQuery::$_cols);
         $selectPending->where("qqueue_jobs.mysqlUserName = ?", $config['username']);
 
         // get the sql select object for the old jobs
-        $selectHistory = $this->select($sqloptionsHistory);
+        $selectHistory = $this->select($sqloptions['history']);
         $selectHistory->from('qqueue_history', Query_Model_Resource_QQueueQuery::$_cols);
         $selectHistory->where("qqueue_history.mysqlUserName = ?", $config['username']);
         
@@ -533,7 +384,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $row['username'] = $userCache[$row['user_id']];
 
             // get status from status string array
-            $row['status'] = $statusStrings[$row['status']];
+            $row['status'] = $statusStrings[$row['status_id']];
 
             // get queue
             $row['queue'] = $queues[$row['queue']]['name'];
@@ -589,7 +440,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         }
 
         // get status from status string array
-        $row['status'] = $statusStrings[$row['status']];
+        $row['status'] = $statusStrings[$row['status_id']];
 
         // get queue
         $row['queue'] = $queues[$row['queue']]['name'];
@@ -734,5 +585,109 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         }
 
         return false;
+    }
+
+    /**
+     * Returns rewritten sqloptions array.
+     * @param array $sqloptions
+     * @return array $sqloptions
+     */
+    protected function _processWhere($sqloptions) {
+        // prepare sqloptions
+        $sqloptions['pending'] = array();
+        $sqloptions['history'] = array();
+
+        if ($sqloptions) {
+            $lexer = new PHPSQLParser\lexer\PHPSQLLexer();
+
+            $fieldStringPending = $this->quoteIdentifier('qqueue_jobs');
+            $fieldStringHistory = $this->quoteIdentifier('qqueue_history');
+
+            if (isset($sqloptions['where'])) {
+                $sqloptions['pending']['where'] = array();
+                $sqloptions['history']['where'] = array();
+
+                foreach($sqloptions['where'] as $key => $value) {
+                    if (is_int($key)) {
+                        $split = $lexer->split(trim($value));
+                    } else {
+                        $split = $lexer->split(trim($key));
+                    }
+
+                    // replace field
+                    $split[0] = str_replace(
+                        array_keys(Query_Model_Resource_QQueueQuery::$_cols),
+                        Query_Model_Resource_QQueueQuery::$_cols,
+                        $split[0]
+                    );
+
+                    if (is_int($key)) {
+                        if (strpos($split[0],'qqueue_jobs') !== false) {
+                            $sqloptions['pending']['where'][] = implode($split);
+                        } else if (strpos($split[0],'qqueue_history') !== false) {
+                            $sqloptions['history']['where'][] = implode($split);
+                        } else {
+                            $sqloptions['pending']['where'][] = implode($split);
+                            $sqloptions['history']['where'][] = implode($split);
+                        }
+                    } else {
+                        if (strpos($split[0],'qqueue_jobs') !== false) {
+                            $sqloptions['pending']['where'][implode($split)] = $value;
+                        } else if (strpos($split[0],'qqueue_history') === 0) {
+                            $sqloptions['history']['where'][implode($split)] = $value;
+                        } else {
+                            $sqloptions['pending']['where'][implode($split)] = $value;
+                            $sqloptions['history']['where'][implode($split)] = $value;
+                        }
+                    }
+                }
+
+                unset($sqloptions['where']);
+            }
+
+            if (isset($sqloptions['orWhere'])) {
+                $sqloptions['pending']['orWhere'] = array();
+                $sqloptions['history']['orWhere'] = array();
+
+                foreach($sqloptions['orWhere'] as $key => $value) {
+                    if (is_int($key)) {
+                        $split = $lexer->split(trim($value));
+                    } else {
+                        $split = $lexer->split(trim($key));
+                    }
+
+                    // replace field
+                    $split[0] = str_replace(
+                        array_keys(Query_Model_Resource_QQueueQuery::$_cols),
+                        Query_Model_Resource_QQueueQuery::$_cols,
+                        $split[0]
+                    );
+
+                    if (is_int($key)) {
+                        if (strpos($split[0],$fieldStringPending) === 0) {
+                            $sqloptions['pending']['orWhere'][] = implode($split);
+                        } else if (strpos($split[0],$fieldStringHistory) === 0) {
+                            $sqloptions['history']['orWhere'][] = implode($split);
+                        } else {
+                            $sqloptions['pending']['orWhere'][] = implode($split);
+                            $sqloptions['history']['orWhere'][] = implode($split);
+                        }
+                    } else {
+                        if (strpos($split[0],$fieldStringPending) === 0) {
+                            $sqloptions['pending']['orWhere'][implode($split)] = $value;
+                        } else if (strpos($split[0],$fieldStringHistory) === 0) {
+                            $sqloptions['history']['orWhere'][implode($split)] = $value;
+                        } else {
+                            $sqloptions['pending']['orWhere'][implode($split)] = $value;
+                            $sqloptions['history']['orWhere'][implode($split)] = $value;
+                        }
+                    }
+                }
+
+                unset($sqloptions['orWhere']);
+            }
+        }
+
+        return $sqloptions;
     }
 }
