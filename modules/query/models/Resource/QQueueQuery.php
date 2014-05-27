@@ -65,6 +65,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         'actualQuery' => 'Actual query',
         'queue' => 'Queue',
         'status' => 'Job status',
+        'status_id' => 'Internal job status id',
         'error' => 'Error message',
         'tbl_size' => 'Total disk usage (in MB)',
         'tbl_idx_size' => 'Index disk usage (in MB)',
@@ -202,11 +203,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $errors['submitError'] = $e->getMessage();
             return Query_Model_Resource_QQueueQuery::$_status['error'];
         }
-
-        // get username and status
-        $statusStrings = array_flip(Query_Model_Resource_QQueueQuery::$_status);
-        $job['status'] = $statusStrings[$statusId];
-        $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
 
         return $result;
     }
