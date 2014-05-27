@@ -97,16 +97,18 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
     /**
      * Returns a database entry.
      * @param mixed $input int id or array with "db" key
+     * @param bool $tables fetch table information
+     * @param bool $columns fetch colums information
      * @return array $response
      */
-    public function show($input) {
+    public function show($input, $tables = false, $columns = false) {
         if (is_int($input)) {
-            $row = $this->getResource()->fetchRow($input);
+            $row = $this->getResource()->fetchRow($input, $tables, $columns);
         } elseif (is_array($input)) {
             if (empty($input['db'])) {
                 throw new Exception('Either int id or array with "db" key must be provided as $input');
             }
-            $row = $this->getResource()->fetchRowByName($input['db']);
+            $row = $this->getResource()->fetchRowByName($input['db'], $tables, $columns);
         } else {
             throw new Exception('$input has wrong type.');
         }
