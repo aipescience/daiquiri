@@ -52,9 +52,6 @@ class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
         $response = $this->_model->export($meetingId, $status, $contributionType);
         $this->view->mode = $this->_getParam('mode');
         $this->view->assign($response);
-
-        // disable layout
-        $this->_helper->layout->disableLayout();
     }
 
     public function showAction() {
