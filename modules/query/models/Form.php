@@ -241,7 +241,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                         }
                         return $response;
                     } else {
-                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
+                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$response['errors']);
                     }
                 }
             } else {

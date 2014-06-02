@@ -37,6 +37,10 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
         $this->_mail = $mail;
     }
 
+    public function getCsrf() {
+        return $this->getElement('plan_csrf');
+    }
+
     public function init() {
         $this->setFormDecorators();
         $this->addCsrfElement('plan_csrf');
