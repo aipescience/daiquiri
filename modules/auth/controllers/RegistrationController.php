@@ -37,7 +37,7 @@ class Auth_RegistrationController extends Daiquiri_Controller_Abstract {
     }
 
     public function registerAction() {
-        $this->getControllerHelper('form')->register();
+        $this->getControllerHelper('form',array('redirect' => '/'))->register();
     }
 
     public function validateAction() {
