@@ -45,6 +45,14 @@ class Meetings_ParticipantsController extends Daiquiri_Controller_Abstract {
         $this->getControllerHelper('pagination')->rows();
     }
 
+    public function exportAction() {
+        $meetingId = $this->_getParam('meetingId');
+        $status = $this->_getParam('status');
+        $response = $this->_model->export($meetingId, $status);
+        $this->view->mode = $this->_getParam('mode');
+        $this->view->assign($response);
+    }
+
     public function showAction() {
         $id = $this->getParam('id');
         $response = $this->_model->show($id);

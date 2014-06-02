@@ -42,31 +42,71 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
         if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['contributions_publication_role_id'])) {
             return array(
-                'status' => 'forbidden'
+                'status' => 'forbidden',
+                'message' => $meeting['contributions_message']
             );
         } else {
-            // get contribution types for this meeting
-            $contributionTypesModel = new Meetings_Model_ContributionTypes();
-            $contributionTypes = $contributionTypesModel->getResource()->fetchRows();
+            $dbRows = $this->getResource()->fetchRows(array('where' => array(
+                '`meeting_id` = ?' => $meetingId,
+                '`accepted` = 1'
+            )));
 
-            $data = array();
-            foreach($contributionTypes as $contributionType) {
-                $data[$contributionType['contribution_type']] = $this->getResource()->fetchRows(array(
-                    'where' => array(
-                        '`meeting_id` = ?' => $meetingId,
-                        '`contribution_type_id` = ?' => $contributionType['id'],
-                        '`accepted` = 1'
-                    )
-                ));
+            $rows = array();
+            foreach($dbRows as $dbRow) {
+                if (!array_key_exists($dbRow['contribution_type'], $rows)) {
+                    $rows[$dbRow['contribution_type']] = array();
+                }
+                $rows[$dbRow['contribution_type']][] = $dbRow;
             }
 
             return array(
                 'status' => 'ok',
                 'message' => $meeting['contributions_message'],
-                'data' => $data
+                'rows' => $rows
             );
         }
     }
+
+    /**
+     * Returns the information about a meetings contributions in a convenient text-only format
+     * @param int $meetingId id of the meeting
+     * @param string $status display only contributions of a certain status
+     * @param string $contributionType display only contributions of a certain type
+     * @return array $response
+     */
+    public function export($meetingId, $status = false, $contributionType = false) {
+        // get model
+        $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+
+        $where = array('`meeting_id` = ?' => $meetingId);
+
+        if (isset($contributionType)) {
+            $where[$this->getResource()->quoteIdentifier('Meetings_ContributionTypes','contribution_type') . '=?'] = $contributionType;
+        }
+
+        if ($status == 'accepted') {
+            $where[] = '`accepted` = 1';
+        } else if ($status == 'rejected') {
+            $where[] = '`accepted` = 0';
+        }
+
+        $dbRows = $this->getResource()->fetchRows(array('where' => $where));
+
+        $rows = array();
+        foreach($dbRows as $dbRow) {
+            if (!array_key_exists($dbRow['contribution_type'], $rows)) {
+                $rows[$dbRow['contribution_type']] = array();
+            }
+            $rows[$dbRow['contribution_type']][] = $dbRow;
+        }
+
+        return array(
+            'status' => 'ok',
+            'rows' => $rows
+        );
+        
+    }   
 
     /**
      * Returns the columns of the contributions table specified by some parameters. 

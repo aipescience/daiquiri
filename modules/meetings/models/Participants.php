@@ -41,7 +41,8 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
         if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['participants_publication_role_id'])) {
             return array(
-                'status' => 'forbidden'
+                'status' => 'forbidden',
+                'message' => $meeting['participants_message']
             );
         } else {
             return array(
@@ -52,12 +53,43 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                         'where' => array(
                             '`meeting_id` = ?' => $meetingId,
                             '(`status` = "accepted") OR (`status` = "organizer") OR (`status` = "invited")'
-                        )
+                        ), 
+                        'order' => 'lastname ASC'
                     )
                 )
             );
         }
     }
+
+    /**
+     * Returns the information about a meetings participants in a convenient text-only format
+     * @param int $meetingId id of the meeting
+     * @param string $status display only participants with a certain status
+     * @return array $response
+     */
+    public function export($meetingId, $status = false) {
+        // get model
+        $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+
+        // get status model
+        $participantStatusModel = new Meetings_Model_ParticipantStatus();
+        $participantStatus = $participantStatusModel->getResource()->fetchValues('status');
+
+        $where = array('`meeting_id` = ?' => $meetingId);
+
+        if (in_array($status, $participantStatus)) {
+            $where['`status` = ?'] = $status;
+        }
+
+        $rows = $this->getResource()->fetchRows(array('where' => $where, 'order' => 'lastname ASC'));
+
+        return array(
+            'status' => 'ok',
+            'rows' => $rows
+        );
+        
+    } 
 
     /**
      * Returns the columns of the participants table specified by some parameters. 

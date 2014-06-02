@@ -19,22 +19,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-
-<div class="main">
-    <?php echo $this->message; ?>
-
-    <?php if (!empty($this->rows)): ?>
-    <?php $flatArray = call_user_func_array('array_merge',$this->rows); // this is nasty... ?>
-    <?php foreach ($this->rows as $contributionType => $contributions): ?>
-        <?php if (!empty($contributions)): ?>
-            <h3><?php echo $this->escape(ucfirst($contributionType)); ?></h3>
-
-            <?php foreach ($contributions as $contribution): ?>
-                <h4><?php echo $this->escape($contribution['title']); ?></h4>
-                <p><?php echo $this->escape($contribution['participant_firstname']) . ' ' . $this->escape($contribution['participant_lastname']); ?></p>
-                <p><?php echo $this->escape($contribution['abstract']); ?></p>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+<pre>
+<?php if ($this->mode == 'email'): ?>
+<?php foreach ($this->rows as $row): ?>
+<?php echo $this->escape($row['firstname']) ?> <?php echo $this->escape($row['lastname']) ?> &lt;<?php echo $this->escape($row['email']) ?>&gt;
+<?php endforeach; ?>
+<?php else: ?>
+<?php foreach ($this->rows as $row): ?>
+<?php echo $this->escape($row['lastname']) ?>, <?php echo $this->escape($row['firstname']) ?> (<?php echo $this->escape($row['affiliation']) ?>)
+<?php endforeach; ?>
+<?php endif; ?>
+</pre>

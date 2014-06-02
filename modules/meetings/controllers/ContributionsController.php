@@ -45,6 +45,18 @@ class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
         $this->getControllerHelper('pagination')->rows();
     }
 
+    public function exportAction() {
+        $meetingId = $this->_getParam('meetingId');
+        $status = $this->_getParam('status');
+        $contributionType = $this->_getParam('contributionType');
+        $response = $this->_model->export($meetingId, $status, $contributionType);
+        $this->view->mode = $this->_getParam('mode');
+        $this->view->assign($response);
+
+        // disable layout
+        $this->_helper->layout->disableLayout();
+    }
+
     public function showAction() {
         $id = $this->getParam('id');
         $response = $this->_model->show($id);

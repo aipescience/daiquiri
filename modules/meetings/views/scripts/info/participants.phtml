@@ -21,13 +21,9 @@
 ?>
 
 <div class="main">
-    <h2>Participants</h2>
+    <?php echo $this->message; ?>
 
-    <?php if (empty($this->data)): ?>
-        <p>The list of participants for this meeting is not available right now.</p>
-    <?php else: ?>
-        <?php echo $this->message; ?>
-
+    <?php if (!empty($this->rows)): ?>
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -38,7 +34,7 @@
             </thead>
             <tbody>
                 <?php $i=1; ?>
-                <?php foreach ($this->data as $row): ?>
+                <?php foreach ($this->rows as $row): ?>
                     <tr>
                         <td><?php echo $i++; ?></td>
                         <td><?php echo $this->escape($row['lastname']); ?>, <?php echo $this->escape($row['firstname']); ?></td>

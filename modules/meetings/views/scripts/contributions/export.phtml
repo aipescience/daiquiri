@@ -1,0 +1,61 @@
+<?php
+
+/*
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<pre>
+<?php if ($this->mode == 'latex'): ?>
+\documentclass{artcl}
+\begin{document}
+<?php foreach ($this->rows as $contributionType => $rows): ?>
+\section*{<?php echo $this->escape(ucfirst($contributionType)) ?>}
+
+<?php foreach ($rows as $row): ?>
+\subsection*{<?php echo $this->escape($row['title']) ?>}
+
+\subsubsection*{<?php echo $this->escape($row['participant_firstname']) ?> <?php echo $this->escape($row['participant_lastname']) ?>}
+
+<?php echo $this->escape(wordwrap($row['abstract'], 100)) ?>
+
+
+<?php endforeach; ?>
+<?php endforeach; ?>
+\end{document}
+<?php else: ?>
+<?php foreach ($this->rows as $contributionType => $rows): ?>
+====================================================================================================
+<?php echo $this->escape(ucfirst($contributionType)) ?>
+
+====================================================================================================
+
+<?php foreach ($rows as $row): ?>
+<?php echo $this->escape($row['title']) ?> 
+
+<?php echo $this->escape($row['participant_firstname']) ?> <?php echo $this->escape($row['participant_lastname']) ?>
+
+
+<?php echo $this->escape(wordwrap($row['abstract'], 100)) ?>
+
+
+----------------------------------------------------------------------------------------------------
+
+<?php endforeach; ?>
+<?php endforeach; ?>
+<?php endif; ?>
+</pre>
