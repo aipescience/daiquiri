@@ -69,7 +69,8 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
 
         if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['registration_publication_role_id'])) {
             return array(
-                'status' => 'error'
+                'status' => 'error',
+                'message' => $meeting['registration_message']
             );
         }
 

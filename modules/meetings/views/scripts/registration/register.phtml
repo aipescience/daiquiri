@@ -22,8 +22,6 @@
 ?>
 
 <div class="main">
-    <h2>Registration</h2>
-    
     <?php if ($this->status === 'ok'): ?>
         <p>Your registration was successful and a mail was send to the provided address.</p>
     <?php elseif ($this->status === 'validate'): ?>
@@ -35,7 +33,6 @@
             <?php echo $this->form; ?>
         <?php endif; ?>
     <?php endif; ?>
-
 </div>
 
 <script type="text/javascript">
