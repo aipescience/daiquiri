@@ -745,7 +745,7 @@ daiquiri.query.Query.prototype.displayDownloadPendingMessage = function() {
     // create new space for download messages
     $('<div/>',{
         'id': 'daiquiri-query-download-pending',
-        'html' : '<p>Your file is beeing created... Please wait...</p>'
+        'html' : '<p>Your file is being created... Please wait...</p>'
     }).appendTo(this.tabs.download);
 };
 

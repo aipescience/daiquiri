@@ -22,9 +22,9 @@
 
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
-        <p>The file hab been regenerated.</p>
+        <p>The file has been regenerated.</p>
     <?php elseif ($this->status === 'pending'): ?>
-        <p>The file is beeing regenerated...</p>
+        <p>The file is being regenerated...</p>
     <?php else: ?>
         <p class="text-error"><?php echo $this->escape($this->errors); ?></p>
     <?php endif; ?>
