@@ -202,6 +202,8 @@ class Query_Model_Resource_MysqlProcessor extends Query_Model_Resource_AbstractP
             return false;
         }
 
+        $multiLineUsedDBs = $this->_processing->multilineUsedDB($multiLineParseTrees, $this->_userDb);
+
         $multiLineParseTrees = $this->_processing->multilineProcessQueryWildcard($multiLineParseTrees, $multiLineUsedDBs, $errors);
 
         if (!empty($errors)) {
