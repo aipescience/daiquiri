@@ -151,8 +151,9 @@ class Meetings_Form_Participants extends Daiquiri_Form_Abstract {
             $this->addHorizontalGroup(array('status_id'),'status', 'Status');
         }
         $this->addHorizontalGroup(array('arrival','departure'),'attendance', 'Attendance');
-        $this->addHorizontalGroup($elements,'contributions', 'Contributions');
-
+        if (!empty($contributionElements)) {
+            $this->addHorizontalGroup($elements,'contributions', 'Contributions');
+        }
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
