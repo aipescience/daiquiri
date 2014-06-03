@@ -960,6 +960,11 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         //link the rows to the tree
         $count = 0;
         foreach($subtreeNode['SELECT'] as $selNode) {
+            if($this->_isReserved($selNode)) {
+                array_push($resultTree['SELECT'], $selNode);
+                continue;
+            }
+
             $tmp = $this->_parseSqlAll_parseResourceName($selNode['base_expr']);
 
             unset($tmp[0]);
@@ -1115,6 +1120,14 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
     function _isColref($node) {
         if(isset($node['expr_type']) && $node['expr_type'] === 'colref') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function _isReserved($node) {
+        if(isset($node['expr_type']) && $node['expr_type'] === 'reserved') {
             return true;
         } else {
             return false;
