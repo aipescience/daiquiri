@@ -481,12 +481,10 @@ class Daiquiri_Init {
     private function _minify() {
         $client = $this->daiquiri_path . '/client/';
 
-        if (!file_exists('public/min/js')) {
-            mkdir('public/min/js',0755,true);
-        }
-        if (!file_exists('public/min/css')) {
-            mkdir('public/min/css',0755,true);
-        }
+        system("rm -rf public/min");
+        mkdir('public/min',0755,true);
+        mkdir('public/min/js',0755,true);
+        mkdir('public/min/css',0755,true);
 
         echo "minifing js and css files.";
 
