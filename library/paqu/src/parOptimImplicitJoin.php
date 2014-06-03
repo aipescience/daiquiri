@@ -402,6 +402,10 @@ function PHPSQLbuildNestedQuery(&$sqlTree, &$tableList, &$dependantWheres, $recL
  */
 function cleanSelectToResembleQuery(&$initialQuery, &$newQuery) {
 	foreach($newQuery['SELECT'] as $key => &$node) {
+		if(isReserved($node)) {
+			continue;
+		}
+
 		if(hasAlias($node)) {
 			$colTable = extractTableAlias($node);
 			$colName = extractColumnAlias($node);
@@ -582,7 +586,7 @@ function rewriteWHEREAliasToFirstSubquery(&$tree, $aliasList, $firstSubqueryAlia
 				$currTableAlias = $node['no_quotes']['parts'];
 				if(!in_array($currTableAlias[0], $aliasList)) {
 					unset($currTableAlias[0]);
-					setNoQuotes($node, array($firstSubqueryAlias['name'], implode(".", $currTableAlias)));
+					setNoQuotes($node, array(trim($firstSubqueryAlias['name'], "`"), implode(".", $currTableAlias)));
 				}
 			}
 		}
@@ -1052,7 +1056,7 @@ function PHPSQLaddOuterQueryOrder(&$sqlTree, &$table, &$toThisNode, &$tableList,
 			#it might be, that this column has been aliased, so take care of that
 			$find = false;
 			foreach ($toThisNode['SELECT'] as $selNode) {
-				if (columnIsEqual($selNode['base_expr'], $node['base_expr']) || ( hasAlias($selNode) &&
+				if (columnIsEqual($selNode, $node) || ( hasAlias($selNode) &&
 							 trim($selNode['alias']['name'], "`") == trim($node['base_expr'], "`") ) ) {
 
 					$find = true;
@@ -1323,7 +1327,7 @@ function PHPSQLcollectColumns($sqlSelect, $tblDb, $tblName, $tblAlias, &$returnA
 	}
 
 	foreach ($workload as $node) {
-		if (!isColref($node) && !isOperator($node)) {
+		if (!isColref($node) && !isOperator($node) && !isReserved($node)) {
 			$currCountDiffTables = false;
 			$currColArray = array();
 			if(hasSubtree($node))	 {
@@ -1422,6 +1426,9 @@ function PHPSQLcollectColumns($sqlSelect, $tblDb, $tblName, $tblAlias, &$returnA
 					$countDiffTables += 1;
 				}
 			}
+		} else if (isReserved($node)) {
+			//always adding reserved keywords to each select statement we issue
+			array_push($returnArray, $node);
 		}
 	}
 
