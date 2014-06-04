@@ -833,6 +833,10 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         //add the default database to FROM tables, as defined in defaultDB
         if($defaultDB !== false) {
             foreach($sqlTree['FROM'] as &$node) {
+                if($this->_isSubquery($node)) {
+                    continue;
+                }
+
                 $tmp = $this->_parseSqlAll_parseResourceName($node['table']);
                 if(count($tmp) == 2) {
                     //add the database name
