@@ -345,7 +345,7 @@ daiquiri.table.Table.prototype.cols = function () {
                         }
                         html += '<div class="handle-right"></div>';
                         if (self.colsmodel[i].sortable != 'false') {
-                            html += '<div class="sort"><i id="' + self.id + '-thead-sort" class="icon-chevron-down"></i></div>';
+                            html += '<div class="sort"><i id="' + self.id + '-thead-sort" class="icon-chevron-up"></i></div>';
                         }
                         html += '<div class="name">' + self.colsmodel[i].name + '</div>';
                         html += '</th>';
@@ -385,16 +385,15 @@ daiquiri.table.Table.prototype.cols = function () {
 
                     // manipulate arrow and change sort options
                     if (classes.indexOf('sorted') == -1) {
-                        $('i.sorted', self.container).removeClass('sorted').removeClass('icon-chevron-up').addClass('icon-chevron-down');
+                        $('i.sorted', self.container).removeClass('sorted').removeClass('icon-chevron-down').addClass('icon-chevron-up');
                         element.addClass('sorted');
-                        element.addClass('icon-chevron-down');
                         self.params.sort = colName + ' ASC';
                     } else {
-                        if (element.attr('class').indexOf('icon-chevron-down') != -1) {
-                            element.removeClass('icon-chevron-down').addClass('icon-chevron-up');
+                        if (element.attr('class').indexOf('icon-chevron-up') != -1) {
+                            element.removeClass('icon-chevron-up').addClass('icon-chevron-down');
                             self.params.sort = colName + ' DESC';
                         } else {
-                            element.removeClass('icon-chevron-up').addClass('icon-chevron-down');
+                            element.removeClass('icon-chevron-down').addClass('icon-chevron-up');
                             self.params.sort = colName + ' ASC';
                         }
                     }
