@@ -37,7 +37,11 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // get rows for this user
         $rows = $this->getResource()->fetchRows(array(
-            'where' => array('user_id = ?' => $userId)
+            'where' => array(
+                'user_id = ?' => $userId,
+                'status_id != ?' => $this->getResource()->getStatusId('removed'),
+            ),
+            'order' => array($this->getResource()->getTimeField() . ' DESC'),
         ));
 
         $jobs = new Uws_Model_Resource_Jobs();
