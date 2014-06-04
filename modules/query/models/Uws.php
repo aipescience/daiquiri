@@ -336,7 +336,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         if ($response['status'] !== 'ok') {
             // throw error
-            $job->addError($response['errors']);
+            foreach ($response['errors'] as $error) {
+                $job->addError($error);
+            }
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
             return;

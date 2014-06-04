@@ -421,6 +421,9 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // get the rowset and return
         $row = $this->fetchOne($select);
+        if (empty($row)) {
+            return false;
+        }
 
         // get all usernames, status, queues
         $userResource = new Auth_Model_Resource_User();
