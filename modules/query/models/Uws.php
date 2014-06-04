@@ -22,7 +22,7 @@
 class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
     // status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED');
-    private static $statusQueue = array('pending' => 1, 'running' => 2, 'removed' => 6, 'error' => 4, 'success' => 3, 'timeout' => 5, 'killed' => 5);
+    private static $statusQueue = array('queued' => 1, 'running' => 2, 'removed' => 6, 'error' => 4, 'success' => 3, 'timeout' => 5, 'killed' => 5);
 
     public function __construct() {
         parent::__construct();
