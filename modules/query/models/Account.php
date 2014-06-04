@@ -243,6 +243,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 $db = array(
                     'id' => $database['id'],
                     'name' => $database['name'],
+                    'description' => $database['description'],
                     'tables' => array()
                 );
 
@@ -251,13 +252,15 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                         $t = array(
                             'id' => $table['id'],
                             'name' => $table['name'],
+                            'description' => $table['description'],
                             'columns' => array(),
                         );
 
                         foreach ($table['columns'] as $column) {
                             $t['columns'][] = array(
                                 'id' => $column['id'],
-                                'name' => $column['name']
+                                'name' => $column['name'],
+                                'description' => $column['description'],
                             );
                         }
                         $db['tables'][] = $t;
@@ -279,6 +282,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         $userdb = array(
             'id' => 'userdb',
             'name' => $userDbName,
+            'description' => 'Your personal database',
             'tables' => array()
         );
 
@@ -302,6 +306,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $table = array(
                 'id' => 'userdb-table-' . $table_id++,
                 'name' => $usertable,
+                'description' => '',
                 'columns' => array()
             );
 
@@ -315,7 +320,8 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             foreach ($usercolumns as $usercolumn) {
                 $table['columns'][] = array(
                     'id' => 'userdb-column-' . $column_id++,
-                    'name' => $usercolumn
+                    'name' => $usercolumn,
+                    'description' => ''
                 );
             }
 

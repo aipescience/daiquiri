@@ -21,7 +21,7 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 0px;
-    overflow-y: hidden;
+    /*overflow-y: hidden;*/
 }
 .daiquiri-browser ul{
     margin: 0;

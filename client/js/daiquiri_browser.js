@@ -174,11 +174,11 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
             } else {
                 cl = "nav-item";
             }
+
             li = $('<li/>',{
                 'class': cl,
-                'html': '<a href="#daiquiri-browser-left-' + i + '">' + leftData[i].name + '</a>'
+                'html': '<a href="#daiquiri-browser-left-' + i + '" data-toggle="tooltip" title="' + leftData[i].description + '" data-placement="right">' + leftData[i].name + '</a>'
             }).appendTo($('.daiquiri-browser-left .daiquiri-browser-body', self.container));
-
 
             $('a',li).click(function (e) {
                 var id = $(e.target).parents('.daiquiri-browser').attr('id');
@@ -214,7 +214,7 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
             
                 li = $('<li/>',{
                     'class': cl,
-                    'html': '<a href="#daiquiri-browser-center-' + j + '">' + centerData[j].name + '</a>'
+                    'html': '<a href="#daiquiri-browser-center-' + j + '" data-toggle="tooltip" title="' + centerData[j].description + '" data-placement="right">' + centerData[j].name + '</a>'
                 }).appendTo($('.daiquiri-browser-center .daiquiri-browser-body', self.container));
 
                 $('a',li).click(function (e) {
@@ -247,7 +247,7 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
                 for (k = 0; k < rightData.length; k++){
                     li = $('<li/>',{
                         'class': 'nav-item',
-                        'html': '<a href="#daiquiri-browser-right-' + k + '">' + rightData[k].name + '</a>'
+                        'html': '<a href="#daiquiri-browser-right-' + k + '" data-toggle="tooltip" title="' + rightData[k].description + '" data-placement="left">' + rightData[k].name + '</a>'
                     }).appendTo($('.daiquiri-browser-right .daiquiri-browser-body', self.container));
         
                     $('a',li).click(function (e) {
@@ -279,6 +279,9 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
             }
         }
     }
+
+    // enable tooltips
+    $('a[data-toggle="tooltip"]', self.container).tooltip();
 };
     
 /**
