@@ -347,7 +347,9 @@ daiquiri.table.Table.prototype.cols = function () {
                         if (self.colsmodel[i].sortable != 'false') {
                             html += '<div class="sort"><i id="' + self.id + '-thead-sort" class="icon-chevron-up"></i></div>';
                         }
-                        html += '<div class="name">' + self.colsmodel[i].name + '</div>';
+
+                        var name = self.colsmodel[i].name.charAt(0).toUpperCase() + self.colsmodel[i].name.slice(1);
+                        html += '<div class="name">' + name + '</div>';
                         html += '</th>';
                     }
                 }
@@ -382,6 +384,8 @@ daiquiri.table.Table.prototype.cols = function () {
                     var classes = element.attr('class');
                     var colId = element.parent().parent().attr('id').match(/thead-col-(\d+)/)[1];
                     var colName = self.colsmodel[colId].name;
+
+                    console.log(self.colsmodel[colId]);
 
                     // manipulate arrow and change sort options
                     if (classes.indexOf('sorted') == -1) {

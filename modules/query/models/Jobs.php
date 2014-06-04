@@ -43,7 +43,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
         $cols = array();
         foreach ($this->_cols as $colname) {
             $col = array(
-                'name' => ucfirst($colname),
+                'name' => $colname,
                 'sortable' => 'true'
             );
             if ($colname === 'id') {
@@ -61,7 +61,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
         }
 
         $cols[] = array(
-            'name' => 'Options',
+            'name' => 'options',
             'width' => '100px',
             'sortable' => 'false',
             'search' => 'false'

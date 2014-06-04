@@ -44,7 +44,7 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
 
         foreach ($this->_cols as $name) {
             $col = array(
-                'name' => ucfirst($name),
+                'name' => $name,
                 'sortable' => 'true'
             );
             if ($name === 'id') {
@@ -62,7 +62,7 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
             $cols[] = $col;
         }
         $cols[] = array(
-            'name' => 'Options',
+            'name' => 'options',
             'width' => '6em',
             'sortable' => 'false'
         );

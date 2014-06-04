@@ -120,10 +120,10 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
         $cols = array();
         foreach(array('title','type','participant','accepted') as $col) {
-            $cols[] = array('name' => ucfirst(str_replace('_',' ',$col)));
+            $cols[] = array('name' => str_replace('_',' ',$col));
         }
 
-        $cols[] = array('name' => 'Options', 'sortable' => 'false');
+        $cols[] = array('name' => 'options', 'sortable' => 'false');
         return array(
             'status' => 'ok',
             'cols' => $cols

@@ -38,7 +38,7 @@ class Auth_Model_Sessions extends Daiquiri_Model_Table {
         $cols = array();
         foreach ($this->_cols as $colname) {
             $col = array(
-                'name' => ucfirst($colname),
+                'name' => $colname,
                 'sortable' => 'true'
             );
             if ($colname === 'session') {
@@ -53,7 +53,7 @@ class Auth_Model_Sessions extends Daiquiri_Model_Table {
             $cols[] = $col;
         }
         $cols[] = array(
-            'name' => 'Options',
+            'name' => 'options',
             'width' => '12em',
             'sortable' => 'false'
         );

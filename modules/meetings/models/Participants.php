@@ -103,9 +103,9 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
         $cols = array();
         foreach($this->_cols as $colname) {
-            $cols[] = array('name' => ucfirst(str_replace('_',' ',$colname)));
+            $cols[] = array('name' => str_replace('_',' ',$colname));
         }
-        $cols[] = array('name' => 'Options', 'sortable' => 'false');
+        $cols[] = array('name' => 'options', 'sortable' => 'false');
 
         return array('status' => 'ok', 'cols' => $cols);
     }

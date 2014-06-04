@@ -69,7 +69,11 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
             if (!isset($s[0]) || empty($s[0])) {
                 throw new Exception('$sortField missing in ' . get_class($this) . '::' . __FUNCTION__);
             } else {
-                $sortField = $s[0];
+                $dbCols = $this->_model->getResource()->fetchCols();
+                $sortField = $dbCols[$s[0]];
+
+                // remove ticks
+                $sortField = str_replace('`','',$sortField);
             }
 
             if (!isset($s[1]) || empty($s[1])) {
