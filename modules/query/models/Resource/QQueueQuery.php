@@ -315,12 +315,12 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $sqloptions = $this->_processWhere($sqloptions);
 
         // get the sql select object for the running jobs
-        $selectPending = $this->select($sqloptionsPending);
+        $selectPending = $this->select($sqloptions['pending']);
         $selectPending->from('qqueue_jobs', 'COUNT(*) as count');
         $selectPending->where("qqueue_jobs.mysqlUserName = ?", $config['username']);
 
         // get the sql select object for the old jobs
-        $selectHistory = $this->select($sqloptionsHistory);
+        $selectHistory = $this->select($sqloptions['history']);
         $selectHistory->from('qqueue_history', 'COUNT(*) as count');
         $selectHistory->where("qqueue_history.mysqlUserName = ?", $config['username']);
 
