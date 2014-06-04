@@ -115,7 +115,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // obtain queue information
         $queues = array();
         if ($resourceClass::$hasQueues === true) {
-            $queues = $this->getResource->fetchQueues();
+            $queues = $this->getResource()->fetchQueues();
 
             // find the queue
             foreach ($queues as $queue) {
