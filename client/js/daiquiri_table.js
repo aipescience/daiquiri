@@ -385,8 +385,6 @@ daiquiri.table.Table.prototype.cols = function () {
                     var colId = element.parent().parent().attr('id').match(/thead-col-(\d+)/)[1];
                     var colName = self.colsmodel[colId].name;
 
-                    console.log(self.colsmodel[colId]);
-
                     // manipulate arrow and change sort options
                     if (classes.indexOf('sorted') == -1) {
                         $('i.sorted', self.container).removeClass('sorted').removeClass('icon-chevron-down').addClass('icon-chevron-up');
