@@ -380,7 +380,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $row['username'] = $userCache[$row['user_id']];
 
             // get status from status string array
-            $row['status'] = $statusStrings[$row['status_id']];
+            $row['status'] = $statusStrings[$row['status']];
 
             // get queue
             $row['queue'] = $queues[$row['queue']]['name'];
