@@ -89,7 +89,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         'query' => 'query',
         'actualQuery' => 'actualQuery',
         'queue' => 'queue',
-        'status_id' => 'status',
+        'status' => 'status',
         'error' => 'error'
     );
 
@@ -439,7 +439,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         }
 
         // get status from status string array
-        $row['status'] = $statusStrings[$row['status_id']];
+        $row['status'] = $statusStrings[$row['status']];
 
         // get queue
         $row['queue'] = $queues[$row['queue']]['name'];
