@@ -260,8 +260,8 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
 
         $lockedTables = $this->getAdapter()->fetchAll('SHOW OPEN TABLES IN `' . $config['dbname'] . '` WHERE In_use > 0');
         $locked = false;
-        foreach ($lockedTables as $table) {
-            if ($table['Table'] === $job['table']) {
+        foreach ($lockedTables as $lockedTable) {
+            if ($lockedTable['Table'] === $table) {
                 $locked = true;
                 break;
             }

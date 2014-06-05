@@ -312,7 +312,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $config = $this->getAdapter()->getConfig();
 
         // rewrite sqloptions especially where
-        $sqloptions = $this->_processWhere($sqloptions);
+        $sqloptions = $this->_processOptions($sqloptions);
 
         // get the sql select object for the running jobs
         $selectPending = $this->select($sqloptions['pending']);
@@ -342,7 +342,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $config = $this->getAdapter()->getConfig();
 
         // rewrite sqloptions especially where
-        $sqloptions = $this->_processWhere($sqloptions);
+        $sqloptions = $this->_processOptions($sqloptions);
 
         // get the sql select object for the running jobs
         $selectPending = $this->select($sqloptions['pending']);
@@ -591,7 +591,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      * @param array $sqloptions
      * @return array $sqloptions
      */
-    protected function _processWhere($sqloptions) {
+    protected function _processOptions($sqloptions) {
         // prepare sqloptions
         $sqloptions['pending'] = array();
         $sqloptions['history'] = array();
@@ -601,6 +601,23 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
             $fieldStringPending = $this->quoteIdentifier('qqueue_jobs');
             $fieldStringHistory = $this->quoteIdentifier('qqueue_history');
+
+            if (isset($sqloptions['order'])) {
+                $order = array();
+                foreach($sqloptions['order'] as $value) {
+                    $split = $lexer->split(trim($value));
+                    $tmp = explode('.',$split[0]);
+                    $order[end($split)] = end($tmp);
+                }
+
+                if (count($order) != 1) {
+                    throw new Expection('More than one col in '  . get_class($this) . '::' . __METHOD__);
+                } else {
+                    // revert column again
+                    $orderField = array_search(reset($order), Query_Model_Resource_QQueueQuery::$_cols);
+                    $sqloptions['order'] = $orderField . ' ' . key($order);
+                }
+            }
 
             if (isset($sqloptions['where'])) {
                 $sqloptions['pending']['where'] = array();

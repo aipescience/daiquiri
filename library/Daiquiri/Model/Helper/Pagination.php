@@ -83,7 +83,14 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
             }
 
             if (in_array($sortOrder, array('ASC', 'DESC'))) {
-                $sqloptions['order'] = $sortField . ' ' . $sortOrder;
+                if (is_array($sortField)) {
+                    $sqloptions['order'] = array();
+                    foreach ($sortField as $field) {
+                        $sqloptions['order'][] = $field . ' ' . $sortOrder;
+                    }
+                } else {
+                    $sqloptions['order'] = $sortField . ' ' . $sortOrder;
+                }
             } else {
                 throw new Exception('$sortOrder must be ASC or DESC in ' . get_class($this) . '::' . __FUNCTION__);
             }
