@@ -37,7 +37,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         $dbRows = $this->getResource()->fetchRows(array(
             'where' => array(
                 'user_id = ?' => $userId,
-                'status != ?' => $this->getResource()->getStatusId('removed'),
+                'status_id != ?' => $this->getResource()->getStatusId('removed'),
             ),
             'order' => array($this->getResource()->getTimeField() . ' DESC'),
         ));

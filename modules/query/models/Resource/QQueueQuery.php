@@ -89,7 +89,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         'query' => 'query',
         'actualQuery' => 'actualQuery',
         'queue' => 'queue',
-        'status' => 'status',
+        'status_id' => 'status',
         'error' => 'error'
     );
 
@@ -380,7 +380,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $row['username'] = $userCache[$row['user_id']];
 
             // get status from status string array
-            $row['status'] = $statusStrings[$row['status']];
+            $row['status'] = $statusStrings[$row['status_id']];
 
             // get queue
             $row['queue'] = $queues[$row['queue']]['name'];
@@ -439,7 +439,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         }
 
         // get status from status string array
-        $row['status'] = $statusStrings[$row['status']];
+        $row['status'] = $statusStrings[$row['status_id']];
 
         // get queue
         $row['queue'] = $queues[$row['queue']]['name'];

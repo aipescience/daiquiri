@@ -54,6 +54,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
                 $col['width'] = '60px';
             } else if (in_array($colname, array('queue', 'status'))) {
                 $col['width'] = '40px';
+                $col['sortable'] = 'false';
             } else {
                 $col['width'] = '100px';
             }
