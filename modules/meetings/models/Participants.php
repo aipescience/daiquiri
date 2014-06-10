@@ -26,7 +26,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
      */
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Participants');
-        $this->_cols = array('firstname','lastname','email','status');
+        $this->_cols = array('id','firstname','lastname','email','status');
     }
 
     /**
@@ -103,7 +103,11 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
         $cols = array();
         foreach($this->_cols as $colname) {
-            $cols[] = array('name' => str_replace('_',' ',$colname));
+            $col = array('name' => str_replace('_',' ',$colname));
+            if ($colname === 'id') {
+                $col['width'] = '10px';
+            }
+            $cols[] = $col;
         }
         $cols[] = array('name' => 'options', 'sortable' => 'false');
 

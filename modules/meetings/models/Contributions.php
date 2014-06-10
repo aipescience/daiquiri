@@ -26,7 +26,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
      */
     public function __construct() {
         $this->setResource('Meetings_Model_Resource_Contributions');
-        $this->_cols = array('title','contribution_type','participant_firstname','participant_lastname','accepted');
+        $this->_cols = array('id','title','contribution_type','participant_firstname','participant_lastname','accepted');
         // Note: only 'title','type','participant','accepted' are actually visible
     }
 
@@ -119,8 +119,12 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
         }
 
         $cols = array();
-        foreach(array('title','type','participant','accepted') as $col) {
-            $cols[] = array('name' => str_replace('_',' ',$col));
+        foreach(array('id','title','type','participant','accepted') as $colname) {
+            $col = array('name' => str_replace('_',' ',$colname));
+            if ($colname === 'id') {
+                $col['width'] = '10px';
+            }
+            $cols[] = $col;
         }
 
         $cols[] = array('name' => 'options', 'sortable' => 'false');
