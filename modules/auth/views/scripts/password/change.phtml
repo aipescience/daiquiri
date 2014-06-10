@@ -27,7 +27,7 @@
             'text' => 'Back',
             'href' => $this->redirect));
         ?>
-    <?php elseif ($this->status === 'form'): ?>
+    <?php else: ?>
         <h2>Change password</h2>
         <?php echo $this->form; ?>
     <?php endif; ?>

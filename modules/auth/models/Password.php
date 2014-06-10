@@ -227,8 +227,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
 
                     return array('status' => 'ok');
                 } else {
-                    $form->setDescription('Wrong (old) password provided');
-                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form, 'Wrong (old) password provided');
                 }
 
             } else {
