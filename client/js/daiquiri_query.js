@@ -331,7 +331,6 @@ daiquiri.query.Query.prototype.displayJobs = function(){
             }
 
             // build queue status
-
             if (typeof json.message !== 'undefined' && json.message !== false 
                 || typeof json.nactive !== 'undefined' && json.nactive !== false) {
 
@@ -342,7 +341,11 @@ daiquiri.query.Query.prototype.displayJobs = function(){
                     html += '<p>' + json.message + '</p>';
                 }
                 if (typeof json.nactive !== 'undefined' && json.nactive !== false) {
-                    html += '<p>There are ' + json.nactive + ' jobs in the queue.</p>';
+                    if (json.nactive === 1) {
+                        html += '<p>There is ' + json.nactive + ' job in the queue.</p>';
+                    } else {
+                        html += '<p>There are ' + json.nactive + ' jobs in the queue.</p>';
+                    }
                 }
                 html += '</li>';
                 html += '</ul>';
