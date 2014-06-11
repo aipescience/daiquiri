@@ -22,8 +22,16 @@
 <div class="main">
     <h2>Jobs from <?php echo $this->escape(Daiquiri_Auth::getInstance()->getCurrentUsername()); ?> </h2>
 
+    <?php if ($this->message !== false): ?>
+    <p>
+        <?php echo $this->escape($this->message); ?>
+    </p>
+    <?php endif; ?>
+
     <?php if ($this->nactive !== false): ?>
-    <p>Currently, there are <?php echo $this->escape($this->nactive); ?> jobs in the queue.</p>
+    <p>
+        Currently, there <?php echo (($this->nactive === 1) ? 'is ' : 'are ') . $this->escape($this->nactive). (($this->nactive === 1) ? ' job' : ' jobs'); ?> in the queue.
+    </p>
     <?php endif; ?>
 
     <?php foreach ($this->jobs as $job): ?>

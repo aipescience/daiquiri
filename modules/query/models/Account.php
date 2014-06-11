@@ -29,6 +29,17 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // set job resource
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
+        // get the current query message
+        $messagesModel = new Core_Model_Messages();
+        $row = $messagesModel->getResource()->fetchRow(array(
+            'where' => 'key = "query"'
+        ));
+        if (empty($row)) {
+            $message = false;
+        } else {
+            $message = $row['value'];
+        }
+
         // get number of currently active jobs
         $resourceClass = get_class($this->getResource());
         if ($resourceClass::$hasQueues) {
@@ -60,6 +71,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         return array(
             'status' => 'ok',
             'nactive' => $nactive,
+            'message' => $message,
             'jobs' => $rows
         );
     }

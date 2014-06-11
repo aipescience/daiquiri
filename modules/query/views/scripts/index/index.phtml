@@ -31,15 +31,7 @@
 
     <div class="row">
         <div class="span3">
-            <?php if (!empty($this->message)): ?>
-            <div id="message" class="daiquiri-widget">
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="nav-header">Database Status</li>
-                    <li class="nav-item"><p><?php echo $this->escape($this->message); ?></p></li>
-                </ul>
-            </div>
-            <?php endif; ?>
-            <div id="jobs" class="daiquiri-widget">
+            <div id="jobs">
                 <!-- ajax widget for job display -->
             </div>
         </div>

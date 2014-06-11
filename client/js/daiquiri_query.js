@@ -330,7 +330,30 @@ daiquiri.query.Query.prototype.displayJobs = function(){
                 $('#jobs').children().remove();
             }
 
-            // construct html string
+            // build queue status
+
+            if (typeof json.message !== 'undefined' && json.message !== false 
+                || typeof json.nactive !== 'undefined' && json.nactive !== false) {
+
+                var html = '<ul class="nav nav-pills nav-stacked">';
+                html += '<li class="nav-header">Database status</li>';
+                html += '<li class="nav-item">';
+                if (typeof json.message !== 'undefined' && json.message !== false) {
+                    html += '<p>' + json.message + '</p>';
+                }
+                if (typeof json.nactive !== 'undefined' && json.nactive !== false) {
+                    html += '<p>There are ' + json.nactive + ' jobs in the queue.</p>';
+                }
+                html += '</li>';
+                html += '</ul>';
+
+                $('<div/>',{
+                    'class': 'daiquiri-widget',
+                    'html' : html
+                }).appendTo($('#jobs'));
+            }
+
+            // build job list
             var html = '<ul class="nav nav-pills nav-stacked">';
             html += '<li class="nav-header">Jobs</li>';
             $.each(self.jobs, function (key, value) {
@@ -346,9 +369,10 @@ daiquiri.query.Query.prototype.displayJobs = function(){
                 html += '</a>';
                 html += '</li>';
             });
-            html += '<ul>';
+            html += '</ul>';
 
             var jobDiv = $('<div/>',{
+                'class': 'daiquiri-widget',
                 'html' : html
             }).appendTo($('#jobs'));
 
