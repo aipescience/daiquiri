@@ -32,12 +32,45 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get the current query message
         $messagesModel = new Core_Model_Messages();
         $row = $messagesModel->getResource()->fetchRow(array(
-            'where' => 'key = "query"'
+            'where' => array('`key` = "query"')
         ));
         if (empty($row)) {
             $message = false;
         } else {
             $message = $row['value'];
+        }
+
+        // set job resource
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
+
+        // get the sqloptions needed to show the list of jobs
+        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
+
+        // get rows and return
+        $rows = array();
+        try {
+            $dbRows = $this->getResource()->fetchRows(array(
+                'where' => array(
+                    'user_id = ?' => $userId,
+                    'status_id != ?' => $this->getResource()->getStatusId('removed'),
+                ),
+                'order' => array($this->getResource()->getTimeField() . ' DESC'),
+            ));
+        } catch (Exception $e) {
+            return array(
+                'status' => 'ok',
+                'message' => $message,
+                'nactive' => false,
+                'jobs' => array()
+            );
+        }
+
+        foreach ($dbRows as $dbRow) {
+            $row = array();
+            foreach (array('id', 'table', 'status') as $col) {
+                $row[$col] = $dbRow[$col];
+            }
+            $rows[] = $row;
         }
 
         // get number of currently active jobs
@@ -46,26 +79,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $nactive = $this->getResource()->fetchNActive();
         } else {
             $nactive = false;
-        }
-
-        // get the sqloptions needed to show the list of jobs
-        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
-
-        // get rows and return
-        $rows = array();
-        $dbRows = $this->getResource()->fetchRows(array(
-            'where' => array(
-                'user_id = ?' => $userId,
-                'status_id != ?' => $this->getResource()->getStatusId('removed'),
-            ),
-            'order' => array($this->getResource()->getTimeField() . ' DESC'),
-        ));
-        foreach ($dbRows as $dbRow) {
-            $row = array();
-            foreach (array('id', 'table', 'status') as $col) {
-                $row[$col] = $dbRow[$col];
-            }
-            $rows[] = $row;
         }
 
         return array(

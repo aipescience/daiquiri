@@ -42,11 +42,13 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
         $queues = array();
         $defaultQueue = false;
         if ($resource::$hasQueues === true) {
-            $queues = $resource->fetchQueues();
-            $defaultQueue = $resource->fetchDefaultQueue();
-            if (empty($defaultQueue)) {
-                throw new Exception('Queues not setup correctly');
+            try {
+                $queues = $resource->fetchQueues();
+                $defaultQueue = $resource->fetchDefaultQueue();
+            } catch (Exception $e) {
+                return array('status' => 'error');
             }
+
             $usrGrp = Daiquiri_Auth::getInstance()->getCurrentRole();
 
             foreach ($queues as $key => $value) {
