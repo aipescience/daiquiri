@@ -555,14 +555,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      * @return int $count
      */
     public function fetchNActive() {
-        // get adapter config
-        $config = $this->getAdapter()->getConfig();
-
         // get number of running jobs for all applications
         $select = $this->select();
         $select->from('qqueue_jobs', 'COUNT(*) as count');
 
-        $row = $this->fetchRow($select);
+        $row = $this->fetchOne($select);
 
         return (int) $row['count'];
     }
