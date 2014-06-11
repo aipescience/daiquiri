@@ -42,7 +42,9 @@ daiquiri.data.Data.prototype.init = function () {
             'url': this.href,
             'width': 725,
             'class': 'daiquiri-user-table-modal',
-            'success': daiquiri.data.item.show
+            'success': function() {
+                daiquiri.data.item.init();
+            }
         });
         return false;
     });
@@ -59,6 +61,7 @@ daiquiri.data.Data.prototype.init = function () {
             daiquiri.data.item.show('database-browser');
         },
     });
+
     $('#function-browser','#data').daiquiri_browser({
         'url': this.baseUrl + "/data/functions",
         'columns': ['functions'],
@@ -71,6 +74,8 @@ daiquiri.data.Data.prototype.init = function () {
             daiquiri.data.item.show('function-browser');
         },
     });
+
+
 }
 
 daiquiri.data.Data.prototype.show = function (id) {
