@@ -75,7 +75,7 @@ daiquiri.data.Data.prototype.init = function () {
 
 daiquiri.data.Data.prototype.show = function (id) {
     var self = daiquiri.data.item;
-
+    console.log(self.opt.left);
     // get url
     var url;
     if (typeof id !== 'undefined') {

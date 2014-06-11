@@ -188,14 +188,18 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
 
                 daiquiri.common.singleDoubleClick(e, function (e) {
                     // single click
-                    if (daiquiri.browser.clicked.opt.click) daiquiri.browser.clicked.opt.click({
-                        'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
-                    });
+                    if (typeof daiquiri.browser.clicked.opt.click !== 'undefined') {
+                        daiquiri.browser.clicked.opt.click({
+                            'left': $('.daiquiri-browser-left .active a', daiquiri.browser.clicked.container).text(),
+                        });
+                    }
                 }, function (e) {
                     // double click
-                    if (daiquiri.browser.clicked.opt.dblclick) daiquiri.browser.clicked.opt.dblclick({
-                        'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
-                    });
+                    if (typeof daiquiri.browser.clicked.opt.dblclick !== 'undefined') {
+                        daiquiri.browser.clicked.opt.dblclick({
+                            'left': $('.daiquiri-browser-left .active a', daiquiri.browser.clicked.container).text(),
+                        });
+                    }
                 }); 
 
                 return false;
@@ -225,16 +229,20 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
 
                     daiquiri.common.singleDoubleClick(e, function (e) {
                         // single click
-                        if (daiquiri.browser.clicked.opt.click) daiquiri.browser.clicked.opt.click({
-                            'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
-                            'center': $('.daiquiri-browser-center .active', daiquiri.browser.clicked.container).text()
-                        });
+                        if (typeof daiquiri.browser.clicked.opt.click !== 'undefined') {
+                            daiquiri.browser.clicked.opt.click({
+                                'left': $('.daiquiri-browser-left .active a', daiquiri.browser.clicked.container).text(),
+                                'center': $('.daiquiri-browser-center .active a', daiquiri.browser.clicked.container).text()
+                            });
+                        }
                     }, function (e) {
                         // double click
-                        if (daiquiri.browser.clicked.opt.dblclick) daiquiri.browser.clicked.opt.dblclick({
-                            'left': $('.daiquiri-browser-left .active', daiquiri.browser.clickedcontainer).text(),
-                            'center': $('.daiquiri-browser-center .active', daiquiri.browser.clicked.container).text()
-                        });
+                        if (typeof daiquiri.browser.clicked.opt.dblclick !== 'undefined') {
+                            daiquiri.browser.clicked.opt.dblclick({
+                                'left': $('.daiquiri-browser-left .active a', daiquiri.browser.clickedcontainer).text(),
+                                'center': $('.daiquiri-browser-center .active a', daiquiri.browser.clicked.container).text()
+                            });
+                        }
                     }); 
 
                     return false;
@@ -259,18 +267,22 @@ daiquiri.browser.Browser.prototype.displayColumns = function (iActive, jActive) 
 
                         daiquiri.common.singleDoubleClick(e, function (e) {
                             // single click
-                            if (daiquiri.browser.clicked.opt.click) daiquiri.browser.clicked.opt.click({
-                                'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
-                                'center': $('.daiquiri-browser-center .active', daiquiri.browser.clicked.container).text(),
-                                'right': $('.daiquiri-browser-right .active', daiquiri.browser.clicked.container).text()
-                            });
+                            if (typeof daiquiri.browser.clicked.opt.click !== 'undefined') { 
+                                daiquiri.browser.clicked.opt.click({
+                                    'left': $('.daiquiri-browser-left .active a', daiquiri.browser.clicked.container).text(),
+                                    'center': $('.daiquiri-browser-center .active a', daiquiri.browser.clicked.container).text(),
+                                    'right': $('.daiquiri-browser-right .active a', daiquiri.browser.clicked.container).text()
+                                });
+                            }
                         }, function (e) {
                             // double click
-                            if (daiquiri.browser.clicked.opt.dblclick) daiquiri.browser.clicked.opt.dblclick({
-                                'left': $('.daiquiri-browser-left .active', daiquiri.browser.clicked.container).text(),
-                                'center': $('.daiquiri-browser-center .active', daiquiri.browser.clicked.container).text(),
-                                'right': $('.daiquiri-browser-right .active', daiquiri.browser.clicked.container).text()
-                            });
+                            if (typeof daiquiri.browser.clicked.opt.dblclick !== 'undefined') {
+                                daiquiri.browser.clicked.opt.dblclick({
+                                    'left': $('.daiquiri-browser-left .active a', daiquiri.browser.clicked.container).text(),
+                                    'center': $('.daiquiri-browser-center .active a', daiquiri.browser.clicked.container).text(),
+                                    'right': $('.daiquiri-browser-right .active a', daiquiri.browser.clicked.container).text()
+                                });
+                            }
                         }); 
 
                         return false;
