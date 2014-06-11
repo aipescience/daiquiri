@@ -564,7 +564,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         $row = $this->fetchRow($select);
 
-        return (int) $row;
+        return (int) $row['count'];
     }
 
     /**
