@@ -28,13 +28,16 @@ class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $meetingId = $this->_getParam('meetingId');
-        if ($meetingId !== null) {
+        $slug = $this->_getParam('slug');
+        $redirect = $this->_getParam('redirect','/meetings/meetings/');
+        if ($slug !== null) {
             $model = Daiquiri_Proxy::factory('Meetings_Model_Meetings');
-            $response = $model->show($meetingId);
-            $this->view->meetingTitle = $response['row']['title'];
+            $response = $model->show(array('slug' => $slug));
+            $this->view->meeting = $response['row'];
         }
-        $this->view->meetingId = $meetingId;
+
+        $this->view->slug = $slug;
+        $this->view->redirect = $redirect;
     }
 
     public function colsAction() {
@@ -46,10 +49,10 @@ class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
     }
 
     public function exportAction() {
-        $meetingId = $this->_getParam('meetingId');
+        $slug = $this->_getParam('slug');
         $status = $this->_getParam('status');
         $contributionType = $this->_getParam('contributionType');
-        $response = $this->_model->export($meetingId, $status, $contributionType);
+        $response = $this->_model->export($slug, $status, $contributionType);
         $this->view->mode = $this->_getParam('mode');
         $this->view->assign($response);
     }
@@ -62,8 +65,8 @@ class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
     }
 
     public function createAction() {
-        $meetingId = $this->_getParam('meetingId');
-        $this->getControllerHelper('form',array('redirect' => '/meetings/contributions/?meetingId=' . $meetingId))->create($meetingId);
+        $slug = $this->_getParam('slug');
+        $this->getControllerHelper('form',array('redirect' => '/meetings/' . $slug . '/contributions/'))->create($slug);
     }
 
     public function updateAction() {

@@ -32,13 +32,19 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
     /**
      * Returns the public information about a meetings contributions
-     * @param int $meetingId id of the meeting
+     * @param string $slug slug of the meeting
      * @return array $response
      */
-    public function info($meetingId) {
+    public function info($slug) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
-        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+        $meeting = $meetingsModel->getResource()->fetchRow(array(
+            'where' => array('slug = ?' => $slug)
+        ));
+
+        if (empty($meeting)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
 
         if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['contributions_publication_role_id'])) {
             return array(
@@ -47,7 +53,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
             );
         } else {
             $dbRows = $this->getResource()->fetchRows(array('where' => array(
-                '`meeting_id` = ?' => $meetingId,
+                '`meeting_id` = ?' => $meeting['id'],
                 '`accepted` = 1'
             )));
 
@@ -69,22 +75,26 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
     /**
      * Returns the information about a meetings contributions in a convenient text-only format
-     * @param int $meetingId id of the meeting
+     * @param string $slug slug of the meeting
      * @param string $status display only contributions of a certain status
      * @param string $contributionType display only contributions of a certain type
      * @return array $response
      */
-    public function export($meetingId, $status = false, $contributionType = false) {
+    public function export($slug, $status = false, $contributionType = false) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
-        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+        $meeting = $meetingsModel->getResource()->fetchRow(array(
+            'where' => array('slug = ?' => $slug)
+        ));
 
-        $where = array('`meeting_id` = ?' => $meetingId);
+        if (empty($meeting)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
 
+        $where = array('`meeting_id` = ?' => $meeting['id']);
         if (isset($contributionType)) {
             $where[$this->getResource()->quoteIdentifier('Meetings_ContributionTypes','contribution_type') . '=?'] = $contributionType;
         }
-
         if ($status == 'accepted') {
             $where[] = '`accepted` = 1';
         } else if ($status == 'rejected') {
@@ -123,11 +133,13 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
             $col = array('name' => str_replace('_',' ',$colname));
             if ($colname === 'id') {
                 $col['width'] = '10px';
+            } else {
+                $col['width'] = '100px';
             }
             $cols[] = $col;
         }
 
-        $cols[] = array('name' => 'options', 'sortable' => 'false');
+        $cols[] = array('name' => 'options', 'sortable' => 'false', 'width' => '150px');
         return array(
             'status' => 'ok',
             'cols' => $cols
@@ -158,6 +170,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
             $row = array();
 
             // rows create manually: Title, Type, Participant, Accepted
+            $row[] = $dbRow['id'];
             $row[] = $dbRow['title'];
             $row[] = $dbRow['contribution_type'];
             $row[] = $dbRow['participant_lastname'] . ', ' . $dbRow['participant_firstname'];
@@ -207,19 +220,28 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
     /**
      * Creates a new contribution.
+     * @param string $slug slug of the meeting
      * @param array $formParams
      * @return array $response
      */
-    public function create($meetingId, array $formParams = array()) {
+    public function create($slug, array $formParams = array()) {
         // get models
         $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow(array(
+            'where' => array('slug = ?' => $slug)
+        ));
+
+        if (empty($meeting)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
         $participantsModel = new Meetings_Model_Participants();
 
         // create the form object
         $form = new Meetings_Form_Contributions(array(
             'submit'=> 'Create contribution',
-            'meeting' => $meetingsModel->getResource()->fetchRow($meetingId),
-            'participants' => $participantsModel->getResource()->fetchValues('email', $meetingId)
+            'meeting' => $meeting,
+            'participants' => $participantsModel->getResource()->fetchValues('email', $meeting['id'])
         ));
 
         // valiadate the form if POST

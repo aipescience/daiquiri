@@ -28,8 +28,13 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $response = $this->_model->index();
-        $this->view->assign($response);
+        $slug = $this->_getParam('slug');
+        if (empty($slug)) {
+            $response = $this->_model->index();
+            $this->view->assign($response);
+        } else {
+            $this->_redirect('/meetings/' . $slug . '/registration/register/');
+        }
     }
 
     public function showAction() {
@@ -47,9 +52,9 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
     public function registerAction() {
         // get params
         $redirect = $this->_getParam('redirect', '/');
-        $meetingId = $this->_getParam('meetingId');
-        if ($meetingId === null) {
-            $response = array('status' => 'error', 'errors' => array('The MeetingId is not specified.'));
+        $slug = $this->_getParam('slug');
+        if ($slug === null) {
+            throw new Daiquiri_Exception_NotFound();
         } else {
             // check if POST or GET
             if ($this->_request->isPost()) {
@@ -58,15 +63,15 @@ class Meetings_RegistrationController extends Daiquiri_Controller_Abstract {
                     $this->_redirect($redirect);
                 } else {
                     // validate form and do stuff
-                    $response = $this->_model->register($meetingId, $this->_request->getPost());
+                    $response = $this->_model->register($slug, $this->_request->getPost());
                 }
             } else {
                 // just display the form
-                $response = $this->_model->register($meetingId);
+                $response = $this->_model->register($slug);
             }
 
             // set action for form
-            $this->setFormAction($response, '/meetings/registration/register?meetingId=' . $meetingId);
+            $this->setFormAction($response, '/meetings/' . $slug . '/registration/register');
         }
 
         // assign to view

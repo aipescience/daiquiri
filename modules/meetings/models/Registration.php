@@ -58,18 +58,24 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
 
     /**
      * Registers a participant.
-     * @param int $meetingId id of the meeting
+     * @param string $slug slug of the meeting
      * @param array $formParams
      * @return array $response
      */
-    public function register($meetingId, array $formParams = array()) {
+    public function register($slug, array $formParams = array()) {
         // get models
         $meetingsModel = new Meetings_Model_Meetings();
-        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+        $meeting = $meetingsModel->getResource()->fetchRow(array(
+            'where' => array('slug = ?' => $slug)
+        ));
+
+        if (empty($meeting)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
 
         if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['registration_publication_role_id'])) {
             return array(
-                'status' => 'error',
+                'status' => 'forbidden',
                 'message' => $meeting['registration_message']
             );
         }
@@ -85,7 +91,7 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
-                $values['meeting_id'] = $meetingId;
+                $values['meeting_id'] = $meeting['id'];
                 $values['details'] = array();
                 foreach ($meeting['participant_detail_keys'] as $key_id => $key) {
                     $values['details'][$key_id] = $values[$key];
@@ -124,7 +130,7 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                         'email' => $values['email'],
                         'code' => $code,
                         'values' => Zend_Json::encode($values),
-                        'meeting_id' => $meetingId
+                        'meeting_id' => $meeting['id']
                     ));
 
                     // prepare and send mail

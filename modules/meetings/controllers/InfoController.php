@@ -22,17 +22,18 @@
 class Meetings_InfoController extends Daiquiri_Controller_Abstract {
 
     protected $_model;
+    protected $_slug;
 
     public function init() {
-        $this->_meetingId = $this->_getParam('meetingId');
-        if ($this->_meetingId === null) {
-            throw new Exception('$meetingId not provided in ' . get_class($this) . '::init()');
+        $this->_slug = $this->_getParam('slug');
+        if ($this->_slug === null) {
+            throw new Daiquiri_Exception_NotFound();
         }
     }
 
     public function participantsAction() {
         $model = Daiquiri_Proxy::factory('Meetings_Model_Participants');
-        $response = $model->info($this->_meetingId);
+        $response = $model->info($this->_slug);
 
         // assign to view
         $this->view->assign($response);
@@ -40,7 +41,7 @@ class Meetings_InfoController extends Daiquiri_Controller_Abstract {
 
     public function contributionsAction() {
         $model = Daiquiri_Proxy::factory('Meetings_Model_Contributions');
-        $response = $model->info($this->_meetingId);
+        $response = $model->info($this->_slug);
 
         // assign to view
         $this->view->assign($response);

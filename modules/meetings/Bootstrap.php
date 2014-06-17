@@ -20,5 +20,23 @@
  */
 
 class Meetings_Bootstrap extends Zend_Application_Module_Bootstrap {
-    
+    //setup rest for this module
+    protected function _initRoute() {
+        $this->bootstrap('frontController');
+        $frontController = Zend_Controller_Front::getInstance();
+
+        $router = new Zend_Controller_Router_Route(
+            '/meetings/:slug/:controller/:action/*', 
+            array(
+                'module' => 'meetings',
+                'action' => 'index'
+            ),
+            array(
+                'slug' => '^(?!(participants|contributions|registration)).*$',
+                'controller' => '^(participants|contributions|registration|info).*$'
+            )
+        );
+
+        $frontController->getRouter()->addRoute('meetings', $router);
+    }
 }

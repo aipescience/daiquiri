@@ -46,19 +46,24 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Fetches a specific row.
-     * @param mixed $id primary key of the row
+     * Fetches one row specified by its primary key or an array of sqloptions.
+     * @param mixed $input primary key of the row OR array of sqloptions
      * @throws Exception
-     * @return array $row 
+     * @return array $row
      */
-    public function fetchRow($id) {
-        if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::fetchRow()');
+    public function fetchRow($input) {
+        if (empty($input)) {
+            throw new Exception('$id or $sqloptions not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        $select = $this->select();
-        $select->from('Meetings_Meetings');
-        $select->where('Meetings_Meetings.id = ?', $id);
+        if (is_array($input)) {
+            $select = $this->select($input);
+            $select->from('Meetings_Meetings');
+        } else {
+            $select = $this->select();
+            $select->from('Meetings_Meetings');
+            $select->where('Meetings_Meetings.id = ?', $input);
+        }
 
         $row = $this->fetchOne($select);
         if (empty($row)) {
@@ -66,8 +71,8 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
         } else {
             return array_merge(
                 $row,
-                array('contribution_types' => $this->_fetchMeetingsContributionTypes($id)),
-                array('participant_detail_keys' => $this->_fetchMeetingsParticipantDetailKeys($id))
+                array('contribution_types' => $this->_fetchMeetingsContributionTypes($row['id'])),
+                array('participant_detail_keys' => $this->_fetchMeetingsParticipantDetailKeys($row['id']))
             );
         }
     }

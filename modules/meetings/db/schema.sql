@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `Meetings_Meetings` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(256) NOT NULL,
+  `slug` VARCHAR(256) NOT NULL,
   `description` TEXT,
   `begin` DATE NOT NULL,
   `end` DATE NOT NULL,

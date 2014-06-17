@@ -31,13 +31,19 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
     /**
      * Returns the public information about a meetings contributions
-     * @param int $meetingId id of the meeting
+     * @param string $slug slug of the meeting
      * @return array $response
      */
-    public function info($meetingId) {
+    public function info($slug) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
-        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+        $meeting = $meetingsModel->getResource()->fetchRow(array(
+            'where' => array('slug = ?' => $slug)
+        ));
+
+        if (empty($meeting)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
 
         if (!Daiquiri_Auth::getInstance()->checkPublicationRoleId($meeting['participants_publication_role_id'])) {
             return array(
@@ -48,10 +54,10 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
             return array(
                 'status' => 'ok',
                 'message' => $meeting['participants_message'],
-                'data' => $this->getResource()->fetchRows(
+                'rows' => $this->getResource()->fetchRows(
                     array(
                         'where' => array(
-                            '`meeting_id` = ?' => $meetingId,
+                            '`meeting_id` = ?' => $meeting['id'],
                             '(`status` = "accepted") OR (`status` = "organizer") OR (`status` = "invited")'
                         ), 
                         'order' => 'lastname ASC'
@@ -63,21 +69,26 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
     /**
      * Returns the information about a meetings participants in a convenient text-only format
-     * @param int $meetingId id of the meeting
+     * @param string $slug slug of the meeting
      * @param string $status display only participants with a certain status
      * @return array $response
      */
-    public function export($meetingId, $status = false) {
+    public function export($slug, $status = false) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
-        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+        $meeting = $meetingsModel->getResource()->fetchRow(array(
+            'where' => array('slug = ?' => $slug)
+        ));
+
+        if (empty($meeting)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
 
         // get status model
         $participantStatusModel = new Meetings_Model_ParticipantStatus();
         $participantStatus = $participantStatusModel->getResource()->fetchValues('status');
 
-        $where = array('`meeting_id` = ?' => $meetingId);
-
+        $where = array('`meeting_id` = ?' => $meeting['id']);
         if (in_array($status, $participantStatus)) {
             $where['`status` = ?'] = $status;
         }
@@ -106,10 +117,12 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
             $col = array('name' => str_replace('_',' ',$colname));
             if ($colname === 'id') {
                 $col['width'] = '10px';
+            } else {
+                $col['width'] = '100px';
             }
             $cols[] = $col;
         }
-        $cols[] = array('name' => 'options', 'sortable' => 'false');
+        $cols[] = array('name' => 'options', 'sortable' => 'false', 'width' => '150px');
 
         return array('status' => 'ok', 'cols' => $cols);
     }
@@ -127,7 +140,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
         if (!empty($params['meetingId'])) {
-            $sqloptions['where'] = array('meeting_id=?' => $params['meetingId']);
+            $sqloptions['where'] = array('`meeting_id` = ?' => $params['meetingId']);
         }
 
         // get the data from the database
@@ -184,13 +197,21 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
 
     /**
      * Creates a new participant.
+     * @param string $slug slug of the meeting
      * @param array $formParams
      * @return array $response
      */
-    public function create($meetingId, array $formParams = array()) {
+    public function create($slug, array $formParams = array()) {
         // get model
         $meetingsModel = new Meetings_Model_Meetings();
-        $meeting = $meetingsModel->getResource()->fetchRow($meetingId);
+        $meeting = $meetingsModel->getResource()->fetchRow(array(
+            'where' => array('slug = ?' => $slug)
+        ));
+
+        if (empty($meeting)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
         $participantStatusModel = new Meetings_Model_ParticipantStatus();
         $participantStatus = $participantStatusModel->getResource()->fetchValues('status');
 
@@ -206,7 +227,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
-                $values['meeting_id'] = $meetingId;
+                $values['meeting_id'] = $meeting['id'];
                 $values['details'] = array();
                 foreach ($meeting['participant_detail_keys'] as $key_id => $key) {
                     $values['details'][$key_id] = $values[$key];

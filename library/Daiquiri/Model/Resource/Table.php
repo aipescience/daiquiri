@@ -75,7 +75,8 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
     }
 
     /**
-     * Fetches one row specified by its primary key from the previously set database table.
+     * Fetches one row specified by its primary key or an array of sqloptions
+     * from the previously set database table.
      * @param mixed $input primary key of the row OR array of sqloptions
      * @throws Exception
      * @return array $row

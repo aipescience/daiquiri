@@ -33,16 +33,44 @@ class Meetings_Model_Meetings extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function index() {
-        return $this->getModelHelper('CRUD')->index();
+        $rows = $this->getResource()->fetchRows(array(
+            'order' => 'begin DESC' 
+        ));
+
+        return array('status' => 'ok', 'rows' => $rows);
     }
 
     /**
      * Returns one specific meeting.
-     * @param int $id id of the meeting
+     * @param mixed $input int id or array with "slug" key
      * @return array $response
      */
-    public function show($id) {
-        return $this->getModelHelper('CRUD')->show($id);
+    public function show($input) {
+        if (is_int($input)) {
+            $row = $this->getResource()->fetchRow($input);
+        } elseif (is_array($input)) {
+            if (empty($input['slug'])) {
+                throw new Exception('Either int id or array with "slug" key must be provided as $input');
+            }
+            $row = $this->getResource()->fetchRow(array(
+                'where' => array('slug = ?' => $input['slug'])
+            ));
+        } else {
+            throw new Exception('$input has wrong type.');
+        }
+
+        if (empty($row)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        $siteUrl = Daiquiri_Config::getInstance()->getSiteUrl();
+
+        $row['public_registration_page'] = $siteUrl . '/meetings/' . $row['slug'] . '/registration/';
+        $row['public_participants_page'] = $siteUrl . '/meetings/' . $row['slug'] . '/info/participants/';
+        $row['public_contributions_page'] = $siteUrl . '/meetings/' . $row['slug'] . '/info/contributions/';
+
+
+        return array('status' => 'ok','row' => $row);
     }
 
     /**

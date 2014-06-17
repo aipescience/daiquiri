@@ -71,6 +71,14 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
+        $this->addElement('text', 'slug', array(
+            'label' => 'Short title for URL',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Zend_Validate_Regex(array('pattern' => '/[a-zA-Z0-9\-]*/'))),
+            )
+        ));
         $this->addElement('textarea', 'description', array(
             'label' => 'Description',
             'rows' => 4,
@@ -138,15 +146,31 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('title','description','begin','end','registration_message','participants_message','contributions_message','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id','contribution_type_id','participant_detail_key_id'));
+        $this->addHorizontalGroup(array('title','slug','description','begin','end','registration_message','participants_message','contributions_message','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id','contribution_type_id','participant_detail_key_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('title','description','begin','end','registration_message','participants_message','contributions_message','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id') as $element) {
+        foreach (array('title','slug','description','begin','end','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }
         }
+        if (isset($this->_entry['registration_message'])) {
+            $this->setDefault('registration_message', $this->_entry['registration_message']);
+        } else {
+            $this->setDefault('registration_message', '<h2>Registration</h2>');
+        }
+        if (isset($this->_entry['participants_message'])) {
+            $this->setDefault('participants_message', $this->_entry['participants_message']);
+        } else {
+            $this->setDefault('participants_message', '<h2>Participants</h2>');
+        }
+        if (isset($this->_entry['contributions_message'])) {
+            $this->setDefault('contributions_message', $this->_entry['contributions_message']);
+        } else {
+            $this->setDefault('contributions_message', '<h2>Contributions</h2>');
+        }
+
         if (isset($this->_entry['contribution_types'])) {
             $this->getElement('contribution_type_id')->setValue(array_keys($this->_entry['contribution_types']));
         }
