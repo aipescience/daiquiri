@@ -42,62 +42,53 @@
         </tbody>
     </table>
 
-    <div class="row">
-        <div class="span6">
-            <?php
-            echo $this->internalLink(array(
-                'text' => 'Update meeting details',
-                'href' => '/meetings/meetings/update/id/' . $this->escape($this->row['id']) . '?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
-                'resource' => 'Meetings_Model_Meetings',
-                'permission' => 'update',
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            echo $this->internalLink(array(
-                'text' => 'Show participants table for this meeting',
-                'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
-                'resource' => 'Meetings_Model_Participants',
-                'permission' => 'index',
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            echo $this->internalLink(array(
-                'text' => 'Show contributions table for this meeting',
-                'href' => '/meetings/' . $this->escape($this->row['slug']) . '/contributions/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
-                'resource' => 'Meetings_Model_Contributions',
-                'permission' => 'index',
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            echo $this->internalLink(array(
-                'text' => 'Back',
-                'href' => $this->redirect,
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            ?>
-        </div>
-        <div class="span6">
-            <?php
-            echo $this->internalLink(array(
-                'text' => 'Show registration page for this meeting',
-                'href' => '/meetings/' . $this->escape($this->row['slug']) . '/registration/register/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
-                'resource' => 'Meetings_Model_Registration',
-                'permission' => 'register',
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            echo $this->internalLink(array(
-                'text' => 'Show public participants page for this meeting',
-                'href' => '/meetings/' . $this->escape($this->row['slug']) . '/info/participants/',
-                'resource' => 'Meetings_Model_Participants',
-                'permission' => 'index',
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            echo $this->internalLink(array(
-                'text' => 'Show public contributions page for for this meeting',
-                'href' => '/meetings/' . $this->escape($this->row['slug']) . '/info/contributions/',
-                'resource' => 'Meetings_Model_Contributions',
-                'permission' => 'index',
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            ?>
-        </div>
-
-    </div>
+    <?php
+    echo $this->internalLink(array(
+        'text' => 'Update meeting details',
+        'href' => '/meetings/meetings/update/id/' . $this->escape($this->row['id']) . '?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
+        'resource' => 'Meetings_Model_Meetings',
+        'permission' => 'update',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Show participants table for this meeting',
+        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
+        'resource' => 'Meetings_Model_Participants',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Show contributions table for this meeting',
+        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/contributions/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
+        'resource' => 'Meetings_Model_Contributions',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Show public registration page for this meeting',
+        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/registration/register/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
+        'resource' => 'Meetings_Model_Registration',
+        'permission' => 'register',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Show public participants page for this meeting',
+        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/info/participants/',
+        'resource' => 'Meetings_Model_Participants',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Show public contributions page for for this meeting',
+        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/info/contributions/',
+        'resource' => 'Meetings_Model_Contributions',
+        'permission' => 'index',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Back',
+        'href' => $this->redirect,
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
 </div>

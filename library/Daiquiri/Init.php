@@ -199,12 +199,18 @@ class Daiquiri_Init {
                 )
             )
         );
-        foreach ($this->options['database'] as $adapter => $database) {
-            foreach (array('dbname', 'username', 'password', 'host') as $key) {
-                $this->options['application']['resources']['multidb'][$adapter][$key] = $database[$key];
-            }
-            if ($database['host'] !== 'localhost') {
-                $this->options['application']['resources']['multidb'][$adapter]['port'] = $database['port'];
+        foreach (array('web','user') as $adapter) {
+            if (isset($this->options['database'][$adapter])) {
+                $database = $this->options['database'][$adapter];
+
+                foreach (array('dbname', 'username', 'password', 'host') as $key) {
+                    $this->options['application']['resources']['multidb'][$adapter][$key] = $database[$key];
+                }
+                if ($database['host'] !== 'localhost') {
+                    $this->options['application']['resources']['multidb'][$adapter]['port'] = $database['port'];
+                }
+            } else {
+                unset($this->options['application']['resources']['multidb'][$adapter]);
             }
         }
 

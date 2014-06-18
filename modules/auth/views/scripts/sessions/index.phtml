@@ -22,16 +22,16 @@
 <script type="text/javascript">
     $(document).ready(function() {
         // create the user table inside the div
-        $('#table').daiquiri_table({
+        $('#daiquiri-sessions-table').daiquiri_table({
             "rowsurl": "<?php echo $this->baseUrl('/auth/sessions/rows') ?>",
             "colsurl": "<?php echo $this->baseUrl('/auth/sessions/cols') ?>",
             'success': function() {
-                $('a','tbody','#table').click(function(){
+                $('#daiquiri-sessions-table tbody a').click(function(){
                     new daiquiri.Modal({
                         'url': this.href,
                         'width': 700,
                         'success': function() {
-                            daiquiri.table.items['table'].rows();
+                            daiquiri.table.items['daiquiri-sessions-table'].rows();
                         }
                     });
                     return false;
@@ -44,7 +44,7 @@
 <div class="main">
     <h2>Session management</h2>
 
-    <div id="table"></div>
+    <div id="daiquiri-sessions-table"></div>
 
     <?php echo $this->adminLink(); ?>
 </div>

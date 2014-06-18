@@ -22,16 +22,16 @@
 <script type="text/javascript">
     $(document).ready(function() {
         // create the table inside the div
-        $('#table').daiquiri_table({
+        $('#daiquiri-jobs-table').daiquiri_table({
             'rowsurl': "<?php echo $this->baseUrl('/query/jobs/rows') ?>",
             'colsurl': "<?php echo $this->baseUrl('/query/jobs/cols') ?>",
             'success': function() {
-                $('a','tbody','#table').click(function(){
+                $('#daiquiri-jobs-table tbody a').click(function(){
                     new daiquiri.Modal({
                         'url': this.href,
                         'width': 700,
                         'success': function() {
-                            daiquiri.table.items['table'].rows();
+                            daiquiri.table.items['daiquiri-jobs-table'].rows();
                         }
                     });
                     return false;
@@ -44,7 +44,7 @@
 <div class="main">
     <h2>Query jobs management</h2>
 
-    <p id="table"></p>
+    <p id="daiquiri-jobs-table"></p>
 
     <?php echo $this->adminLink(); ?>
 </div>

@@ -28,7 +28,7 @@
     <h2>Contributions</h4>
     <?php endif; ?>
 
-    <div id="table"></div>
+    <div id="daiquiri-contributions-table"></div>
 
     <?php
     if ($this->slug !== null) {
@@ -54,17 +54,17 @@
             var params = {};
         <?php endif; ?>
 
-        $('#table').daiquiri_table({
+        $('#daiquiri-contributions-table').daiquiri_table({
             'rowsurl': "<?php echo $this->baseUrl('/meetings/contributions/rows') ?>",
             'colsurl': "<?php echo $this->baseUrl('/meetings/contributions/cols') ?>",
             'params': params,
             'success': function() {
-                $('a','tbody','#table').click(function(){
+                $('#daiquiri-contributions-table tbody a').click(function(){
                     new daiquiri.Modal({
                         'url': this.href,
                         'width': 800,
                         'success': function () {
-                            daiquiri.table.items['table'].rows();
+                            daiquiri.table.items['daiquiri-contributions-table'].rows();
                         }
                     });
                     return false;

@@ -22,11 +22,11 @@
 <script type="text/javascript">
     $(document).ready(function() {
         // create the user table inside the div
-        $('#table').daiquiri_table({
+        $('#user-table').daiquiri_table({
             "rowsurl": "<?php echo $this->baseUrl('/auth/user/rows') ?>",
             "colsurl": "<?php echo $this->baseUrl('/auth/user/cols') ?>",
             'success': function() {
-                $('a','tbody','#table').click(function(){
+                $('#user-table tbody a').click(function(){
                     new daiquiri.Modal({
                         'url': this.href,
                         'width': 700,
@@ -44,7 +44,7 @@
 <div class="main">
     <h2>User management</h2>
 
-    <div id="table"></div>
+    <div id="user-table"></div>
 
     <?php
     echo $this->internalLink(array(
