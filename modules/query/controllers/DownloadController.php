@@ -66,7 +66,7 @@ class Query_DownloadController extends Daiquiri_Controller_Abstract {
             exit();
         } else {
             $this->view->status = $response['status'];
-            $this->view->error = $response['error'];
+            $this->view->errors = $response['errors'];
         }
     }
 
