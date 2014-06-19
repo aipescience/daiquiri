@@ -7,6 +7,8 @@ distributions might differ. For the deployment of an existing daiquiri web
 application on a new server, follow only first steps until Initialising 
 Project.
 
+A more detailed documentation can be found on https://escience.aip.de/daiquiri
+
 Install prerequisites and prepare server
 ----------------------------------------
 
@@ -30,28 +32,30 @@ Obtain the daiquiri and the daiquiri-app repository
 The preferred way of getting the Daiquiri repositories is by cloning them from 
 github:
 
-git clone ssh://git@github.com/jochenklar/daiquiri.git
-git clone ssh://git@github.com/jochenklar/daiquiri-app.git
+$ git clone ssh://git@github.com/jochenklar/daiquiri.git
+$ git clone ssh://git@github.com/jochenklar/daiquiri-app.git
 
 or
 
-git clone https://github.com/jochenklar/daiquiri.git
-git clone https://github.com/jochenklar/daiquiri-app.git
+$ git clone https://github.com/jochenklar/daiquiri.git
+$ git clone https://github.com/jochenklar/daiquiri-app.git
 
 Although not necessary, it is recommended to clone both repositories next to 
-each other in one directory. Preferably '/srv/daiquiri', but only if this is your 
-Apache DocumentRoot.
+each other in one directory. For this document we assume this is '/srv/daiquiri'.
 
 Configure the init.php file of the application
 ----------------------------------------------
 
-This is covered on a seperate page of the HTML documentation (or see
-escience.aip.de/daiquiri)
+Change to the daiquiri-app directory and copy default.init.php to init.php 
+(which is ignored by git).
+
+Then edit init.php for your individual setup. The different options are covered in the HTML 
+documentation (see https://escience.aip.de/daiquiri/cms/init-file/).
 
 Create captcha and download directory
 -------------------------------------
 
-Daiquiri need directories to store captcha images and download files. Again, 
+Daiquiri needs directories to store captcha images and download files. Again, 
 we recommend to put these under '/srv/daiquiri/'. For Ubuntu the AppArmor rules 
 must be adjusted, to make it possible for MySQL to write in the download directory. 
 In RHEL/CentOS/SL selinux should be set to permissive.
