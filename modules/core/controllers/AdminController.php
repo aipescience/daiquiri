@@ -21,64 +21,69 @@
 
 class Core_AdminController extends Daiquiri_Controller_Abstract {
 
-    private static $_items = array(
-        'config' => array(
-            'text' => 'Configuration',
-            'href' => '/core/config',
-            'resource' => 'Core_Model_Config',
-            'permission' => 'index'),
-        'templates' => array(
-            'text' => 'Mail templates',
-            'href' => '/core/templates',
-            'resource' => 'Core_Model_Templates',
-            'permission' => 'index'),
-        'messages' => array(
-            'text' => 'Status messages',
-            'href' => '/core/messages',
-            'resource' => 'Core_Model_Messages',
-            'permission' => 'index'),
-        'user' => array(
-            'text' => 'User management',
-            'href' => '/auth/user',
-            'resource' => 'Auth_Model_User',
-            'permission' => 'rows'),
-        'sessions' => array(
-            'text' => 'Sessions management',
-            'href' => '/auth/sessions',
-            'resource' => 'Auth_Model_Sessions',
-            'permission' => 'rows'),
-        'data' => array(
-            'text' => 'Database management',
-            'href' => '/data',
-            'resource' => 'Data_Model_Databases',
-            'permission' => 'show'),
-        'meetings' => array(
-            'text' => 'Meetings management',
-            'href' => '/meetings/',
-            'resource' => 'Meetings_Model_Meetings',
-            'permission' => 'index'),
-        'contact' => array(
-            'text' => 'Contact messages',
-            'href' => '/contact/messages',
-            'resource' => 'Contact_Model_Messages',
-            'permission' => 'rows'),
-        'examples' => array(
-            'text' => 'Examples',
-            'href' => '/query/examples',
-            'resource' => 'Query_Model_Examples',
-            'permission' => 'index'),
-        'query' => array(
-            'text' => 'Query jobs',
-            'href' => '/query/jobs',
-            'resource' => 'Query_Model_Jobs',
-            'permission' => 'rows')
-    );
-
     protected $_links = array();
 
-
     public function init() {
-        foreach (Core_AdminController::$_items as $item) {
+        $items = array(
+            'config' => array(
+                'text' => 'Configuration',
+                'href' => '/core/config',
+                'resource' => 'Core_Model_Config',
+                'permission' => 'index'),
+            'templates' => array(
+                'text' => 'Mail templates',
+                'href' => '/core/templates',
+                'resource' => 'Core_Model_Templates',
+                'permission' => 'index'),
+            'messages' => array(
+                'text' => 'Status messages',
+                'href' => '/core/messages',
+                'resource' => 'Core_Model_Messages',
+                'permission' => 'index'),
+            'user' => array(
+                'text' => 'User management',
+                'href' => '/auth/user',
+                'resource' => 'Auth_Model_User',
+                'permission' => 'rows'),
+            'sessions' => array(
+                'text' => 'Sessions management',
+                'href' => '/auth/sessions',
+                'resource' => 'Auth_Model_Sessions',
+                'permission' => 'rows'),
+            'data' => array(
+                'text' => 'Database management',
+                'href' => '/data',
+                'resource' => 'Data_Model_Databases',
+                'permission' => 'show'),
+            'meetings' => array(
+                'text' => 'Meetings management',
+                'href' => '/meetings/',
+                'resource' => 'Meetings_Model_Meetings',
+                'permission' => 'index'),
+            'contact' => array(
+                'text' => 'Contact messages',
+                'href' => '/contact/messages',
+                'resource' => 'Contact_Model_Messages',
+                'permission' => 'rows'),
+            'examples' => array(
+                'text' => 'Examples',
+                'href' => '/query/examples',
+                'resource' => 'Query_Model_Examples',
+                'permission' => 'index'),
+            'query' => array(
+                'text' => 'Query jobs',
+                'href' => '/query/jobs',
+                'resource' => 'Query_Model_Jobs',
+                'permission' => 'rows')
+        );
+        if (Daiquiri_Config::getInstance()->core->cms->enabled) {
+            $items['cms'] = array(
+                'text' => 'CMS Admin',
+                'href' => '/cms/wp-admin/',
+            );
+        }
+
+        foreach ($items as $item) {
             $link = $this->internalLink($item);
 
             if(!empty($link)) {
