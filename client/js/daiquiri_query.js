@@ -347,6 +347,14 @@ daiquiri.query.Query.prototype.displayJobs = function(){
                         html += '<p>There are ' + json.nactive + ' jobs in the queue.</p>';
                     }
                 }
+                if (typeof json.quota !== 'undefined' && json.quota !== false) {
+                    html += '<p class="' + ((json.quota.exeeded) ? 'text-error' : '') + '">';
+                    html += 'You are using ' + json.quota.used + ' of your quota of ' + json.quota.max + '. ';
+                    if (json.quota.exeeded) {
+                        html += 'Please remove some jobs to free space or contact the administrators.'
+                    }
+                    html += '</p>';
+                }
                 html += '</li>';
                 html += '</ul>';
 

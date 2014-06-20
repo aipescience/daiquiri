@@ -34,6 +34,12 @@
     </p>
     <?php endif; ?>
 
+    <?php if ($this->quota !== false): ?>
+    <p class="<?php echo (($this->quota['exeeded'] === true) ? 'text-error' : '') ?>">
+        You are using <?php echo $this->escape($this->quota['used']); ?> of your quota of <?php echo $this->escape($this->quota['max']); ?>.
+    </p>
+    <?php endif; ?>
+
     <?php foreach ($this->jobs as $job): ?>
     <table class="table table-bordered">
         <?php foreach ($job as $key => $value): ?>

@@ -134,11 +134,11 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     public function fetchDatabaseStats() {
         // check if this table is locked and if yes, don't query information_schema. This will result in a
         // "waiting for metadata lock" and makes daiquiri hang
-        $adapter = $this->getAdapter();
-        $config = $this->getAdapter()->getConfig();
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $db = Daiquiri_Config::getInstance()->getUserDbName($username);
 
         // get list of locked tables
-        $lockedTables = $adapter->query('SHOW OPEN TABLES IN `' . $config['dbname'] . '` WHERE In_use > 0')->fetchAll();
+        $lockedTables = $this->getAdapter()->query('SHOW OPEN TABLES IN `' . $db . '` WHERE In_use > 0')->fetchAll();
         $where = "";
         foreach ($lockedTables as $table) {
             $where .= " AND table_name != '" . $table['Table'] . "'";
@@ -154,7 +154,7 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
                 "FROM information_schema.tables " .
                 "WHERE table_schema = ?" . $where;
 
-        return $adapter->query($sql, array($config['dbname']))->fetch();
+        return $this->getAdapter()->query($sql, array($db))->fetch();
     }
 
     /**

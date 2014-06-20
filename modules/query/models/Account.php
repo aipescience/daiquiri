@@ -81,9 +81,65 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $nactive = false;
         }
 
+        // get the quota information
+        $usrGrp = Daiquiri_Auth::getInstance()->getCurrentRole();
+        if ($usrGrp !== null) {
+            $quota = array();
+
+            // get database stats
+            $stats = $this->getResource()->fetchDatabaseStats();
+
+            // space in byte
+            $usedSpace = $stats['db_size'] * 1024 * 1024;
+
+            // get the quota space
+            $quota['max'] = Daiquiri_Config::getInstance()->query->quota->$usrGrp;
+
+            // parse the quota to resolve KB, MB, GB, TB, PB, EB...
+            preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quota['max'], $parse);
+            $quotaSpace = (float) $parse[1];
+            $unit = $parse[2];
+
+            switch (strtoupper($unit)) {
+                case 'EB':
+                    $quotaSpace *= 1024;
+                case 'PB':
+                    $quotaSpace *= 1024;
+                case 'TB':
+                    $quotaSpace *= 1024;
+                case 'GB':
+                    $quotaSpace *= 1024;
+                case 'MB':
+                    $quotaSpace *= 1024;
+                case 'KB':
+                    $quotaSpace *= 1024;
+                default:
+                    break;
+            }
+
+            if ($usedSpace > $quotaSpace) {
+                $quota['exeeded'] = true;
+            } else {
+                $quota['exeeded'] = false;
+            }
+
+            foreach (array('KB','MB','GB','TB','PB','EB') as $u) {
+                if ($usedSpace > 1024) {
+                    $usedSpace /= 1024.0;
+                    $usedUnit = $u;
+                }
+            }
+
+            $quota['used'] = ((string) floor($usedSpace * 100) / 100 ) . $unit;
+
+        } else {
+            $quota = false;
+        }
+
         return array(
             'status' => 'ok',
             'nactive' => $nactive,
+            'quota' => $quota,
             'message' => $message,
             'jobs' => $rows
         );

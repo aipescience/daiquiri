@@ -59,7 +59,7 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
         }
 
         if (!$this->_editable) {
-            //$this->getElement('plan_query')->setAttrib('readonly', 'readonly');
+            $this->getElement('plan_query')->setAttrib('readonly', 'readonly');
         }
 
         $this->addPrimaryButtonElement('plan_submit', 'Submit this plan');
