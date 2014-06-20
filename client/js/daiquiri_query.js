@@ -375,8 +375,8 @@ daiquiri.query.Query.prototype.displayJobs = function(){
                 }
 
                 html += '<a href="#job-' + value.id + '">';
-                html += '<span>' + value.table + '</span>';
                 html += self.createStatusIcon(value.status);
+                html += '<div class="daiquiri-query-jobs-item">' + value.table + '</div>';
                 html += '</a>';
                 html += '</li>';
             });

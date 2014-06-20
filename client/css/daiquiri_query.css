@@ -48,3 +48,8 @@
     margin-top: 10px;
     font-size: smaller;
 }
+#jobs .nav-item .daiquiri-query-jobs-item {
+    margin-right: 26px; /* 12 + 14 */
+    white-space: nowrap;
+    overflow: hidden;
+}
