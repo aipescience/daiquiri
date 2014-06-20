@@ -200,7 +200,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     private function _checkQuota($resource, $usrGrp) {
         $dbStatData = $resource->fetchDatabaseStats();
 
-        $usedSpace = $dbStatData['db_size'] * 1024 * 1024;
+        $usedSpace = (float) $dbStatData['db_size'];
 
         $quotaStr = Daiquiri_Config::getInstance()->query->quota->$usrGrp;
 

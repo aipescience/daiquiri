@@ -90,7 +90,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $stats = $this->getResource()->fetchDatabaseStats();
 
             // space in byte
-            $usedSpace = $stats['db_size'] * 1024 * 1024;
+            $usedSpace = (float) $stats['db_size'];
 
             // get the quota space
             $quota['max'] = Daiquiri_Config::getInstance()->query->quota->$usrGrp;
@@ -126,7 +126,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             foreach (array('KB','MB','GB','TB','PB','EB') as $u) {
                 if ($usedSpace > 1024) {
                     $usedSpace /= 1024.0;
-                    $usedUnit = $u;
+                    $unit = $u;
                 }
             }
 
