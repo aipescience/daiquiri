@@ -123,7 +123,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 $quota['exeeded'] = false;
             }
 
-            $unit = 'byte';
+            $unit = ' byte';
             foreach (array('KB','MB','GB','TB','PB','EB') as $u) {
                 if ($usedSpace > 1024) {
                     $usedSpace /= 1024.0;
