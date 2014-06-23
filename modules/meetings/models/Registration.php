@@ -80,10 +80,21 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
             );
         }
 
+        // get user if one is logged in
+        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
+        if ($userId > 0) {
+            // get the user model for getting user details
+            $userModel = new Auth_Model_User();
+            $user = $userModel->getResource()->fetchRow($userId);
+        } else {
+            $user = array();
+        }
+
         // create the form object
         $form = new Meetings_Form_Registration(array(
             'submit'=> 'Register for this meeting',
-            'meeting' => $meeting
+            'meeting' => $meeting,
+            'user' => $user
         ));
 
         // valiadate the form if POST

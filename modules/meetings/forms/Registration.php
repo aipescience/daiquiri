@@ -24,6 +24,7 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
     private $_submit;
     private $_entry;
     private $_meeting;
+    private $_user;
 
     public function setSubmit($submit) {
         $this->_submit = $submit;
@@ -35,6 +36,10 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
 
     public function setMeeting($meeting) {
         $this->_meeting = $meeting;
+    }
+
+    public function setUser($user) {
+        $this->_user = $user;
     }
 
     public function init() {
@@ -120,9 +125,10 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
             $contributionElements[] = $contribution_type . '_title';
             $contributionElements[] = $contribution_type . '_abstract';
         }
-
-        $this->addElement(new Daiquiri_Form_Element_Captcha('captcha'));
-
+        if (empty($this->_user)) {
+            // display captcha if no user is logged in
+            $this->addElement(new Daiquiri_Form_Element_Captcha('captcha'));
+        }
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
@@ -135,10 +141,18 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
         if (!empty($contributionElements)) {
             $this->addHorizontalGroup($contributionElements,'contributions', 'Contributions');
         }
-        $this->addCaptchaGroup('captcha');
+        if (empty($this->_user)) {
+            $this->addCaptchaGroup('captcha');
+        }
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
+        foreach (array('firstname', 'lastname', 'email') as $key) {
+            if (isset($this->_user[$key])) {
+                $this->setDefault($key, $this->_user[$key]);
+                $this->setFieldReadonly($key);
+            }
+        }
         $this->setDefault('arrival', $this->_meeting['begin']);
         $this->setDefault('departure', $this->_meeting['end']);
     }
