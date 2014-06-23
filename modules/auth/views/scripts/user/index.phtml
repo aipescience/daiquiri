@@ -31,7 +31,7 @@
                         'url': this.href,
                         'width': 700,
                         'success': function() {
-                            daiquiri.table.items['table'].rows();
+                            daiquiri.table.items['user-table'].rows();
                         }
                     });
                     return false;
@@ -60,6 +60,26 @@
         'resource' => 'Auth_Model_Registration',
         'permission' => 'index',
         'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Export to init.php syntax',
+        'href' => '/auth/user/export/',
+        'resource' => 'Auth_Model_User',
+        'permission' => 'export',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Export mail addresses',
+        'href' => '/auth/user/export/mode/mail',
+        'resource' => 'Auth_Model_User',
+        'permission' => 'export',
+        'prepend' => '<p>',
+        'append' => '&nbsp'));
+    echo $this->internalLink(array(
+        'text' => '(active)',
+        'href' => '/auth/user/export/mode/mail/status/active',
+        'resource' => 'Auth_Model_User',
+        'permission' => 'export',
         'append' => '</p>'));
     echo $this->adminLink();
     ?>

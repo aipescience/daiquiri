@@ -54,6 +54,10 @@ class Meetings_ParticipantsController extends Daiquiri_Controller_Abstract {
         $response = $this->_model->export($slug, $status);
         $this->view->mode = $this->_getParam('mode');
         $this->view->assign($response);
+
+        // disable layout
+        $this->_helper->layout->disableLayout();
+        $this->getResponse()->setHeader('Content-Type', 'text/plain');
     }
 
     public function showAction() {

@@ -63,4 +63,15 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
         $id = $this->getParam('id');
         $this->getControllerHelper('form')->delete($id);
     }
+
+    public function exportAction() {
+        $status = $this->_getParam('status');
+        $response = $this->_model->export($status);
+        $this->view->mode = $this->_getParam('mode');
+        $this->view->assign($response);
+
+        // disable layout
+        $this->_helper->layout->disableLayout();
+        $this->getResponse()->setHeader('Content-Type', 'text/plain');
+    }
 }

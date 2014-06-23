@@ -19,43 +19,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-<pre>
 <?php if ($this->mode == 'latex'): ?>
 \documentclass{artcl}
 \begin{document}
 <?php foreach ($this->rows as $contributionType => $rows): ?>
-\section*{<?php echo $this->escape(ucfirst($contributionType)) ?>}
-
+<?php echo '\section*{' . ucfirst($contributionType) . "} \n\n"; ?>
 <?php foreach ($rows as $row): ?>
-\subsection*{<?php echo $this->escape($row['title']) ?>}
-
-\subsubsection*{<?php echo $this->escape($row['participant_firstname']) ?> <?php echo $this->escape($row['participant_lastname']) ?>}
-
-<?php echo $this->escape(wordwrap($row['abstract'], 100)) ?>
-
-
+<?php echo '\subsection*{' . $row['title'] . "} \n\n"; ?>
+<?php echo '\subsubsection*{' . $row['participant_firstname'] . ' ' . $row['participant_lastname'] . "}\n\n"; ?>
+<?php echo $this->escape(wordwrap($row['abstract'], 100)) . "\n\n"; ?>
 <?php endforeach; ?>
 <?php endforeach; ?>
 \end{document}
 <?php else: ?>
 <?php foreach ($this->rows as $contributionType => $rows): ?>
-====================================================================================================
-<?php echo $this->escape(ucfirst($contributionType)) ?>
-
-====================================================================================================
-
+<?php echo ucfirst($contributionType) . "\n"; ?>
+<?php echo str_repeat('=',strlen($contributionType)) . "\n\n"; ?>
 <?php foreach ($rows as $row): ?>
-<?php echo $this->escape($row['title']) ?> 
-
-<?php echo $this->escape($row['participant_firstname']) ?> <?php echo $this->escape($row['participant_lastname']) ?>
-
-
-<?php echo $this->escape(wordwrap($row['abstract'], 100)) ?>
-
-
-----------------------------------------------------------------------------------------------------
-
+<?php echo $row['title'] . ' (' . $row['participant_firstname'] . ' ' . $row['participant_lastname'] . ")\n";?>
+<?php echo str_repeat('-',strlen($row['title']) + strlen($row['participant_firstname']) + strlen($row['participant_lastname']) + 4) . "\n\n"; ?>
+<?php echo $this->escape(wordwrap($row['abstract'], 100)) . "\n\n"; ?>
 <?php endforeach; ?>
 <?php endforeach; ?>
 <?php endif; ?>
-</pre>

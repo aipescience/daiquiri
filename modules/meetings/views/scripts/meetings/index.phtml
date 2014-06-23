@@ -79,6 +79,44 @@
                     'append' => '</li>'));
                 ?>
                 </ul>
+                <ul class="unstyled">
+                    <li>
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'Export participants',
+                        'href' => '/meetings/' . $this->escape($row['slug']) . '/participants/export',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export',
+                        'append' => '&nbsp'));
+                    echo $this->internalLink(array(
+                        'text' => '(mail)',
+                        'href' => '/meetings/' . $this->escape($row['slug']) . '/participants/export/mode/mail',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export',
+                        'append' => '&nbsp'));
+                    echo $this->internalLink(array(
+                        'text' => '(affiliation)',
+                        'href' => '/meetings/' . $this->escape($row['slug']) . '/participants/export/mode/affiliation',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export'));
+                    ?>
+                    </li>
+                    <li>
+                    <?php   
+                    echo $this->internalLink(array(
+                        'text' => 'Export contributions',
+                        'href' => '/meetings/' . $this->escape($row['slug']) . '/contributions/export',
+                        'resource' => 'Meetings_Model_Contributions',
+                        'permission' => 'index',
+                        'append' => '&nbsp'));
+                    echo $this->internalLink(array(
+                        'text' => '(latex)',
+                        'href' => '/meetings/' . $this->escape($row['slug']) . '/contributions/export/mode/latex',
+                        'resource' => 'Meetings_Model_Contributions',
+                        'permission' => 'index'));
+                    ?>
+                    </li>
+                </ul>
             </div>
         </div>
     <?php endforeach; ?>

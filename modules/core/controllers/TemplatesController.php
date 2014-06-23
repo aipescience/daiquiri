@@ -53,5 +53,6 @@ class Core_TemplatesController extends Daiquiri_Controller_Abstract {
 
         // disable layout
         $this->_helper->layout->disableLayout();
+        $this->getResponse()->setHeader('Content-Type', 'text/plain');
     }
 }

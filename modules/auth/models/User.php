@@ -314,4 +314,27 @@ class Auth_Model_User extends Daiquiri_Model_Table {
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Returns the user information in a convenient text-only format
+     * @param string $status display only participants with a certain status
+     * @return array $response
+     */
+    public function export($status = false) {
+        if (!empty($status)) {
+            $sqloptions = array(
+                'where' => array(
+                    'status = ?' => $status
+                )
+            );
+        } else {
+            $sqloptions = array();
+        }
+
+        return array(
+            'status' => 'ok',
+            'rows' => $this->getResource()->fetchRows($sqloptions)
+        );
+        
+    } 
+
 }

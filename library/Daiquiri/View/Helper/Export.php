@@ -27,10 +27,8 @@ class Daiquiri_View_Helper_Export extends Zend_View_Helper_Abstract {
         $this->view = $view;
     }
 
-    public function export($data) {
-        $output = "<pre>\n";
-        $this->_buildExport_r($data, 4, $output);
-        $output .= "</pre>";
+    public function export($data, $indent = 4) {
+        $this->_buildExport_r($data, $indent, $output);
         return $output;
     }
 

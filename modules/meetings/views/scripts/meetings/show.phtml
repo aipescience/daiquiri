@@ -85,6 +85,44 @@
         'permission' => 'index',
         'prepend' => '<p>',
         'append' => '</p>'));
+    ?>
+    <p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Export participants',
+            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/export',
+            'resource' => 'Meetings_Model_Participants',
+            'permission' => 'export',
+            'append' => '&nbsp'));
+        echo $this->internalLink(array(
+            'text' => '(mail)',
+            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/export/mode/mail',
+            'resource' => 'Meetings_Model_Participants',
+            'permission' => 'export',
+            'append' => '&nbsp'));
+        echo $this->internalLink(array(
+            'text' => '(affiliation)',
+            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/export/mode/affiliation',
+            'resource' => 'Meetings_Model_Participants',
+            'permission' => 'export'));
+        ?>
+    </p>
+    <p>
+        <?php   
+        echo $this->internalLink(array(
+            'text' => 'Export contributions',
+            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/contributions/export',
+            'resource' => 'Meetings_Model_Contributions',
+            'permission' => 'index',
+            'append' => '&nbsp'));
+        echo $this->internalLink(array(
+            'text' => '(latex)',
+            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/contributions/export/mode/latex',
+            'resource' => 'Meetings_Model_Contributions',
+            'permission' => 'index'));
+        ?>
+    </p>
+    <?php
     echo $this->internalLink(array(
         'text' => 'Back',
         'href' => $this->redirect,

@@ -70,7 +70,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
 
         // admin
         $rules['admin'] = array(
-            'Auth_Model_User' => array('rows','cols','show','create','update','delete'),
+            'Auth_Model_User' => array('rows','cols','show','create','update','delete','export'),
             'Auth_Model_Password' => array('set'),
             'Auth_Model_Details' => array('show','create','update', 'delete'),
             'Auth_Model_Sessions' => array('rows','cols','destroy'),
