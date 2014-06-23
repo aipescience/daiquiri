@@ -19,6 +19,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+require_once(Daiquiri_Config::getInstance()->core->libs->phpSqlParser . '/lexer/PHPSQLLexer.php');
+
 class Data_Model_Viewer extends Daiquiri_Model_Table {
 
     /**
@@ -49,7 +51,19 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
         if (empty($params['cols'])) {
             $colnames = array_keys($this->getResource()->fetchCols());
         } else {
-            $colnames = explode(',', $params['cols']);
+            // we can not use explode here since there can be commas in functions
+            $lexer = new PHPSQLParser\lexer\PHPSQLLexer();
+            $string = '';
+            $colnames = array();
+            foreach($lexer->split($params['cols']) as $token) {
+                if ($token !== ',') {
+                    $string .= $token;
+                } else {
+                    $colnames[] = $string;
+                    $string = '';
+                }
+            }
+            $colnames[] = $string;
         }
 
         // obtain table metadata
@@ -153,7 +167,19 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
         if (empty($params['cols'])) {
             $colnames = array_keys($this->getResource()->fetchCols());
         } else {
-            $colnames = explode(',', $params['cols']);
+            // we can not use explode here since there can be commas in functions
+            $lexer = new PHPSQLParser\lexer\PHPSQLLexer();
+            $string = '';
+            $colnames = array();
+            foreach($lexer->split($params['cols']) as $token) {
+                if ($token !== ',') {
+                    $string .= $token;
+                } else {
+                    $colnames[] = $string;
+                    $string = '';
+                }
+            }
+            $colnames[] = $string;
         }
 
         // get the table from the resource
