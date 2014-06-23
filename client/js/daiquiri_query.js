@@ -363,7 +363,7 @@ daiquiri.query.Query.prototype.displayJobs = function(){
                 if (typeof json.quota !== 'undefined' && json.quota !== false) {
                     html += '<p class="' + ((json.quota.exeeded) ? 'text-error' : '') + '">';
                     if (typeof json.guest !== 'undefined' && json.guest !== false) {
-                        html += 'The guest user is using ' + json.quota.used + ' byte of its quota of ' + json.quota.max + '.';
+                        html += 'The guest user is using ' + json.quota.used + ' of its quota of ' + json.quota.max + '.';
                     } else {
                         html += 'You are using ' + json.quota.used + ' of your quota of ' + json.quota.max + '. ';
                     }
