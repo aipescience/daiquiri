@@ -211,6 +211,7 @@ daiquiri.table.Table.prototype.pager = function () {
     }).submit(function () {
         var id = $(this).attr('id').match(/(.+)-pager-search/)[1];
         var self = daiquiri.table.items[id];
+        self.params.page = 1;
         self.params.search = $('input',this).val()
         self.rows();
         return false;
