@@ -195,15 +195,13 @@ daiquiri.Modal.prototype.display = function () {
         return false;
     });
 
-    // enable esc and enter keys
+    // enable esc key
     $(document).keyup(function(e) {
         if (e.keyCode == 27) {
             // esc pressed
             $('.daiquiri-modal').remove();
             $('body').css('overflow','auto');
             return false;
-        } else if (e.keyCode == 13) {
-            $('.daiquiri-modal .btn-primary').trigger('click');
         }
     });
 
