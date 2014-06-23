@@ -30,13 +30,23 @@
 
     <?php if ($this->nactive !== false): ?>
     <p>
+        You are using the guest user. For a personal account, please sign up <?php echo $this->internalLink(array('text' => 'here', 'href' => '/auth/registration/register')); ?>.
+    </p>
+    <?php endif; ?>
+
+    <?php if ($this->nactive !== false): ?>
+    <p>
         Currently, there <?php echo (($this->nactive === 1) ? 'is ' : 'are ') . $this->escape($this->nactive). (($this->nactive === 1) ? ' job' : ' jobs'); ?> in the queue.
     </p>
     <?php endif; ?>
 
     <?php if ($this->quota !== false): ?>
     <p class="<?php echo (($this->quota['exeeded'] === true) ? 'text-error' : '') ?>">
+        <?php if ($this->guest === true): ?>
+        The guest user is using <?php echo $this->escape($this->quota['used']); ?> of its quota of <?php echo $this->escape($this->quota['max']); ?>.
+        <?php else: ?>
         You are using <?php echo $this->escape($this->quota['used']); ?> of your quota of <?php echo $this->escape($this->quota['max']); ?>.
+        <?php endif; ?>
     </p>
     <?php endif; ?>
 

@@ -145,9 +145,9 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 )
             ),
             'quota' => array(
-                'guest' => '100MB',
-                'user' => '500MB',
-                'admin' => '1.5GB',
+                'guest' => '100 MB',
+                'user' => '500 MB',
+                'admin' => '1.5 GB',
             ),
             'download' => array(
                 'type' => 'direct', // or gearman

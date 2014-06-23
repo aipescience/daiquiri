@@ -131,7 +131,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 }
             }
 
-            $quota['used'] = ((string) floor($usedSpace * 100) / 100 ) . $unit;
+            $quota['used'] = ((string) floor($usedSpace * 100) / 100 ) . ' ' . $unit;
 
         } else {
             $quota = false;
@@ -140,6 +140,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         return array(
             'status' => 'ok',
             'nactive' => $nactive,
+            'guest' => (Daiquiri_Auth::getInstance()->getCurrentRole() === 'guest'),
             'quota' => $quota,
             'message' => $message,
             'jobs' => $rows

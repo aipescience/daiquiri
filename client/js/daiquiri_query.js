@@ -60,6 +60,7 @@ daiquiri.query.Query = function (siteUrl) {
         },
         'fileDownload': baseUrl + '/data/files/row',
         'sampStream': siteUrl + '/query/download/stream',
+        'register': baseUrl + '/auth/registration/register',
         'baseUrl': baseUrl
     }
 
@@ -332,14 +333,19 @@ daiquiri.query.Query.prototype.displayJobs = function(){
 
             // build queue status
             if (typeof json.message !== 'undefined' && json.message !== false 
-                || typeof json.nactive !== 'undefined' && json.nactive !== false) {
+                || typeof json.nactive !== 'undefined' && json.nactive !== false
+                || typeof json.guest !== 'undefined' && json.guest !== false ) {
 
                 var html = '<ul class="nav nav-pills nav-stacked">';
                 html += '<li class="nav-header">Database status</li>';
                 html += '<li class="nav-item">';
+
+                // status message
                 if (typeof json.message !== 'undefined' && json.message !== false) {
                     html += '<p>' + json.message + '</p>';
                 }
+
+                // number of jobs in the queue
                 if (typeof json.nactive !== 'undefined' && json.nactive !== false) {
                     if (json.nactive === 1) {
                         html += '<p>There is ' + json.nactive + ' job in the queue.</p>';
@@ -347,17 +353,28 @@ daiquiri.query.Query.prototype.displayJobs = function(){
                         html += '<p>There are ' + json.nactive + ' jobs in the queue.</p>';
                     }
                 }
+
+                // guest user warning
+                if (typeof json.guest !== 'undefined' && json.guest !== false) {
+                    html += '<p>You are using the guest user. For a personal account, please sign up <a href="' + self.url.register + '">here</a>.</p>';
+                }
+
+                // quota information
                 if (typeof json.quota !== 'undefined' && json.quota !== false) {
                     html += '<p class="' + ((json.quota.exeeded) ? 'text-error' : '') + '">';
-                    html += 'You are using ' + json.quota.used + ' of your quota of ' + json.quota.max + '. ';
+                    if (typeof json.guest !== 'undefined' && json.guest !== false) {
+                        html += 'The guest user is using ' + json.quota.used + ' byte of its quota of ' + json.quota.max + '.';
+                    } else {
+                        html += 'You are using ' + json.quota.used + ' of your quota of ' + json.quota.max + '. ';
+                    }
                     if (json.quota.exeeded) {
                         html += 'Please remove some jobs to free space or contact the administrators.'
                     }
                     html += '</p>';
                 }
+
                 html += '</li>';
                 html += '</ul>';
-
                 $('<div/>',{
                     'class': 'daiquiri-widget',
                     'html' : html
