@@ -260,6 +260,50 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 case 'std':
                 case 'sqrt':
                 case 'tan':
+                // string functions
+                case 'ascii':
+                case 'bin':
+                case 'bit_length':
+                case 'char':
+                case 'char_length':
+                case 'character_length':
+                case 'concat':
+                case 'concat_ws':
+                case 'conv':
+                case 'elt':
+                case 'export_set':
+                case 'field':
+                case 'find_in_set':
+                case 'format':
+                case 'hex':
+                case 'insert':
+                case 'instr':
+                case 'lcase':
+                case 'left':
+                case 'length':
+                case 'locate':
+                case 'lower':
+                case 'lpad':
+                case 'ltrim':
+                case 'lower':
+                case 'make_set':
+                case 'mid':
+                case 'oct':
+                case 'octet_length':
+                case 'ord':
+                case 'position':
+                case 'quote':
+                case 'repeat':
+                case 'replace':
+                case 'reverse':
+                case 'right':
+                case 'rpad':
+                case 'rtrim':
+                case 'space':
+                case 'substring':
+                case 'trim':
+                case 'ucase':
+                case 'upper':
                 case 'truncate':
                     return true;
                     break;
