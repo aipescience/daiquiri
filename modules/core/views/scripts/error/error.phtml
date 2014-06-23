@@ -19,20 +19,22 @@
  */
 ?>
 
-<h2>Sorry, but there has been an error.</h2>
-<h3><?php echo $this->message ?></h3>
+<div class="main">
+    <h2>Sorry, but there has been an error.</h2>
+    <h3><?php echo $this->message ?></h3>
 
-<?php if (isset($this->exception)): ?>
-    <h4>Exception information:</h4>
-    <p>
-        <b>Message:</b> <?php echo $this->exception->getMessage() ?>
-    </p>
+    <?php if (isset($this->exception)): ?>
+        <h4>Exception information:</h4>
+        <p>
+            <b>Message:</b> <?php echo $this->exception->getMessage() ?>
+        </p>
 
-    <h4>Stack trace:</h4>
-    <pre><?php echo $this->exception->getTraceAsString() ?></pre>
+        <h4>Stack trace:</h4>
+        <pre><?php echo $this->exception->getTraceAsString() ?></pre>
 
-    <h4>Request Parameters:</h4>
-    <pre><?php echo $this->escape(var_export($this->request->getParams(), true)) ?></pre>
-<?php else: ?>
-    <p>We are sorry for any inconvenience.</p>
-<?php endif ?>
+        <h4>Request Parameters:</h4>
+        <pre><?php echo $this->escape(var_export($this->request->getParams(), true)) ?></pre>
+    <?php else: ?>
+        <p>We are sorry for any inconvenience.</p>
+    <?php endif ?>
+</div>
