@@ -260,6 +260,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 case 'std':
                 case 'sqrt':
                 case 'tan':
+                case 'truncate':
                 // string functions
                 case 'ascii':
                 case 'bin':
@@ -304,7 +305,10 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 case 'trim':
                 case 'ucase':
                 case 'upper':
-                case 'truncate':
+                // string functions
+                case 'binary':
+                case 'cast':
+                case 'convert':                
                     return true;
                     break;
             }
