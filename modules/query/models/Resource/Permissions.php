@@ -305,7 +305,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 case 'trim':
                 case 'ucase':
                 case 'upper':
-                // string functions
+                // cast functions
                 case 'binary':
                 case 'cast':
                 case 'convert':                
