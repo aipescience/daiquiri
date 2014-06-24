@@ -862,7 +862,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         foreach($sqlTree['WHERE'] as &$node) {
             if($this->_isSubquery($node)) {
                 $tree = $this->processQueryWildcard($node['sub_tree']);
-                    $node['sub_tree'] = $tree->parsed;
+                $node['sub_tree'] = $tree;
             }
         }
     }
