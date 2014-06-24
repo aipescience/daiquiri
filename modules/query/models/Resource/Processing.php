@@ -850,8 +850,6 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
     /**
      * @brief Identifies subqueries that need processing in the WHERE clause
      * @param sqlTree SQL parser tree node of complete query/subquery
-     * @param mysqlConn a properly initialised MySQLI/MySQLII connection to the DB
-     * @param zendAdapter a valid ZEND DB adapter
      * 
      * This function parser the current level of the sqlTree to find any subqueries
      * in the WHERE statement. If subqueries are found, process them recursively using
@@ -863,7 +861,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
         foreach($sqlTree['WHERE'] as &$node) {
             if($this->_isSubquery($node)) {
-                $tree = $this->processQueryWildcard($node['sub_tree'], $defaultDB);
+                $tree = $this->processQueryWildcard($node['sub_tree']);
                     $node['sub_tree'] = $tree->parsed;
             }
         }
