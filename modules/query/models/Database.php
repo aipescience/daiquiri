@@ -305,9 +305,26 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         }
 
         if ((!file_exists($file) || file_exists($file . ".lock")) && $queueType === "gearman") {
-            // check if GearmanManager is up and running
-            if (!file_exists(Daiquiri_Config::getInstance()->query->download->gearman->pid)) {
+            // check if gearman is up and running
+            exec('pgrep gearmand', $output, $return);
+            if ($return != 0) {
+                throw new Exception('gearmand is not running.');
+            }
 
+            // check if 
+            $restartGeamanManager = false;
+            $pidfile = Daiquiri_Config::getInstance()->query->download->gearman->pid;
+            if (file_exists($pidfile)) {
+                $pid = file_get_contents($pidfile);
+                exec('ps -p ' . $pid, $output, $return);
+                if ($return != 0) {
+                    $restartGeamanManager = true;
+                }
+            } else {
+                $restartGeamanManager = true;
+            }
+
+            if ($restartGeamanManager) {
                 // check if we have write access to actually create this PID file
                 if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->gearman->pid))) {
                     return array(
