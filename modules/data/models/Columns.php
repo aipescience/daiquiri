@@ -138,7 +138,7 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
             'tables' => $tablesResource->fetchValues('name'),
             'tableId' => $entry['table_id'],
             'ucds' => $ucdsResource->fetchRows(),
-            'submit' => 'Create column entry',
+            'submit' => 'Update column entry',
             'entry' => $entry
         ));
 
