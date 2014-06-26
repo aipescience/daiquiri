@@ -261,11 +261,20 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      * @return array $file
      */
     private function _findFile($name) {
+        if (empty(Daiquiri_Config::getInstance()->data->files->static)) {
+            return array();
+        }
+
         $directories = Daiquiri_Config::getInstance()->data->files->static->toArray();
+
+        if (empty($directories)) {
+            return array();
+        }
 
         $file = array();
         foreach ($directories as $dir) {
             $file = array_merge($file, $this->_findFileRec($name, $dir));
+
         }
 
         return $file;
