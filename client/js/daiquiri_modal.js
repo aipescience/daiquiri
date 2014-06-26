@@ -113,7 +113,7 @@ daiquiri.Modal.prototype.display = function () {
     // adjust left and top margin
     var leftMargin = ($(window).width() - dialog.width()) / 2;
     dialog.css('marginLeft', leftMargin);
-    var topMargin = ($(window).height() - dialog.height()) / 2 - 30;
+    var topMargin = ($(window).height() - dialog.height()) / 2 - 10;
     dialog.css('marginTop', topMargin);
 
     // close button link

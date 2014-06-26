@@ -42,9 +42,9 @@
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
 }
 .daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-close-container {
-    float: right;
-
-    margin-top: -6px;
+    position: absolute;
+    top: 0px;
+    right: 6px;
     line-height: 20px;
     font-style: bold;
     font-size: 20px;
@@ -57,8 +57,7 @@
 }
 .daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-body {
     padding: 10px;
-
-    max-height: 640px;
+    max-height: 620px;
     overflow: auto;
 }
 .daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-body :first-child {

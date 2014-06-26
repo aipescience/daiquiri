@@ -48,8 +48,8 @@ daiquiri.imageview.item = null;
  * Object to hold the default options.
  */
 daiquiri.imageview.opt = {
-    'width': 600,
-    'height': 600
+    'width': 800,
+    'height': 580
 };
 
 /**
@@ -74,24 +74,41 @@ daiquiri.imageview.ImageView = function (a, tableId, opt) {
     $('#' + this.tableId + ' .daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
     $('#' + this.tableId + ' .daiquiri-table-row-' + this.row).addClass('daiquiri-table-row-selected');
 
-    // create modal
-    this.modal = new daiquiri.Modal({
-        'html': '<div class="daiquiri-imageview-img" style="width: ' + this.opt.width + 'px; height: ' + this.opt.height + 'px;"><img src="' + url + '"></img></div><div class="daiquiri-imageview-navigation"><div class="pagination pull-left text-left"><ul><li><a class="daiquiri-modal-prev" href="#">Previous</a></li></ul></div><div class="pagination pull-right text-right"><ul><li><a class="daiquiri-modal-next" href="#">Next</a></li></ul></div><div class="daiquiri-imageview-title"><a href="' + url + '" target="_blank">' + title + '</a></div></div>',
-        'width': this.opt.width + 20,
-        'height': this.opt.height + 60,
-        'next': function () {
-            if (daiquiri.imageview.item.idle) {
-                daiquiri.imageview.item.idle = false;
-                daiquiri.imageview.item.next();
-            }
-        },
-        'prev': function () {
-            if (daiquiri.imageview.item.idle) {
-                daiquiri.imageview.item.idle = false;
-                daiquiri.imageview.item.prev();
-            }
+    // look for the images properties
+    var img = new Image();
+    img.onload = function() {
+        var width = this.width;
+        var height = this.height;
+
+        if (width > daiquiri.imageview.item.opt.width) {
+            height = height * daiquiri.imageview.item.opt.width / width;
+            width = daiquiri.imageview.item.opt.width;
         }
-    });
+        if (height > daiquiri.imageview.item.opt.height) {
+            width = width * daiquiri.imageview.item.opt.height / height;
+            height = daiquiri.imageview.item.opt.height;
+        }
+
+        // create modal
+        this.modal = new daiquiri.Modal({
+            'html': '<div class="daiquiri-imageview-img"><img style="width:' + width + 'px; height:' + height + 'px;" src="' + url + '"></img></div><div class="daiquiri-imageview-navigation"><div class="pagination pull-left text-left"><ul><li><a class="daiquiri-modal-prev" href="#">Previous</a></li></ul></div><div class="pagination pull-right text-right"><ul><li><a class="daiquiri-modal-next" href="#">Next</a></li></ul></div><div class="daiquiri-imageview-title"><a href="' + url + '" target="_blank">' + title + '</a></div></div>',
+            'width': width,
+            'height': height + 60,
+            'next': function () {
+                if (daiquiri.imageview.item.idle) {
+                    daiquiri.imageview.item.idle = false;
+                    daiquiri.imageview.item.next();
+                }
+            },
+            'prev': function () {
+                if (daiquiri.imageview.item.idle) {
+                    daiquiri.imageview.item.idle = false;
+                    daiquiri.imageview.item.prev();
+                }
+            }
+        });
+    }
+    img.src = url;
 };
 
 /**

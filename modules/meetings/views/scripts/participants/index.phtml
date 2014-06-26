@@ -34,7 +34,7 @@
     if ($this->slug !== null) {
         echo $this->internalLink(array(
             'text' => 'Create new participant for this meeting',
-            'href' => '/meetings/' . $this->slug . 'participants/create/',
+            'href' => '/meetings/' . $this->slug . '/participants/create/',
             'prepend' => '<p>',
             'append' => '</p>'));
     }
