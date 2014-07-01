@@ -242,6 +242,10 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
             throw new Exception('No static file directories defined.');
         }
 
+        if (empty($name)) {
+            return false;
+        }
+
         $files = array();
         foreach ($directories as $dir) {
             $files = array_merge($files, $this->_findFileRec($name, $dir));
