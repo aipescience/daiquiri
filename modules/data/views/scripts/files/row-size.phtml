@@ -21,7 +21,6 @@
 
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
-        <h2>All files in given row size:</h2>
-        <?php echo $this->escape($this->size . " bytes"); ?>
+        <?php echo $this->escape($this->name) . ' has ' . $this->size . ' bytes.'; ?>
     <?php endif; ?>
 </div>

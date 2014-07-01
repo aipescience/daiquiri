@@ -22,7 +22,7 @@
 class Daiquiri_Exception_NotFound extends Zend_Exception {
     
     public function __construct() {
-        parent::__construct('This page does not exist.', 404);
+        parent::__construct('This page does not exist (404).', 404);
     }
 
 }

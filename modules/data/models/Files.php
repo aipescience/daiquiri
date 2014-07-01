@@ -51,22 +51,18 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      */
     public function single($name) {
         if (empty($name)) {
-            throw new Daiquiri_Exception_Forbidden();
+            throw new Daiquiri_Exception_BadRequest();
         }
 
         // find file
-        $files = $this->_findFile($name);
-
-        if (count($files) > 1) {
-            return array("status" => "err_multi");
-        } else if (count($files) == 0) {
-            throw new Daiquiri_Exception_Forbidden();
+        $file = $this->_findFile($name);
+        if (empty($file)) {
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // determine mime type of this file
         $finfo = new finfo;
 
-        $file = $files[0];
         $mime = $finfo->file($file, FILEINFO_MIME);
         $fileName = basename($file);
 
@@ -82,21 +78,21 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      */
     public function singleSize($name) {
         if (empty($name)) {
-            throw new Daiquiri_Exception_Forbidden();
+            throw new Daiquiri_Exception_BadRequest();
         }
 
         // find file
         $files = $this->_findFile($name);
 
         if (count($files) > 1) {
-            return array("status" => "err_multi");
+            throw new Exception('More than one file found.');
         } else if (count($files) == 0) {
-            throw new Daiquiri_Exception_Forbidden();
+            throw new Daiquiri_Exception_NotFound();
         }
 
         $size = filesize($files[0]);
 
-        return array('size' => $size, 'status' => 'ok');
+        return array('name' => $name, 'size' => $size, 'status' => 'ok');
     }
 
     /**
@@ -105,35 +101,32 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      * @param string $column name of the column
      */
     public function multi($table, $column) {
-        $rows = $this->_getFilesInCol($table, $column);
+        // look for the files in the table
+        $colFiles = $this->_getFilesInCol($table, $column);
+        if (empty($colFiles)) {
+            throw new Daiquiri_Exception_NotFound();
+        } 
 
         // leave some time for the file to be transferred
         ini_set('max_execution_time', 3600);
 
+        // setup zipped transfer
         $fileName = $table . "_" . $column . ".zip";
-
         $zip = new ZipStream($fileName);
-
         $comment = "All files in column " . $column . " of table " . $table . " downloaded on " . date('l jS \of F Y h:i:s A');
-
         $zip->setComment($comment);
 
-        foreach ($rows as $row) {
-            //first find file
-            if (!empty($row['cell'][1])) {
-                $files = $this->_findFile($row['cell'][1]);
-            } else {
+        // look for the files in the file system and stream files
+        foreach ($colFiles as $colFile) {
+            // look for file
+            $file = $this->_findFile($colFile);
+            if (empty($file)) {
                 continue;
             }
 
-            if (count($files) > 1) {
-                continue;
-            } else if (count($files) == 0) {
-                continue;
-            }
-
-            $fhandle = fopen($files[0], "rb");
-            $zip->addLargeFile($fhandle, $row['cell'][1]);
+            // zip and stream
+            $fhandle = fopen($file, "rb");
+            $zip->addLargeFile($fhandle, $colFile);
             fclose($fhandle);
         }
 
@@ -147,28 +140,25 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function multiSize($table, $column) {
-        $rows = $this->_getFilesInCol($table, $column);
+        // look for the files in the table
+        $colFiles = $this->_getFilesInCol($table, $column);
+        if (empty($colFiles)) {
+            throw new Daiquiri_Exception_NotFound();
+        } 
 
+        // look for the files in the file system and aggregate size
         $size = 0;
-
-        foreach ($rows as $row) {
-            //first find file
-            if (!empty($row['cell'][1])) {
-                $files = $this->_findFile($row['cell'][1]);
-            } else {
+        foreach ($colFiles as $colFile) {
+            // look for file
+            $file = $this->_findFile($colFile);
+            if (empty($file)) {
                 continue;
             }
 
-            if (count($files) > 1) {
-                continue;
-            } else if (count($files) == 0) {
-                continue;
-            }
-
-            $size += filesize($files[0]);
+            $size += filesize($file);
         }
 
-        return array('size' => $size, 'status' => 'ok');
+        return array('name' => $table . "_" . $column . ".zip", 'size' => $size, 'status' => 'ok');
     }
 
     /**
@@ -177,42 +167,33 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      * @param string $rowIds ids of the rows
      */
     public function row($table, array $rowIds) {
-        $data = $this->_getFilesInRow($table, $rowIds);
-
-        if ($data['rows'] === NULL) {
-            return NULL;
-        }
+        // look for the files in the table
+        $rowFiles = $this->_getFilesInRow($table, $rowIds);
+        if (empty($rowFiles)) {
+            throw new Daiquiri_Exception_NotFound();
+        } 
 
         // leave some time for the file to be transferred
         ini_set('max_execution_time', 3600);
 
+        // setup zipped transfer
         $fileName = $table . ".zip";
-
         $zip = new ZipStream($fileName);
-
         $comment = "All files connected to rows " . implode(", ", $rowIds) . " of table " . $table . " downloaded on " . date('l jS \of F Y h:i:s A');
-
         $zip->setComment($comment);
 
-        foreach ($data['cols'] as $key => $col) {
-            // first find file
-            foreach ($data['rows'] as $row) {
-                if (!empty($row[$col['name']])) {
-                    $files = $this->_findFile($row[$col['name']]);
-                } else {
-                    continue;
-                }
-
-                if (count($files) > 1) {
-                    continue;
-                } else if (count($files) == 0) {
-                    continue;
-                }
-
-                $fhandle = fopen($files[0], "rb");
-                $zip->addLargeFile($fhandle, $row[$col['name']]);
-                fclose($fhandle);
+        // look for the files in the file system and stream files
+        foreach ($rowFiles as $rowFile) {
+            // look for file
+            $file = $this->_findFile($rowFile);
+            if (empty($file)) {
+                continue;
             }
+
+            // zip and stream
+            $fhandle = fopen($file, "rb");
+            $zip->addLargeFile($fhandle, $rowFile);
+            fclose($fhandle);
         }
 
         $zip->finalize();
@@ -225,166 +206,167 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function rowSize($table, array $rowIds) {
-        $data = $this->_getFilesInRow($table, $rowIds);
-
-        if ($data['rows'] === NULL) {
-            return array('status' => 'error');
-        }
+        // look for the files in the table
+        $rowFiles = $this->_getFilesInRow($table, $rowIds);
+        if (empty($rowFiles)) {
+            throw new Daiquiri_Exception_NotFound();
+        } 
 
         $size = 0;
-
-        foreach ($data['cols'] as $key => $col) {
-            // first find files
-            foreach ($data['rows'] as $row) {
-                if (!empty($row[$col['name']])) {
-                    $files = $this->_findFile($row[$col['name']]);
-                } else {
-                    continue;
-                }
-
-                if (count($files) > 1) {
-                    continue;
-                } else if (count($files) == 0) {
-                    continue;
-                }
-
-                $size += filesize($files[0]);
+        foreach ($rowFiles as $rowFile) {
+            // look for file
+            $file = $this->_findFile($rowFile);
+            if (empty($file)) {
+                continue;
             }
+
+            $size += filesize($file);
         }
 
-        return array('size' => $size, 'status' => 'ok');
+        return array('name' => $table . ".zip", 'size' => $size, 'status' => 'ok');
     }
 
     /**
      * Returns the absolute path of a specific file.
      * @param string $name name of the file
-     * @return array $file
+     * @return string $file
      */
     private function _findFile($name) {
         if (empty(Daiquiri_Config::getInstance()->data->files->static)) {
-            return array();
+            throw new Exception('No static file directories defined.');
         }
 
         $directories = Daiquiri_Config::getInstance()->data->files->static->toArray();
 
         if (empty($directories)) {
-            return array();
+            throw new Exception('No static file directories defined.');
         }
 
-        $file = array();
+        $files = array();
         foreach ($directories as $dir) {
-            $file = array_merge($file, $this->_findFileRec($name, $dir));
+            $files = array_merge($files, $this->_findFileRec($name, $dir));
 
         }
 
-        return $file;
+        if (count($files) > 1) { 
+            throw new Exception('More than one file found.');
+        } elseif (count($files) === 0) {
+            return false;
+        } else {
+            return $files[0];
+        }
     }
 
     /**
      * Recursive function to find a specific file.
      * @param string $name name of the file
      * @param string $currDir current directory
-     * @return array $file
+     * @return array $files
      */
     private function _findFileRec($name, $currDir) {
         $subdirs = glob($currDir . '/*', GLOB_ONLYDIR|GLOB_NOSORT);
 
-        $file = array();
+        $files = array();
         foreach($subdirs as $subdir) {
-            $file = array_merge($file, $this->_findFileRec($name, $subdir));
+            $files = array_merge($files, $this->_findFileRec($name, $subdir));
         }
 
         if(file_exists($currDir . DIRECTORY_SEPARATOR . $name)) {
-                $file[] = $currDir . DIRECTORY_SEPARATOR . $name;
+                $files[] = $currDir . DIRECTORY_SEPARATOR . $name;
         }
 
-        return $file;
+        return $files;
     }
 
     /**
      * Returns all files of a specific column in a users table.
      * @param string $name name of the database table
      * @param string $column name of the column
-     * @return array $rows
+     * @return array $files
      */
     private function _getFilesInCol($table, $column) {
         if (empty($table) || empty($column)) {
-            throw new Daiquiri_Exception_Forbidden();
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // get the column of the result set to obtain a list of all files we are dealing with
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $db = Daiquiri_Config::getInstance()->getUserDbName($username);
-
         $viewer = new Data_Model_Viewer();
         try {
-            $cols = $viewer->cols($db, $table);
+            $response = $viewer->cols(array('db' => $db, 'table' => $table));
         } catch (Exception $e) {
-            throw new Daiquiri_Exception_Forbidden();
+            throw new Daiquiri_Exception_NotFound();
         }
 
-        //extract file link columns by looking for the singleFileLink formatter...
-        foreach ($cols as $key => $col) {
-            if (isset($col['formatter']) && $col['formatter'] === "singleFileLink") {
-                continue;
-            } else {
-                unset($cols[$key]);
+        // extract file link columns by looking for the format type filelink ...
+        $fileCols = array();
+        foreach ($response['cols'] as $key => $col) {
+            if (isset($col['format']['type']) && $col['format']['type'] === "filelink") {
+                $fileCols[] = $col['name'];
             }
         }
 
-        //get the data from the result table
-        $params = array();
-        $params['cols'] = array('row_id', $column);
+        // get rows from the database
+        $rows = $viewer->getResource()->fetchRows();
 
-        $rows = $viewer->rows($db, $table, $params)->rows;
-
-        return $rows;
+        // loop over rows, gather files, and return
+        $files = array();
+        foreach ($rows as $row) {
+            foreach ($fileCols as $fileCol) {
+                $files[] = $row[$fileCol];
+            }
+        }
+        return $files;
     }
 
     /**
      * Returns all files of a set of rows in a users table.
      * @param string $name name of the database table
-     * @param @param string $rowIds ids of the rows
-     * @return array $data 
+     * @param array $rowIds ids of the rows
+     * @return array $files
      */
-    private function _getFilesInRow($table, array $rowIds) {
+    private function _getFilesInRow($table, $rowIds) {
         if (empty($table) || empty($rowIds)) {
-            throw new Daiquiri_Exception_Forbidden();
+            throw new Daiquiri_Exception_NotFound();
         }
 
-        //get the column of the result set to obtain a list of all files we are dealing with
+        // get the column of the result set to obtain a list of all files we are dealing with
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $db = Daiquiri_Config::getInstance()->getUserDbName($username);
-
         $viewer = new Data_Model_Viewer();
         try {
-            $cols = $viewer->cols($db, $table);
+            $response = $viewer->cols(array('db' => $db, 'table' => $table));
         } catch (Exception $e) {
-            throw new Daiquiri_Exception_Forbidden();
+            throw new Daiquiri_Exception_NotFound();
         }
 
-        //extract file link columns by looking for the singleFileLink formatter...
-        foreach ($cols['data'] as $key => $col) {
-            if (isset($col['formatter']) && $col['formatter'] === "singleFileLink") {
-                continue;
-            } else {
-                unset($cols['data'][$key]);
+        // extract file link columns by looking for the format type filelink ...
+        $fileCols = array();
+        foreach ($response['cols'] as $key => $col) {
+            if (isset($col['format']['type']) && $col['format']['type'] === "filelink") {
+                $fileCols[] = $col['name'];
             }
         }
-
-        //get the data from the result table
-        $rows = array();
-
+        
+        // escape input row ids
+        $escapedIds = array();
         foreach ($rowIds as $rowId) {
-            try {
-                $row = $viewer->getResource()->fetchRow($rowId);
-            } catch (Exception $e) {
-                return NULL;
-            }
-            $rows[] = $row;
+            $escapedIds[] = (int) $rowId;
         }
+        $sqloptions = array('orWhere' => array('row_id IN (' . implode(',',$escapedIds) .  ')'));
 
-        return array('cols' => $cols['data'], 'rows' => $rows);
+        // get rows from the database
+        $rows = $viewer->getResource()->fetchRows($sqloptions);
+
+        // loop over rows, gather files, and return
+        $files = array();
+        foreach ($rows as $row) {
+            foreach ($fileCols as $fileCol) {
+                $files[] = $row[$fileCol];
+            }
+        }
+        return $files;
     }
 
 

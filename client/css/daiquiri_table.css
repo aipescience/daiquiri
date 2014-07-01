@@ -69,7 +69,7 @@
 }
 .daiquiri-table .daiquiri-table-col-selected,
 .daiquiri-table .daiquiri-table-row-selected {
-    background-color: #eee;
+    background-color: #ccc;
 }
 .daiquiri-table th {
     position: relative;

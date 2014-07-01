@@ -31,76 +31,57 @@ class Data_FilesController extends Daiquiri_Controller_Abstract {
     }
 
     public function singleAction() {
-        // get parameters from request
-        $name = $this->_getParam('name');
-
         // getting rid of all the output buffering in Zend
         $this->_helper->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         Zend_Controller_Front::getInstance()->getDispatcher()->setParam('disableOutputBuffering', true);
         ob_end_clean();
 
-        // call model function to send the file to the client
-        return $this->_model->single($name);
+        $name = $this->_getParam('name');
+        $this->_model->single($name);
     }
 
-    public function singlesizeAction() {
-        // get parameter
+    public function singleSizeAction() {
         $name = $this->_getParam('name');
-
         $response = $this->_model->singleSize($name);
-
         $this->view->assign($response);
     }
 
     public function multiAction() {
-        // get parameters from request
-        $table = $this->_getParam('table');
-        $column = $this->_getParam('column');
-
         // getting rid of all the output buffering in Zend
         $this->_helper->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         Zend_Controller_Front::getInstance()->getDispatcher()->setParam('disableOutputBuffering', true);
         ob_end_clean();
 
-        // call model function to send multible files to the client
-        return $this->_model->multi($table, $column);
-    }
-
-    public function multisizeAction() {
-        // get parameters from request
         $table = $this->_getParam('table');
         $column = $this->_getParam('column');
+        $this->_model->multi($table, $column);
+    }
 
+    public function multiSizeAction() {
+        $table = $this->_getParam('table');
+        $column = $this->_getParam('column');
         $response = $this->_model->multiSize($table, $column);
-
         $this->view->assign($response);
     }
 
     public function rowAction() {
-        // get parameters from request
-        $table = $this->_getParam('table');
-        $row_ids = explode(',', $this->_getParam('id'));
-
         // getting rid of all the output buffering in Zend
         $this->_helper->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         Zend_Controller_Front::getInstance()->getDispatcher()->setParam('disableOutputBuffering', true);
         ob_end_clean();
 
-        $response = $this->_model->row($table, $row_ids);
-
-        return $response;
-    }
-
-    public function rowsizeAction() {
-        // get parameters from request
         $table = $this->_getParam('table');
         $row_ids = explode(',', $this->_getParam('id'));
+        $this->_model->row($table, $row_ids);
+    }
 
+    public function rowSizeAction() {
+        $table = $this->_getParam('table');
+        $row_ids = explode(',', $this->_getParam('id'));
         $response = $this->_model->rowSize($table, $row_ids);
-
         $this->view->assign($response);
     }
 

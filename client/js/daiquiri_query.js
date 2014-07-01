@@ -58,7 +58,8 @@ daiquiri.query.Query = function (siteUrl) {
             'rows': baseUrl + '/data/viewer/rows',
             'base': baseUrl
         },
-        'fileDownload': baseUrl + '/data/files/row',
+        'rowDownload': baseUrl + '/data/files/row',
+        'colDownload': baseUrl + '/data/files/multi',
         'sampStream': siteUrl + '/query/download/stream',
         'register': baseUrl + '/auth/registration/register',
         'baseUrl': baseUrl
@@ -548,7 +549,7 @@ daiquiri.query.Query.prototype.displayResults = function(){
     var self = this;
     
     // remove any old buttons or iframes
-    $('.daiquiri-query-file-download').remove();
+    $('#daiquiri-file-download-buttons').remove();
 
     if (self.job.status.value != 'success') {
         self.header.results.hide();
@@ -569,57 +570,105 @@ daiquiri.query.Query.prototype.displayResults = function(){
                 // enable image viewer for possible images
                 $('#results-table').daiquiri_imageview();
 
-                if ($('.daiquiri-table-downloadable','#results-tab').length != 0) {
-                    if ($('#daiquiri-file-download-rows-button').length == 0) {
-                        $('#results-tab').append('<div><button id="daiquiri-file-download-rows-button" class="linkbutton">Download files from selected rows</button></div>')
-
-                        $('#daiquiri-file-download-rows-button').on('click', function () {
-                            var rowIds = [];
-                            $('.daiquiri-table-downloadable.daiquiri-table-row-selected','#results-tab').each(function () {
-
-                                rowIds.push($(this).attr('class').match(/daiquiri-table-row-(\d+)/)[1]);
-                            })
-                            if (rowIds.length != 0) {
-                                console.log(rowIds.join(','));
-                                // $('<iframe />', {
-                                //     'style': 'visibility: hidden; height: 0; width: 0;',
-                                //     'src': url
-                                // }).appendTo(div);
-                            }
-                        })
-                    }
-
-                    if ($('#daiquiri-file-download-cols-button').length == 0) {
-                        $('#results-tab').append('<div><button id="daiquiri-file-download-cols-button" class="linkbutton">Download files from the selected column</button></div>')
-
-                        $('#daiquiri-file-download-cols-button').on('click', function () {
-                            var colId = false;
-                            var col = $('.daiquiri-table-downloadable.daiquiri-table-col-selected','#results-tab').first();
-                            if (col.length != 0) {
-                                colId = col.attr('class').match(/daiquiri-table-col-(\d+)/)[1];
-                            }
-                            if (colId != false) {
-                                console.log(colId);
-                                // $('<iframe />', {
-                                //      'style': 'visibility: hidden; height: 0; width: 0;',
-                                //      'src': '<?php echo $this->baseUrl('/files/index/row/id/'); ?>' + colId
-                                // }).appendTo('body');
-                            }
-                        })
-                    }
+                // create download-buttons div if it is not already there
+                if ($('#daiquiri-file-download-buttons').length == 0) {
+                    $('#results-tab').append('<div id="daiquiri-file-download-buttons"><p id="daiquiri-file-download-message" class="help-block"></p><p id="daiquiri-file-download-cols-button"></p><p id="daiquiri-file-download-rows-button"></p></div>');
                 }
 
-                if ($('#daiquiri-samp-connect').length == 0) {
-                    $('#results-tab').append('<div id="daiquiri-samp-connect" class="daiquiri-samp-connect"></div>');
-
-                    var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
-                        baseStream: self.url.sampStream
-                    });
+                // display download message if files can be downloaded
+                if ($('#results-tab .daiquiri-table-downloadable').length != 0) {
+                    $('#daiquiri-file-download-message').html("To download all files in one or more rows, please select the corresponding rows by mouse click. In order to download all files in a particular column, please select the column by a mouse click on the column's title.");
+                } else {
+                    $('#daiquiri-file-download-message').html('');
+                    $('#daiquiri-file-download-cols-button').html('');
+                    $('#daiquiri-file-download-rows-button').html('');
                 }
+
+                // enable controls for downloading all file in a column
+                $('#results-table').on('click', function () {
+                    if ($('#results-tab .daiquiri-table-downloadable').length != 0) {
+                        var ncols = $('#results-tab .daiquiri-table-col-selected').length;
+                        var nrows = $('#results-tab .daiquiri-table-row-selected').length;
+                        var self = daiquiri.query.item;
+
+                        // create download button for the column
+                        if (ncols != 0) {
+                            var col = $('#results-tab th.daiquiri-table-col-selected');
+                            var colId = col.attr('class').match(/daiquiri-table-col-(\d+)/)[1];
+                            var colname = daiquiri.table.items['results-table'].colsmodel[colId].name;
+
+                            if (typeof daiquiri.table.items['results-table'].colsmodel[colId].format !== 'undefined' &&
+                                typeof daiquiri.table.items['results-table'].colsmodel[colId].format.type !== 'undefined' &&
+                                daiquiri.table.items['results-table'].colsmodel[colId].format.type == 'filelink') {
+
+                                $('#daiquiri-file-download-cols-button').html('<button class="linkbutton">Download all files from column `' + colname + '`</button>');
+
+                                $('#daiquiri-file-download-cols-button button').on('click', function () {
+                                    var colId = false;
+                                    var col = $('.daiquiri-table-downloadable.daiquiri-table-col-selected','#results-tab').first();
+                                    if (col.length != 0) {
+                                        colId = col.attr('class').match(/daiquiri-table-col-(\d+)/)[1];
+                                    }
+                                    if (colId != false) {
+                                        var tablename = self.job.table.value;
+                                        var colname = daiquiri.table.items['results-table'].colsmodel[colId].name;
+                                        var url = self.url.colDownload + '?table=' + tablename + '&column=' + colname;
+                                        $('<iframe />', {
+                                             'style': 'visibility: hidden; height: 0; width: 0;',
+                                             'src': url
+                                        }).appendTo('body');
+                                    }
+                                });
+                            } else {
+                                $('#daiquiri-file-download-cols-button').html('');
+                            }
+                        } else {
+                            $('#daiquiri-file-download-cols-button').html('');
+                        }
+
+                        // create download button for the rows
+                        if (nrows != 0) {
+                            $('#daiquiri-file-download-rows-button').html('<button class="linkbutton">Download files from selected row(s)</button>');
+
+                            $('#daiquiri-file-download-rows-button button').on('click', function () {
+                                var rowIds = [];
+                                $('.daiquiri-table-downloadable.daiquiri-table-row-selected','#results-tab').each(function () {
+                                    rowIds.push($(this).attr('class').match(/daiquiri-table-row-(\d+)/)[1]);
+                                });
+
+                                if (rowIds.length != 0) {
+                                    // get only unique entries
+                                    rowIds = rowIds.filter(function(itm,i,a) {
+                                        return i==a.indexOf(itm);
+                                    });
+
+                                    var tablename = self.job.table.value;
+                                    var url = self.url.rowDownload + '?table=' + tablename + '&id=' + rowIds.join(',');
+
+                                    $('<iframe />', {
+                                         'style': 'visibility: hidden; height: 0; width: 0;',
+                                         'src': url
+                                    }).appendTo('body');
+                                }
+                            });
+                        } else {
+                            $('#daiquiri-file-download-rows-button').html('');
+                        }
+                    }
+                });
+
+                // create samp button if it is not already there
+                // if ($('#daiquiri-samp-connect').length == 0) {
+                //     $('#results-tab').append('<div id="daiquiri-samp-connect" class="daiquiri-samp-connect"></div>');
+
+                //     var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
+                //         baseStream: self.url.sampStream
+                //     });
+                // }
 
                 // setting SAMP options
-                daiquiri.samp.item.table = self.job.table.value;
-                daiquiri.samp.item.username = self.job.username.value;
+                // daiquiri.samp.item.table = self.job.table.value;
+                // daiquiri.samp.item.username = self.job.username.value;
             }
         });
     }

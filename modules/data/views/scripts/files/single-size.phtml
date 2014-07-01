@@ -21,7 +21,6 @@
 
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
-        <h2>Single file size:</h2>
-        <?php echo $this->size . " bytes"; ?>
+        <?php echo $this->escape($this->name) . ' has ' . $this->size . ' bytes.'; ?>
     <?php endif; ?>
 </div>

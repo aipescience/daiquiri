@@ -22,7 +22,7 @@
 class Daiquiri_Exception_Unauthorized extends Zend_Exception {
 
     public function __construct() {
-        parent::__construct('You are not authorized to view this page.', 401);
+        parent::__construct('You are not authorized to view this page (401).', 401);
     }
 
 }
