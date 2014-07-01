@@ -80,7 +80,7 @@ class Core_AdminController extends Daiquiri_Controller_Abstract {
             && Daiquiri_Auth::getInstance()->getCurrentRole() === 'admin') {
             $items['cms'] = array(
                 'text' => 'CMS Admin',
-                'href' => '/cms/wp-admin/',
+                'href' => Daiquiri_Config::getInstance()->core->cms->url + '/wp-admin/'
             );
         }
 
