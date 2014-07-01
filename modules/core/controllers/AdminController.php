@@ -76,7 +76,8 @@ class Core_AdminController extends Daiquiri_Controller_Abstract {
                 'resource' => 'Query_Model_Jobs',
                 'permission' => 'rows')
         );
-        if (Daiquiri_Config::getInstance()->core->cms->enabled) {
+        if (Daiquiri_Config::getInstance()->core->cms->enabled
+            && Daiquiri_Auth::getInstance()->getRole() === 'admin') {
             $items['cms'] = array(
                 'text' => 'CMS Admin',
                 'href' => '/cms/wp-admin/',
