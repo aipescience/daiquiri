@@ -71,8 +71,8 @@ daiquiri.imageview.ImageView = function (a, tableId, opt) {
     this.col = parseInt(tablecell.match(/daiquiri-table-col-(\d+)/)[1]);
     this.row = parseInt(tablecell.match(/daiquiri-table-row-(\d+)/)[1]);
 
-    $('#' + this.tableId + ' .daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
-    $('#' + this.tableId + ' .daiquiri-table-row-' + this.row).addClass('daiquiri-table-row-selected');
+    //$('#' + this.tableId + ' .daiquiri-table-row-selected').removeClass('daiquiri-table-row-selected');
+    //$('#' + this.tableId + ' .daiquiri-table-row-' + this.row).addClass('daiquiri-table-row-selected');
 
     // look for the images properties
     var img = new Image();
