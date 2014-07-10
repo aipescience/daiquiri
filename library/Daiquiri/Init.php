@@ -485,8 +485,6 @@ class Daiquiri_Init {
      * Minifies the static js and css files.
      */
     private function _minify() {
-        $client = $this->daiquiri_path . '/client/';
-
         system("rm -rf public/min");
         mkdir('public/min',0755,true);
         mkdir('public/min/js',0755,true);
@@ -494,21 +492,45 @@ class Daiquiri_Init {
 
         echo "minifing js and css files.";
 
-        exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/daiquiri.js" );
-        exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/daiquiri.css");
+        exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/js/daiquiri.js" );
+        exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/css/daiquiri.css");
 
-        foreach (Daiquiri_View_Helper_HeadDaiquiri::$files as $file) {
+        // get the layout file and parse out the call to the daiquiri view helper
+        $layoutFile = $this->application_path . '/application/layouts/scripts/layout.phtml';
+        $html = file_get_contents($layoutFile);
+        $html = trim(preg_replace('/\s\s+/',' ', $html)); // remove newlines
+        if (preg_match_all('/\<\?php echo(.*?)\?\>/', $html, $matches)) {
+            $pattern = '/' . preg_quote('$this->headDaiquiri(') . '(array\(.*?\))' . preg_quote(',') . '(array\(.*?\))' . preg_quote(')') .'/';
+            foreach ($matches[1] as $match) {
+                $string = str_replace(' ', '', $match);
+                if (preg_match($pattern,$string,$m)) {
+                    eval('$overrideFiles = ' . $m[2] . ';');
+                    break;
+                }
+            }
+        } else {
+            throw new Exception('No php tag found.');
+        }
+
+        // if the overrideFiles variable is set merge these variabes with the default ones
+        if (isset($overrideFiles)) {
+            $files = array_merge(Daiquiri_View_Helper_HeadDaiquiri::$files, $overrideFiles);
+        } else {
+            $files = Daiquiri_View_Helper_HeadDaiquiri::$files;
+        }
+
+        foreach ($files as $file) {
             $ext = pathinfo($file, PATHINFO_EXTENSION);
             if ($ext === 'js') {
-                exec("yui-compressor " . $client . "/" . $file . " >> public/min/js/daiquiri.js");
+                exec("yui-compressor " . $this->daiquiri_path . "/" . $file . " >> public/min/js/daiquiri.js");
             } else if ($ext === 'css') {
-                exec("yui-compressor " . $client . "/" . $file . " >> public/min/css/daiquiri.css");
+                exec("yui-compressor " . $this->daiquiri_path . "/" . $file . " >> public/min/css/daiquiri.css");
             }
         }
 
         // take care of images
         foreach (Daiquiri_View_Helper_HeadDaiquiri::$links as $key => $value) {
-            $target = $client . $value;
+            $target = $this->application_path . '/public/' . $value;
             $link = $this->application_path . '/public/min/' . $key;
             if (is_link($link)) {
                 unlink($link);
