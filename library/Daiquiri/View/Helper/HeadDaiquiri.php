@@ -19,72 +19,64 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @class   Daiquiri_View_Helper_HeadDaiquiri HeadDaiquiri.php
- * @brief   Daiquiri View helper for displaying HTML header with all JS and CSS information
- * 
- * Zend view helper for adding the Daiquiri header to the page. All the JavaScript and CSS
- * files defined in the $_files array are added and if wished, minified. 
- * 
- */
 class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
 
     // files to be included in this order, but css and js seperately
     public static $files = array(
         // jquery
-        'lib/jquery-2.1.1.min.js',
+        'jquery.js' => 'daiquiri/lib/jquery-2.1.1.min.js',
         // bootstrap
-        'lib/bootstrap/css/bootstrap.css',
-        'lib/bootstrap/js/bootstrap.js',
+        'bootstrap.css' => 'daiquiri/lib/bootstrap/css/bootstrap.css',
+        'bootstrap.js' => 'daiquiri/lib/bootstrap/js/bootstrap.js',
         // flot
-        'lib/jquery.flot.min.js',
+        'jquery.flot.js' => 'daiquiri/lib/jquery.flot.min.js',
         // code mirror
-        'lib/codemirror/css/codemirror.css',
-        'lib/codemirror/js/codemirror.js',
-        'lib/codemirror/js/runmode.js',
-        'lib/codemirror/js/sql.js',
+        'codemirror.css' => 'daiquiri/lib/codemirror/css/codemirror.css',
+        'codemirror.js' => 'daiquiri/lib/codemirror/js/codemirror.js',
+        'codemirror.runmode.js' => 'daiquiri/lib/codemirror/js/runmode.js',
+        'codemirror.sql.js' => 'daiquiri/lib/codemirror/js/sql.js',
         // bootstrap-datepicker
-        'lib/bootstrap-datepicker/css/datepicker.css',
-        'lib/bootstrap-datepicker/js/bootstrap-datepicker.js',
+        'bootstrap-datepicker.css' => 'daiquiri/lib/bootstrap-datepicker/css/datepicker.css',
+        'bootstrap-datepicker.js' => 'daiquiri/lib/bootstrap-datepicker/js/bootstrap-datepicker.js',
         // other libs
-        'lib/insert_at_caret.js',
-        'lib/samp.js',
+        'insert_at_caret.js' => 'daiquiri/lib/insert_at_caret.js',
+        'samp.js' => 'daiquiri/lib/samp.js',
         //daiquiri common
-        'css/daiquiri_common.css',
-        'js/daiquiri_common.js',
+        'daiquiri_common.css' => 'daiquiri/css/daiquiri_common.css',
+        'daiquiri_common.js' => 'daiquiri/js/daiquiri_common.js',
         // daiquiri browser
-        'css/daiquiri_browser.css',
-        'js/daiquiri_browser.js',
+        'daiquiri_browser.css' => 'daiquiri/css/daiquiri_browser.css',
+        'daiquiri_browser.js' => 'daiquiri/js/daiquiri_browser.js',
         // daiquiri table
-        'css/daiquiri_table.css',
-        'js/daiquiri_table.js',
+        'daiquiri_table.css' => 'daiquiri/css/daiquiri_table.css',
+        'daiquiri_table.js' => 'daiquiri/js/daiquiri_table.js',
         // daiquiri table
-        'css/daiquiri_imageview.css',
-        'js/daiquiri_imageview.js',
+        'daiquiri_imageview.css' => 'daiquiri/css/daiquiri_imageview.css',
+        'daiquiri_imageview.js' => 'daiquiri/js/daiquiri_imageview.js',
         // daiquiri query
-        'css/daiquiri_query.css',
-        'js/daiquiri_query.js',
+        'daiquiri_query.css' => 'daiquiri/css/daiquiri_query.css',
+        'daiquiri_query.js' => 'daiquiri/js/daiquiri_query.js',
         // daiquiri data management
-        'css/daiquiri_data.css',
-        'js/daiquiri_data.js',
+        'daiquiri_data.css' => 'daiquiri/css/daiquiri_data.css',
+        'daiquiri_data.js' => 'daiquiri/js/daiquiri_data.js',
         // daiquiri modal
-        'css/daiquiri_modal.css',
-        'js/daiquiri_modal.js',
+        'daiquiri_modal.css' => 'daiquiri/css/daiquiri_modal.css',
+        'daiquiri_modal.js' => 'daiquiri/js/daiquiri_modal.js',
         // daiquiri codemirror
-        'css/daiquiri_codemirror.css',
-        'js/daiquiri_codemirror.js',
+        'daiquiri_codemirror.css' => 'daiquiri/css/daiquiri_codemirror.css',
+        'daiquiri_codemirror.js' => 'daiquiri/js/daiquiri_codemirror.js',
         // daiquiri wordpress stylesheet
-        'css/daiquiri_wp.css',
+        'daiquiri_wp.css' => 'daiquiri/css/daiquiri_wp.css',
         // daiquiri misc
-        'js/daiquiri_plot.js',
-        'js/daiquiri_query_buttons.js',
-        'js/daiquiri_samp.js'
+        'daiquiri_plot.js' => 'daiquiri/js/daiquiri_plot.js',
+        'daiquiri_query_buttons.js' => 'daiquiri/js/daiquiri_query_buttons.js',
+        'daiquiri_samp.js' => 'daiquiri/js/daiquiri_samp.js'
     );
 
     // files, which need to be linked when minifying
     public static $links = array(
-        'img/glyphicons-halflings.png' => 'lib/bootstrap/img/glyphicons-halflings.png',
-        'img/glyphicons-halflings-white.png' => 'lib/bootstrap/img/glyphicons-halflings-white.png',
+        'img/glyphicons-halflings.png' => 'daiquiri/lib/bootstrap/img/glyphicons-halflings.png',
+        'img/glyphicons-halflings-white.png' => 'daiquiri/lib/bootstrap/img/glyphicons-halflings-white.png',
     );
 
     public $view;
@@ -94,19 +86,15 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
     }
 
     /**
-     * @brief   headDaiquiri method - prints the Daiquiri header
+     * Produces the HTML header by adding the required JS and CSS script to the view. 
+     * These are the files necessary for Daiquiri to work as defined in $_files and any
+     * additional file given in $inputfiles. If minify is enabled in the configuration 
+     * file, the JS and CSS files are minified.
      * @param   array $inputfiles: array with any additional files that should be added
      *                             to the header.
      * @return  HTML header
-     * 
-     * Produces the HTML header by adding the required JS and CSS script to the view. 
-     * These are the files necessary for Daiquiri to work as defined in $_files and any
-     * additional file given in $inputfiles. 
-     *
-     * If minify is enabled in the configuration file, the JS and CSS files are minified.
-     * 
      */
-    public function headDaiquiri(array $inputfiles) {
+    public function headDaiquiri(array $customFiles, array $overrideFiles) {
         $hl = $this->view->headLink();
         $hs = $this->view->headScript();
 
@@ -119,13 +107,13 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
             foreach (Daiquiri_View_Helper_HeadDaiquiri::$files as $file) {
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 if ($ext === 'js') {
-                    $js[] = 'daiquiri/' . $file;
+                    $js[] = $file;
                 } else if ($ext === 'css') {
-                    $css[] = 'daiquiri/' . $file;
+                    $css[] = $file;
                 }
             }
         }
-        foreach ($inputfiles as $file) {
+        foreach ($customFiles as $file) {
             $ext = pathinfo($file, PATHINFO_EXTENSION);
             if ($ext === 'js') {
                 $js[] = $file;
