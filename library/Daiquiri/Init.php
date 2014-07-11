@@ -502,8 +502,6 @@ class Daiquiri_Init {
         $pattern = '/' . preg_quote('$this->headStatic') . '\s*\(\s*(array\(.*?\))\s*' . preg_quote(',') . '\s*(array\(.*?\))\s*' . preg_quote(')') . '/';
         if (preg_match($pattern,$html,$matches)) {
             eval('$overrideFiles = ' . $matches[2] . ';');
-        } else {
-            throw new Exception('No headStatic function found.');
         }
 
         // if the overrideFiles variable is set merge these variabes with the default ones
