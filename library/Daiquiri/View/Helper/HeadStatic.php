@@ -107,7 +107,7 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
      * @param  array  $customFiles   additional static files
      * @param  array  $overrideFiles files that override the default files
      */
-    public function headStatic(array $customFiles, array $overrideFiles) {
+    public function headStatic(array $customFiles, array $overrideFiles = array()) {
         $hl = $this->view->headLink();
         $hs = $this->view->headScript();
 
