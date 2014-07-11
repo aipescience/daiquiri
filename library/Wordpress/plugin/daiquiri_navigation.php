@@ -26,7 +26,8 @@ function daiquiri_update_nav_menu() {
         $html = wp_nav_menu(array(
             'menu' => $menu->name,
             'echo' => false,
-            'container' => 'p'
+            'container' => false,
+            'items_wrap' => '%3$s'
         ));
 
         $filename = $path . '/' . $menu->name . '.html';
