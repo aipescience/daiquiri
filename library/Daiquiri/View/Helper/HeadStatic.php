@@ -19,9 +19,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
+class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
 
-    // files to be included in this order, but css and js seperately
+    /**
+     * Default static files to be included in this order, but css and js seperately
+     * @var array
+     */
     public static $files = array(
         // jquery
         'jquery.js' => 'daiquiri/lib/jquery-2.1.1.min.js',
@@ -73,14 +76,25 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
         'daiquiri_samp.js' => 'daiquiri/js/daiquiri_samp.js'
     );
 
-    // files, which need to be linked when minifying
+    /**
+     * Files, which need to be linked when minifying
+     * @var array
+     */
     public static $links = array(
         'img/glyphicons-halflings.png' => 'daiquiri/lib/bootstrap/img/glyphicons-halflings.png',
         'img/glyphicons-halflings-white.png' => 'daiquiri/lib/bootstrap/img/glyphicons-halflings-white.png',
     );
 
+    /**
+     * The Zend view object
+     * @var Zend_View_Interface
+     */
     public $view;
 
+    /**
+     * Setter for the view object
+     * @param Zend_View_Interface $view [description]
+     */
     public function setView(Zend_View_Interface $view) {
         $this->view = $view;
     }
@@ -90,11 +104,10 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
      * These are the files necessary for Daiquiri to work as defined in $_files and any
      * additional file given in $inputfiles. If minify is enabled in the configuration 
      * file, the JS and CSS files are minified.
-     * @param   array $inputfiles: array with any additional files that should be added
-     *                             to the header.
-     * @return  HTML header
+     * @param  array  $customFiles   additional static files
+     * @param  array  $overrideFiles files that override the default files
      */
-    public function headDaiquiri(array $customFiles, array $overrideFiles) {
+    public function headStatic(array $customFiles, array $overrideFiles) {
         $hl = $this->view->headLink();
         $hs = $this->view->headScript();
 
@@ -104,7 +117,11 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
             $js[] = 'min/js/daiquiri.js';
             $css[] =  'min/css/daiquiri.css';
         } else {
-            foreach (Daiquiri_View_Helper_HeadDaiquiri::$files as $file) {
+            foreach (Daiquiri_View_Helper_HeadStatic::$files as $key => $file) {
+                if (array_key_exists($key, $overrideFiles)) {
+                    $file = $overrideFiles[$key];
+                }
+
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 if ($ext === 'js') {
                     $js[] = $file;
@@ -113,6 +130,7 @@ class Daiquiri_View_Helper_HeadDaiquiri extends Zend_View_Helper_Abstract {
                 }
             }
         }
+
         foreach ($customFiles as $file) {
             $ext = pathinfo($file, PATHINFO_EXTENSION);
             if ($ext === 'js') {

@@ -499,37 +499,31 @@ class Daiquiri_Init {
         $layoutFile = $this->application_path . '/application/layouts/scripts/layout.phtml';
         $html = file_get_contents($layoutFile);
         $html = trim(preg_replace('/\s\s+/',' ', $html)); // remove newlines
-        if (preg_match_all('/\<\?php echo(.*?)\?\>/', $html, $matches)) {
-            $pattern = '/' . preg_quote('$this->headDaiquiri(') . '(array\(.*?\))' . preg_quote(',') . '(array\(.*?\))' . preg_quote(')') .'/';
-            foreach ($matches[1] as $match) {
-                $string = str_replace(' ', '', $match);
-                if (preg_match($pattern,$string,$m)) {
-                    eval('$overrideFiles = ' . $m[2] . ';');
-                    break;
-                }
-            }
+        $pattern = '/' . preg_quote('$this->headStatic') . '\s*\(\s*(array\(.*?\))\s*' . preg_quote(',') . '\s*(array\(.*?\))\s*' . preg_quote(')') . '/';
+        if (preg_match($pattern,$html,$matches)) {
+            eval('$overrideFiles = ' . $matches[2] . ';');
         } else {
-            throw new Exception('No php tag found.');
+            throw new Exception('No headStatic function found.');
         }
 
         // if the overrideFiles variable is set merge these variabes with the default ones
         if (isset($overrideFiles)) {
-            $files = array_merge(Daiquiri_View_Helper_HeadDaiquiri::$files, $overrideFiles);
+            $files = array_merge(Daiquiri_View_Helper_HeadStatic::$files, $overrideFiles);
         } else {
-            $files = Daiquiri_View_Helper_HeadDaiquiri::$files;
+            $files = Daiquiri_View_Helper_HeadStatic::$files;
         }
 
         foreach ($files as $file) {
             $ext = pathinfo($file, PATHINFO_EXTENSION);
             if ($ext === 'js') {
-                exec("yui-compressor " . $this->daiquiri_path . "/" . $file . " >> public/min/js/daiquiri.js");
+                exec("yui-compressor " . $this->application_path . "/public/" . $file . " >> public/min/js/daiquiri.js");
             } else if ($ext === 'css') {
-                exec("yui-compressor " . $this->daiquiri_path . "/" . $file . " >> public/min/css/daiquiri.css");
+                exec("yui-compressor " . $this->application_path . "/public/" . $file . " >> public/min/css/daiquiri.css");
             }
         }
 
         // take care of images
-        foreach (Daiquiri_View_Helper_HeadDaiquiri::$links as $key => $value) {
+        foreach (Daiquiri_View_Helper_HeadStatic::$links as $key => $value) {
             $target = $this->application_path . '/public/' . $value;
             $link = $this->application_path . '/public/min/' . $key;
             if (is_link($link)) {
