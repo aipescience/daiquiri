@@ -111,10 +111,10 @@ daiquiri.Modal.prototype.display = function () {
     }
 
     // check for max height
-    var maxHeight = $(window).height() - 100;
+    var maxHeight = $(window).height() - 40;
     if (dialog.height() > maxHeight) {
         dialog.height(maxHeight);
-        $('.daiquiri-modal-body').height(maxHeight - 80);
+        $('.daiquiri-modal-body').height(maxHeight - $('.daiquiri-modal-title').height() - 40);
     }
 
     // adjust left and top margin
