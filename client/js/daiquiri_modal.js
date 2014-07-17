@@ -110,8 +110,15 @@ daiquiri.Modal.prototype.display = function () {
         dialog.width(600);
     }
 
+    // check for max height
+    var maxHeight = $(window).height() - 100;
+    if (dialog.height() > maxHeight) {
+        dialog.height(maxHeight);
+        $('.daiquiri-modal-body').height(maxHeight - 80);
+    }
+
     // adjust left and top margin
-    var leftMargin = ($(window).width() - dialog.width()) / 2;
+    var leftMargin = ($(window).width() - dialog.width()) / 2 - 10;
     dialog.css('marginLeft', leftMargin);
     var topMargin = ($(window).height() - dialog.height()) / 2 - 10;
     dialog.css('marginTop', topMargin);

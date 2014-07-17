@@ -45,14 +45,6 @@ daiquiri.imageview.item = null;
 })(jQuery);
 
 /**
- * Object to hold the default options.
- */
-daiquiri.imageview.opt = {
-    'width': 800,
-    'height': 580
-};
-
-/**
  * Constructor-like function for the ImageView class. 
  */
 daiquiri.imageview.ImageView = function (a, tableId, opt) {
@@ -80,13 +72,16 @@ daiquiri.imageview.ImageView = function (a, tableId, opt) {
         var width = this.width;
         var height = this.height;
 
-        if (width > daiquiri.imageview.item.opt.width) {
-            height = height * daiquiri.imageview.item.opt.width / width;
-            width = daiquiri.imageview.item.opt.width;
+        var maxWidth = $(window).width() - 100;
+        var maxHeight = $(window).height() - 100;
+
+        if (width > maxWidth) {
+            height = height * maxWidth / width;
+            width = maxWidth;
         }
-        if (height > daiquiri.imageview.item.opt.height) {
-            width = width * daiquiri.imageview.item.opt.height / height;
-            height = daiquiri.imageview.item.opt.height;
+        if (height > maxHeight) {
+            width = width * maxHeight / height;
+            height = maxHeight;
         }
 
         // create modal

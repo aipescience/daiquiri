@@ -24,14 +24,21 @@
     margin: 0;
     font-size: 8pt;
 }
+.daiquiri-imageview-navigation .pagination.pull-left {
+    margin-right: 10px;
+}
+.daiquiri-imageview-navigation .pagination.pull-right {
+    margin-left: 10px;
+}
 .daiquiri-imageview-navigation .pagination a {
     width: 42px;
     text-align: center;
 }
 .daiquiri-imageview-title {
     text-align: center;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px 0;
+    margin: 0 10px;
+    overflow: hidden;
 }
 .daiquiri-imageview-img  {
     text-align: center;

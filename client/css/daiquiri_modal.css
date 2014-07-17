@@ -57,8 +57,8 @@
 }
 .daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-body {
     padding: 10px;
-    max-height: 620px;
     overflow: auto;
+    position: relative;
 }
 .daiquiri-modal .daiquiri-modal-dialog .daiquiri-modal-body :first-child {
     margin-top: 0;
