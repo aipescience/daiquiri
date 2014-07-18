@@ -21,6 +21,8 @@
 
 class Meetings_Model_ParticipantDetailKeys extends Daiquiri_Model_Table {
 
+    public static $types = array('default','checkbox','radio','select','multiselect');
+
     /**
      * Constructor. Sets resource and tablename.
      */

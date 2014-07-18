@@ -122,7 +122,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
             }
             $cols[] = $col;
         }
-        $cols[] = array('name' => 'options', 'sortable' => 'false', 'width' => '150px');
+        $cols[] = array('name' => 'options', 'sortable' => 'false', 'width' => '200px');
 
         return array('status' => 'ok', 'cols' => $cols);
     }
@@ -229,9 +229,14 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                 $values = $form->getValues();
                 $values['meeting_id'] = $meeting['id'];
                 $values['details'] = array();
-                foreach ($meeting['participant_detail_keys'] as $key_id => $key) {
-                    $values['details'][$key_id] = $values[$key];
-                    unset($values[$key]);
+                foreach ($meeting['participant_detail_keys'] as $key_id => $detailKey) {
+                    if (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']] === 'default') {
+                        $values['details'][$key_id] = $values[$detailKey['key']];
+                    } else {
+                        $options = explode(',',$detailKey['options']);
+                        $values['details'][$key_id] = $options[$values[$detailKey['key']]];
+                    }
+                    unset($values[$detailKey['key']]);
                 }
                 $values['contributions'] = array();
                 foreach ($meeting['contribution_types'] as $contributionTypeId => $contributionType) {
@@ -293,9 +298,14 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                 // get the form values
                 $values = $form->getValues();
                 $values['details'] = array();
-                foreach ($meeting['participant_detail_keys'] as $key_id => $key) {
-                    $values['details'][$key_id] = $values[$key];
-                    unset($values[$key]);
+                foreach ($meeting['participant_detail_keys'] as $key_id => $detailKey) {
+                    if (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']] === 'default') {
+                        $values['details'][$key_id] = $values[$detailKey['key']];
+                    } else {
+                        $options = explode(',',$detailKey['options']);
+                        $values['details'][$key_id] = $options[$values[$detailKey['key']]];
+                    }
+                    unset($values[$detailKey['key']]);
                 }
                 $values['contributions'] = array();
                 foreach ($meeting['contribution_types'] as $contributionTypeId => $contributionType) {

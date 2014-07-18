@@ -104,9 +104,14 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                 $values = $form->getValues();
                 $values['meeting_id'] = $meeting['id'];
                 $values['details'] = array();
-                foreach ($meeting['participant_detail_keys'] as $key_id => $key) {
-                    $values['details'][$key_id] = $values[$key];
-                    unset($values[$key]);
+                foreach ($meeting['participant_detail_keys'] as $key_id => $detailKey) {
+                    if (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']] === 'default') {
+                        $values['details'][$key_id] = $values[$detailKey['key']];
+                    } else {
+                        $options = explode(',',$detailKey['options']);
+                        $values['details'][$key_id] = $options[$values[$detailKey['key']]];
+                    }
+                    unset($values[$detailKey['key']]);
                 }
                 $values['contributions'] = array();
                 foreach ($meeting['contribution_types'] as $contributionTypeId => $contributionType) {
@@ -172,8 +177,8 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                         'arrival' => $values['arrival'],
                         'departure' => $values['departure']
                     );
-                    foreach ($meeting['participant_detail_keys'] as $key => $value) {
-                        $mailValues[$value] = $values['details'][$key];
+                    foreach ($meeting['participant_detail_keys'] as $key => $detailKey) {
+                        $mailValues[$detailKey['key']] = $values['details'][$key];
                     }
                     foreach ($meeting['contribution_types'] as $key => $contribution_type) {
                         if (!empty($values['contributions'][$key])) {
@@ -229,8 +234,8 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                 'arrival' => $values['arrival'],
                 'departure' => $values['departure']
             );
-            foreach ($meeting['participant_detail_keys'] as $key => $value) {
-                $mailValues[$value] = $values['details'][$key];
+            foreach ($meeting['participant_detail_keys'] as $key => $detailKey) {
+                $mailValues[$detailKey['key']] = $values['details'][$key];
             }
             foreach ($meeting['contribution_types'] as $key => $contribution_type) {
                 if (!empty($values['contributions'][$key])) {

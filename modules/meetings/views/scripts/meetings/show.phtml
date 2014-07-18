@@ -28,13 +28,25 @@
                 <tr>
                     <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
                     <td>
-                        <?php 
-                        if (is_array($value)) {
-                            echo $this->escape(implode(',',$value)); 
-                        } else {
-                            echo $this->escape($value);
-                        }
-                        ?>
+                        <?php if ($key === 'participant_detail_keys'): ?>
+                            <ul style="margin-bottom: 0;">
+                            <?php
+                            foreach ($value as $v) {
+                                echo '<li>' . $this->escape($v['key']) . '</li>';
+                            }
+                            ?>
+                            </ul>
+                        <?php elseif ($key === 'contribution_types'): ?>
+                            <ul style="margin-bottom: 0;">
+                            <?php
+                            foreach ($value as $v) {
+                                echo '<li>' . $this->escape($v) . '</li>';
+                            }
+                            ?>
+                            </ul>
+                        <?php else: ?>
+                            <?php echo $this->escape($value); ?>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endif; ?>

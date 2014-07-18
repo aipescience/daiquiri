@@ -76,7 +76,7 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
 
         // create default entries
         $defaults = array(
-            'validation' => true,
+            'validation' => false,
             'autoAccept' => false
         );
 
@@ -102,7 +102,7 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
 
         // create default values
         $defaults = array(
-            'contributionTypes' => array('Poster','Talk'),
+            'contributionTypes' => array('poster','talk'),
             'participantDetailKeys' => array(),
             'participantStatus' => array('organizer', 'invited', 'registered', 'accepted', 'rejected'),
             'meetings' => array()
@@ -142,8 +142,10 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
         // create participant detail keys
         $meetingsParticipantDetailKeyModel = new Meetings_Model_ParticipantDetailKeys();
         if ($meetingsParticipantDetailKeyModel->getResource()->countRows() == 0) {
-            foreach ($this->_init->options['init']['meetings']['participantDetailKeys'] as $participantDetailKey) {
-                $a = array('key' => $participantDetailKey);
+            foreach ($this->_init->options['init']['meetings']['participantDetailKeys'] as $a) {
+                $a['type_id'] = array_search($a['type'],Meetings_Model_ParticipantDetailKeys::$types);
+                unset($a['type']);
+
                 $r = $meetingsParticipantDetailKeyModel->create($a);
                 $this->_check($r, $a);
             }

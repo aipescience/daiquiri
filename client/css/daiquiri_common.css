@@ -99,6 +99,12 @@ form .inline {
 .daiquiri-form-inline-right-group { 
     float: right;
 }
+.daiquiri-form-horizontal-group input[type="radio"] {
+    margin: 0 10px 0 0;
+}
+.daiquiri-form-horizontal-group .controls br {
+    display: none;
+}
 pre {
     margin-top: 10px;
     margin-bottom: 20px;

@@ -109,12 +109,12 @@ class Core_Model_Init extends Daiquiri_Model_Init {
      * Processes the 'templates' part of $options['init'].
      */
     private function _processTemplatesInit() {
-        if (!isset($this->_init->options['init']['templates'])) {
+        if (!isset($this->_init->input['init']['templates'])) {
             $input = array();
-        } else if (!is_array($this->_init->options['init']['templates'])) {
+        } else if (!is_array($this->_init->input['init']['templates'])) {
             $this->_error('Templates init options need to be an array.');
         } else {
-            $input = $this->_init->options['init']['templates'];
+            $input = $this->_init->input['init']['templates'];
         }
 
         $defaults = array(
@@ -296,22 +296,6 @@ Arrival:     _arrival_
 Departure:   _departure_
 
 Best Regards'
-            ),
-            'meetings.accept' => array(
-                'subject' => '_meeting_',
-                'body' => 'Dear _firstname_ _lastname_,
-
-Yes!
-
-Best Regards'
-            ),
-            'meetings.reject' => array(
-                'subject' => '_meeting_',
-                'body' => 'Dear _firstname_ _lastname_,
-
-No!
-
-Best Regards'
             )
         );
 
@@ -336,12 +320,12 @@ Best Regards'
      * Processes the 'messages' part of $options['init'].
      */
     private function _processMessagesInit() {
-        if (!isset($this->_init->options['init']['messages'])) {
+        if (!isset($this->_init->input['init']['messages'])) {
             $input = array();
-        } else if (!is_array($this->_init->options['init']['messages'])) {
+        } else if (!is_array($this->_init->input['init']['messages'])) {
             $this->_error('Message init options needs to be an array.');
         } else {
-            $input = $this->_init->options['init']['messages'];
+            $input = $this->_init->input['init']['messages'];
         }
 
         $this->_init->options['init']['messages'] = $input;
