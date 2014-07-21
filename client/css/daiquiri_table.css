@@ -93,12 +93,11 @@
     right: 4px;
     bottom: 2px;
     width: 14px;
-
-    padding: 2px 0 4px 0;
 }
 .daiquiri-table th i {
-    margin: 0;
+    margin-top: 2px;
     opacity: 0.2;
+    display: block;
 }
 .daiquiri-table th i.sorted {
     opacity: 1;
