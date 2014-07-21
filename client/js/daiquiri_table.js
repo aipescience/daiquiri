@@ -340,7 +340,7 @@ daiquiri.table.Table.prototype.cols = function () {
                         if (self.colsmodel[i].sortable != 'false') {
                             classes += ' sortable';
                         }
-                        html += '<th id="' + self.id + '-thead-col-' + colId + '" style="width:' + width + '" class="' + classes + '">';
+                        html += '<th id="' + self.id + '-thead-col-' + colId + '" style="width:' + width + '" class="' + classes + '"><div class="daiquiri-table-col-head">';
                         if (i != 0) {
                             html += '<div class="handle-left"></div>';
                         }
@@ -351,7 +351,7 @@ daiquiri.table.Table.prototype.cols = function () {
 
                         var name = self.colsmodel[i].name.charAt(0).toUpperCase() + self.colsmodel[i].name.slice(1);
                         html += '<div class="name">' + name + '</div>';
-                        html += '</th>';
+                        html += '</div></th>';
                     }
                 }
                 html += '</tr>';
@@ -376,14 +376,14 @@ daiquiri.table.Table.prototype.cols = function () {
                 });
                 
                 // add sorting function to click on header
-                $('i', 'th', self.container).click( function () {
+                $('th i',self.container).click( function () {
                     var id = $(this).attr('id').match(/(.+)-thead-sort/)[1];
                     var self = daiquiri.table.items[id];
 
                     // determine which column was clicked
                     var element = $(this);
                     var classes = element.attr('class');
-                    var colId = element.parent().parent().attr('id').match(/thead-col-(\d+)/)[1];
+                    var colId = element.parent().parent().parent().attr('id').match(/thead-col-(\d+)/)[1];
                     var colName = self.colsmodel[colId].name;
 
                     // manipulate arrow and change sort options
@@ -419,7 +419,7 @@ daiquiri.table.Table.prototype.cols = function () {
                 
                 // on mousedown, init global resizing object
                 $('.handle-right').on('mousedown', function (e) {
-                    var match = $(this).parent().attr('id').match(/(.+)-thead-col-(\d+)/);
+                    var match = $(this).parent().parent().attr('id').match(/(.+)-thead-col-(\d+)/);
                     var id = match[1];
                     var colId = match[2];
                     var self = daiquiri.table.items[id];
@@ -432,7 +432,7 @@ daiquiri.table.Table.prototype.cols = function () {
                     }
                 });
                 $('.handle-left').on('mousedown', function (e) {
-                    var match = $(this).parent().attr('id').match(/(.+)-thead-col-(\d+)/);
+                    var match = $(this).parent().parent().attr('id').match(/(.+)-thead-col-(\d+)/);
                     var id = match[1];
                     var colId = match[2];
                     var self = daiquiri.table.items[id];

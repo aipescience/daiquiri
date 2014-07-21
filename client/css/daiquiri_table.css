@@ -28,14 +28,20 @@
     white-space: nowrap;
 }
 .daiquiri-table th {
+    padding: 0;
+}
+.daiquiri-table th div.daiquiri-table-col-head {
     padding: 2px 22px 2px 4px;
 }
 .daiquiri-table td {
     padding: 2px 4px;
 }
 .daiquiri-table td:first-child,
-.daiquiri-table th:first-child {    
+.daiquiri-table th:first-child {
     border-left: none;
+}
+.daiquiri-table td:first-child,
+.daiquiri-table th:first-child div.daiquiri-table-col-head {
     padding-left: 4px;
 }
 .daiquiri-table-pane {
@@ -72,8 +78,10 @@
     background-color: #ccc;
 }
 .daiquiri-table th {
-    position: relative;
     height: 20px;
+}
+.daiquiri-table th div.daiquiri-table-col-head {
+    position: relative;
 }
 .daiquiri-table th div.name {
     overflow: hidden;
