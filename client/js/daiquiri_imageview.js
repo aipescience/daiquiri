@@ -73,7 +73,7 @@ daiquiri.imageview.ImageView = function (a, tableId, opt) {
         var height = this.height;
 
         var maxWidth = $(window).width() - 100;
-        var maxHeight = $(window).height() - 100;
+        var maxHeight = $(window).height() - 180;
 
         if (width > maxWidth) {
             height = height * maxWidth / width;

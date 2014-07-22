@@ -111,7 +111,7 @@ daiquiri.Modal.prototype.display = function () {
     }
 
     // check for max height
-    var maxHeight = $(window).height() - 80;
+    var maxHeight = $(window).height() - 120;
     if (dialog.height() > maxHeight) {
         dialog.height(maxHeight);
         $('.daiquiri-modal-body').height(maxHeight - $('.daiquiri-modal-title').height() - 40);
