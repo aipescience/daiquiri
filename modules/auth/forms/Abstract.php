@@ -150,7 +150,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
         if (Daiquiri_Config::getInstance()->auth->lowerCaseUsernames) {
             $field->addValidator(new Daiquiri_Form_Validator_LowerCaseAlnum());
         } else {
-            $field->addValidator(new Daiquiri_Form_Validator_Text());
+            $field->addValidator(new Zend_Validate_Alnum());
         }
 
         $minLength = Daiquiri_Config::getInstance()->auth->usernameMinLength;
