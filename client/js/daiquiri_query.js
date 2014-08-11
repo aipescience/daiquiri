@@ -658,17 +658,17 @@ daiquiri.query.Query.prototype.displayResults = function(){
                 });
 
                 // create samp button if it is not already there
-                // if ($('#daiquiri-samp-connect').length == 0) {
-                //     $('#results-tab').append('<div id="daiquiri-samp-connect" class="daiquiri-samp-connect"></div>');
+                if ($('#daiquiri-samp-connect').length == 0) {
+                    $('#results-tab').append('<div id="daiquiri-samp-connect" class="daiquiri-samp-connect"></div>');
 
-                //     var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
-                //         baseStream: self.url.sampStream
-                //     });
-                // }
+                    var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
+                        baseStream: self.url.sampStream
+                    });
+                }
 
                 // setting SAMP options
-                // daiquiri.samp.item.table = self.job.table.value;
-                // daiquiri.samp.item.username = self.job.username.value;
+                daiquiri.samp.item.table = self.job.table.value;
+                daiquiri.samp.item.username = self.job.username.value;
             }
         });
     }
