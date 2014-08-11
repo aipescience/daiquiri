@@ -66,10 +66,12 @@
 }
 #wp-content .alignright {
     margin-left: 20px;
+    margin-bottom: 20px;
     float: right;
 }
 #wp-content .alignleft {
     margin-right: 20px;
+    margin-bottom: 20px;
     float: left;
 }
 #wp-content .news-entry {
