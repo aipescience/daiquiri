@@ -74,6 +74,11 @@
     margin-bottom: 20px;
     float: left;
 }
+#wp-content .aligncenter {
+    margin-right: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
 #wp-content .news-entry {
     margin-bottom: 10px;
 }
