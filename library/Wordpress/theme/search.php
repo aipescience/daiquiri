@@ -50,7 +50,6 @@
                 </p>
             </div>
 
-            <p align="center"><?php posts_nav_link(); ?></p>
         <?php endwhile; else: ?>
             <p>Sorry, no page found.</p>
         <?php endif; ?>
