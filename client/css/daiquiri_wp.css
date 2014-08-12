@@ -108,6 +108,12 @@
 #wp-content .sidebar li {
     list-style: none;
 }
+#wp-content .sidebar .children li {
+    margin-left: 10px;
+}
+#wp-content .sidebar .children li:before {
+    content: "- ";
+}
 #wp-content .sidebar .sidebar-container {
     margin-bottom: 20px;
 }
