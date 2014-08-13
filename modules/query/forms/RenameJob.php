@@ -36,7 +36,7 @@ class Query_Form_RenameJob extends Daiquiri_Form_Abstract {
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => 'StringLength', 'options' => array(1, 128)),
-                array('validator' => 'Regex', 'options' => array('pattern' => '/^[^;@%*?()!"`\'&]+$/'))
+                array('validator' => 'Regex', 'options' => array('pattern' => '/^[^;@%*?()!"`\'&=]+$/'))
             ),
             'label' => 'New name of the table',
             'value' => $this->_tablename,
