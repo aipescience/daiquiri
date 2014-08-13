@@ -51,5 +51,12 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
         } else {
             $this->view->forms = array();
         }
+
+        // check if samp is enabled
+        if (Daiquiri_Config::getInstance()->query->samp && Daiquiri_Auth::getInstance()->getCurrentUsername() !== 'guest') {
+            $this->view->samp = true;
+        } else {
+            $this->view->samp = false;
+        }
     }
 }

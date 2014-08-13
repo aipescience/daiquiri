@@ -144,6 +144,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                     'mail' => array()
                 )
             ),
+            'samp' => true,
             'quota' => array(
                 'guest' => '100 MB',
                 'user' => '500 MB',
