@@ -28,14 +28,9 @@
                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
             </h2>
 
-            <?php the_content(); ?>
+            <div class="post-date">
 
-            <div class="post-footer">
-                This post was first published on 
-                <?php the_date(); ?>
-                and last modified on 
-                <?php the_modified_date(); ?>.
-            </div>
+            <?php the_content(); ?>
 
             <div class="post-nav">
                 <?php echo get_previous_posts_link(); ?>

@@ -27,9 +27,19 @@
     text-decoration: none;
 }
 
+#wp-content .post-date,
 #wp-content .post-footer,
 #wp-content .post-nav {
     color: #999;
+}
+#wp-content .post-nav {
+    margin-top: 20px;
+}
+#wp-content div.post-date {
+    margin-bottom: 10px;
+}
+#wp-content h3.post-title {
+    display: inline;
 }
 #wp-content #list,
 #wp-content #respond{
