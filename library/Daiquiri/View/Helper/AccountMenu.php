@@ -37,14 +37,14 @@ class Daiquiri_View_Helper_AccountMenu extends Zend_View_Helper_Abstract {
                 $html .= '<ul class = "dropdown-menu">';
             }
             $html .= $this->view->internalLink(array(
-                'href' => '/auth/account/update',
+                'href' => '/auth/account/update?redirect=' . $this->view->path(),
                 'text' => 'Update Profile',
                 'resource' => 'Auth_Model_Account',
                 'permission' => 'update',
                 'prepend' => '<li class="nav-item">',
                 'append' => '</li>'));
             $html .= $this->view->internalLink(array(
-                'href' => '/auth/password/change',
+                'href' => '/auth/password/change?redirect=' . $this->view->path(),
                 'text' => 'Change Password',
                 'resource' => 'Auth_Model_Password',
                 'permission' => 'change',

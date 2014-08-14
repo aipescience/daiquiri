@@ -19,21 +19,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_AccountController extends Daiquiri_Controller_Abstract {
+class Daiquiri_View_Helper_Path extends Zend_View_Helper_Abstract {
 
-    protected $_model;
+    public $view;
 
-    public function init() {
-        $this->_model = Daiquiri_Proxy::factory('Auth_Model_Account');
+    public function setView(Zend_View_Interface $view) {
+        $this->view = $view;
     }
 
-    public function showAction() {
-        $response = $this->_model->show();
-        $this->view->assign($response);
-    }
-
-    public function updateAction() {
-        $this->getControllerHelper('form',array('redirect' => '/'))->update();
+    public function path() {
+        return substr($this->view->url(),strlen($this->view->baseUrl()));
     }
 
 }

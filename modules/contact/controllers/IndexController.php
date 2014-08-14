@@ -31,6 +31,6 @@ class Contact_IndexController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $this->getControllerHelper('form')->contact();
+        $this->getControllerHelper('form', array('redirect' => '/'))->contact();
     }
 }
