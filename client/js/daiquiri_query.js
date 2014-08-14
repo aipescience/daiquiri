@@ -663,6 +663,7 @@ daiquiri.query.Query.prototype.displayResults = function(){
                         $('#results-tab').append('<div id="daiquiri-samp-connect" class="daiquiri-samp-connect"></div>');
 
                         var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
+                            baseUrl: self.url.baseUrl,
                             baseStream: self.url.sampStream
                         });
                     }

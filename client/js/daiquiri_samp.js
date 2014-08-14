@@ -150,8 +150,10 @@ daiquiri.samp.SAMP = function (container, opt) {
         var regErrHandler = function(err) {
             var target = $("#" + parent.names.clientsList);
             target.empty();
+
+            var webhubUrl = daiquiri.samp.item.opt.baseUrl + '/daiquiri/lib/sampjs/webhub.jnlp';
             target.html("<p>Could not register with a SAMP Hub! You can start one by clicking here:</p>");
-            target.append('<p><a href="http://www.star.bristol.ac.uk/~mbt/websamp/webhub.jnlp" title="Start SAMP Hub using Java web start">Start SAMP Hub using Java web start</a></p>');
+            target.append('<p><a href="' + webhubUrl + '" title="Start SAMP Hub using Java web start">Start SAMP Hub using Java web start</a></p>');
         };
         var regSuccessHandler = function(conn) {
             connector.setConnection(conn);
