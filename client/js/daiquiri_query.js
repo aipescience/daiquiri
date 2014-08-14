@@ -658,10 +658,14 @@ daiquiri.query.Query.prototype.displayResults = function(){
                 });
 
                 // create samp button if the placeholder is there
-                if ($('#daiquiri-samp-connect').length != 0) {
-                    var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
-                        baseStream: self.url.sampStream
-                    });
+                if ($('#daiquiri-samp').length != 0) {
+                    if ($('#daiquiri-samp-connect').length == 0) {
+                        $('#results-tab').append('<div id="daiquiri-samp-connect" class="daiquiri-samp-connect"></div>');
+
+                        var samp = new daiquiri.samp.SAMP($('#daiquiri-samp-connect'),{
+                            baseStream: self.url.sampStream
+                        });
+                    }
 
                     // setting SAMP options
                     daiquiri.samp.item.table = self.job.table.value;
