@@ -499,7 +499,7 @@ class Daiquiri_Init {
         $layoutFile = $this->application_path . '/application/layouts/scripts/layout.phtml';
         $html = file_get_contents($layoutFile);
         $html = trim(preg_replace('/\s\s+/',' ', $html)); // remove newlines
-        $pattern = '/' . preg_quote('$this->headStatic') . '\s*\(\s*(array\(.*?\))\s*' . preg_quote(',') . '\s*(array\(.*?\))\s*' . preg_quote(')') . '/';
+        $pattern = '/' . preg_quote('$this->headStatic') . '\s*\(\s*(array\([^?]*?\))\s*' . preg_quote(',') . '\s*(array\([^?]*?\))\s*' . preg_quote(');') . '/';
         if (preg_match($pattern,$html,$matches)) {
             eval('$overrideFiles = ' . $matches[2] . ';');
         }
