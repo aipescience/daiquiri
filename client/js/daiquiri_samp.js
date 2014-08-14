@@ -433,6 +433,8 @@ daiquiri.samp.SAMP.prototype.createClientNode = function(clientID, sampMsg) {
             var pwd = $('#' + self.names.passwordInput).val();
 
             if(!pwd) {
+                $('#daiquiri-samp-connect-password-error').remove();
+                $('#daiquiri-samp-connect-passwordInput').after('<p id="daiquiri-samp-connect-password-error" class="text-error ">Please give your password.</p>');
                 return;
             }
 
