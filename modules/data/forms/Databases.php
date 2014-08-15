@@ -38,7 +38,6 @@ class Data_Form_Databases extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add elements
@@ -104,7 +103,7 @@ class Data_Form_Databases extends Daiquiri_Form_Abstract {
             $inputelements[] = 'autofill';
         }
         $this->addHorizontalGroup($inputelements);
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('order', 'name', 'description', 'adapter', 'publication_role_id', 'publication_select',

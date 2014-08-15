@@ -28,7 +28,6 @@ class Query_Form_RenameJob extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
 
         // add fields
@@ -48,7 +47,7 @@ class Query_Form_RenameJob extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('tablename'), 'tablerename-group');
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 
 }

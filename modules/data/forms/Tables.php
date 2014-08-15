@@ -53,8 +53,6 @@ class Data_Form_Tables extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
-
         if($this->_csrfActive === true) {
             $this->addCsrfElement();
         }
@@ -122,7 +120,7 @@ class Data_Form_Tables extends Daiquiri_Form_Abstract {
             $inputelements[] = 'autofill';
         }
         $this->addHorizontalGroup($inputelements);
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('order', 'name', 'description', 'publication_role_id', 'publication_select',

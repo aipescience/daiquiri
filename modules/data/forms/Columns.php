@@ -58,8 +58,6 @@ class Data_Form_Columns extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
-
         if($this->_csrfActive === true) {
             $this->addCsrfElement();
         }
@@ -152,7 +150,7 @@ class Data_Form_Columns extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('table_id', 'name', 'order', 'type', 'unit', 'ucd', 'ucd_list', 'description', 'publication_role_id', 'publication_select', 'publication_update', 'publication_insert'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('table_id', 'order', 'name', 'type', 'unit', 'ucd', 'description', 'publication_role_id', 'publication_select',

@@ -59,7 +59,6 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
 
     public function init() {
         $this->setAttrib('id', 'daiquiri-form-query-cone');
-        $this->setFormDecorators();
         $this->addCsrfElement($this->getFieldId('csrf'));
 
         // add fields

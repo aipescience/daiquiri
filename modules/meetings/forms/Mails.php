@@ -47,7 +47,6 @@ class Meetings_Form_Mails extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
 
         $element = new Daiquiri_Form_Element_Note('accepted_note', array(
@@ -86,7 +85,7 @@ class Meetings_Form_Mails extends Daiquiri_Form_Abstract {
         $this->addHorizontalGroup(array('accepted_mail','accepted_id'), 'accepted');
         $this->addInlineGroup(array('rejected_note'), 'rejected-note');
         $this->addHorizontalGroup(array('rejected_mail','rejected_id'), 'rejected-id');
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // tick all fields
         $this->getElement('accepted_id')->setValue(array_keys($this->_accepted));   

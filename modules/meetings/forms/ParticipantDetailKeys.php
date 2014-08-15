@@ -33,7 +33,6 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add elements
@@ -66,7 +65,7 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('key','type_id','options'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('key','type_id','options') as $element) {

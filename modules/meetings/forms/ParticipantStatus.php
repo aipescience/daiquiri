@@ -33,7 +33,6 @@ class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add elements
@@ -52,7 +51,7 @@ class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('status'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('status') as $element) {

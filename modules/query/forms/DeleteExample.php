@@ -22,7 +22,6 @@
 class Query_Form_DeleteExample extends Daiquiri_Form_Abstract {
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add fields
@@ -30,7 +29,7 @@ class Query_Form_DeleteExample extends Daiquiri_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 
 }

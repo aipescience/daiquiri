@@ -19,22 +19,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_ForgotPassword extends Auth_Form_Abstract {
+class Daiquiri_Form_Element_DumbButton extends Zend_Form_Element_Button {
 
-    public function init() {
-        $this->addCsrfElement();
-
-        // add form elements
-        $this->addEmailElement(true);
-
-        $this->addPrimaryButtonElement('submit', 'Request password reset');
-        $this->addButtonElement('cancel', 'Cancel');
-        $this->addCaptchaElement();
+    /**
+     * Initializes the form element
+     */
+    function init() {
+        // set css class for html element
+        $this->setAttrib('class', 'btn');
 
         // set decorators
-        $this->addHorizontalGroup(array('email'));
-        $this->addHorizontalCaptchaGroup('captcha');
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->setDecorators(array('ViewHelper'));
     }
-
 }

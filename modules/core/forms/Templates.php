@@ -32,7 +32,6 @@ class Core_Form_Templates extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
 
         // add elements
@@ -69,7 +68,7 @@ class Core_Form_Templates extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('template','subject', 'body'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_entry['template'])) {

@@ -22,7 +22,6 @@
 class Auth_Form_Registration extends Auth_Form_Abstract {
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         $u = array();
@@ -43,8 +42,8 @@ class Auth_Form_Registration extends Auth_Form_Abstract {
         // add groups
         $this->addHorizontalGroup($d, 'detail-group');
         $this->addHorizontalGroup($u, 'user-group');
-        $this->addCaptchaGroup('captcha');
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalCaptchaGroup('captcha');
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 
 }

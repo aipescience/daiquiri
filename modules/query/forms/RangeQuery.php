@@ -51,7 +51,6 @@ class Query_Form_RangeQuery extends Query_Form_AbstractFormQuery {
 
     public function init() {
         $this->setAttrib('id', 'daiquiri-form-query-range');
-        $this->setFormDecorators();
         $this->addCsrfElement('range_csrf');
 
         // add fields

@@ -22,7 +22,6 @@
 class Auth_Form_Apps extends Auth_Form_Abstract {
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add elements
@@ -36,7 +35,7 @@ class Auth_Form_Apps extends Auth_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup($u);
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 
 }

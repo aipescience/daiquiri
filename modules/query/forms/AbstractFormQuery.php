@@ -61,37 +61,52 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
             foreach ($this->_queues as $key => $queue) {
                 if ($queue['name'] === $this->_defaultQueue['name']) {
                     $buttons[] = array(
-                        'identifier' => $prefix . $key . "_def",
+                        'name' => $prefix . $key . "_def",
                         'label' => ucfirst($queue['name']) . ' queue',
                         'tooltip' => "Priority: {$queue['priority']} Timeout: {$queue['timeout']}"
                     );
                 } else {
                     $buttons[] = array(
-                        'identifier' => $prefix . $key,
+                        'name' => $prefix . $key,
                         'label' => ucfirst($queue['name']) . ' queue',
                         'tooltip' => "Priority: {$queue['priority']} Timeout: {$queue['timeout']}"
                     );
                 }
             }
-            $this->addToggleButtonElements($prefix, $buttons);
+
+            if (count($buttons) <= 5) {
+                $this->addToggleButtonElements($buttons, $prefix);
+            } else {
+                $entries = array();
+                foreach ($buttons as $button) {
+                    $entries[$button['name']] = $button['label'];
+                }
+                $this->addElement('select', $prefix . 'select', array(
+                    'required' => false,
+                    'ignore' => false,
+                    'decorators' => array('ViewHelper', 'Label'),
+                    'multiOptions' => $entries
+                ));
+            }
         }
     }
 
-    public function addQueueGroup($prefix, $identifier) {
+    public function addQueueGroup($prefix, $name) {
         if (!empty($this->_queues)) {
-            $buttons = array();
-            foreach ($this->_queues as $key => $queue) {
-                if ($queue['name'] === $this->_defaultQueue['name']) {
-                    $buttons[] = array(
-                        'identifier' => $prefix . $key . "_def",
-                    );
-                } else {
-                    $buttons[] = array(
-                        'identifier' => $prefix . $key,
-                    );
+            if (count($this->_queues) <= 5) {
+                $elements = array();
+                foreach ($this->_queues as $key => $queue) {
+                    if ($queue['name'] === $this->_defaultQueue['name']) {
+                        $elements[] = $prefix . $key . "_def";
+                    } else {
+                        $elements[] = $prefix . $key;
+                    }
                 }
+
+                $this->addToggleButtonsGroup($elements, $name, $prefix);
+            } else {
+                $this->addInlineRightGroup(array($prefix . 'select'), $name);
             }
-            $this->addToggleButtonGroup($prefix, $buttons, $identifier);
         }
     }
 

@@ -45,7 +45,6 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
 
     public function init() {
         $this->setAttrib('id', 'daiquiri-form-query-sql');
-        $this->setFormDecorators();
         $this->addCsrfElement('sql_csrf');
 
         // add fields

@@ -38,7 +38,6 @@ class Auth_Form_Details extends Auth_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
 
         $this->addElement('text', 'key', array(
@@ -63,7 +62,7 @@ class Auth_Form_Details extends Auth_Form_Abstract {
 
         // set decorators
         $this->addHorizontalGroup(array('key', 'value'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_key)) {

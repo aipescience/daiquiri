@@ -22,7 +22,6 @@
 class Contact_Form_Category extends Daiquiri_Form_Abstract {
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add elements
@@ -40,7 +39,7 @@ class Contact_Form_Category extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('category'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 
 }

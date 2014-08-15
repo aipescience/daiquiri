@@ -39,7 +39,6 @@ class Query_Form_Example extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
 
         // add elements
@@ -82,7 +81,7 @@ class Query_Form_Example extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('name', 'query', 'description', 'publication_role_id'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_row)) {

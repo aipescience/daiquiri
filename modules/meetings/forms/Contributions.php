@@ -43,7 +43,6 @@ class Meetings_Form_Contributions extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add elements
@@ -82,7 +81,7 @@ class Meetings_Form_Contributions extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('participant_id','contribution_type_id','title','abstract'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('contribution_type_id','title','abstract') as $element) {

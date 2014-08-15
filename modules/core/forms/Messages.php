@@ -32,7 +32,6 @@ class Core_Form_Messages extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add elements
@@ -60,7 +59,7 @@ class Core_Form_Messages extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('key', 'value'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_entry['key'])) {

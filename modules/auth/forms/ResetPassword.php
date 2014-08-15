@@ -22,7 +22,6 @@
 class Auth_Form_ResetPassword extends Auth_Form_Abstract {
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
 
         // add elements
@@ -34,7 +33,7 @@ class Auth_Form_ResetPassword extends Auth_Form_Abstract {
 
         // set decorators
         $this->addHorizontalGroup(array('username', 'newPassword', 'confirmPassword'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 
 }

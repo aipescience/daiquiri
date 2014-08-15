@@ -19,27 +19,42 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_Roles extends Daiquiri_Form_Abstract {
+class Daiquiri_Form_DisplayGroup_ViewScript extends Zend_Form_DisplayGroup {
 
+    /**
+     * The viewscript to use with this group.
+     * @var string
+     */
+    protected $_viewScript;
+
+    /**
+     * Sets the viewscript.
+     * @param string $viewScript viewscript to use with this group
+     */
+    public function setViewScript($viewScript) {
+        $this->_viewScript = $viewScript;
+    }
+
+    /**
+     * Initializes the DisplayGroup
+     */
     public function init() {
-        $this->addCsrfElement();
-
-        // add elements
-        $this->addElement('text', 'role', array(
-            'label' => 'Role',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => 'alnum'),
+        // set decorators for DisplayGroup
+        $this->setDecorators(array(
+            array(
+                'ViewScript',
+                array(
+                    'viewScript' => $this->_viewScript,
+                    'group' => $this
+                )
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', 'Create user role');
-        $this->addButtonElement('cancel', 'Cancel');
-
-        // add groups
-        $this->addHorizontalGroup(array('role'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        // loop over elements and set decorators
+        foreach ($this->getElements() as $element) {
+            $element->setDecorators(array(
+                'ViewHelper'
+            ));
+        }
     }
-
 }

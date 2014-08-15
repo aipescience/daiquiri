@@ -19,22 +19,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_ForgotPassword extends Auth_Form_Abstract {
+class Daiquiri_Form_DisplayGroup_ToggleButtons extends Zend_Form_DisplayGroup {
 
-    public function init() {
-        $this->addCsrfElement();
+    /**
+     * The prefix for html attributes.
+     * @var string
+     */
+    protected $_prefix;
 
-        // add form elements
-        $this->addEmailElement(true);
-
-        $this->addPrimaryButtonElement('submit', 'Request password reset');
-        $this->addButtonElement('cancel', 'Cancel');
-        $this->addCaptchaElement();
-
-        // set decorators
-        $this->addHorizontalGroup(array('email'));
-        $this->addHorizontalCaptchaGroup('captcha');
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+    /**
+     * Sets the prefix.
+     * @param string $prefix prefix for html attributes
+     */
+    public function setPrefix($prefix) {
+        $this->_prefix = $prefix;
     }
 
+    /**
+     * Initializes the DisplayGroup
+     */
+    function init() {
+        // set css class for html element
+        $this->setAttrib('class', 'daiquiri-form-queue-group btn-group pull-right');
+
+        // set decorators for DisplayGroup
+        $this->setDecorators(array(
+            'FormElements',
+            array(
+                'Fieldset', array(
+                    'data-toggle' => 'buttons-radio',
+                    'data-toggle-name' => $this->_prefix . 'value'
+                )
+            )
+        ));
+    }
 }

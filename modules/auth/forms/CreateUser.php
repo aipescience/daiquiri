@@ -22,7 +22,6 @@
 class Auth_Form_CreateUser extends Auth_Form_Abstract {
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         $d = array();
@@ -45,7 +44,7 @@ class Auth_Form_CreateUser extends Auth_Form_Abstract {
         // add groups
         $this->addHorizontalGroup($d, 'detail-group');
         $this->addHorizontalGroup($u, 'user-group');
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 
 }

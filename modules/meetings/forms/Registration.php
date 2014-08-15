@@ -43,7 +43,6 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
     }
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // firstname, lastname and affiliation fields
@@ -177,9 +176,9 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
             $this->addHorizontalGroup($contributionElements,'contributions', 'Contributions');
         }
         if (empty($this->_user)) {
-            $this->addCaptchaGroup('captcha');
+            $this->addHorizontalCaptchaGroup('captcha');
         }
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('firstname', 'lastname', 'email') as $key) {

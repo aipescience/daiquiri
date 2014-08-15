@@ -19,22 +19,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_ForgotPassword extends Auth_Form_Abstract {
+class Daiquiri_Form_DisplayGroup_HorizontalButton extends Zend_Form_DisplayGroup {
 
-    public function init() {
-        $this->addCsrfElement();
+    /**
+     * Initializes the DisplayGroup
+     */
+    function init() {
+        // set css class for html element
+        $this->setAttrib('class', 'form-horizontal');
 
-        // add form elements
-        $this->addEmailElement(true);
+        // set decorators for DisplayGroup
+        $this->setDecorators(array(
+            'FormElements',
+            array(
+                array('control-group' => 'HtmlTag'),
+                array('tag' => 'div', 'class' => 'controls')),
+            array(
+                array('controls' => 'HtmlTag'),
+                array('tag' => 'div', 'class' => 'control-group')),
+            'Fieldset'
+        ));
 
-        $this->addPrimaryButtonElement('submit', 'Request password reset');
-        $this->addButtonElement('cancel', 'Cancel');
-        $this->addCaptchaElement();
-
-        // set decorators
-        $this->addHorizontalGroup(array('email'));
-        $this->addHorizontalCaptchaGroup('captcha');
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        // loop over elements and set decorators
+        foreach ($this->getElements() as $element) {
+            $element->setDecorators(array(
+                'ViewHelper'
+            ));
+        }
     }
-
 }

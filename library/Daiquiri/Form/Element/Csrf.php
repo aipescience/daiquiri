@@ -53,7 +53,7 @@ class Daiquiri_Form_Element_Csrf extends Zend_Form_Element_Xhtml {
         $validator->setMessage('The CSRF token is not valid. Please refresh the page.');
         $this->addValidator($validator);
 
-        // configure decorators
+        // set decorators
         $this->setDecorators(array(
             'ViewHelper',
             'Errors'

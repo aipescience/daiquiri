@@ -22,7 +22,6 @@
 class Auth_Form_Rules extends Daiquiri_Form_Abstract {
 
     public function init() {
-        $this->setFormDecorators();
         $this->addCsrfElement();
         
         // add elements
@@ -56,7 +55,7 @@ class Auth_Form_Rules extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('role', 'resource', 'permissions'));
-        $this->addActionGroup(array('submit', 'cancel'));
+        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 
 }
