@@ -59,7 +59,7 @@ class Daiquiri_Form_Element_Csrf extends Zend_Form_Element_Xhtml {
             'Errors'
         ));
         $this->getDecorator('Errors')->setOptions(array(
-            'class' => 'daiquiri-form-error unstyled',
+            'class' => 'daiquiri-form-error unstyled text-error',
         ));
     }
 
