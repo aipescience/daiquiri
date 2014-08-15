@@ -163,13 +163,6 @@ class Daiquiri_Model_Helper_CRUD extends Daiquiri_Model_Helper_Abstract {
             'errors' => $errors
         );
 
-        // add and re-init csrf
-        $csrf = $form->getCsrf();
-        if (!empty($csrf)) {
-            $csrf->initCsrfToken();
-            $response['csrf'] = $csrf->getHash();
-        }
-
         return $response;
     }
 

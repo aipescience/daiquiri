@@ -124,31 +124,15 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
                     // construct response with redirect to plan
                     $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
-                    $response = array(
+                    return array(
                         'status' => 'plan',
                         'redirect' => $baseurl . '/query/form/plan?form=' . $formstring,
                     );
-
-                    // re-init csrf
-                    $csrf = $form->getCsrf();
-                    if (!empty($csrf)) {
-                        $csrf->initCsrfToken();
-                        $response['csrf'] = $csrf->getHash();
-                    }
-
-                    return $response;
                 } else {
                     // submit query
                     $response = $model->query($sql, false, $tablename, $options);
 
                     if ($response['status'] === 'ok') {
-                        // re-init csrf
-                        $csrf = $form->getCsrf();
-                        if (!empty($csrf)) {
-                            $csrf->initCsrfToken();
-                            $response['csrf'] = $csrf->getHash();
-                        }
-
                         // submitting the query was successful
                         return $response;
                     } else {
@@ -235,12 +219,6 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                     $response = $model->query($ns->sql, $plan, $ns->tablename, array("queue" => $ns->queue));
 
                     if ($response['status'] === 'ok') {
-                        // re-init csrf and return
-                        $csrf = $form->getElement('plan_csrf');
-                        if (!empty($csrf)) {
-                            $csrf->initCsrfToken();
-                            $response['csrf'] = $csrf->getHash();
-                        }
                         return $response;
                     } else {
                         return $this->getModelHelper('CRUD')->validationErrorResponse($form,$response['errors']);
@@ -251,17 +229,10 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             }
         }
 
-        // re-init csrf and return
-        $response = array(
+        return array(
             'form' => $form,
             'status' => 'form'
         );
-        $csrf = $form->getElement('plan_csrf');
-        if (!empty($csrf)) {
-            $csrf->initCsrfToken();
-            $response['csrf'] = $csrf->getHash();
-        }
-        return $response;
     }
 
     /**

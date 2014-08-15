@@ -316,26 +316,19 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
         }
     }
 
+
     /**
-     * @brief   Add a hash element for security against CSRF attacks.
-     * @param   string $salt salt value for the hash
-     * @return  Zend_Form_Element_Hash
-     * 
-     * Adds a hidden tag with a salt for CSRF attack protection.
+     * Add a hash element for security against CSRF attacks.
+     * @param string $name name of the element
+     * @return mixed $name name of the element or 'false'
      */
-    public function addCsrfElement($identifier = 'csrf') {
+    public function addCsrfElement($name = 'csrf') {
         if (php_sapi_name() !== 'cli' && Daiquiri_Auth::getInstance()->useCsrf()) {
-            $field = new Zend_Form_Element_Hash($identifier, array(
-                'class' => 'daiquiri-csrf',
-                'ignore' => true,
-                'timeout' => 1000000,
-                'salt' => str_replace('_','',get_called_class()),
-                'decorators' => array('ViewHelper')
-                ));
+            $field = new Daiquiri_Form_Element_Csrf($name);
             $this->addElement($field);
-            return $identifier;
+            return $name;
         } else {
-            return False;
+            return false;
         }
     }
 
