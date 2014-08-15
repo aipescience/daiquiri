@@ -25,11 +25,9 @@ class Auth_Form_Apps extends Auth_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $u = array();
-        $u[] = $this->addAppnameElement(true);
-        $u[] = $this->addNewPasswordElement(true);
-        $u[] = $this->addConfirmPasswordElement(true);
-
+        $this->addAppnameElement();
+        $this->addNewPasswordElement();
+        $this->addConfirmPasswordElement();
         $this->addPrimaryButtonElement('submit', 'Create user status');
         $this->addButtonElement('cancel', 'Cancel');
 

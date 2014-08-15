@@ -23,25 +23,24 @@ class Auth_Form_Registration extends Auth_Form_Abstract {
 
     public function init() {
         $this->addCsrfElement();
-        
-        $u = array();
-        $d = array();
 
         // add elements
         foreach ($this->getDetails() as $detail) {
-            $d[] = $this->addDetailElement($detail, true);
+            $this->addElement(new Auth_Form_Element_Detail($detail));
         }
-        $u[] = $this->addUsernameElement(true, true);
-        $u[] = $this->addEmailElement(true, true);
-        $u[] = $this->addNewPasswordElement(true);
-        $u[] = $this->addConfirmPasswordElement(true);
+        $elements = array(
+            $this->addUsernameElement(),
+            $this->addEmailElement(),
+            $this->addNewPasswordElement(),
+            $this->addConfirmPasswordElement()
+        );
         $this->addCaptchaElement();
         $this->addPrimaryButtonElement('submit', 'Register');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup($d, 'detail-group');
-        $this->addHorizontalGroup($u, 'user-group');
+        $this->addHorizontalGroup($this->getDetails(), 'detail-group');
+        $this->addHorizontalGroup($elements, 'user-group');
         $this->addHorizontalCaptchaGroup('captcha');
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }

@@ -24,24 +24,23 @@ class Auth_Form_UpdateUser extends Auth_Form_Abstract {
     public function init() {
         $this->addCsrfElement();
         
-        $elements = array();
-
         // add elements
+        $elements = array();
         foreach ($this->getDetails() as $detail) {
-            $elements[] = $this->addDetailElement($detail, true);
+            $elements[] = $this->addDetailElement($detail);
         }
         if ($this->_changeUsername) {
-            $elements[] = $this->addUsernameElement(true, false, $this->_user['id']);
+            $elements[] = $this->addUsernameElement($this->_user['id']);
         }
         if ($this->_changeEmail) {
-            $elements[] = $this->addEmailElement(true, false, $this->_user['id']);
+            $elements[] = $this->addEmailElement($this->_user['id']);
         }
-        $elements[] = $this->addRoleIdElement(true);
-        $elements[] = $this->addStatusIdElement(true);
+        $elements[] = $this->addRoleIdElement();
+        $elements[] = $this->addStatusIdElement();
         $this->addPrimaryButtonElement('submit', 'Update user profile');
         $this->addButtonElement('cancel', 'Cancel');
 
-        // set decorators
+        // add groups
         $this->addHorizontalGroup($elements);
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
@@ -50,5 +49,4 @@ class Auth_Form_UpdateUser extends Auth_Form_Abstract {
             $this->setDefault($element, $this->_user[$element]);
         }
     }
-
 }

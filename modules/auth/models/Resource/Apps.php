@@ -40,7 +40,7 @@ class Auth_Model_Resource_Apps extends Daiquiri_Model_Resource_Table {
         }
 
         // handle unencrypted password
-        $data['password'] = Daiquiri_Crypt_Abstract::factory()->encrypt($data['newPassword']);
+        $data['password'] = Daiquiri_Crypt_Abstract::factory()->encrypt($data['new_password']);
 
         // insert the new row
         $this->getAdapter()->insert('Auth_Apps', array(

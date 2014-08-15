@@ -283,8 +283,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 unset($credentials['status']);
 
                 // pre-process password first
-                $credentials['newPassword'] = $credentials['password'];
-                $credentials['confirmPassword'] = $credentials['password'];
+                $credentials['new_password'] = $credentials['password'];
+                $credentials['confirm_password'] = $credentials['password'];
                 unset($credentials['password']);
 
                 // fake request parametes to make 
@@ -305,8 +305,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         if ($authAppsModel->getResource()->countRows() === 0) {
             foreach ($this->_init->options['init']['auth']['apps'] as $credentials) {
                 // pre-process password first
-                $credentials['newPassword'] = $credentials['password'];
-                $credentials['confirmPassword'] = $credentials['password'];
+                $credentials['new_password'] = $credentials['password'];
+                $credentials['confirm_password'] = $credentials['password'];
                 unset($credentials['password']);
 
                 // fake request parametes to make 

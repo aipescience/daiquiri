@@ -25,8 +25,14 @@ class Auth_Form_ForgotPassword extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         // add form elements
-        $this->addEmailElement(true);
-
+        $this->addElement('text','email', array(
+            'label' => 'Email',
+            'required' => true,
+            'filter' => 'StringTrim',
+            'validators' => array(
+                array('validator' => 'emailAddress'),
+            )
+        ));
         $this->addPrimaryButtonElement('submit', 'Request password reset');
         $this->addButtonElement('cancel', 'Cancel');
         $this->addCaptchaElement();

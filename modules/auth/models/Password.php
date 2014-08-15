@@ -115,7 +115,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                     // check if the given username was correct
                     if ($values['username'] === $user['username']) {
                         // update the user
-                        $this->getResource()->updatePassword($userId, $values['newPassword']);
+                        $this->getResource()->updatePassword($userId, $values['new_password']);
 
                         // remove code
                         $resource = new Auth_Model_Resource_Details();
@@ -177,7 +177,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                 $values = $form->getValues();
 
                 // update the user and redirect
-                $this->getResource()->updatePassword($userId, $values['newPassword']);
+                $this->getResource()->updatePassword($userId, $values['new_password']);
 
                 // log the event
                 $resource = new Auth_Model_Resource_Details();
@@ -215,11 +215,11 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                 $user = $this->getResource()->fetchRow($userId);
 
                 // check if the old password is valid
-                $result = Daiquiri_Auth::getInstance()->authenticateUser($user['username'], $values['oldPassword']);
+                $result = Daiquiri_Auth::getInstance()->authenticateUser($user['username'], $values['old_password']);
 
                 if ($result) {
                     // update the user and redirect
-                    $this->getResource()->updatePassword($userId, $values['newPassword']);
+                    $this->getResource()->updatePassword($userId, $values['new_password']);
 
                     // log the event
                     $detailsResource = new Auth_Model_Resource_Details();

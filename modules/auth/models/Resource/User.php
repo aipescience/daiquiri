@@ -140,19 +140,19 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
             throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        if (isset($data['newPassword'])) {
+        if (isset($data['new_password'])) {
             // handle password
-            $data['password'] = Daiquiri_Crypt_Abstract::factory()->encrypt($data['newPassword']);
+            $data['password'] = Daiquiri_Crypt_Abstract::factory()->encrypt($data['new_password']);
 
             // handle additional versions of the password
             foreach (array_keys(Daiquiri_Config::getInstance()->auth->password->toArray()) as $type) {
                 if ($type != 'default') {
-                    $data['password_' . $type] = Daiquiri_Crypt_Abstract::factory($type)->encrypt($data['newPassword']);
+                    $data['password_' . $type] = Daiquiri_Crypt_Abstract::factory($type)->encrypt($data['new_password']);
                 }
             }
 
             // unset password
-            unset($data['newPassword']);
+            unset($data['new_password']);
         }
 
         // seperate primary credentials and details
@@ -388,17 +388,17 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      */
     public function registerUser(array $data) {
         // handle password
-        $data['password'] = Daiquiri_Crypt_Abstract::factory()->encrypt($data['newPassword']);
+        $data['password'] = Daiquiri_Crypt_Abstract::factory()->encrypt($data['new_password']);
 
         // handle additional versions of the password
         foreach (array_keys(Daiquiri_Config::getInstance()->auth->password->toArray()) as $type) {
             if ($type != 'default') {
-                $data['password_' . $type] = Daiquiri_Crypt_Abstract::factory($type)->encrypt($data['newPassword']);
+                $data['password_' . $type] = Daiquiri_Crypt_Abstract::factory($type)->encrypt($data['new_password']);
             }
         }
 
         // unset password
-        unset($data['newPassword']);
+        unset($data['new_password']);
 
         // seperate primary credentials and details and check for password
         $credentials = array();

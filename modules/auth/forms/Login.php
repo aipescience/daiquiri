@@ -25,9 +25,14 @@ class Auth_Form_Login extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements 
-        $this->addUsernameElement(true);
-        $this->addPasswordElement(true);
-
+        $this->addElement('text','username', array(
+            'label' => 'Username',
+            'required' => true
+        ));
+        $this->addElement('password','password', array(
+            'label' => 'Password',
+            'required' => true
+        ));
         $this->addElement('checkbox', 'remember', array(
             'label' => 'Remember login'
         ));

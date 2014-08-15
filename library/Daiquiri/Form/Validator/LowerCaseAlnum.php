@@ -28,7 +28,7 @@ class Daiquiri_Form_Validator_LowerCaseAlnum extends Zend_Validate_Abstract {
     const CHARS = 'chars';
 
     protected $_messageTemplates = array(
-        self::CHARS => "Only digits and lower case letters!"
+        self::CHARS => "Only digits and lower case letters are allowed"
     );
 
     public function isValid($value) {
@@ -36,7 +36,7 @@ class Daiquiri_Form_Validator_LowerCaseAlnum extends Zend_Validate_Abstract {
 
         $isValid = true;
 
-        if (preg_match("/[^ a-z0-9]/", $value)) {
+        if (preg_match("/[^a-z0-9]/", $value)) {
             $this->_error(self::CHARS);
             $isValid = false;
         }

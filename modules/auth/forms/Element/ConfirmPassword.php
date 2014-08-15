@@ -19,27 +19,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_Resources extends Daiquiri_Form_Abstract {
+class Auth_Form_Element_ConfirmPassword extends Auth_Form_Element_AbstractPassword {
 
-    public function init() {
-        $this->addCsrfElement();
-        
-        // add elements
-        $this->addElement('text', 'resource', array(
-            'label' => 'Resource',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
-                array('stringLength', false, array(0, 256))
-            )
-        ));
-        $this->addPrimaryButtonElement('submit', 'Create Resource');
-        $this->addButtonElement('cancel', 'Cancel');
-
-        // add groups
-        $this->addHorizontalGroup(array('resource'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+    /**
+     * Construtor. Sets the name of the element.
+     * @param array $options form options for this element
+     */
+    public function __construct($options = null) {
+        parent::__construct('confirm_password', $options);
     }
 
+    /**
+     * Initializes the form element
+     */
+    function init() {
+        parent::init();
+
+        // set label
+        $this->setLabel('Confirm password');
+
+        // add validataor for comparison with NewPassword element
+        $newPassword = Zend_Controller_Front::getInstance()->getRequest()->getParam('new_password');
+        $validator = new Zend_Validate_Identical($newPassword);
+        $validator->setMessage("The passwords do not match.");
+        $this->addValidator($validator);
+    }
 }

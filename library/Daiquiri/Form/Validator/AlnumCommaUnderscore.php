@@ -19,27 +19,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_Resources extends Daiquiri_Form_Abstract {
+/**
+ * A validator which allows unicode letters and numbers and certain common 
+ * special characters, which we consider save.
+ */
+class Daiquiri_Form_Validator_AlnumCommaUnderscore extends Zend_Validate_Abstract {
 
-    public function init() {
-        $this->addCsrfElement();
-        
-        // add elements
-        $this->addElement('text', 'resource', array(
-            'label' => 'Resource',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
-                array('stringLength', false, array(0, 256))
-            )
-        ));
-        $this->addPrimaryButtonElement('submit', 'Create Resource');
-        $this->addButtonElement('cancel', 'Cancel');
+    const CHARS = 'chars';
 
-        // add groups
-        $this->addHorizontalGroup(array('resource'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+    protected $_messageTemplates = array(
+        self::CHARS => "Only digits, letters, commas, and underscores are allowed"
+    );
+
+    public function isValid($value) {
+        $this->_setValue($value);
+
+        $isValid = true;
+
+        if (preg_match("/[^A-Za-z0-9\,\_]/", $value)) {
+            $this->_error(self::CHARS);
+            $isValid = false;
+        }
+
+        return $isValid;
     }
 
 }

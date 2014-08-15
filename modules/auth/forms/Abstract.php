@@ -116,284 +116,99 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
 
     /**
      * Creates a form element for a detail and adds it to the form.
-     * @param string $detail
-     * @param bool $required
-     * @return string 
+     * @param  string $detail key of the user detail
+     * @return string $name   name of the element
      */
-    public function addDetailElement($detail, $required = false) {
-        // create form element
-        $field = new Zend_Form_Element_Text($detail);
-        $field->setLabel(ucfirst($detail));
-
-        // add stuff
-        $field->addFilter('StringTrim');
-        $field->addValidator(new Daiquiri_Form_Validator_Text());
-        $field->setRequired($required);
-
-        $this->addElement($field);
+    public function addDetailElement($detail) {
+        $this->addElement(new Auth_Form_Element_Detail($detail));
         return $detail;
     }
 
     /**
      * Creates a form element for the username and adds it to the form.
-     * @param bool $required
-     * @param bool $unique
-     * @return string 
+     * @param int $excludeId exclude a certain user id from the unique-ness validator
+     * @return string $name   name of the element
      */
-    public function addUsernameElement($required = false, $unique = false, $excludeId = null) {
-        // create form element
-        $field = new Zend_Form_Element_Text('username');
-        $field->setLabel('Username');
-
-        // add stuff
-        $field->addFilter('StringTrim');
-        if (Daiquiri_Config::getInstance()->auth->lowerCaseUsernames) {
-            $field->addValidator(new Daiquiri_Form_Validator_LowerCaseAlnum());
-        } else {
-            $field->addValidator(new Zend_Validate_Alnum());
-        }
-
-        $minLength = Daiquiri_Config::getInstance()->auth->usernameMinLength;
-        $field->addValidator('StringLength', false, array($minLength, 80));
-
-        $field->setRequired($required);
-
-        // add validator for beeing unique
-        if ($unique) {
-            $val = new Zend_Validate();
-            $msg = 'The username is in use, please use another username.';
-
-            $val1 = new Zend_Validate_Db_NoRecordExists('Auth_User', 'username');
-            $val1->setMessage($msg);
-            if ($excludeId) {
-                $val1->setExclude(array(
-                    'field' => 'id',
-                    'value' => $excludeId
-                ));
-            }
-
-            $val2 = new Zend_Validate_Db_NoRecordExists('Auth_Registration', 'username');
-            $val2->setMessage($msg);
-
-            $val3 = new Zend_Validate_Db_NoRecordExists('Auth_Apps', 'appname');
-            $val3->setMessage($msg);
-
-            $val->addValidator($val1)->addValidator($val2)->addValidator($val3);
-
-            $field->addValidator($val);
-        }
-
-        $this->addElement($field);
+    public function addUsernameElement($excludeId = null) {
+        $this->addElement(new Auth_Form_Element_Username());
         return 'username';
     }
 
     /**
      * Creates a form element for the appname and adds it to the form.
-     * @param bool $required
-     * @param bool $unique
-     * @return string 
+     * @param int $excludeId exclude a certain user id from the unique-ness validator
+     * @return string $name   name of the element
      */
-    public function addAppnameElement($required = false, $unique = false, $excludeId = null) {
-        // create form element
-        $field = new Zend_Form_Element_Text('appname');
-        $field->setLabel('Appname');
-
-        // add stuff
-        $field->addFilter('StringTrim');
-        if (Daiquiri_Config::getInstance()->auth->lowerCaseUsernames) {
-            $field->addValidator(new Daiquiri_Form_Validator_LowerCaseAlnum());
-        } else {
-            $field->addValidator(new Daiquiri_Form_Validator_Text());
-        }
-
-        $minLength = Daiquiri_Config::getInstance()->auth->usernameMinLength;
-        $field->addValidator('StringLength', false, array($minLength, 80));
-
-        $field->setRequired($required);
-
-        // add validator for beeing unique
-        if ($unique) {
-            $val = new Zend_Validate();
-            $msg = 'The username is in use, please use another username.';
-
-            $val1 = new Zend_Validate_Db_NoRecordExists('Auth_User', 'username');
-            $val1->setMessage($msg);
-            if ($excludeId) {
-                $val1->setExclude(array(
-                    'field' => 'id',
-                    'value' => $excludeId
-                ));
-            }
-
-            $val2 = new Zend_Validate_Db_NoRecordExists('Auth_Registration', 'username');
-            $val2->setMessage($msg);
-
-            $val3 = new Zend_Validate_Db_NoRecordExists('Auth_Apps', 'appname');
-            $val3->setMessage($msg);
-
-            $val->addValidator($val1)->addValidator($val2)->addValidator($val3);
-
-            $field->addValidator($val);
-        }
-
-        $this->addElement($field);
+    public function addAppnameElement($excludeId = null) {
+        $this->addElement(new Auth_Form_Element_Appname());
         return 'appname';
     }
 
     /**
      * Creates a form element for the email and adds it to the form.
-     * @param bool $required
-     * @param bool $unique
-     * @return string 
+     * @param int $excludeId exclude a certain user id from the unique-ness validator
+     * @return string $name   name of the element
      */
-    public function addEmailElement($required = false, $unique = false, $excludeId = null) {
-        // create form element
-        $field = new Zend_Form_Element_Text('email');
-        $field->setLabel('Email');
-
-        // add stuff
-        $field->addFilter('StringTrim');
-        $field->addValidator('emailAddress');
-        $field->setRequired($required);
-
-        // add validator for beeing unique
-        if ($unique) {
-            $val = new Zend_Validate();
-            $msg = 'The email is already in the database, please check if you are already registered.';
-            $val1 = new Zend_Validate_Db_NoRecordExists('Auth_User', 'email');
-            $val1->setMessage($msg);
-            if ($excludeId) {
-                $val1->setExclude(array(
-                    'field' => 'id',
-                    'value' => $excludeId
-                ));
-            }
-            $val2 = new Zend_Validate_Db_NoRecordExists('Auth_Registration', 'email');
-            $val2->setMessage($msg);
-            $val->addValidator($val1)->addValidator($val2);
-
-            $field->addValidator($val);
-        }
-
-        $this->addElement($field);
+    public function addEmailElement($excludeId = null) {
+        $this->addElement(new Auth_Form_Element_Email());
         return 'email';
     }
 
     /**
      * Creates a form element for the password and adds it to the form.
-     * @param bool $required
-     * @return string 
+     * @return string $name name of the element
      */
-    public function addPasswordElement($required = false) {
-        // create form element
-        $field = new Zend_Form_Element_Password('password');
-        $field->setLabel('Password');
-
-        // add stuff
-        $field->addFilter('StringTrim');
-        $field->addValidator(new Daiquiri_Form_Validator_Text());
-        $field->setRequired($required);
-
-        $this->addElement($field);
+    public function addPasswordElement() {
+        $this->addElement(new Auth_Form_ElementPassword());
         return 'password';
     }
 
     /**
      * Creates a form element for the old password and adds it to the form.
-     * @param bool $required
-     * @return string 
+     * @return string $name name of the element
      */
-    public function addOldPasswordElement($required = false) {
-        // create form element
-        $field = new Zend_Form_Element_Password('oldPassword');
-        $field->setLabel('Old Password');
-
-        // add stuff
-        $field->addFilter('StringTrim');
-        $field->addValidator(new Daiquiri_Form_Validator_Text());
-        $field->setRequired($required);
-
-        $this->addElement($field);
-        return 'oldPassword';
+    public function addOldPasswordElement() {
+        $this->addElement(new Auth_Form_Element_OldPassword());
+        return 'old_password';
     }
 
     /**
      * Creates a form element for the new password and adds it to the form.
-     * @param bool $required
-     * @return string 
+     * @return string $name name of the element
      */
-    public function addNewPasswordElement($required = false) {
-        // create form element
-        $field = new Zend_Form_Element_Password('newPassword');
-        $field->setLabel('New Password');
-
-        // add stuff
-        $field->addFilter('StringTrim');
-        $field->addValidator(new Daiquiri_Form_Validator_Text());
-        $minLength = Daiquiri_Config::getInstance()->auth->passwordMinLength;
-        $field->addValidator('StringLength', false, array($minLength, 80));
-        $field->setRequired($required);
-
-        $this->addElement($field);
-        return 'newPassword';
+    public function addNewPasswordElement() {
+        $this->addElement(new Auth_Form_Element_NewPassword());
+        return 'new_password';
     }
 
     /**
      * Creates a form element for the password confirmation and adds it to the form.
-     * @param bool $required
-     * @return string 
+     * @return string $name name of the element 
      */
-    public function addConfirmPasswordElement($required = false) {
-        // create form element
-        $field = new Zend_Form_Element_Password('confirmPassword');
-        $field->setLabel('Confirm Password');
-
-        // add stuff
-        $field->addFilter('StringTrim');
-        $field->setRequired($required);
-
-        // add custom validataor
-        $val = new Zend_Validate_Identical(
-                        Zend_Controller_Front::getInstance()->getRequest()->getParam('newPassword'));
-        $val->setMessage("The passwords do not match.");
-        $field->addValidator($val);
-        $this->addElement($field);
-        return 'confirmPassword';
+    public function addConfirmPasswordElement() {
+        $this->addElement(new Auth_Form_Element_ConfirmPassword());
+        return 'confirm_password';
     }
 
     /**
      * Creates a form element for the role id and adds it to the form.
-     * @param bool $required
-     * @return string 
+     * @return string $name name of the element
      */
-    public function addRoleIdElement($required = false) {
-        // create form element
-        $field = new Zend_Form_Element_Select('role_id');
-        $field->setLabel('Role');
-
-        // add stuff
-        $field->addMultiOptions($this->_roles);
-        $field->setRequired($required);
-
-        $this->addElement($field);
+    public function addRoleIdElement() {
+        $this->addElement(new Auth_Form_Element_RoleId(array(
+            'multiOptions' => $this->_roles
+        )));
         return 'role_id';
     }
 
     /**
      * Creates a form element for the status id and adds it to the form.
-     * @param bool $required
-     * @return string 
+     * @return string $name name of the element
      */
-    public function addStatusIdElement($required = false) {
-        // create form element
-        $field = new Zend_Form_Element_Select('status_id');
-        $field->setLabel('Status');
-
-        // add stuff
-        $field->addMultiOptions($this->_status);
-        $field->setRequired($required);
-
-        $this->addElement($field);
+    public function addStatusIdElement() {
+        $this->addElement(new Auth_Form_Element_StatusId(array(
+            'multiOptions' => $this->_status
+        )));
         return 'status_id';
     }
 

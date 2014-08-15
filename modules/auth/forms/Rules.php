@@ -30,7 +30,8 @@ class Auth_Form_Rules extends Daiquiri_Form_Abstract {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => 'alnum'),
+                array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
+                array('stringLength', false, array(0, 256))
             )
         ));
         $this->addElement('text', 'resource', array(
@@ -38,7 +39,8 @@ class Auth_Form_Rules extends Daiquiri_Form_Abstract {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Zend_Validate_Regex(array('pattern' => '/^[A-Za-z0-9\_\%\.\,\*\:\=]*$/'))),
+                array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
+                array('stringLength', false, array(0, 256))
             )
         ));
         $this->addElement('text', 'permissions', array(
@@ -46,7 +48,8 @@ class Auth_Form_Rules extends Daiquiri_Form_Abstract {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Zend_Validate_Regex(array('pattern' => '/^[A-Za-z0-9\_\%\.\,\*\:\=\ ]*$/'))),
+                array('validator' => new Daiquiri_Form_Validator_AlnumCommaUnderscore()),
+                array('stringLength', false, array(0, 256))
             )
         ));
 

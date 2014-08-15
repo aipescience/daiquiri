@@ -41,22 +41,15 @@ class Auth_Form_Details extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         $this->addElement('text', 'key', array(
-            'label' => 'Key:',
+            'label' => 'Key',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => 'alnum'),
+                array('alnum'),
+                array('stringLength', false, array(0, 256))
             )
         ));
-        $this->addElement('text', 'value', array(
-            'label' => 'Value:',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-            )
-        ));
-
+        $this->addElement(new Auth_Form_Element_Detail('value'));
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 

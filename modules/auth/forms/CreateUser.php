@@ -23,27 +23,25 @@ class Auth_Form_CreateUser extends Auth_Form_Abstract {
 
     public function init() {
         $this->addCsrfElement();
-        
-        $d = array();
-        $u = array();
 
         // add elements
         foreach ($this->getDetails() as $detail) {
-            $d[] = $this->addDetailElement($detail, true);
+            $this->addDetailElement($detail);
         }
-        $u[] = $this->addUsernameElement(true, true);
-        $u[] = $this->addEmailElement(true, true);
-        $u[] = $this->addNewPasswordElement(true);
-        $u[] = $this->addConfirmPasswordElement(true);
-        $u[] = $this->addRoleIdElement(true);
-        $u[] = $this->addStatusIdElement(true);
-
+        $elements = array(
+            $this->addUsernameElement(),
+            $this->addEmailElement(),
+            $this->addNewPasswordElement(),
+            $this->addConfirmPasswordElement(),
+            $this->addRoleIdElement(),
+            $this->addStatusIdElement()
+        );
         $this->addPrimaryButtonElement('submit', 'Create user');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup($d, 'detail-group');
-        $this->addHorizontalGroup($u, 'user-group');
+        $this->addHorizontalGroup($this->getDetails(), 'detail-group');
+        $this->addHorizontalGroup($elements, 'user-group');
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 

@@ -23,21 +23,17 @@ class Auth_Form_Account extends Auth_Form_Abstract {
 
     public function init() {
         $this->addCsrfElement();
-        
-        $elements = array();
 
         // add elements
+        $elements = array();
         foreach ($this->getDetails() as $detail) {
-            $this->addDetailElement($detail, true);
-            $elements[] = $detail;
+            $elements[] = $this->addDetailElement($detail);
         }
         if ($this->_changeUsername) {
-            $element = $this->addUsernameElement(true, true, $this->_user['id']);
-            $elements[] = 'username';
+            $elements[] = $this->addUsernameElement($this->_user['id']);
         }
         if ($this->_changeEmail) {
-            $element = $this->addEmailElement(true, true, $this->_user['id']);
-            $elements[] = 'email';
+            $elements[] = $this->addEmailElement($this->_user['id']);
         }
         $this->addPrimaryButtonElement('submit', 'Update profile');
         $this->addButtonElement('cancel', 'Cancel');

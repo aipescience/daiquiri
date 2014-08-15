@@ -25,14 +25,13 @@ class Auth_Form_SetPassword extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addNewPasswordElement(true);
-        $this->addConfirmPasswordElement(true);
+        $this->addNewPasswordElement();
+        $this->addConfirmPasswordElement();
         $this->addPrimaryButtonElement('submit', 'Set new password');
         $this->addButtonElement('cancel', 'Cancel');
 
         // set decorators
-        $this->addHorizontalGroup(array('newPassword', 'confirmPassword'));
+        $this->addHorizontalGroup(array('new_password', 'confirm_password'));
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
-
 }

@@ -30,10 +30,10 @@ class Auth_Form_Status extends Daiquiri_Form_Abstract {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => 'alnum'),
+                array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
+                array('stringLength', false, array(0, 16))
             )
         ));
-
         $this->addPrimaryButtonElement('submit', 'Create user status');
         $this->addButtonElement('cancel', 'Cancel');
 

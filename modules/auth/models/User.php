@@ -211,7 +211,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 $values = $form->getValues();
 
                 // unset some elements
-                unset($values['confirmPassword']);
+                unset($values['confirm_password']);
 
                 // create the user
                 $id = $this->getResource()->insertRow($values);

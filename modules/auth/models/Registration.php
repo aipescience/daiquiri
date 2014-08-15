@@ -85,7 +85,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
-                unset($values['confirmPassword']);
+                unset($values['confirm_password']);
 
                 // produce random validation link
                 $values['code'] = $this->createRandomString(32);

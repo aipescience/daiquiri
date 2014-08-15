@@ -19,27 +19,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_Resources extends Daiquiri_Form_Abstract {
+class Auth_Form_Element_Detail extends Zend_Form_Element_Text {
 
-    public function init() {
-        $this->addCsrfElement();
-        
-        // add elements
-        $this->addElement('text', 'resource', array(
-            'label' => 'Resource',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
-                array('stringLength', false, array(0, 256))
-            )
-        ));
-        $this->addPrimaryButtonElement('submit', 'Create Resource');
-        $this->addButtonElement('cancel', 'Cancel');
+    /**
+     * Initializes the form element
+     */
+    function init() {
+        // set label
+        $this->setLabel(ucfirst($this->getName()));
 
-        // add groups
-        $this->addHorizontalGroup(array('resource'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        // set required
+        $this->setRequired(true);
+
+        // set filter
+        $this->addFilter('StringTrim');
+
+        // add validator
+        $this->addValidator(new Daiquiri_Form_Validator_Text());
+
+        // add validator for max string length
+        $this->addValidator('StringLength', false, array(0, 256));
     }
-
 }
