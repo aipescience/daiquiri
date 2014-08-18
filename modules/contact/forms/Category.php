@@ -21,6 +21,9 @@
 
 class Contact_Form_Category extends Daiquiri_Form_Abstract {
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
         

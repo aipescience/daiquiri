@@ -21,17 +21,37 @@
 
 class Contact_Form_Respond extends Daiquiri_Form_Abstract {
 
+    /**
+     * The subject of the message.
+     * @var string
+     */
     protected $_subject;
+
+    /**
+     * The body of the message.
+     * @var string
+     */
     protected $_body;
 
+    /**
+     * Sets $_subject.
+     * @param string $subject the subject of the message
+     */
     public function setSubject($subject) {
         $this->_subject = $subject;
     }
 
+    /**
+     * Sets $_body.
+     * @param string $body the body of the message
+     */
     public function setBody($body) {
         $this->_body = $body;
     }
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
 

@@ -21,17 +21,37 @@
 
 class Contact_Form_Submit extends Daiquiri_Form_Abstract {
 
+    /**
+     * The set of categories to choose from
+     * @var array
+     */
     protected $_categories = array();
+
+    /**
+     * The user credentials for this form.
+     * @var array
+     */
     protected $_user = array();
 
+    /**
+     * Sets $_categories.
+     * @param array $categories the set of categories to choose from
+     */
     public function setCategories($categories) {
         $this->_categories = $categories;
     }
 
+    /**
+     * Sets $_user.
+     * @param array $user the user credentials for this form
+     */
     public function setUser($user) {
         $this->_user = $user;
     }
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
 
