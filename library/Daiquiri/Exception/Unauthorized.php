@@ -21,8 +21,12 @@
 
 class Daiquiri_Exception_Unauthorized extends Zend_Exception {
 
-    public function __construct() {
-        parent::__construct('You are not authorized to view this page (401).', 401);
+    public function __construct($message = null) {
+        if (empty($message)) {
+            parent::__construct('You are not authorized to view this page. (401)', 401);
+        } else {
+            parent::__construct($message . ' (401)', 401);
+        }
     }
 
 }

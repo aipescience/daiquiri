@@ -21,8 +21,12 @@
 
 class Daiquiri_Exception_Forbidden extends Zend_Exception {
 
-    public function __construct() {
-        parent::__construct('You are not allowed to view this page (403).', 403);
+    public function __construct($message = null) {
+        if (empty($message)) {
+            parent::__construct('You are not allowed to view this page. (403)', 403);
+        } else {
+            parent::__construct($message . ' (403)', 403);
+        }
     }
     
 }

@@ -21,8 +21,12 @@
 
 class Daiquiri_Exception_BadRequest extends Zend_Exception {
 
-    public function __construct() {
-        parent::__construct('There has been an error with your request (400).', 400);
+    public function __construct($message = null) {
+        if (empty($message)) {
+            parent::__construct('There has been an error with your request. (400)', 400);
+        } else {
+            parent::__construct($message . ' (400)', 400);
+        }
     }
 
 }

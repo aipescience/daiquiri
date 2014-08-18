@@ -35,6 +35,10 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function show($userId, $key) {
+        if (empty($userId) || empty($key)) {
+            throw new Daiquiri_Exception_BadRequest('id and/or key arguments are missing. ');
+        }
+
         $detail = $this->getResource()->fetchValue($userId, $key);
         if ($detail === false) {
             throw new Daiquiri_Exception_NotFound();
@@ -50,6 +54,10 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function create($userId, array $formParams = array()) {
+        if (empty($userId) || empty($key)) {
+            throw new Daiquiri_Exception_BadRequest('id argument is missing. ');
+        }
+
         // create the form object
         $form = new Auth_Form_Details(array(
             'submit' => 'Create detail'
@@ -85,6 +93,10 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function update($userId, $key, array $formParams = array()) {
+        if (empty($userId) || empty($key)) {
+            throw new Daiquiri_Exception_BadRequest('id and/or key arguments are missing. ');
+        }
+
         // get the detail from the database
         $value = $this->getResource()->fetchValue($userId, $key);
         if ($value === false) {
@@ -123,6 +135,10 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function delete($userId, $key, array $formParams = array()) {
+        if (empty($userId) || empty($key)) {
+            throw new Daiquiri_Exception_BadRequest('id and/or key arguments are missing. ');
+        }
+
         // check if the key is there
         if ($this->getResource()->fetchValue($userId, $key) === false) {
             return array('status' => 'error', 'error' => 'Key not found');

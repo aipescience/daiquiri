@@ -21,8 +21,12 @@
 
 class Daiquiri_Exception_NotFound extends Zend_Exception {
     
-    public function __construct() {
-        parent::__construct('This page does not exist (404).', 404);
+    public function __construct($message = null) {
+        if (empty($message)) {
+            parent::__construct('This page does not exist. (404)', 404);
+        } else {
+            parent::__construct($message . ' (404)', 404);
+        }
     }
 
 }
