@@ -21,6 +21,10 @@
 
 class Query_Form_RangeQuery extends Query_Form_AbstractFormQuery {
 
+    /**
+     * Gets the SQL query contructed from the form fields.
+     * @return string $sql
+     */
     public function getQuery() {
         if (!isset($this->_formOptions['table'])) {
             throw new Exception('no table was specified');
@@ -37,18 +41,25 @@ class Query_Form_RangeQuery extends Query_Form_AbstractFormQuery {
         return $sql;
     }
 
+    /**
+     * Gets the content of the tablename field.
+     * @return string $tablename
+     */
     public function getTablename() {
         return $this->getValue('range_tablename');
     }
 
+    /**
+     * Gets the selected queue.
+     * @return string $queue
+     */
     public function getQueue() {
         return $this->getValue('range_queue');
     }
 
-    public function getCsrf() {
-        return $this->getElement('range_csrf');
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->setAttrib('id', 'daiquiri-form-query-range');
         $this->addCsrfElement('range_csrf');

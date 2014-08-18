@@ -21,12 +21,23 @@
 
 class Query_Form_RenameJob extends Daiquiri_Form_Abstract {
 
+    /**
+     * The default entry for the tablename field.
+     * @var array
+     */
     private $_tablename;
 
+    /**
+     * Sets $_tablename.
+     * @param array $tablename the default entry for the tablename field
+     */
     public function setTablename($tablename) {
         $this->_tablename = $tablename;
     }
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
 

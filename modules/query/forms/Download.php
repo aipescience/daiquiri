@@ -21,17 +21,23 @@
 
 class Query_Form_Download extends Daiquiri_Form_Abstract {
 
+    /**
+     * The set of formats to choose from.
+     * @var array
+     */
     protected $_formats;
-    protected $_csrfActive = true;
 
+    /**
+     * Sets $_formats.
+     * @param array $formats the set of formats to choose from
+     */
     public function setFormats(array $formats) {
         $this->_formats = $formats;
     }
 
-    public function getCsrf() {
-        return $this->getElement('download_csrf');
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addElement('select', 'download_format', array(
             'required' => true,

@@ -21,26 +21,51 @@
 
 class Query_Form_Plan extends Daiquiri_Form_Abstract {
 
+    /**
+     * The sql query plan.
+     * @var string
+     */
     protected $_query;
+
+    /**
+     * Whether or not the plan can be edited.
+     * @var bool
+     */
     protected $_editable;
+
+    /**
+     * Whether or not a mail link is displayed.
+     * @var bool
+     */
     protected $_mail;
 
+    /**
+     * Sets $_query.
+     * @param string $query the sql query plan
+     */
     public function setQuery($query) {
         $this->_query = $query;
     }
 
+    /**
+     * Sets $_editable.
+     * @param bool $editable whether or not the plan can be edited
+     */
     public function setEditable($editable) {
         $this->_editable = $editable;
     }
 
+    /**
+     * Sets $_mail.
+     * @param bool $mail whether or not a mail link is displayed.
+     */
     public function setMail($mail) {
         $this->_mail = $mail;
     }
 
-    public function getCsrf() {
-        return $this->getElement('plan_csrf');
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement('plan_csrf');
 

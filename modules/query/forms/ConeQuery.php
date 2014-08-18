@@ -21,6 +21,10 @@
 
 class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
 
+    /**
+     * Gets the SQL query contructed from the form fields.
+     * @return string $sql
+     */
     public function getQuery() {
         if (!isset($this->_formOptions['table'])) {
             throw new Exception('no table was specified');
@@ -41,22 +45,28 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         $sql .= " WHERE angdist({$ra},{$dec},`{$this->_formOptions['raField']}`,`{$this->_formOptions['decField']}`)";
         $sql .= " < {$radius} / 3600.0;";
 
-    //Zend_Debug::dump($sql); die(0);
         return $sql;
     }
 
+    /**
+     * Gets the content of the tablename field.
+     * @return string $tablename
+     */
     public function getTablename() {
         return $this->getValue($this->getFieldId('tablename'));
     }
 
+    /**
+     * Gets the selected queue.
+     * @return string $queue
+     */
     public function getQueue() {
         return $this->getValue($this->getFieldId('queue'));
     }
 
-    public function getCsrf() {
-        return $this->getElement($this->getFieldId('csrf'));
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->setAttrib('id', 'daiquiri-form-query-cone');
         $this->addCsrfElement($this->getFieldId('csrf'));

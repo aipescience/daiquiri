@@ -19,25 +19,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Query_Form_Example extends Daiquiri_Form_Abstract {
+class Query_Form_Example extends Daiquiri_Form_Model {
 
-    protected $_row;
-    protected $_submit;
-
+    /**
+     * The different publication roles to choose from.
+     * @var array
+     */
     protected $_roles = array();
 
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
-    public function setRow($row) {
-        $this->_row = $row;
-    }
-
+    /**
+     * Sets $_roles.
+     * @param array $roles the different publication roles to choose from
+     */
     public function setRoles($roles) {
         $this->_roles = $roles;
     }
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
 
@@ -84,9 +84,9 @@ class Query_Form_Example extends Daiquiri_Form_Abstract {
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
-        if (isset($this->_row)) {
+        if (isset($this->_entry)) {
             foreach (array('name', 'query', 'description', 'publication_role_id') as $element) {
-                $this->setDefault($element, $this->_row[$element]);
+                $this->setDefault($element, $this->_entry[$element]);
             }
         }
     }

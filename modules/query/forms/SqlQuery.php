@@ -21,28 +21,49 @@
 
 class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
 
-    protected $_queue;
-    public function getQuery() {
-        return $this->getValue('sql_query');
-    }
+    /**
+     * The default value for the query field.
+     * @var string
+     */
+    protected $_query;
 
+
+    /**
+     * Sets $_query.
+     * @param string $query the default value for the query field
+     */
     public function setQuery($query) {
         $this->_query = $query;
     }
 
+    /**
+     * Gets the SQL query contructed from the form fields.
+     * @return string $sql
+     */
+    public function getQuery() {
+        return $this->getValue('sql_query');
+    }
+    
+    /**
+     * Gets the content of the tablename field.
+     * @return string $tablename
+     */
     public function getTablename() {
         return $this->getValue('sql_tablename');
     }
 
+    /**
+     * Gets the selected queue.
+     * @return string $queue
+     */
     public function getQueue() {
         $value = str_replace('sql_queue_', '', $this->getValue('sql_queue_value'));
         return $value;
     }
 
-    public function getCsrf() {
-        return $this->getElement('sql_csrf');
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->setAttrib('id', 'daiquiri-form-query-sql');
         $this->addCsrfElement('sql_csrf');

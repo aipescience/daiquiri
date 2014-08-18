@@ -80,8 +80,8 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
      */
     public function update($id, array $formParams = array()) {
         // get example from database
-        $row = $this->getResource()->fetchRow($id);
-        if (empty($row)) {
+        $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
             throw new Daiquiri_Exception_NotFound();
         }
 
@@ -92,7 +92,7 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
         $form = new Query_Form_Example(array(
             'roles' => $roles,
             'submit' => 'Create Example',
-            'row' => $row
+            'entry' => $entry
         ));
 
         // valiadate the form if POST

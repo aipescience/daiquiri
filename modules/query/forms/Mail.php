@@ -21,24 +21,50 @@
 
 class Query_Form_Mail extends Daiquiri_Form_Abstract {
 
+    /**
+     * The user entry for the user credential fields.
+     * @var array
+     */
     protected $_user = array();
+
+    /**
+     * The sql query to be send.
+     * @var array
+     */
     protected $_sql = array();
+
+    /**
+     * The query plan to be send.
+     * @var array
+     */
     protected $_plan = array();
 
+    /**
+     * Sets $_user.
+     * @param array $user the user entry for the user credential fields
+     */
     public function setUser($user) {
         $this->_user = $user;
     }
 
+    /**
+     * Sets $_sql.
+     * @param [type] $sql the sql query to be send
+     */
     public function setSql($sql) {
         $this->_sql = $sql;
     }
 
+    /**
+     * Sets $_plan.
+     * @param [type] $plan the query plan to be send
+     */
     public function setPlan($plan) {
         $this->_plan = $plan;
     }
 
     /**
-     * @brief Initializes the contact form.
+     * Initializes the form.
      */
     public function init() {
         $this->addCsrfElement();
