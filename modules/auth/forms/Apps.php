@@ -25,14 +25,16 @@ class Auth_Form_Apps extends Auth_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addAppnameElement();
-        $this->addNewPasswordElement();
-        $this->addConfirmPasswordElement();
+        $elements = array(
+            $this->addAppnameElement(),
+            $this->addNewPasswordElement(),
+            $this->addConfirmPasswordElement(),
+        );
         $this->addPrimaryButtonElement('submit', 'Create user status');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup($u);
+        $this->addHorizontalGroup($elements);
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }
 

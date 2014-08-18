@@ -70,11 +70,11 @@ abstract class Daiquiri_Model_Init {
      */ 
     protected function _check($r, $a) {
         if ($r['status'] !== 'ok') {
-            echo 'ERROR';
-            if (array_key_exists('error', $r)) {
-                echo ': ' . $r['error'];
-            }
+            echo PHP_EOL . 'There has been an error.';
             Zend_Debug::dump($a);
+            if (array_key_exists('errors', $r)) {
+                Zend_Debug::dump($r['errors']);
+            }
             die(0);
         }
     }
