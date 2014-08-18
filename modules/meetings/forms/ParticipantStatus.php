@@ -21,17 +21,9 @@
 
 class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Abstract {
 
-    private $_submit;
-    private $_entry;
-    
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
         

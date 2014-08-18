@@ -22,20 +22,20 @@
 class Data_Form_Tables extends Data_Form_Abstract {
 
     /**
-     * Databases to choose from.
+     * The set of databases to choose from.
      * @var array
      */
     protected $_databases = array();
 
     /**
-     * Preselected database.
+     * The preselected database.
      * @var int 
      */
     protected $_database_id;
 
     /**
      * Sets $_databases.
-     * @param array $databases databases to choose from
+     * @param array $databases the set of databases to choose from
      */
     public function setDatabases($databases) {
         $this->_databases = $databases;
@@ -43,7 +43,7 @@ class Data_Form_Tables extends Data_Form_Abstract {
 
     /**
      * Sets $_database_id.
-     * @param [type] $database_id preselected database
+     * @param [type] $database_id the preselected database
      */
     public function setDatabaseId($database_id) {
         $this->_database_id = $database_id;

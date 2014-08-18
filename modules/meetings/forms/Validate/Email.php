@@ -21,15 +21,43 @@
 
 class Meetings_Form_Validate_Email extends Zend_Validate_Db_NoRecordExists {
 
+    /**
+     * The id of the meeting for this validator.
+     * @var int
+     */
     private $_meetingId = null;
 
+    /**
+     * Sets $_meetingId.
+     * @param int $meetingId the id of the meeting for this validator
+     */
     public function setMeetingId($meetingId) {
         $this->_meetingId = $meetingId;
     }
 
+    /**
+     * Exclude a certain id from the unique-ness validator.
+     * @var int
+     */
+    private $_excludeId = false;
+
+    /**
+     * Sets $_excludeId.
+     * @param bool $unique exclude a certain id from the unique-ness validator.
+     */
+    public function setExcludeId($excludeId) {
+        $this->_excludeId = $excludeId;
+    }
+
+    /**
+     * Returns the select object to be used for validation.
+     * @return Zend_Db_Select $select
+     */
     public function getSelect() {
         if (null === $this->_select) {
             $db = $this->getAdapter();
+
+            // Zend_Debug::dump($this->_excludeId ); // die(0);
 
             $select = new Zend_Db_Select($db);
             $select->from($this->_table, array($this->_field), $this->_schema);
@@ -39,8 +67,11 @@ class Meetings_Form_Validate_Email extends Zend_Validate_Db_NoRecordExists {
                 $select->where($db->quoteIdentifier($this->_field, true).' = ?'); // positional
             }
             $select->limit(1);
-            if ($this->_meetingId !== null) {
+            if (!empty($this->_meetingId)) {
                 $select->where($db->quoteInto('`meeting_id` = ?', $this->_meetingId));
+            }
+            if (!empty($this->_excludeId)) {
+                $select->where($db->quoteInto('`id` != ?', $this->_excludeId));
             }
 
             $this->_select = $select;

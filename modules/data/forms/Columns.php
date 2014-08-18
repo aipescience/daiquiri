@@ -22,26 +22,26 @@
 class Data_Form_Columns extends Data_Form_Abstract {
 
     /**
-     * Tables to choose from.
+     * The set of tables to choose from.
      * @var array
      */
     protected $_tables = array();
 
     /**
-     * Preselected table.
+     * The preselected table.
      * @var [type]
      */
     protected $_table_id;
 
     /**
-     * Unified Content Descriptors to choose from.
+     * The set of Unified Content Descriptors to choose from.
      * @var array
      */
     protected $_ucds = array();
 
     /**
      * Sets $_tables.
-     * @param array $tables tables to choose from
+     * @param array $tables the set of tables to choose from
      */
     public function setTables($tables) {
         $this->_tables = $tables;
@@ -49,7 +49,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
 
     /**
      * Sets $_table_id.
-     * @param int $table_id preselected table
+     * @param int $table_id the preselected table
      */
     public function setTableId($table_id) {
         $this->_table_id = $table_id;
@@ -57,7 +57,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
 
     /**
      * Sets $_ucds 
-     * @param array $ucds Unified Content Descriptors to choose from.
+     * @param array $ucds the set of Unified Content Descriptors to choose from.
      */
     public function setUcds($ucds) {
         $this->_ucds = $ucds;

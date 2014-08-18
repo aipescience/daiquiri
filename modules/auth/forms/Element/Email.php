@@ -22,14 +22,14 @@
 class Auth_Form_Element_Email extends Zend_Form_Element_Text {
 
     /**
-     * Exclude a certain id from the unique-ness validator.
+     * Exclude a certain id from the validator.
      * @var int
      */
-    protected $_excludeId = false;
+    private $_excludeId = false;
 
     /**
      * Sets $_excludeId.
-     * @param bool $unique exclude a certain id from the unique-ness validator.
+     * @param bool $unique exclude a certain id from the validator.
      */
     public function setExcludeId($excludeId) {
         $this->_excludeId = $excludeId;
@@ -78,8 +78,8 @@ class Auth_Form_Element_Email extends Zend_Form_Element_Text {
         $registrationTableValidator = new Zend_Validate_Db_NoRecordExists('Auth_Registration', 'email');
         $registrationTableValidator->setMessage($message);
 
+        // chainvalidators and add to field
         $validator->addValidator($userTableValidator)->addValidator($registrationTableValidator);
-
         $this->addValidator($validator);
     }
 }

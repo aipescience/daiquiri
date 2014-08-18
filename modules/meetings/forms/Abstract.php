@@ -19,19 +19,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-abstract class Data_Form_Abstract extends Daiquiri_Form_Model {
+abstract class Meetings_Form_Abstract extends Daiquiri_Form_Model {
 
     /**
-     * The different publication roles to choose from.
+     * The meeting for this form.
      * @var array
      */
-    protected $_roles = array();
+    protected $_meeting;
 
     /**
-     * Sets $_roles.
-     * @param array $roles the different publication roles to choose from
+     * Sets $_meeting.
+     * @param array $meeting the meeting for this form
      */
-    public function setRoles($roles) {
-        $this->_roles = $roles;
+    public function setMeeting($meeting) {
+        $this->_meeting = $meeting;
     }
 }

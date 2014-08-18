@@ -21,41 +21,74 @@
 
 class Meetings_Form_Element_Email extends Zend_Form_Element_Text {
 
-    private $_unique = null;
+    /**
+     * The id of the meeting for this element.
+     * @var int
+     */
     private $_meetingId = null;
 
+    /**
+     * Sets $_meetingId.
+     * @param int $meetingId the id of the meeting for this element
+     */
     public function setMeetingId($meetingId) {
         $this->_meetingId = $meetingId;
     }
 
-    public function setUnique($unique) {
-        $this->_unique = $unique;
+    /**
+     * Exclude a certain id from the unique-ness validator.
+     * @var int
+     */
+    protected $_excludeId = false;
+
+    /**
+     * Sets $_excludeId.
+     * @param bool $unique exclude a certain id from the unique-ness validator.
+     */
+    public function setExcludeId($excludeId) {
+        $this->_excludeId = $excludeId;
     }
 
-    function init() {
-        parent::init();
+    /**
+     * Construtor. Sets the name of the element.
+     * @param array $options form options for this element
+     */
+    public function __construct($options = null) {
+        parent::__construct('email', $options);
+    }
 
+    /**
+     * Initializes the form element.
+     */
+    function init() {
         $this->setLabel('Email');
 
-        // add stuff
+        // set filter
         $this->addFilter('StringTrim');
+
+        // add validator for max string length
+        $this->addValidator('StringLength', false, array(0, 256));
+
+        // add validator for email addresses
         $this->addValidator('emailAddress');
-        
-        if ($this->_unique) {
-            $val = new Zend_Validate();
-            $msg = 'The email is already in the database, please check if you are already registered.';
 
-            $val1 = new Meetings_Form_Validate_Email('Meetings_Participants', 'email');
-            $val1->setMessage($msg);
-            $val1->setMeetingId($this->_meetingId);
+        // add validator for beeing unique in the database
+        $validator = new Zend_Validate();
+        $message = 'The email is already in the database, please check if you are already registered.';
 
-            $val2 = new Meetings_Form_Validate_Email('Meetings_Registration', 'email');
-            $val2->setMessage($msg);
-            $val2->setMeetingId($this->_meetingId);
-
-            // chainvalidators and add to field
-            $val->addValidator($val1)->addValidator($val2);
-            $this->addValidator($val);
+        $participantsTableValidator = new Meetings_Form_Validate_Email('Meetings_Participants', 'email');
+        $participantsTableValidator->setMessage($message);
+        $participantsTableValidator->setMeetingId($this->_meetingId);
+        if (!empty($this->_excludeId)) {
+            $participantsTableValidator->setExcludeId($this->_excludeId);
         }
+
+        $registrationTableValidator = new Meetings_Form_Validate_Email('Meetings_Registration', 'email');
+        $registrationTableValidator->setMessage($message);
+        $registrationTableValidator->setMeetingId($this->_meetingId);
+
+        // chainvalidators and add to field
+        $validator->addValidator($participantsTableValidator)->addValidator($registrationTableValidator);
+        $this->addValidator($validator);
     }
 }

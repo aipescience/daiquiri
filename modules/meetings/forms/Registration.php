@@ -19,29 +19,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
+class Meetings_Form_Registration extends Meetings_Form_Abstract {
 
-    private $_submit;
-    private $_entry;
-    private $_meeting;
+    /**
+     * The user which is logged in.
+     * @var array
+     */
     private $_user;
 
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
-    public function setMeeting($meeting) {
-        $this->_meeting = $meeting;
-    }
-
+    /**
+     * Sets $_user.
+     * @param array $user the user which is logged in.
+     */
     public function setUser($user) {
         $this->_user = $user;
     }
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
         
@@ -58,9 +54,7 @@ class Meetings_Form_Registration extends Daiquiri_Form_Abstract {
         }
 
         // email fiels
-        $field = new Meetings_Form_Element_Email('email', array(
-            'required' => true,
-            'unique' => true,
+        $field = new Meetings_Form_Element_Email(array(
             'meetingId' => $this->_meeting['id']
         ));
         $this->addElement($field);

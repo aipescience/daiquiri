@@ -19,29 +19,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Meetings_Form_Contributions extends Daiquiri_Form_Abstract {
+class Meetings_Form_Contributions extends Meetings_Form_Abstract {
 
-    private $_submit;
-    private $_entry;
-    private $_meeting;
+    /**
+     * The different participants for this meeting.
+     * @var array
+     */
     private $_participants;
 
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
-    public function setMeeting($meeting) {
-        $this->_meeting = $meeting;
-    }
-
+    /**
+     * Sets $_participants.
+     * @param array $participants the different participants for this meeting.
+     */
     public function setParticipants($participants) {
         $this->_participants = $participants;
     }
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
         

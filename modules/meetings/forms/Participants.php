@@ -19,29 +19,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Meetings_Form_Participants extends Daiquiri_Form_Abstract {
+class Meetings_Form_Participants extends Meetings_Form_Abstract {
 
-    private $_submit;
-    private $_entry;
-    private $_meeting;
+    /**
+     * The different status entries to choose from.
+     * @var array
+     */
     private $_status;
 
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
-    public function setMeeting($meeting) {
-        $this->_meeting = $meeting;
-    }
-
+    /**
+     * Sets $_status.
+     * @param array $status the different status entries to choose from.
+     */
     public function setStatus($status) {
         $this->_status = $status;
     }
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
         
@@ -60,17 +56,15 @@ class Meetings_Form_Participants extends Daiquiri_Form_Abstract {
 
         // email fiels
         if (empty($this->_entry)) {
-            $field = new Meetings_Form_Element_Email('email', array(
+            $field = new Meetings_Form_Element_Email(array(
                 'class' => 'input-xxlarge',
-                'required' => true,
-                'unique' => true,
                 'meetingId' => $this->_meeting['id']
             ));
         } else {
-            $field = new Meetings_Form_Element_Email('email', array(
+            $field = new Meetings_Form_Element_Email(array(
                 'class' => 'input-xxlarge',
-                'required' => true,
-                'meetingId' => $this->_meeting['id']
+                'meetingId' => $this->_meeting['id'],
+                'excludeId' => $this->_entry['id']
             ));
         }
         $this->addElement($field);
