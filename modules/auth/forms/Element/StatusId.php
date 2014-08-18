@@ -30,7 +30,7 @@ class Auth_Form_Element_StatusId extends Zend_Form_Element_Select {
     }
 
     /**
-     * Initializes the form element
+     * Initializes the form element.
      */
     function init() {
         parent::init();

@@ -30,7 +30,7 @@ class Auth_Form_Element_ConfirmPassword extends Auth_Form_Element_AbstractPasswo
     }
 
     /**
-     * Initializes the form element
+     * Initializes the form element.
      */
     function init() {
         parent::init();

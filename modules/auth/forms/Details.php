@@ -21,22 +21,51 @@
 
 class Auth_Form_Details extends Auth_Form_Abstract {
 
+    /**
+     * The key of the user detail.
+     * @var string
+     */
     protected $_key;
+
+    /**
+     * The value of the user detail.
+     * @var string
+     */
     protected $_value;
+
+    /**
+     * The label of the submit button.
+     * @var string
+     */
     protected $_submit;
 
+    /**
+     * Sets $_key.
+     * @param string $key the key of the user detail
+     */
     public function setKey($key) {
         $this->_key = $key;
     }
 
+    /**
+     * Sets $_value.
+     * @param string $value the value of the user detail
+     */
     public function setValue($value) {
         $this->_value = $value;
     }
 
+    /**
+     * Sets $_submit.
+     * @param string $submit the label of the submit button
+     */
     public function setSubmit($submit) {
         $this->_submit = $submit;
     }
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
 

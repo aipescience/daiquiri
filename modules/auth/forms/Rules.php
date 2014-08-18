@@ -21,6 +21,9 @@
 
 class Auth_Form_Rules extends Daiquiri_Form_Abstract {
 
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
         

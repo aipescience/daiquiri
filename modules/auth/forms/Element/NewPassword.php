@@ -30,7 +30,7 @@ class Auth_Form_Element_NewPassword extends Auth_Form_Element_AbstractPassword {
     }
 
     /**
-     * Initializes the form element
+     * Initializes the form element.
      */
     function init() {
         parent::init();

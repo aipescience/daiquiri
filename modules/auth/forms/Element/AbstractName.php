@@ -36,7 +36,7 @@ abstract class Auth_Form_Element_AbstractName extends Zend_Form_Element_Text {
     }
 
     /**
-     * Initializes the form element
+     * Initializes the form element.
      */
     function init() {
         // set filter

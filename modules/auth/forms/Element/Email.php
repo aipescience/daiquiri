@@ -44,7 +44,7 @@ class Auth_Form_Element_Email extends Zend_Form_Element_Text {
     }
 
     /**
-     * Initializes the form element
+     * Initializes the form element.
      */
     function init() {
         // set label

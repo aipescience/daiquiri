@@ -22,7 +22,7 @@
 class Auth_Form_Element_AbstractPassword extends Zend_Form_Element_Password {
 
     /**
-     * Initializes the form element
+     * Initializes the form element.
      */
     function init() {
         // set filter
