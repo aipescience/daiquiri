@@ -21,8 +21,16 @@
 
 class Daiquiri_Form_Danger extends Daiquiri_Form_Abstract {
 
+    /**
+     * Label for the submit button
+     * @var string
+     */
     protected $_submit;
 
+    /**
+     * Sets $_submit
+     * @param string $submit label for the submit button
+     */
     public function setSubmit($submit) {
         $this->_submit = $submit;
     }

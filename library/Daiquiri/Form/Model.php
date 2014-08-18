@@ -19,13 +19,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Form_Confirm extends Daiquiri_Form_Abstract {
+abstract class Daiquiri_Form_Model extends Daiquiri_Form_Abstract {
 
     /**
      * Label for the submit button
      * @var string
      */
-    protected $_submit;
+    protected $_submit = null;
+
+    /**
+     * Model entry to update
+     * @var array
+     */
+    protected $_entry = null;
 
     /**
      * Sets $_submit
@@ -35,15 +41,11 @@ class Daiquiri_Form_Confirm extends Daiquiri_Form_Abstract {
         $this->_submit = $submit;
     }
 
-    public function init() {
-        $this->addCsrfElement();
-        
-        // add fields
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
-
-        // add groups
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+    /**
+     * Sets $_entry
+     * @param array $entry model entry to update
+     */
+    public function setEntry($entry) {
+        $this->_entry = $entry;
     }
-
 }

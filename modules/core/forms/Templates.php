@@ -19,18 +19,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Core_Form_Templates extends Daiquiri_Form_Abstract {
+class Core_Form_Templates extends Daiquiri_Form_Model {
 
-    private $_submit = null;
-    private $_entry = null;
-
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
 
