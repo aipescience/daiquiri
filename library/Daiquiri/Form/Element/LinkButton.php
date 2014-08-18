@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Form_Element_LinkButton extends Zend_Form_Element_Submit {
+class Daiquiri_Form_Element_LinkButton extends Zend_Form_Element_Button {
 
     /**
      * Initializes the form element

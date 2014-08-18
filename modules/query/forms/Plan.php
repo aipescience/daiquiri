@@ -79,7 +79,7 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
         ));
 
         if ($this->_mail) {
-            $this->addLinkButtonElement('plan_mail', 'Send this plan as a bug report to the Daiquiri developers (opens a new window/tab).', false);
+            $this->addLinkButtonElement('plan_mail', 'Send this plan as a bug report to the Daiquiri developers (opens a new window/tab).');
         }
 
         if (!$this->_editable) {

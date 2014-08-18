@@ -102,4 +102,17 @@ class Daiquiri_Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
         }
     }
 
+    protected function _initCsrf() {
+        // get session
+        $session = new Zend_Session_Namespace('csrf');
+
+        // see if a hash is already stored
+        if (!isset($session->hash)) {
+            $session->hash = md5(mt_rand(1,1000000));
+        }
+
+        // set cookie for ajax requests
+        setcookie('XSRF-TOKEN', $session->hash, 0, Daiquiri_Config::getInstance()->getBaseUrl());
+    }
+
 }

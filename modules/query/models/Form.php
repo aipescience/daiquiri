@@ -77,9 +77,6 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
         // validate form
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
-                // get the name of the csrf element for this form
-                $csrfElement = $formstring . '_csrf';
-
                 // form is valid, get sql string from functions
                 $sql = $form->getQuery();
                 $tablename = $form->getTablename();
@@ -208,7 +205,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                         $ns->planString = implode('\n', $ns->plan);
                     }
 
-                    // redirect to mail controller action, re-init csrf and return
+                    // redirect to mail controller action and return
                     $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
                     return array(
                         'status' => 'redirect',
@@ -276,15 +273,19 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 $sql = $ns->sql;
                 $planString = $ns->planString;
 
-                $this->getModelHelper('mail')->send('query.plan', array(
-                    'to' => Daiquiri_Config::getInstance()->query->processor->mail->admin->toArray(),
-                    'sql' => $sql,
-                    'plan' => $planString,
-                    'firstname' => $user['firstname'],
-                    'lastname' => $user['lastname'],
-                    'email' => $user['email'],
-                    'message' => $values['message']
-                ));
+                if (empty(Daiquiri_Config::getInstance()->query->processor->mail->admin)) {
+                    throw new Exception('No admin email addresses configured');
+                } else {
+                    $this->getModelHelper('mail')->send('query.plan', array(
+                        'to' => Daiquiri_Config::getInstance()->query->processor->mail->admin->toArray(),
+                        'sql' => $sql,
+                        'plan' => $planString,
+                        'firstname' => $user['firstname'],
+                        'lastname' => $user['lastname'],
+                        'email' => $user['email'],
+                        'message' => $values['message']
+                    ));
+                }
 
                 return array('status' => 'ok');
             } else {

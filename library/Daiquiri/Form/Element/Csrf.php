@@ -34,11 +34,6 @@ class Daiquiri_Form_Element_Csrf extends Zend_Form_Element_Xhtml {
         // get session
         $session = new Zend_Session_Namespace('csrf');
 
-        // see if a hash is already stored
-        if (!isset($session->hash)) {
-            $session->hash = $this->_generateHash();
-        }
-
         // this element is required
         $this->setRequired(true);
 
@@ -61,14 +56,5 @@ class Daiquiri_Form_Element_Csrf extends Zend_Form_Element_Xhtml {
         $this->getDecorator('Errors')->setOptions(array(
             'class' => 'daiquiri-form-error unstyled text-error',
         ));
-    }
-
-    /**
-     * Generate CSRF token
-     * @return $token
-     */
-    protected function _generateHash()
-    {
-        return md5(mt_rand(1,1000000));
     }
 }

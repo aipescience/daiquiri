@@ -154,8 +154,6 @@ daiquiri.query.Query.prototype.submitQuery= function(form){
                 // remove old errors
                 $('.daiquiri-form-error').remove();
 
-                daiquiri.common.updateCsrf(form, json.csrf);
-
                 if (json.status == 'ok') {
                     // store new job and show modal for acknowledgement
                     self.storeNewJob(json.job);

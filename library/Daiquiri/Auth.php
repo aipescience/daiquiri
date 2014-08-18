@@ -447,7 +447,6 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         }
     }
 
-    
     /**
      * @brief   unsetCsrf method - unsets the csrf flag of the auth singleton
      * 

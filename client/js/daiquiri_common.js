@@ -65,17 +65,6 @@ daiquiri.common.showFormErrors = function(form, errors) {
     });
 }
 
-/**
- * Updated the csrf token of a given form
- */
-daiquiri.common.updateCsrf = function(form, csrf) {
-    if (csrf != undefined) {
-        $('.daiquiri-csrf', $(form)).attr('value', csrf);
-    } else {
-        console.log('Error: No new csrf was provided!');
-    }
-}
-
 /** 
  * Displays errors with ajax calls.
  */
