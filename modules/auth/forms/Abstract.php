@@ -130,7 +130,9 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @return string $name   name of the element
      */
     public function addUsernameElement($excludeId = null) {
-        $this->addElement(new Auth_Form_Element_Username());
+        $this->addElement(new Auth_Form_Element_Username(array(
+            'excludeId' => $excludeId
+        )));
         return 'username';
     }
 
@@ -140,7 +142,9 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @return string $name   name of the element
      */
     public function addAppnameElement($excludeId = null) {
-        $this->addElement(new Auth_Form_Element_Appname());
+        $this->addElement(new Auth_Form_Element_Appname(array(
+            'excludeId' => $excludeId
+        )));
         return 'appname';
     }
 
@@ -150,7 +154,9 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @return string $name   name of the element
      */
     public function addEmailElement($excludeId = null) {
-        $this->addElement(new Auth_Form_Element_Email());
+        $this->addElement(new Auth_Form_Element_Email(array(
+            'excludeId' => $excludeId
+        )));
         return 'email';
     }
 
