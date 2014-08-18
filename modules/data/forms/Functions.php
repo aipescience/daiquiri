@@ -19,24 +19,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Data_Form_Functions extends Daiquiri_Form_Abstract {
+class Data_Form_Functions extends Data_Form_Abstract {
 
-    protected $_roles = array();
-    protected $_entry = array();
-    protected $_submit;
-
-    public function setRoles($roles) {
-        $this->_roles = $roles;
-    }
-
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
         $this->addCsrfElement();
         

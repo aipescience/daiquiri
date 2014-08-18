@@ -134,10 +134,14 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
         $ucdsResource = new Daiquiri_Model_Resource_Table();
         $ucdsResource->setTablename('Data_UCD');
         
+        // get roles
+        $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
+        
         $form = new Data_Form_Columns(array(
             'tables' => $tablesResource->fetchValues('name'),
             'tableId' => $entry['table_id'],
             'ucds' => $ucdsResource->fetchRows(),
+            'roles' => $roles,
             'submit' => 'Update column entry',
             'entry' => $entry
         ));

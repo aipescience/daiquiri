@@ -19,48 +19,55 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Data_Form_Columns extends Daiquiri_Form_Abstract {
+class Data_Form_Columns extends Data_Form_Abstract {
 
+    /**
+     * Tables to choose from.
+     * @var array
+     */
     protected $_tables = array();
-    protected $_table_id;
-    protected $_roles = array();
-    protected $_ucds = array();
-    protected $_entry = array();
-    protected $_submit;
-    protected $_csrfActive = true;
 
+    /**
+     * Preselected table.
+     * @var [type]
+     */
+    protected $_table_id;
+
+    /**
+     * Unified Content Descriptors to choose from.
+     * @var array
+     */
+    protected $_ucds = array();
+
+    /**
+     * Sets $_tables.
+     * @param array $tables tables to choose from
+     */
     public function setTables($tables) {
         $this->_tables = $tables;
     }
 
+    /**
+     * Sets $_table_id.
+     * @param int $table_id preselected table
+     */
     public function setTableId($table_id) {
         $this->_table_id = $table_id;
     }
 
-    public function setRoles($roles) {
-        $this->_roles = $roles;
-    }
-    
+    /**
+     * Sets $_ucds 
+     * @param array $ucds Unified Content Descriptors to choose from.
+     */
     public function setUcds($ucds) {
         $this->_ucds = $ucds;
     }
 
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
-    public function setCsrfActive($csrfActive) {
-        $this->_csrfActive = $csrfActive;
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
-        if($this->_csrfActive === true) {
-            $this->addCsrfElement();
-        }
+        $this->addCsrfElement();
 
         // add elements
         $this->addElement('select', 'table_id', array(
@@ -125,11 +132,10 @@ class Data_Form_Columns extends Daiquiri_Form_Abstract {
 
         // obtain UCD data and provide a usable form (but only if called from a non scriptable context)
         $ucdStrings = array();
-        if($this->_csrfActive === true) {
-            foreach ($this->_ucds as $ucd) {
-                $ucdStrings[$ucd['word']] = $ucd['word'] . " | " . $ucd['type'] . " | " . $ucd['description'];
-            }
+        foreach ($this->_ucds as $ucd) {
+            $ucdStrings[$ucd['word']] = $ucd['word'] . " | " . $ucd['type'] . " | " . $ucd['description'];
         }
+        
         $this->addElement('select', 'ucd_list', array(
             'label' => 'List of UCDs: ',
             'required' => false,

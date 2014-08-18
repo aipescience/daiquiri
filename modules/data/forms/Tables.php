@@ -19,44 +19,42 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Data_Form_Tables extends Daiquiri_Form_Abstract {
+class Data_Form_Tables extends Data_Form_Abstract {
 
+    /**
+     * Databases to choose from.
+     * @var array
+     */
     protected $_databases = array();
-    protected $_database_id;
-    protected $_roles = array();
-    protected $_entry = array();
-    protected $_submit;
-    protected $_csrfActive = true;
 
+    /**
+     * Preselected database.
+     * @var int 
+     */
+    protected $_database_id;
+
+    /**
+     * Sets $_databases.
+     * @param array $databases databases to choose from
+     */
     public function setDatabases($databases) {
         $this->_databases = $databases;
     }
 
+    /**
+     * Sets $_database_id.
+     * @param [type] $database_id preselected database
+     */
     public function setDatabaseId($database_id) {
         $this->_database_id = $database_id;
     }
 
-    public function setRoles($roles) {
-        $this->_roles = $roles;
-    }
-
-    public function setEntry($entry) {
-        $this->_entry = $entry;
-    }
-
-    public function setSubmit($submit) {
-        $this->_submit = $submit;
-    }
-
-    public function setCsrfActive($csrfActive) {
-        $this->_csrfActive = $csrfActive;
-    }
-
+    /**
+     * Initializes the form.
+     */
     public function init() {
-        if($this->_csrfActive === true) {
-            $this->addCsrfElement();
-        }
-        
+        $this->addCsrfElement();
+    
         // add elements
         $this->addElement('select', 'database_id', array(
             'label' => 'Database:',
@@ -123,8 +121,7 @@ class Data_Form_Tables extends Daiquiri_Form_Abstract {
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('order', 'name', 'description', 'publication_role_id', 'publication_select',
-    'publication_update', 'publication_insert') as $element) {
+        foreach (array('order', 'name', 'description', 'publication_role_id', 'publication_select','publication_update', 'publication_insert') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

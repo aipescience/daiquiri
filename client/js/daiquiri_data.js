@@ -74,13 +74,11 @@ daiquiri.data.Data.prototype.init = function () {
             daiquiri.data.item.show('function-browser');
         },
     });
-
-
 }
 
 daiquiri.data.Data.prototype.show = function (id) {
     var self = daiquiri.data.item;
-    console.log(self.opt.left);
+
     // get url
     var url;
     if (typeof id !== 'undefined') {
@@ -112,6 +110,7 @@ daiquiri.data.Data.prototype.show = function (id) {
 
     if (self.idle) {
         self.idle = false;
+
         $.ajax({
             url: url,
             dataType: 'text',
@@ -132,9 +131,13 @@ daiquiri.data.Data.prototype.show = function (id) {
                         'width': 725,
                         'class': 'daiquiri-user-table-modal',
                         'success': function (json, action) {
-                            daiquiri.data.item.opt.action = action.replace('update','show');
                             daiquiri.data.item.init();
-                            daiquiri.data.item.show();
+                            if (action.indexOf('update') > -1) {
+                                daiquiri.data.item.opt.action = action.replace('update','show');
+                                daiquiri.data.item.show();
+                            } else {
+                                $('#display','#data').children().remove();
+                            }
                         }
                     });
                     return false;
