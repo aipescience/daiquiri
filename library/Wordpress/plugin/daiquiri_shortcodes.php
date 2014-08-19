@@ -27,7 +27,7 @@ function tableinfo_func($atts, $content = null) {
         'table' => 'NON_EXISTING_TABLE',
     ), $atts ) );
 
-    $layoutUrl = get_option('daiquiri_url') . '/data/tables/show/db/' . $atts['db'] . '/table/' . $atts['table'];
+    $layoutUrl = DAIQUIRI_URL . '/data/tables/show/db/' . $atts['db'] . '/table/' . $atts['table'];
 
     // construct request
     require_once('HTTP/Request2.php');
@@ -63,7 +63,7 @@ function dbinfo_func($atts, $content = null) {
         'db' => 'NON_EXISTING_DATABASE',
     ), $atts ) );
 
-    $layoutUrl = get_option('daiquiri_url') . '/data/databases/show/db/' . $atts['db'];
+    $layoutUrl = DAIQUIRI_URL . '/data/databases/show/db/' . $atts['db'];
 
     // construct request
     require_once('HTTP/Request2.php');
