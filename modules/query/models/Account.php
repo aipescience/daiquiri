@@ -343,7 +343,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 );
 
                 foreach ($database['tables'] as $table) {
-                    if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($database['publication_role_id'])) {
+                    if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($table['publication_role_id'])) {
                         $t = array(
                             'id' => $table['id'],
                             'name' => $table['name'],
