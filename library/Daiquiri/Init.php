@@ -51,6 +51,7 @@ class Daiquiri_Init {
         'u|user' => 'Displays the commands to create the database user.',
         'c|clean' => 'Displays the commands to clean the database.',
         'v|vhost' => 'Displays the virtual host configuration.',
+        'w|wordpress' => 'Displays the wp-config.php entries.',
         'd|drop' => 'Drops the databases including the user databases.',
         's|sync' => 'Creates the databases and tables as long as they do not exist yet.',
         'i|init' => 'Runs the initalisation process.'
@@ -245,12 +246,7 @@ class Daiquiri_Init {
             'username' => null,
             'password' => null,
             'port' => 3306,
-            'additional' => array(),
-            'scratchdb' => array(),
             'mysql' => '/usr/bin/mysql',
-            'file' => false,
-            'func' => false,
-            'qqueue' => false
         );
 
         // loop over database adapters 'web' and 'user'
@@ -557,87 +553,74 @@ class Daiquiri_Init {
      * Displays the commands to create the database user.
      */
     private function _user() {
-        foreach ($this->options['database'] as $dbkey => $db) {
-            // fix localhost confusion of mysql
-            $localhost = array('localhost', '127.0.0.1', '::1');
-            if (in_array($db['host'], $localhost)) {
-                $db['hosts'] = $localhost;
-            } else {
-                $db['hosts'] = array($db['host']);
-            }
+        $db = $this->options['database']['web'];
 
-            $output = array();
-            foreach ($db['hosts'] as $host) {
-                $output[$host] = array();
-                $output[$host][] = "CREATE USER `{$db['username']}`@`{$host}` IDENTIFIED BY '{$db['password']}';";
-
-                $output[$host][] = "GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to `{$db['username']}`@`{$host}`;";
-
-                if ($dbkey === 'web') {
-                    foreach ($this->options['database'] as $currDb) {
-                        foreach ($currDb['additional'] as $dbname) {
-                            if (empty($this->options['config']['data']['writeToDB']) ||
-                                    $this->options['config']['data']['writeToDB'] === 0) {
-
-                                $output[$host][] = "GRANT SELECT ON `{$dbname}`.* to `{$db['username']}`@`{$host}`;";
-                            } else {
-                                $output[$host][] = "GRANT SELECT, ALTER ON `{$dbname}`.* to `{$db['username']}`@`{$host}`;";
-                            }
-                        }
-                    }
-                } else {
-                    foreach ($db['additional'] as $dbname) {
-                        if (empty($this->options['config']['data']['writeToDB']) ||
-                                $this->options['config']['data']['writeToDB'] === 0) {
-
-                            $output[$host][] = "GRANT SELECT ON `{$dbname}`.* to `{$db['username']}`@`{$host}`;";
-                        } else {
-                            $output[$host][] = "GRANT SELECT, ALTER ON `{$dbname}`.* to `{$db['username']}`@`{$host}`;";
-                        }
-                    }
-                }
-
-                foreach ($db['scratchdb'] as $dbname) {
-                    $output[$host][] = "GRANT ALL PRIVILEGES ON `{$dbname}`.* to `{$db['username']}`@`{$host}`;";
-                }
-
-                if ($db['file'] === true) {
-                    $output[$host][] = "GRANT FILE ON *.* TO `{$db['username']}`@`{$host}`;";
-                }
-                if ($db['func'] === true) {
-                    $output[$host][] = "GRANT SELECT ON `mysql`.func to `{$db['username']}`@`{$host}`;";
-                }
-                if ($db['qqueue'] === true) {
-                    $output[$host][] = "GRANT SELECT, UPDATE ON `mysql`.qqueue_history to `{$db['username']}`@`{$host}`;";
-                    $output[$host][] = "GRANT SELECT ON `mysql`.qqueue_jobs to `{$db['username']}`@`{$host}`;";
-                    $output[$host][] = "GRANT SELECT ON `mysql`.qqueue_queues to `{$db['username']}`@`{$host}`;";
-                    $output[$host][] = "GRANT SELECT ON `mysql`.qqueue_usrGrps to `{$db['username']}`@`{$host}`;";
-                }
-            }
-            for ($i = 0; $i < count($output[$db['hosts'][0]]); $i++) {
-                foreach ($db['hosts'] as $host) {
-                    echo $output[$host][$i] . PHP_EOL;
-                }
-            }
-            echo PHP_EOL;
+        if (!in_array($db['host'], array('localhost','127.0.0.1','::1'))) {
+            $host  = trim(`hostname -f`);
+        } else {
+            $host = $db['host'];
         }
-        echo 'FLUSH PRIVILEGES;' . PHP_EOL;
+
+        echo <<<EOT
+-- Execute on {$db['host']}
+CREATE USER `{$db['username']}`@`{$host}` IDENTIFIED BY '{$db['password']}';
+GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to `{$db['username']}`@`{$host}`;
+
+
+EOT;
+
+        $db = $this->options['database']['user'];
+
+        if (!in_array($db['host'], array('localhost','127.0.0.1','::1'))) {
+            $host  = trim(`hostname -f`);
+        } else {
+            $host = $db['host'];
+        }
+
+        $alter = empty($this->options['config']['data']['writeToDB']) ? '' : ', ALTER';
+
+        echo <<<EOT
+-- Execute on {$db['host']}
+CREATE USER `{$db['username']}`@`{$host}` IDENTIFIED BY '{$db['password']}';
+GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to `{$db['username']}`@`{$host}`;
+GRANT SELECT ON `mysql`.`func` to `{$db['username']}`@`{$host}`;
+
+EOT;
+
+        if ($this->options['config']['query']['query']['type'] === 'qqueue') {
+            echo <<<EOT
+GRANT SELECT ON `mysql`.`qqueue_queues` to `{$db['username']}`@`{$host}`;
+GRANT SELECT ON `mysql`.`qqueue_usrGrps` to `{$db['username']}`@`{$host}`;
+GRANT SELECT ON `mysql`.`qqueue_jobs` to `{$db['username']}`@`{$host}`;
+GRANT SELECT, UPDATE ON `mysql`.`qqueue_history` to `{$db['username']}`@`{$host}`;
+
+
+EOT;
+        }
+
+        if ($this->options['config']['query']['processor']['type'] === 'paqu') {
+            echo <<<EOT
+-- Execute on {$db['host']} for the scratch db
+GRANT ALL PRIVILEGES ON `{$this->options['config']['query']['scratchdb']}`.* to `{$db['username']}`@`{$host}`;
+
+
+EOT;
+        }
+
+            echo <<<EOT
+-- Execute on {$db['host']} for every science database
+GRANT SELECT{$alter} ON `DB`.* to `{$db['username']}`@`{$host}`;
+
+EOT;
     }
 
     /**
      * Displays the virtual host configuration.
      */
     private function _vhost() {
-        // guess an alias name
-        $alias = basename($this->application_path);
-
         echo <<<EOT
-Virtual host configuration:
-    
     #SetEnv APPLICATION_ENV development
-    
     DocumentRoot "{$this->application_path}/public"
-    # or Alias /{$alias} "{$this->application_path}/public"
     <Directory "{$this->application_path}/public">
         Options FollowSymLinks -Indexes -MultiViews
         AllowOverride All
@@ -645,7 +628,21 @@ Virtual host configuration:
         Allow from all
     </Directory>
 
-Uncomment 'SetEnv APPLICATION_ENV development' for a debugging.
+EOT;
+    }
+
+    /**
+     * Displays the virtual host configuration.
+     */
+    private function _wordpress() {
+        echo <<<EOT
+define('DAIQUIRI_URL',''); // put the daiquiri url here
+define('DAIQUIRI_NAVIGATION_PATH','{$this->options['config']['core']['cms']['navPath']}');
+
+define('COOKIEPATH','/');
+define('SITECOOKIEPATH',COOKIEPATH);
+define('ADMIN_COOKIE_PATH',COOKIEPATH);
+define('PLUGINS_COOKIE_PATH',COOKIEPATH);
 
 EOT;
     }
