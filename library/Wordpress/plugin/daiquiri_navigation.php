@@ -21,7 +21,6 @@
 add_action('wp_update_nav_menu', 'daiquiri_update_nav_menu');
 
 function daiquiri_update_nav_menu() {
-    $path = get_option('daiquiri_navigation_path');
     foreach (get_terms( 'nav_menu') as $menu) {
         $html = wp_nav_menu(array(
             'menu' => $menu->name,
@@ -30,7 +29,7 @@ function daiquiri_update_nav_menu() {
             'items_wrap' => '%3$s'
         ));
 
-        $filename = $path . '/' . $menu->name . '.html';
+        $filename = DAIQUIRI_NAVIGATION_PATH . '/' . $menu->name . '.html';
         $fh = fopen($filename, 'w') or die("can't open file");
         fwrite($fh, $html);
         fclose($fh);
