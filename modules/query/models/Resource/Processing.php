@@ -1038,10 +1038,9 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
     }
 
     function _parseSqlAll_getColsDaiquiri(&$sqlTree, &$node, $zendAdapter, $table, $alias) {
-        //Zend_Debug::dump($table); die(0);
         $resParts = $this->_parseSqlAll_parseResourceName($table);
         
-        //process the alias name
+        // process the alias name
         $aliasParts = $this->_parseSqlAll_parseResourceName($alias);
         unset($aliasParts[0]);
 
@@ -1054,22 +1053,35 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
             }
         }
 
-        //check if the given table resource is composed of DATABASE.TABLE
+        // check if the given table resource is composed of DATABASE.TABLE
         if(count($resParts) !== 3) {
              throw new Exception("Cannot resolve table columns, table name is not valid.");
         }
 
-        $tableResource = new Data_Model_Resource_Tables();
+        // check if this is a table of the user database
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        if ($resParts[1] === Daiquiri_Config::getInstance()->getUserDbName($username)) {
+            $resource = new Data_Model_Resource_Viewer();
+            $resource->init($resParts[1],$resParts[2]);
 
-        $tableData = $tableResource->fetchRowByName($resParts[1], $resParts[2], true);
+            $tableData = array('columns' => array());
+            foreach ($resource->fetchCols() as $col => $value) {
+                if ($col !== 'row_id') {
+                    $tableData['columns'][] = array('name' => $col);
+                }
+            }
+        } else {
+            $tableResource = new Data_Model_Resource_Tables();
+            $tableData = $tableResource->fetchRowByName($resParts[1],$resParts[2],true);
+        }
 
-        if($tableData === false) {
+        if(empty($tableData)) {
             throw new Exception("Table {$table} does not exist.");
         }
 
         foreach($tableData['columns'] as $count => $row) {
             if($count == 0) {
-                //this is the item we change
+                // this is the item we change
                 if($alias === false || empty($alias)) {
                     $node['base_expr'] = "`" . $row['name'] . "`";
                     $node['no_quotes'] = array("delim" => ".", "parts" => array($row['name']));
@@ -1086,7 +1098,8 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
 
                 array_push($sqlTree['SELECT'], $node);
             } else {
-                $newNode = $nodeTemplate;           //this is set on the first passing when count is 0
+                $newNode = $nodeTemplate;
+                // this is set on the first passing when count is 0
                 if($alias === false || empty($alias)) {
                     $newNode['base_expr'] = "`" . $row['name'] . "`";
                     $newNode['no_quotes'] = array("delim" => ".", "parts" => array($row['name']));
@@ -1098,7 +1111,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
                                        "base_expr" => "as `" . str_replace(".", "__", str_replace("`", "", $newNode['base_expr'])) . "`",
                                        "no_quotes" => array("delim" => ".", "parts" => array(str_replace(".", "__", str_replace("`", "", $newNode['base_expr'])))));
                 }
-                
+
                 array_push($sqlTree['SELECT'], $newNode);
             }
         }
