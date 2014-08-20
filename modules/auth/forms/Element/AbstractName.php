@@ -52,7 +52,7 @@ abstract class Auth_Form_Element_AbstractName extends Zend_Form_Element_Text {
         if (Daiquiri_Config::getInstance()->auth->lowerCaseUsernames) {
             $this->addValidator(new Daiquiri_Form_Validator_LowerCaseAlnum());
         } else {
-            $this->addValidator(new Zend_Validate_Alnum());
+            $this->addValidator(new Daiquiri_Form_Validator_AlnumUnderscore());
         }
 
         // add validator for min and max string length
