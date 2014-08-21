@@ -36,19 +36,19 @@ class Auth_DetailsController extends Daiquiri_Controller_Abstract {
 
     public function createAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form')->create($id);
+        $this->getControllerHelper('form', array('redirect' => '/auth/user'))->create($id);
     }
 
     public function updateAction() {
         $id = $this->_getParam('id');
         $key = $this->_getParam('key');
-        $this->getControllerHelper('form')->update($id, $key);
+        $this->getControllerHelper('form', array('redirect' => '/auth/user'))->update($id, $key);
     }
 
     public function deleteAction() {
         $id = $this->_getParam('id');
         $key = $this->_getParam('key');
-        $this->getControllerHelper('form')->delete($id, $key);
+        $this->getControllerHelper('form', array('redirect' => '/auth/user'))->delete($id, $key);
     }
 
 }

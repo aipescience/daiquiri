@@ -260,3 +260,8 @@ li.dropdown ul ul {
 .modal-body {
     max-height: 500px;
 }
+
+.table [class^="icon-"],
+.table [class*=" icon-"] {
+    margin-top: 3px;
+}

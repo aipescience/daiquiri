@@ -69,6 +69,18 @@ unset($this->row['status_id']);
                 <tr>
                     <td><?php echo ucfirst($this->escape($key)); ?></td>
                     <td><?php echo $this->escape($value); ?></td>
+                    <td>
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => '<i class="icon-pencil"></i>',
+                        'href' => "/auth/details/update?id={$id}&key={$key}",
+                        'target' => '_blank',
+                        'append' => '&nbsp;'));
+                    echo $this->internalLink(array(
+                        'text' => '<i class="icon-remove"></i>',
+                        'href' => "/auth/details/delete?id={$id}&key={$key}",
+                        'target' => '_blank'));
+                    ?>
                 </tr>
             <?php endforeach; ?>  
         </tbody>
