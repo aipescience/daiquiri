@@ -75,7 +75,7 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
                     $this->getResource()->insertValue($userId, $values['key'], $values['value']);
                     return array('status' => 'ok');
                 } else {
-                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form, array('key' => 'The key is already stored in the database.'));
                 }
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
