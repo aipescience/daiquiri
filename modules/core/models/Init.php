@@ -144,7 +144,7 @@ Best Regards'
             ),
             'auth.resetPassword' => array(
                 'subject' => '[Daiquiri] Password reset by user',
-                'body' => 'Dear Daiquiri-Test manager,
+                'body' => 'Dear Daiquiri manager,
 
 _firstname_ _lastname_ has just reset his/her password. 
 
@@ -156,7 +156,7 @@ Best Regards'
             ),
             'auth.validate' => array(
                 'subject' => '[Daiquiri] New User registered',
-                'body' => 'Dear Daiquiri-Test manager,
+                'body' => 'Dear Daiquiri manager,
 
 _firstname_ _lastname_ has just validated his/her registration. 
 
@@ -168,7 +168,7 @@ Best Regards'
             ),
             'auth.confirm' => array(
                 'subject' => '[Daiquiri] User account confirmed',
-                'body' => 'Dear Daiquiri-Test manager,
+                'body' => 'Dear Daiquiri manager,
 
 _firstname_ _lastname_ has just been confirmed by a manager (username: _manager_).
 
@@ -176,7 +176,7 @@ Best Regards'
             ),
             'auth.reject' => array(
                 'subject' => '[Daiquiri] User account rejected',
-                'body' => 'Dear Daiquiri-Test manager,
+                'body' => 'Dear Daiquiri manager,
 
 _firstname_ _lastname_ has just been rejected by a manager (username: _manager_).
 
@@ -190,12 +190,19 @@ your account has been created and you should be able to log in.
 
 Best Regards'
             ),
-            'auth.reenable' => array(
-                'subject' => '[Daiquiri] User account re-enabled',
-                'body' => 'Dear _firstname_ _lastname_,
+            'auth.changePassword' => array(
+                'subject' => '[Daiquiri] User password changed',
+                'body' => 'Dear Daiquiri admin,
 
-your account has been enabled again. If your account was disabled in the process of
-setting a new password, you can now use the new password to log in.
+_firstname_ _lastname_ (username: _username_) has just changed his or her password.
+
+Best Regards'
+            ),
+            'auth.updateUser' => array(
+                'subject' => '[Daiquiri] User credentials changed',
+                'body' => 'Dear Daiquiri admin,
+
+_firstname_ _lastname_ (username: _username_) has just updated his or her credentials.
 
 Best Regards'
             ),

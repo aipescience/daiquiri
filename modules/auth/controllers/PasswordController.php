@@ -39,7 +39,7 @@ class Auth_PasswordController extends Daiquiri_Controller_Abstract {
     }
 
     public function forgotAction() {
-       $this->getControllerHelper('form')->forgot();
+       $this->getControllerHelper('form', array('redirect' => '/auth/login'))->forgot();
     }
 
     public function resetAction() {

@@ -54,7 +54,7 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function create($userId, array $formParams = array()) {
-        if (empty($userId) || empty($key)) {
+        if (empty($userId)) {
             throw new Daiquiri_Exception_BadRequest('id argument is missing. ');
         }
 

@@ -107,7 +107,9 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 'lastname'
             ),
             'timeout' => 0,
-            'disableOnForgotPassword' => false,
+            'mailOnChangePassword' => false,
+            'mailOnUpdateUser' => false,
+            'changeUsername' => false,
             'changeEmail' => true,
             'lowerCaseUsernames' => false,
             'usernameMinLength' => 4,

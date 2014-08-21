@@ -48,6 +48,9 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
         // get id
         $id = Daiquiri_Auth::getInstance()->getCurrentId();
 
+        // get user
+        $user = $this->getResource()->fetchRow($id);
+
         // create the form object
         $form = new Auth_Form_Account(array(
             'user' => $this->getResource()->fetchRow($id),
@@ -68,6 +71,16 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
                 // log the event
                 $detailsResource = new Auth_Model_Resource_Details();
                 $detailsResource->logEvent($id, 'update by user');
+
+                // send a notification mail to the admins
+                if (Daiquiri_Config::getInstance()->auth->mailOnUpdateUser &&  $user['status'] !== 'admin') {
+                    $this->getModelHelper('mail')->send('auth.updateUser', array(
+                        'to' => $this->getResource()->fetchEmailByRole('admin'),
+                        'firstname' => $user['firstname'],
+                        'lastname' => $user['lastname'],
+                        'username' => $user['username']
+                    ));
+                }
 
                 return array('status' => 'ok');
             } else {

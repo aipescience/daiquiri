@@ -411,14 +411,6 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     $detailResource = new Auth_Model_Resource_Details();
                     $detailResource->logEvent($userId, 'reenable');
 
-                    // send mail
-                    $this->getModelHelper('mail')->send('auth.reenable', array(
-                        'to' => $user['email'],
-                        'firstname' => $user['firstname'],
-                        'lastname' => $user['lastname'],
-                        'username' => $user['username']
-                    ));
-
                     return array('status' => 'ok');
                 }
             } else {

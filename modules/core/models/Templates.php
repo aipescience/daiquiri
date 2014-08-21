@@ -43,14 +43,14 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
             'auth.reject' => array('firstname', 'lastname', 'username', 'manager'),
             'auth.activate' => array('firstname', 'lastname', 'username'),
             'auth.reenable' => array('firstname', 'lastname', 'username'),
+            'auth.changePassword' => array('firstname', 'lastname', 'username'),
+            'auth.updateUser' => array('firstname', 'lastname', 'username'),
             'contact.submit_user' => array('firstname', 'lastname', 'username'),
             'contact.submit_support' => array('firstname', 'lastname', 'username', 'email',
                 'category', 'subject', 'message', 'link'),
             'contact.respond' => array('firstname', 'lastname', 'username', 'subject'),
             'query.plan' => array('firstname', 'lastname', 'email', 'sql', 'plan', 'message'),
             'meetings.validate' => array('meeting', 'firstname', 'lastname', 'link'),
-            'meetings.accept' => array('meeting', 'firstname', 'lastname'),
-            'meetings.reject' => array('meeting', 'firstname', 'lastname'),
         );
         
         if (in_array('meetings',Daiquiri_Config::getInstance()->getApplication()->resources->modules->toArray())) {

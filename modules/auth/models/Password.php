@@ -124,24 +124,17 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                         // log the event
                         $resource->logEvent($userId, 'resetPassword');
 
-                        if (Daiquiri_Config::getInstance()->auth->disableOnForgotPassword) {
-                            // disable user
-                            $statusId = Daiquiri_Auth::getInstance()->getStatusId('disabled');
-                            $this->getResource()->updateRow($userId, array('status_id' => $statusId));
-
-                            // send mail to admins
-                            $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/user';
-                            $this->getModelHelper('mail')->send('auth.resetPassword', array(
+                        // send a notification mail to the admins
+                        if (Daiquiri_Config::getInstance()->auth->mailOnChangePassword &&  $user['status'] !== 'admin') {
+                            $this->getModelHelper('mail')->send('auth.changePassword', array(
                                 'to' => $this->getResource()->fetchEmailByRole('admin'),
                                 'firstname' => $user['firstname'],
                                 'lastname' => $user['lastname'],
-                                'link' => $link
+                                'username' => $user['username']
                             ));
-
-                            return array('status' => 'ok', 'disable' => true);
-                        } else {
-                            return array('status' => 'ok', 'disable' => false);
                         }
+
+                        return array('status' => 'ok', 'disable' => false);
 
                     } else {
                         $form->setDescription('The username is not correct.');
@@ -224,6 +217,16 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                     // log the event
                     $detailsResource = new Auth_Model_Resource_Details();
                     $detailsResource->logEvent($userId, 'changePassword');
+
+                    // send a notification mail to the admins
+                    if (Daiquiri_Config::getInstance()->auth->mailOnChangePassword &&  $user['status'] !== 'admin') {
+                        $this->getModelHelper('mail')->send('auth.changePassword', array(
+                            'to' => $this->getResource()->fetchEmailByRole('admin'),
+                            'firstname' => $user['firstname'],
+                            'lastname' => $user['lastname'],
+                            'username' => $user['username']
+                        ));
+                    }
 
                     return array('status' => 'ok');
                 } else {
