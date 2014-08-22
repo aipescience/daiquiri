@@ -86,6 +86,11 @@ class Core_Model_Init extends Daiquiri_Model_Init {
                 'type' => 'wordpress',
                 'path' => '/var/lib/daiquiri/wordpress',
                 'navPath' => '/var/lib/daiquiri/navigation',
+            ),
+            'log' => array(
+                'enabled' => true,
+                'loglevel' => 'notice',
+                'logfile' => '/var/lib/daiquiri/logs/daiquiri.log'
             )
         );
 
