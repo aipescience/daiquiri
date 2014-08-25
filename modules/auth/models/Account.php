@@ -69,8 +69,7 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
                 $this->getResource()->updateRow($id, $values);
 
                 // log the event
-                $detailsResource = new Auth_Model_Resource_Details();
-                $detailsResource->logEvent($id, 'updateByUser');
+                Daiquiri_Log::getInstance()->notice('account updated by user');
 
                 // send a notification mail to the admins
                 if (Daiquiri_Config::getInstance()->auth->mailOnUpdateUser &&  $user['status'] !== 'admin') {

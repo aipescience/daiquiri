@@ -107,25 +107,5 @@ class Auth_Model_Resource_Details extends Daiquiri_Model_Resource_Table {
         ));
     }
 
-    /**
-     * Stores a given event as detail with the date, the ip and the user.
-     * @param int $userId id of the user
-     * @param string $event
-     * @throws Exception
-     */
-    public function logEvent($userId, $event) {
-        if (empty($userId) || empty($event)) {
-            throw new Exception('$userId or $event not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
-        }
-
-        $date = date("Y-m-d\TH:i:s");
-        $ip = Daiquiri_Auth::getInstance()->getRemoteAddr();
-        $user = Daiquiri_Auth::getInstance()->getCurrentUsername();
-
-        $string = 'date:' . $date . ',ip:' . $ip . ',user:' . $user;
-
-        $this->insertValue($userId, $event, $string);
-    }
-
 }
 

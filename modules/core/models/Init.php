@@ -90,7 +90,7 @@ class Core_Model_Init extends Daiquiri_Model_Init {
             'log' => array(
                 'enabled' => true,
                 'loglevel' => 'notice',
-                'logfile' => '/var/lib/daiquiri/logs/daiquiri.log'
+                'logfile' => '/var/lib/daiquiri/log/daiquiri.log'
             )
         );
 

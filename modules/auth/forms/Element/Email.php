@@ -60,7 +60,8 @@ class Auth_Form_Element_Email extends Zend_Form_Element_Text {
         $this->addValidator('StringLength', false, array(0, 256));
 
         // add validator for email addresses
-        $this->addValidator('emailAddress');
+        $emailValidator = new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL);
+        $this->addValidator($emailValidator);
 
         // add validator for beeing unique in the database
         $validator = new Zend_Validate();

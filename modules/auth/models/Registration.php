@@ -90,11 +90,8 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                 // produce random validation link
                 $values['code'] = $this->createRandomString(32);
 
-                // (pre-) log the event
-                $date = date("Y-m-d\TH:i:s");
-                $ip = Daiquiri_Auth::getInstance()->getRemoteAddr();
-                $user = Daiquiri_Auth::getInstance()->getCurrentUsername();
-                $values['register'] = 'date:' . $date . ',ip:' . $ip . ',user:' . $user;
+                // log the event
+                Daiquiri_Log::getInstance()->notice("user '{$user['username']}' registered");
 
                 // create the user and return
                 $userId = $this->getResource()->registerUser($values);
@@ -129,8 +126,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
         // return with the apropriate string
         if ($user !== false) {
             // log the event
-            $resource = new Auth_Model_Resource_Details();
-            $resource->logEvent($user['id'], 'validate');
+            Daiquiri_Log::getInstance()->notice("user '{$user['username']}' validated");
 
             if (Daiquiri_Config::getInstance()->auth->activation) {
                 // send mail since the user needs to be activated/confirmed
@@ -145,6 +141,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     'lastname' => $user['lastname'],
                     'link' => $link
                 ));
+
                 return array('status' => 'ok','pending' => true);
 
             } else {
@@ -153,6 +150,9 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
 
                 // activate user in database
                 $this->getResource()->updateRow($user['id'], array('status_id' => $statusId));
+
+                // log the event
+                Daiquiri_Log::getInstance()->notice("user '{$user['username']}' activated");
 
                 return array('status' => 'ok','pending' => false);
             }
@@ -194,8 +194,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
                     // log the event
-                    $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($userId, 'confirm');
+                    Daiquiri_Log::getInstance()->notice("user '{$user['username']}' confirmed");
 
                     // send mail
                     $this->getModelHelper('mail')->send('auth.confirm', array(
@@ -247,8 +246,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
                     // log the event
-                    $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($userId, 'reject');
+                    Daiquiri_Log::getInstance()->notice("user '{$user['username']}' rejected");
 
                     // send mail
                     $manager = array_merge(
@@ -303,8 +301,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
                     // log the event
-                    $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($userId, 'activate');
+                    Daiquiri_Log::getInstance()->notice("user '{$user['username']}' activated");
 
                     // send mail
                     $manager = array_merge(
@@ -364,10 +361,8 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                         $sessionResource->deleteRow($session);
                     };
 
-                    // log the event
-                    $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($userId, 'disable');
-
+                    // log the event amd return
+                    Daiquiri_Log::getInstance()->notice("user '{$user['username']}' disabled");
                     return array('status' => 'ok');
                 }
             } else {
@@ -407,10 +402,8 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     // activate user in database
                     $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
-                    // log the event
-                    $detailResource = new Auth_Model_Resource_Details();
-                    $detailResource->logEvent($userId, 'reenable');
-
+                    // log the event and return
+                    Daiquiri_Log::getInstance()->notice("user '{$user['username']}' reenabled");
                     return array('status' => 'ok');
                 }
             } else {

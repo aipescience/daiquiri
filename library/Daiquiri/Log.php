@@ -31,15 +31,25 @@ class Daiquiri_Log extends Daiquiri_Model_Singleton {
      * Constructor. Sets writer and filter for log.
      */
     function __construct() {
-        $stream = @fopen('/var/lib/daiquiri/logs/daiquiri.log', 'a', false);
+        // configure formatter for log
+        $ip = Daiquiri_Auth::getInstance()->getRemoteAddr();
+        $username = Daiquiri_Auth::getInstance()->getCurrentUSername();
+        $formatstring = '%timestamp% ' . $ip . ' "' . $username . '" %priorityName% "%message%"' . PHP_EOL;
+        $formatter = new Zend_Log_Formatter_Simple($formatstring);
+
+        // open log file and get writer for log
+        $stream = @fopen(Daiquiri_Config::getInstance()->core->log->logfile, 'a', false);
         if (!$stream) {
             throw new Exception('Failed to open log file');
         }
         $writer = new Zend_Log_Writer_Stream($stream);
+        $writer->setFormatter($formatter);
 
+        // set loglevel
         $loglevel = strtoupper(Daiquiri_Config::getInstance()->core->log->loglevel);
         $filter = new Zend_Log_Filter_Priority(constant("Zend_Log::$loglevel"));
 
+        // configure log object
         $this->_log = new Zend_Log();
         $this->_log->addWriter($writer);
         $this->_log->addFilter($filter);

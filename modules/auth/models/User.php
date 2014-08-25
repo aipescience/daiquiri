@@ -216,10 +216,8 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 // create the user
                 $id = $this->getResource()->insertRow($values);
 
-                // log the event
-                $detailsResource = new Auth_Model_Resource_Details();
-                $detailsResource->logEvent($id, 'create');
-
+                // log the event and return
+                Daiquiri_Log::getInstance()->notice("user '{$user['username']}' created");
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
@@ -265,10 +263,8 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 // update the user and redirect
                 $this->getResource()->updateRow($id, $values);
 
-                // log the event
-                $detailsResource = new Auth_Model_Resource_Details();
-                $detailsResource->logEvent($id, 'update');
-
+                // log the event and return
+                Daiquiri_Log::getInstance()->notice("user '{$user['username']}' updated");
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
@@ -305,6 +301,8 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                     $resource->deleteRow($session);
                 };
                 
+                // log the event and return
+                Daiquiri_Log::getInstance()->notice("user deleted by admin (user_id: {$id})");
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);

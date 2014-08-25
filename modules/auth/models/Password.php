@@ -71,6 +71,9 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                     $resource->deleteValue($user['id'], 'code');
                     $resource->insertValue($user['id'], 'code', $code);
 
+                    // log the event
+                    Daiquiri_Log::getInstance()->notice("password reset requested by user '{$user['username']}'");
+
                     // send mail
                     $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/password/reset/id/' . $user['id'] . '/code/' . $code;
                     $this->getModelHelper('mail')->send('auth.forgotPassword', array(
@@ -122,8 +125,8 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                         $resource->deleteValue($userId, 'code');
 
                         // log the event
-                        $resource->logEvent($userId, 'resetPassword');
-
+                        Daiquiri_Log::getInstance()->notice("password reset by user '{$user['username']}'");
+                        
                         // send a notification mail to the admins
                         if (Daiquiri_Config::getInstance()->auth->mailOnChangePassword &&  $user['status'] !== 'admin') {
                             $this->getModelHelper('mail')->send('auth.changePassword', array(
@@ -173,8 +176,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                 $this->getResource()->updatePassword($userId, $values['new_password']);
 
                 // log the event
-                $resource = new Auth_Model_Resource_Details();
-                $resource->logEvent($userId, 'setPassword');
+                Daiquiri_Log::getInstance()->notice("password set by admin (user_id: {$userId})");
 
                 return array('status' => 'ok');
             } else {
@@ -215,8 +217,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                     $this->getResource()->updatePassword($userId, $values['new_password']);
 
                     // log the event
-                    $detailsResource = new Auth_Model_Resource_Details();
-                    $detailsResource->logEvent($userId, 'changePassword');
+                    Daiquiri_Log::getInstance()->notice('password changed by user');
 
                     // send a notification mail to the admins
                     if (Daiquiri_Config::getInstance()->auth->mailOnChangePassword &&  $user['status'] !== 'admin') {
