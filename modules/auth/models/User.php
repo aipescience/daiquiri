@@ -217,7 +217,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 $id = $this->getResource()->insertRow($values);
 
                 // log the event and return
-                Daiquiri_Log::getInstance()->notice("user '{$user['username']}' created");
+                Daiquiri_Log::getInstance()->notice("user '{$values['username']}' created");
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
