@@ -541,12 +541,24 @@ class Daiquiri_Init {
      */
     private function _clean() {
         foreach ($this->options['database'] as $db) {
-            echo "DELETE FROM mysql.user where User='{$db['username']}';" . PHP_EOL;
-            echo "DELETE FROM mysql.tables_priv where User='{$db['username']}';" . PHP_EOL;
-            echo "DELETE FROM mysql.db where User='{$db['username']}';" . PHP_EOL;
-            echo PHP_EOL;
+            if (!in_array($db['host'], array('localhost','127.0.0.1','::1'))) {
+                $host  = trim(`hostname -f`);
+            } else {
+                $host = $db['host'];
+            }
+
+            echo <<<EOT
+
+-- on {$db['host']}
+
+DELETE FROM mysql.user where User='{$db['username']}';
+DELETE FROM mysql.tables_priv where User='{$db['username']}';
+DELETE FROM mysql.db where User='{$db['username']}';
+FLUSH PRIVILEGES;
+
+EOT;
         }
-        echo 'FLUSH PRIVILEGES;' . PHP_EOL;
+        echo PHP_EOL;
     }
 
     /**
@@ -562,10 +574,12 @@ class Daiquiri_Init {
         }
 
         echo <<<EOT
--- Execute on {$db['host']}
+
+-- on {$db['host']}
+
 CREATE USER `{$db['username']}`@`{$host}` IDENTIFIED BY '{$db['password']}';
 GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to `{$db['username']}`@`{$host}`;
-
+FLUSH PRIVILEGES;
 
 EOT;
 
@@ -580,7 +594,9 @@ EOT;
         $alter = empty($this->options['config']['data']['writeToDB']) ? '' : ', ALTER';
 
         echo <<<EOT
--- Execute on {$db['host']}
+
+-- on {$db['host']}
+
 CREATE USER `{$db['username']}`@`{$host}` IDENTIFIED BY '{$db['password']}';
 GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to `{$db['username']}`@`{$host}`;
 GRANT SELECT ON `mysql`.`func` to `{$db['username']}`@`{$host}`;
@@ -594,22 +610,23 @@ GRANT SELECT ON `mysql`.`qqueue_usrGrps` to `{$db['username']}`@`{$host}`;
 GRANT SELECT ON `mysql`.`qqueue_jobs` to `{$db['username']}`@`{$host}`;
 GRANT SELECT, UPDATE ON `mysql`.`qqueue_history` to `{$db['username']}`@`{$host}`;
 
-
 EOT;
         }
 
         if ($this->options['config']['query']['processor']['type'] === 'paqu') {
             echo <<<EOT
--- Execute on {$db['host']} for the scratch db
-GRANT ALL PRIVILEGES ON `{$this->options['config']['query']['scratchdb']}`.* to `{$db['username']}`@`{$host}`;
 
+-- on {$db['host']} for the scratch db
+GRANT ALL PRIVILEGES ON `{$this->options['config']['query']['scratchdb']}`.* to `{$db['username']}`@`{$host}`;
 
 EOT;
         }
 
             echo <<<EOT
--- Execute on {$db['host']} for every science database
+
+-- on {$db['host']} for every science database
 GRANT SELECT{$alter} ON `DB`.* to `{$db['username']}`@`{$host}`;
+
 
 EOT;
     }
