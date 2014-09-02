@@ -91,7 +91,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                 $values['code'] = $this->createRandomString(32);
 
                 // log the event
-                Daiquiri_Log::getInstance()->notice("user '{$user['username']}' registered");
+                Daiquiri_Log::getInstance()->notice("user '{$values['username']}' registered");
 
                 // create the user and return
                 $userId = $this->getResource()->registerUser($values);
