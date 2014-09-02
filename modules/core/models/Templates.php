@@ -41,7 +41,6 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
             'auth.confirm' => array('firstname', 'lastname', 'username', 'manager'),
             'auth.reject' => array('firstname', 'lastname', 'username', 'manager'),
             'auth.activate' => array('firstname', 'lastname', 'username'),
-            'auth.reenable' => array('firstname', 'lastname', 'username'),
             'auth.changePassword' => array('firstname', 'lastname', 'username'),
             'auth.updateUser' => array('firstname', 'lastname', 'username'),
             'contact.submit_user' => array('firstname', 'lastname', 'username'),
