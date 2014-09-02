@@ -37,7 +37,6 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
         $this->templates = array(
             'auth.register' => array('firstname', 'lastname', 'username', 'link'),
             'auth.forgotPassword' => array('firstname', 'lastname', 'username', 'link'),
-            'auth.resetPassword' => array('firstname', 'lastname', 'username', 'link'),
             'auth.validate' => array('firstname', 'lastname', 'username', 'link'),
             'auth.confirm' => array('firstname', 'lastname', 'username', 'manager'),
             'auth.reject' => array('firstname', 'lastname', 'username', 'manager'),

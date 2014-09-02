@@ -147,18 +147,6 @@ _link_
 
 Best Regards'
             ),
-            'auth.resetPassword' => array(
-                'subject' => '[Daiquiri] Password reset by user',
-                'body' => 'Dear Daiquiri manager,
-
-_firstname_ _lastname_ has just reset his/her password. 
-
-Please login to the admin interface to re-enable the user.
-
-_link_
-
-Best Regards'
-            ),
             'auth.validate' => array(
                 'subject' => '[Daiquiri] New User registered',
                 'body' => 'Dear Daiquiri manager,
