@@ -38,6 +38,11 @@
                 });
             }
         });
+        $('#show-registered').on('click', function() {
+            $('#user-table-pager-search input').val('registered');
+            $('#user-table-pager-search').submit();
+            return false;
+        });
     });
 </script>
 
@@ -45,11 +50,13 @@
     <h2>User management</h2>
 
     <div id="user-table"></div>
-
+        <p>
+            <a href="#" id="show-registered">Show registered users only</a>
+        </p>
     <?php
     echo $this->internalLink(array(
         'href' => '/auth/user/create',
-        'text' => 'Create user',
+        'text' => 'Create new user',
         'resource' => 'Auth_Model_User',
         'permission' => 'create',
         'prepend' => '<p>',
