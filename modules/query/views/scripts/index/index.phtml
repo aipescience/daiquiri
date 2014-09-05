@@ -85,6 +85,7 @@
                                 echo $this->message('query.download'); 
                                 echo $this->downloadForm;
                             ?>
+                            <?php if (!empty($this->adapter)): ?>
                             <h4>Available formats</h4>
                             <table class="table table-bordered">
                             <?php foreach($this->adapter as $adapter): ?>
@@ -98,6 +99,7 @@
                                 </tr>
                             <?php endforeach; ?>
                             </table>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
