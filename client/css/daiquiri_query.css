@@ -53,3 +53,8 @@
     white-space: nowrap;
     overflow: hidden;
 }
+
+#query #daiquiri-query-download-pending,
+#query #daiquiri-query-download-link {
+    margin-bottom: 20px;
+}
