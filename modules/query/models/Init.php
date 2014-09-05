@@ -162,9 +162,8 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                     'manager' => $this->_init->daiquiri_path . '/library/GearmanManager/pecl-manager.php'
                 ),
                 'adapter' => array(
-                    'enabled' => array(
-                        'csv'
-                    ),
+                    'default' => 'csv',
+                    'enabled' => array('csv'),
                     'config' => array(
                         'mysql' => array(
                             'name' => "MySql database dump",

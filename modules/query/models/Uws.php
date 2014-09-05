@@ -151,17 +151,13 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         
         // add link to results if needed
         if ($jobUWS->phase === "COMPLETED") {
-            // see if vodump-csv is enabled
-            if (in_array('vodump-csv', Daiquiri_Config::getInstance()->query->download->adapter->enabled->toArray())) {
-                $format = 'vodump-csv';
-            } else {
-                $format = 'csv';
-            }
+            foreach (Daiquiri_Config::getInstance()->getQueryDownloadAdapter() as $adapter) {
 
-            // we have results!
-            $href = Daiquiri_Config::getInstance()->getSiteUrl() . '/query/download/stream/table/' .
-                    urlencode($job['table']) . '/format/' . $format;
-            $jobUWS->addResult($job['table'], $href);
+                $id = $adapter['format'] . $adapter['suffix'];
+                $href = Daiquiri_Config::getInstance()->getSiteUrl() . '/query/download/stream/table/' .urlencode($job['table']) . '/format/' . $adapter['format'];
+
+                $jobUWS->addResult($id, $href);
+            }
         } else if ($jobUWS->phase === "ERROR") {
             $jobUWS->addError($job['error']);
         }

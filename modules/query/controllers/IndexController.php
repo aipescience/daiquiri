@@ -37,9 +37,8 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
 
         // get the different download formats
         $formats = array();
-        $adapter = Daiquiri_Config::getInstance()->query->download->adapter->toArray();
-        foreach ($adapter['enabled'] as $key) {
-            $formats[$key] = $adapter['config'][$key]['name'];
+        foreach (Daiquiri_Config::getInstance()->getQueryDownloadAdapter() as $adapter) {
+            $formats[$adapter['format']] = $adapter['name'];
         }
         $this->view->downloadForm = new Query_Form_Download(array(
             'formats' => $formats

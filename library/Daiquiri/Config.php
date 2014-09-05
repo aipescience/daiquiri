@@ -226,4 +226,39 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         return $this->_application->resources->multidb->user->toArray();
     }
 
+    /**
+     * Returns the download adapter for the query module in the right order.
+     * @return array $output
+     */
+    public function getQueryDownloadAdapter() {
+
+        $output = array();
+        $input = Daiquiri_Config::getInstance()->query->download->adapter->toArray();
+
+        // put the default adapter in front
+        if (isset($input['default'])) {
+
+            // sanity check
+            if (! in_array($input['default'], $input['enabled'] )) {
+                throw new Exception('Default adapter not in enbaled adapters.');
+            }
+
+            $output[] = array_merge(
+                array('format' => $input['default']),
+                $input['config'][$input['default']]
+            );
+        }
+
+        foreach ($input['enabled'] as $key) {
+            if (! isset($input['default']) || $key !== $input['default']) {
+                $output[] = array_merge(
+                    array('format' => $key),
+                    $input['config'][$key]
+                );
+            }
+        }
+
+        return $output;
+    }
+
 }
