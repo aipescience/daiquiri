@@ -80,25 +80,39 @@
                             <div id="plot-form" class="span3"></div>
                         </div>
                         <div class="tab-pane" id="download-tab">
-                            <h4>Select format</h4>
+                            <h4>Select format for download</h4>
                             <?php
                                 echo $this->message('query.download'); 
                                 echo $this->downloadForm;
                             ?>
                             <?php if (!empty($this->adapter)): ?>
+                            <div id="daiquiri-query-download-description">
                             <h4>Available formats</h4>
-                            <table class="table table-bordered">
-                            <?php foreach($this->adapter as $adapter): ?>
-                                <tr>
-                                    <td class="onehundredeighty">
-                                        <?php echo $adapter['name']; ?>
-                                    </td>
-                                    <td>
-                                        <?php echo $adapter['description']; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </table>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="onehundredfifty">
+                                                Format
+                                            </th>
+                                            <th>
+                                                Description
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                <?php foreach($this->adapter as $adapter): ?>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <?php echo $adapter['name']; ?>
+                                            </td>
+                                            <td>
+                                                <?php echo $adapter['description']; ?>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                <?php endforeach; ?>
+                                </table>
+                            </div>
                             <?php endif; ?>
                         </div>
                     </div>
