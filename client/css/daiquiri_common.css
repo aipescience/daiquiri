@@ -54,6 +54,7 @@ form .control-group .controls > input[type="checkbox"]{
     margin-top: 9px;
 }
 
+form p select, 
 form p textarea, 
 form p input[type="text"], 
 form p input[type="password"], 
@@ -70,6 +71,7 @@ form p input[type="search"],
 form p input[type="tel"], 
 form p input[type="color"], 
 form p .uneditable-input,
+form .inline select,
 form .inline textarea, 
 form .inline input[type="text"], 
 form .inline input[type="password"], 

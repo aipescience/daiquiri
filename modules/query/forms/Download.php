@@ -44,14 +44,13 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
             'label' => 'Select format:',
             'multiOptions' => $this->_formats,
             'decorators' => array('ViewHelper'),
-            'class' => 'span4'
+            'class' => 'input-xxlarge'
         ));
         $this->addElement('button','download_submit',array(
             'label' => 'Download',
             'class' => 'btn btn-primary'
         ));
 
-        $this->addHorizontalGroup(array('download_format'));
-        $this->addHorizontalButtonGroup(array('download_submit'));
+        $this->addInlineGroup(array('download_format','download_submit'));
     }
 }

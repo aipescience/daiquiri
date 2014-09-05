@@ -167,6 +167,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                     'config' => array(
                         'mysql' => array(
                             'name' => "MySql database dump",
+                            'description' => "A file containing the SQL commands to ingest the table into a MySQL database. Use this option if you want to include the data into a application or pipeline which is based on a MySQL database.",
                             'suffix' => ".sql",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/mysql.sh",
                             'binPath' => '/usr/bin/',
@@ -174,6 +175,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                         ),
                         'csv' => array(
                             'name' => "Comma separated Values",
+                            'description' => "A text file with a line for each row of the table. The the fields are delimeted by a comma and quoted by double quotes. Use this option for a later import into a spredsheed application or a custom script. Use this option if you are unsure what to use.",
                             'suffix' => ".csv",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/csv.sh",
                             'binPath' => '/usr/bin/',
@@ -181,6 +183,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                         ),
                         'vodump-csv' => array(
                             'name' => "Comma separated Values",
+                            'description' => "A text file with a line for each row of the table. The the fields are delimeted by a comma and quoted by double quotes. Use this option for a later import into a spredsheed application or a custom script. Use this option if you are unsure what to use.",
                             'suffix' => ".csv",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/vodump-csv.sh",
                             'binPath' => '/usr/local/bin/',
@@ -188,6 +191,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                         ),
                         'votable' => array(
                             'name' => "IVOA VOTable XML file - ASCII Format",
+                            'description' => "A XML file using the IVOA VOTable format. Use this option if you intend to use VO compatible software to further process the data.",
                             'suffix' => ".xml",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/votable.sh",
                             'binPath' => '/usr/local/bin/',
@@ -195,6 +199,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                         ),
                         'votableB1' => array(
                             'name' => "IVOA VOTable XML file - BINARY 1 Format",
+                            'description' => "A XML file using the IVOA VOTable format (BINARY Serialization). Use this option if you intend to use VO compatible software to process the data and prefer the use of a binary file.",
                             'suffix' => ".xml",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/votable-binary1.sh",
                             'binPath' => '/usr/local/bin/',
@@ -202,6 +207,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                         ),
                         'votableB2' => array(
                             'name' => "IVOA VOTable XML file - BINARY 2 Format",
+                            'description' => "A XML file using the IVOA VOTable format (BINARY2 Serialization). Use this option if you intend to use VO compatible software to process the data and prefer the use of a binary file.",
                             'suffix' => ".xml",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/votable-binary2.sh",
                             'binPath' => '/usr/local/bin/',

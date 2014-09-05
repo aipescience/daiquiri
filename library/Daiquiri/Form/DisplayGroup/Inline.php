@@ -40,7 +40,7 @@ class Daiquiri_Form_DisplayGroup_Inline extends Zend_Form_DisplayGroup {
      */
     function init() {
         // set css class for html element
-        $this->setAttrib('class', 'daiquiri-form-inline-group');
+        $this->setAttrib('class', 'daiquiri-form-inline-group inline');
 
         // set decorators for DisplayGroup
         $this->setDecorators(array('FormElements','Fieldset'));
