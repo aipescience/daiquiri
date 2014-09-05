@@ -830,7 +830,7 @@ daiquiri.query.Query.prototype.displayDownloadLink = function(json) {
     $('<div/>',{
         'id': 'daiquiri-query-download-link',
         'html' : self.createDownloadLink(json.link)
-    }).appendTo(self.tabs.download);
+    }).insertAfter('#download-tab form');
 
     // overide the click on the renerate link
     $('#regenerate-download').click(function(){
