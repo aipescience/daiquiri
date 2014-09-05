@@ -848,7 +848,7 @@ daiquiri.query.Query.prototype.displayDownloadPendingMessage = function() {
     $('<div/>',{
         'id': 'daiquiri-query-download-pending',
         'html' : '<p>Your file is being created... Please wait...</p>'
-    }).appendTo(this.tabs.download);
+    }).appendTo('#daiquiri-query-download-info');
 };
 
 daiquiri.query.Query.prototype.displayDownloadErrors = function (error) {
@@ -861,7 +861,7 @@ daiquiri.query.Query.prototype.displayDownloadErrors = function (error) {
     $('<div/>',{
         'id': 'daiquiri-query-download-pending',
         'html' : '<p class="text-error">Your file cannot be created due to an error. Please contact support.<br />' + error.form + '</p>'
-    }).appendTo(this.tabs.download);
+    }).appendTo('#daiquiri-query-download-info');
 };
 
 daiquiri.query.Query.prototype.removeJob = function () {
