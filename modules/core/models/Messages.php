@@ -67,7 +67,7 @@ class Core_Model_Messages extends Daiquiri_Model_Abstract {
     public function create(array $formParams = array()) {
         // create the form object
         $form = new Core_Form_Messages(array(
-            'submit' => 'Create status message'
+            'submit' => 'Create message'
         ));
 
         // valiadate the form if POST
@@ -113,7 +113,7 @@ class Core_Model_Messages extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function update($id, array $formParams = array()) {
-        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update status message');
+        return $this->getModelHelper('CRUD')->update($id, $formParams, 'Update message');
     }
 
     /**
@@ -123,7 +123,7 @@ class Core_Model_Messages extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function delete($id, array $formParams = array()) {
-        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete status message');
+        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete message');
     }
 
     /**

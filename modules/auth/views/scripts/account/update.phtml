@@ -31,6 +31,9 @@
         ?>
     <?php else: ?>
         <h2>Update your user credentials</h2>
-        <?php echo $this->form; ?>
+        <?php
+            echo $this->message('auth.updateUser');
+            echo $this->form;
+        ?>
     <?php endif; ?>
 </div>

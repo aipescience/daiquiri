@@ -36,7 +36,7 @@ class Core_AdminController extends Daiquiri_Controller_Abstract {
                 'resource' => 'Core_Model_Templates',
                 'permission' => 'index'),
             'messages' => array(
-                'text' => 'Status messages',
+                'text' => 'Messages',
                 'href' => '/core/messages',
                 'resource' => 'Core_Model_Messages',
                 'permission' => 'index'),

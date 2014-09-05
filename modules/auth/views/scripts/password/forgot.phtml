@@ -28,6 +28,9 @@
     <?php else: ?>
         <h2>Request new password</h2>
         <p>Please enter the email address registered with your user account.</p>
-        <?php echo $this->form; ?>
+        <?php
+            echo $this->message('auth.forgotPassword');
+            echo $this->form;
+        ?>
     <?php endif; ?>
 </div>

@@ -29,6 +29,9 @@
         ?>
     <?php else: ?>
         <h2>Change password</h2>
-        <?php echo $this->form; ?>
+        <?php
+            echo $this->message('auth.changePassword');
+            echo $this->form;
+        ?>
     <?php endif; ?>
 </div>
