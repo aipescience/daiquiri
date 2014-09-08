@@ -175,7 +175,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                         ),
                         'csv' => array(
                             'name' => "Comma separated Values",
-                            'description' => "A text file with a line for each row of the table. The the fields are delimeted by a comma and quoted by double quotes. Use this option for a later import into a spredsheed application or a custom script. Use this option if you are unsure what to use.",
+                            'description' => "A text file with a line for each row of the table. The fields are delimeted by a comma and quoted by double quotes. Use this option for a later import into a spredsheed application or a custom script. Use this option if you are unsure what to use.",
                             'suffix' => ".csv",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/csv.sh",
                             'binPath' => '/usr/bin/',
