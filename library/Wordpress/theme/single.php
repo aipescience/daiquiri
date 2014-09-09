@@ -28,7 +28,7 @@
                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
             </h2>
 
-            <div class="post-date"><?php the_date(); ?></div>
+            <div class="post-date">by <?php the_author(); ?> on <?php the_date(); ?></div>
 
             <?php the_content(); ?>
 

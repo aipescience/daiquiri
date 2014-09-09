@@ -31,8 +31,9 @@
                     <h3 class="post-title">
                         <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                     </h3>
-                    <span class="post-date"><?php the_date(); ?></span>
                 </div>
+
+                <div class="post-date">by <?php the_author(); ?> on <?php the_date(); ?></div>
 
                 <?php the_content(); ?>
 
