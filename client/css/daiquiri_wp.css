@@ -44,8 +44,13 @@
     display: inline;
 }
 #wp-content #list,
-#wp-content #respond{
+#wp-content #respond {
     margin-top: 20px;
+    margin-bottom: 20px;
+}
+#wp-content #respond,
+#wp-content #comment-close-write-link {
+    display: none;
 }
 #wp-content .comment {
     border-left: 3px solid rgba(0 ,0 ,0 ,0.2);;

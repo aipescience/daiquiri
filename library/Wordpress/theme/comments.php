@@ -26,9 +26,36 @@
             <?php wp_list_comments('style=div&callback=daiquiri_comment'); ?>
         </div>
     <?php endif ?>
+
+    <p>
+        <a href="" id="comment-open-write-link">Write a comment</a>
+        <a href="" id="comment-close-write-link">Close comment form</a>
+
+        <script>
+            $(document).ready(function() {
+                if (window.location.search.indexOf('replytocom=') != -1) {
+                    $('#comment-open-write-link').trigger('click');
+                }
+            });
+            $('#comment-open-write-link').on('click', function() {
+                $('#respond').show();
+                $('#comment-open-write-link').hide();
+                $('#comment-close-write-link').show();
+                return false;
+            });
+            $('#comment-close-write-link').on('click', function() {
+                $('#respond').hide();
+                $('#comment-open-write-link').show();
+                $('#comment-close-write-link').hide();
+                return false;
+            });
+        </script>
+    </p>
+
     <?php
     comment_form(array(
-        'title_reply' => 'Write a Reply or Comment',
+        'title_reply' => '',
+        'title_reply_to' =>  '',
         'comment_notes_before' => '',
         'logged_in_as' => '
 <fieldset class="form-horizontal">
