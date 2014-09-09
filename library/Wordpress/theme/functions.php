@@ -110,7 +110,7 @@ class Daiquiri_Layout {
  */
 
 register_sidebar(array(
-    'name' => 'SidebarFoo',
+    'name' => 'Sidebar',
     'id' => 'sidebar',
     'before_widget' => '<li>',
     'after_widget' => "</li>",
@@ -148,3 +148,16 @@ function daiquiri_comment($comment, $args, $depth) {
     <?php
 }
 
+/*
+ * Modyfy style of admin interface
+ */
+
+add_action('admin_head', 'daiquiri_admin_style');
+
+function daiquiri_admin_style() {
+    echo '<style>
+        #wp-auth-check-wrap {
+            display: none !important;
+        }
+    </style>'.PHP_EOL;
+}
