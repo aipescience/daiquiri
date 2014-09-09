@@ -33,7 +33,8 @@
 
         <script>
             $(document).ready(function() {
-                if (window.location.search.indexOf('replytocom=') != -1) {
+                if (window.location.hash.indexOf('#comment') != -1 ||
+                    window.location.hash.indexOf('#respond') != -1) {
                     $('#comment-open-write-link').trigger('click');
                 }
             });

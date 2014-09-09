@@ -48,6 +48,9 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
+#wp-content #comments {
+    margin-top: 10px;
+}
 #wp-content #respond,
 #wp-content #comment-close-write-link {
     display: none;
