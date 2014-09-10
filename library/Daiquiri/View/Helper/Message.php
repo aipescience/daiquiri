@@ -49,7 +49,7 @@ class Daiquiri_View_Helper_Message extends Zend_View_Helper_Abstract {
         if (empty($row)) {
             return '';
         } else {
-            return '<p>' . $this->view->escape($row['value']) . '</p>';
+            return '<p>' . $row['value'] . '</p>';
         }
     }
 
