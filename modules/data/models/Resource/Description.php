@@ -214,10 +214,7 @@ class Data_Model_Resource_Description extends Daiquiri_Model_Resource_Table {
             // find the column definition
             $definition = false;
             foreach ($columnInfo as $currColumn) {
-                if (strpos($currColumn, "`{$column}`") !== false) {
-                    $definition = trim($currColumn, "\r,\n ");
-                    break;
-                } else if (strpos($currColumn, " {$column} ") !== false) {
+                if (strpos(trim($currColumn), "`{$column}`") === 0) {
                     $definition = trim($currColumn, "\r,\n ");
                     break;
                 }
