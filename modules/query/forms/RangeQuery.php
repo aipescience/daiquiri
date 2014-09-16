@@ -119,18 +119,10 @@ class Query_Form_RangeQuery extends Query_Form_AbstractFormQuery {
             'label' => 'z<sub>max</sub>',
             'class' => 'span2'
         ));
-        $this->addElement('text', 'range_tablename', array(
-            'filters' => array(
-                'StringTrim',
-                array('PregReplace', array('match' => '/ /', 'replace' => '_'))
-            ),
-            'validators' => array(
-                array('validator' => 'StringLength', 'options' => array(0, 128)),
-                array('validator' => 'Regex', 'options' => array('pattern' => '/^[^;@%*?()!"`\'&]+$/'))
-            ),
-            'label' => 'Name of the new table',
+        $this->addElement(new Daiquiri_Form_Element_Tablename('range_tablename', array(
+            'label' => 'Name of the new table (optional)',
             'class' => 'span9'
-        ));
+        )));
 
         // add fields
         $this->addPrimaryButtonElement('range_submit', 'Submit new Range Query');

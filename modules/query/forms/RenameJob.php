@@ -42,16 +42,11 @@ class Query_Form_RenameJob extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
 
         // add fields
-        $this->addElement('text', 'tablename', array(
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => 'StringLength', 'options' => array(1, 128)),
-                array('validator' => 'Regex', 'options' => array('pattern' => '/^[^;@%*?()!"`\'&=]+$/'))
-            ),
+        $this->addElement(new Daiquiri_Form_Element_Tablename('tablename', array(
             'label' => 'New name of the table',
             'value' => $this->_tablename,
             'required' => true
-        ));
+        )));
 
         $this->addPrimaryButtonElement('submit', 'Rename table');
         $this->addButtonElement('cancel', 'Cancel');

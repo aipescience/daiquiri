@@ -81,18 +81,10 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             'class' => 'span9 mono codemirror',
             'style' => "resize: none;"
         ));
-        $this->addElement('text', 'sql_tablename', array(
-            'filters' => array(
-                'StringTrim',
-                array('PregReplace', array('match' => '/ /', 'replace' => '_'))
-            ),
-            'validators' => array(
-                array('validator' => 'StringLength', 'options' => array(0, 128)),
-                array('validator' => 'Regex', 'options' => array('pattern' => '/^[^;@%*?()!"`\'&]+$/'))
-            ),
-            'label' => 'Name of the new table (optional):',
+        $this->addElement(new Daiquiri_Form_Element_Tablename('sql_tablename', array(
+            'label' => 'Name of the new table (optional)',
             'class' => 'span9'
-        ));
+        )));
 
         $this->addQueueElements('sql_queue_');
         $this->addPrimaryButtonElement('sql_submit', 'Submit new SQL Query');

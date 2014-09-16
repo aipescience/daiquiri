@@ -107,6 +107,13 @@ form .inline {
 .daiquiri-form-horizontal-group .controls br {
     display: none;
 }
+.form-horizontal .control-group:last-child {
+    margin-bottom: 0;
+}
+.form-horizontal:last-child {
+    margin-bottom: 0;
+}
+
 pre {
     margin-top: 10px;
     margin-bottom: 20px;

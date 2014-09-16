@@ -914,7 +914,7 @@ daiquiri.query.Query.prototype.renameJob = function () {
     // prepare dialog
     new daiquiri.Modal({
         'url': self.url.rename + '?id=' + self.job.id.value,
-        'width': 700,
+        'width': 800,
         'success': function () {
             // reload jobs
             self.displayDetails();

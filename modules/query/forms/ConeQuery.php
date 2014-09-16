@@ -101,18 +101,10 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             ),
             'label' => 'Radius<sub>arcsec</sub>'
         ));
-        $this->addElement('text', $this->getFieldId('tablename'), array(
-            'filters' => array(
-                'StringTrim',
-                array('PregReplace', array('match' => '/ /', 'replace' => '_'))
-            ),
-            'validators' => array(
-                array('validator' => 'StringLength', 'options' => array(0, 128)),
-                array('validator' => 'Regex', 'options' => array('pattern' => '/^[^;@%*?()!"`\'&]+$/'))
-            ),
-            'label' => 'Name of the new table',
+        $this->addElement(new Daiquiri_Form_Element_Tablename($this->getFieldId('tablename'), array(
+            'label' => 'Name of the new table (optional)',
             'class' => 'span9'
-        ));
+        )));
 
         // add fields
         $this->addPrimaryButtonElement($this->getFieldId('submit'), 'Submit new cone search');

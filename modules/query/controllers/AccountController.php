@@ -40,17 +40,17 @@ class Query_AccountController extends Daiquiri_Controller_Abstract {
 
     public function renameJobAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form')->renameJob($id);
+        $this->getControllerHelper('form',array('redirect' => '/query'))->renameJob($id);
     }
 
     public function removeJobAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form')->removeJob($id);
+        $this->getControllerHelper('form',array('redirect' => '/query'))->removeJob($id);
     }
 
     public function killJobAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form')->killJob($id);
+        $this->getControllerHelper('form',array('redirect' => '/query'))->killJob($id);
     }
 
     public function databasesAction() {
