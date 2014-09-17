@@ -172,7 +172,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         if (in_array('contact',$this->_init->options['modules'])) {
             $output['roles'][] = 'support';
         }
-        if ($this->_init->options['config']['auth']['confirmation']) {
+        if ($this->_init->options['config']['auth']['confirmation'] 
+            || in_array('meetings',$this->_init->options['modules'])) {
             $output['roles'][] = 'manager';
         }
         $output['roles'][] = 'admin';
