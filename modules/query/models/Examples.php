@@ -53,7 +53,7 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
         // create the form object
         $form = new Query_Form_Example(array(
             'roles' => $roles,
-            'submit' => 'Create Example'
+            'submit' => 'Create example'
         ));
 
         // valiadate the form if POST
@@ -91,7 +91,7 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
         // create the form object
         $form = new Query_Form_Example(array(
             'roles' => $roles,
-            'submit' => 'Create Example',
+            'submit' => 'Update example',
             'entry' => $entry
         ));
 
