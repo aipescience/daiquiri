@@ -136,4 +136,12 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
         }
     }
 
+    /**
+     * Returns a table name contructed from the current time
+     */
+    public function createResultTableName() {
+        $micro = explode(" ", microtime());
+        return date("Y-m-d-Hi-s-") . substr($micro[0], 2, 4);
+    }
+
 }

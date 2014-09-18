@@ -245,8 +245,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
 
             // determine result table name
             if (empty($resultTableName)) {
-                $micro = explode(" ", microtime());
-                $resultTableName = date("Y-m-d\TH:i:s") . ":" . substr($micro[0], 2, 4);
+                $resultTableName = $this->createResultTableName();
             }
 
             foreach ($plan as &$line) {
