@@ -323,8 +323,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $database = $databasesModel->getResource()->fetchRow($row['id'], true, true);
 
             $database['publication_role'] = Daiquiri_Auth::getInstance()->getRole($database['publication_role_id']);
-            foreach ($database['tables'] as &$table) {
-                $table['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
+            foreach ($database['tables'] as $key => $table) {
+                $database['tables'][$key]['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['p\
+ublication_role_id']);
             }
 
             $rows[] = $database;
