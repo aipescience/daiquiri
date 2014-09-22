@@ -41,6 +41,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 'user_id = ?' => $userId,
                 'status_id != ?' => $this->getResource()->getStatusId('removed'),
             ),
+            'limit' => 1000,
             'order' => array($this->getResource()->getTimeField() . ' DESC'),
         ));
 
@@ -153,7 +154,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         if ($jobUWS->phase === "COMPLETED") {
             foreach (Daiquiri_Config::getInstance()->getQueryDownloadAdapter() as $adapter) {
 
-                $id = $adapter['format'] . $adapter['suffix'];
+                $id = $adapter['suffix'];
                 $href = Daiquiri_Config::getInstance()->getSiteUrl() . '/query/download/stream/table/' .urlencode($job['table']) . '/format/' . $adapter['format'];
 
                 $jobUWS->addResult($id, $href);

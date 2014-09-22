@@ -1,3 +1,18 @@
+2014/09/22
+==========
+
+The suffixed for the download adapters have been changed and need to be changed in 
+the configuration of existing applications as well:
+
+'mysql' => array('suffix' => "sql")
+'csv' => array('suffix' => "csv")
+'vodump-csv' => array('suffix' => "csv")
+'votable' => array('suffix' => "votable.xml")
+'votableB1' => array('suffix' => "votableB1.xml")
+'votableB2' => array('suffix' => "votableB2.xml")
+
+Note that the dot at the beginning is removed and will be added automatically.
+
 2014/07/18
 ==========
 

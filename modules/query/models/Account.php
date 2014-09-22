@@ -32,7 +32,8 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get the current query message
         $messagesModel = new Core_Model_Messages();
         $row = $messagesModel->getResource()->fetchRow(array(
-            'where' => array('`key` = "query"')
+            'where' => array('`key` = "query"'),
+            'limit' => 1000
         ));
         if (empty($row)) {
             $message = false;
