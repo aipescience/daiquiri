@@ -141,7 +141,7 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
      */
     public function createResultTableName() {
         $micro = explode(" ", microtime());
-        return date("Y-m-d-Hi-s-") . substr($micro[0], 2, 4);
+        return date("Y-m-d-H-i-s-") . substr($micro[0], 2, 4);
     }
 
 }
