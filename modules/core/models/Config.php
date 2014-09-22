@@ -35,7 +35,12 @@ class Core_Model_Config extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function index() {
-        return $this->getModelHelper('CRUD')->index();
+        return array(
+            'status' => 'ok',
+            'rows' => $this->getResource()->fetchRows(array(
+                'order' => 'key ASC'
+            ))
+        );
     }
 
     /**
