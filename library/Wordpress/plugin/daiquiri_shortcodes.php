@@ -18,77 +18,75 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// [dbinfo db="DBName"]
+add_shortcode('dbinfo', 'dbinfo_func' );
+
+function dbinfo_func($atts, $content = null) {
+    global $wpdb;
+
+    extract(shortcode_atts(array(
+        'db' => 'NON_EXISTING_DATABASE',
+    ), $atts ) );
+
+    $query = $wpdb->prepare("SELECT `name`,`description` from `" . DAIQUIRI_DB . "`.`Data_Databases` WHERE `name` = %s",$atts['db']);
+
+    $rows = $wpdb->get_results($query);
+    if (count($rows) != 1) {
+        return '<p class="text-error">Error with daiquiri dbinfo shortcode.</p>';
+    }
+
+    $db = $rows[0];
+    $html = "<h3>{$db->name}</h3>";
+    $html .= "<p>{$db->description}</p>";
+
+    return $html;
+}
+
 // [tableinfo db="DBName" table="tableName"]
 add_shortcode('tableinfo', 'tableinfo_func' );
 
 function tableinfo_func($atts, $content = null) {
+    global $wpdb;
+
     extract(shortcode_atts(array(
         'db' => 'NON_EXISTING_DATABASE',
         'table' => 'NON_EXISTING_TABLE',
     ), $atts ) );
 
-    $layoutUrl = DAIQUIRI_URL . '/data/tables/show/db/' . $atts['db'] . '/table/' . $atts['table'];
-
-    // construct request
-    require_once('HTTP/Request2.php');
-    $req = new HTTP_Request2($layoutUrl);
-    $req->setConfig(array(
-        'connect_timeout' => 2,
-        'timeout' => 3
-    ));
-    $req->setMethod('GET');
-    $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
-    $req->setHeader('Accept: application/html');
-
-    try {
-        $response = $req->send();
-        $status = $response->getStatus();
-        $body = $response->getBody();
-    } catch (HTTP_Request2_Exception $e) {
-        return '<h5>Error with daiquiri tableinfo</h5><p>Error with HTTP request.</p>';
+    $query = $wpdb->prepare("SELECT `id`,`name`,`description` from `" . DAIQUIRI_DB . "`.`Data_Tables` WHERE `name` = %s",$atts['table']);
+    $rows = $wpdb->get_results($query);
+    if (count($rows) != 1) {
+        return '<p class="text-error">Error with daiquiri tableinfo shortcode.</p>';
     }
 
-    if ($status != 200) {
-        return "<h5>Error with daiquiri tableinfo</h5><p>Error with HTTP request. Error code {$status}</p>";
+    $table = $rows[0];
+    $html = "<h4>{$atts['db']}.{$table->name}</h4>";
+    $html .= "<p>{$table->description}</p>";
+
+    $query = $wpdb->prepare("SELECT `name`,`description`,`ucd`,`unit`,`type` from `" . DAIQUIRI_DB . "`.`Data_Columns` WHERE `table_id` = %s ORDER BY `order` ASC",$table->id);
+
+    $columns = $wpdb->get_results($query);
+
+    if (count($columns) < 1) {
+        return '<p class="text-error">Error with daiquiri tableinfo shortcode.</p>';
     }
 
-    return $body;
-}
-
-// [tableinfo db="DBName"]
-add_shortcode('dbinfo', 'dbinfo_func' );
-
-function dbinfo_func($atts, $content = null) {
-    extract(shortcode_atts(array(
-        'db' => 'NON_EXISTING_DATABASE',
-    ), $atts ) );
-
-    $layoutUrl = DAIQUIRI_URL . '/data/databases/show/db/' . $atts['db'];
-
-    // construct request
-    require_once('HTTP/Request2.php');
-    $req = new HTTP_Request2($layoutUrl);
-    $req->setConfig(array(
-        'connect_timeout' => 2,
-        'timeout' => 3
-    ));
-    $req->setMethod('GET');
-    $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
-    $req->setHeader('Accept: application/html');
-
-    try {
-        $response = $req->send();
-        $status = $response->getStatus();
-        $body = $response->getBody();
-    } catch (HTTP_Request2_Exception $e) {
-        return '<h5>Error with daiquiri dbinfo</h5><p>Error with HTTP request.</p>';
+    $html .= '<table class="table table-bordered">';
+    $html .= '<thead><tr><th>Column</th><th>Type</th><th>UCD</th><th>Unit</th><th>Description</th></tr></thead>';
+    $html .= '<tbody>';
+    foreach ($columns as $column) {
+        $html .= '<tr>';
+        $html .= "<td><strong>{$column->name}</strong></td>";
+        $html .= "<td>{$column->type}</td>";
+        $html .= "<td>{$column->ucd}</td>";
+        $html .= "<td>{$column->unit}</td>";
+        $html .= "<td>{$column->description}</td>";
+        $html .= '</tr>';
     }
+    $html .= '</tbody>';
+    $html .= '</table>';
 
-    if ($status != 200) {
-        return "<h5>Error with daiquiri dbinfo</h5><p>Error with HTTP request. Error code {$status}</p>";
-    }
-
-    return $body;
+    return $html;
 }
 
 // [menu]
