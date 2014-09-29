@@ -657,6 +657,9 @@ EOT;
      */
     private function _wordpress() {
         echo <<<EOT
+\$_SERVER['HTTPS']='on';    // for ssl
+
+define('DAIQUIRI_DB','');  // put the daiquiri web database here (for shortcodes)
 define('DAIQUIRI_URL',''); // put the daiquiri url here
 define('DAIQUIRI_NAVIGATION_PATH','{$this->options['config']['core']['cms']['navPath']}');
 
