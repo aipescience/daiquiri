@@ -18,11 +18,7 @@
  */
 
 #wp-content h1 a, #wp-content h1 a:hover, #wp-content h1 a:focus, #wp-content h1 a:visited,
-#wp-content h2 a, #wp-content h2 a:hover, #wp-content h2 a:focus, #wp-content h2 a:visited,
-#wp-content h3 a, #wp-content h3 a:hover, #wp-content h3 a:focus, #wp-content h3 a:visited,
-#wp-content h4 a, #wp-content h4 a:hover, #wp-content h4 a:focus, #wp-content h4 a:visited,
-#wp-content h5 a, #wp-content h5 a:hover, #wp-content h5 a:focus, #wp-content h5 a:visited,
-#wp-content h6 a, #wp-content h6 a:hover, #wp-content h6 a:focus, #wp-content h6 a:visited {
+#wp-content h2 a, #wp-content h2 a:hover, #wp-content h2 a:focus, #wp-content h2 a:visited {
     color: inherit;
     text-decoration: none;
 }
