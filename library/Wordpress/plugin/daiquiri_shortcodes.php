@@ -28,7 +28,13 @@ function dbinfo_func($atts, $content = null) {
         'db' => 'NON_EXISTING_DATABASE',
     ), $atts ) );
 
-    $query = $wpdb->prepare("SELECT `name`,`description` from `" . DAIQUIRI_DB . "`.`Data_Databases` WHERE `name` = %s",$atts['db']);
+    $databases = '`' . DAIQUIRI_DB . '`.`Data_Databases`';
+
+    $query = $wpdb->prepare("
+        SELECT description
+        FROM {$databases}
+        WHERE `name` = %s
+    ",$atts['db']);
 
     $rows = $wpdb->get_results($query);
     if (count($rows) != 1) {
@@ -36,7 +42,6 @@ function dbinfo_func($atts, $content = null) {
     }
 
     $db = $rows[0];
-    $html = "<h3>{$db->name}</h3>";
     $html .= "<p>{$db->description}</p>";
 
     return $html;
@@ -53,32 +58,64 @@ function tableinfo_func($atts, $content = null) {
         'table' => 'NON_EXISTING_TABLE',
     ), $atts ) );
 
-    $query = $wpdb->prepare("SELECT `id`,`name`,`description` from `" . DAIQUIRI_DB . "`.`Data_Tables` WHERE `name` = %s",$atts['table']);
+    $databases = '`' . DAIQUIRI_DB . '`.`Data_Databases`';
+    $tables    = '`' . DAIQUIRI_DB . '`.`Data_Tables`';
+
+    $query = $wpdb->prepare("
+        SELECT t.description
+        FROM {$tables} as t
+        JOIN {$databases} as d ON d.id = t.database_id
+        WHERE d.name = %s AND t.name = %s
+    ",$atts['db'],$atts['table']);
+
     $rows = $wpdb->get_results($query);
     if (count($rows) != 1) {
         return '<p class="text-error">Error with daiquiri tableinfo shortcode.</p>';
     }
 
     $table = $rows[0];
-    $html = "<h4>{$atts['db']}.{$table->name}</h4>";
-    $html .= "<p>{$table->description}</p>";
+    return "<p>{$table->description}</p>";
+}
 
-    $query = $wpdb->prepare("SELECT `name`,`description`,`ucd`,`unit`,`type` from `" . DAIQUIRI_DB . "`.`Data_Columns` WHERE `table_id` = %s ORDER BY `order` ASC",$table->id);
+// [columninfo db="DBName" table="tableName"]
+add_shortcode('columninfo', 'columninfo_func' );
+
+function columninfo_func($atts, $content = null) {
+    global $wpdb;
+
+    extract(shortcode_atts(array(
+        'db' => 'NON_EXISTING_DATABASE',
+        'table' => 'NON_EXISTING_TABLE',
+    ), $atts ) );
+
+    $databases = '`' . DAIQUIRI_DB . '`.`Data_Databases`';
+    $tables    = '`' . DAIQUIRI_DB . '`.`Data_Tables`';
+    $columns   = '`' . DAIQUIRI_DB . '`.`Data_Columns`';
+
+    $query = $wpdb->prepare("
+        SELECT c.name,c.description,c.ucd,c.unit,c.type
+        FROM {$columns} as c
+        JOIN {$tables} as t ON t.id = c.table_id
+        JOIN {$databases} as d ON d.id = t.database_id
+        WHERE d.name = %s AND t.name = %s
+        ORDER BY c.`order` ASC
+    ",$atts['db'],$atts['table']);
 
     $columns = $wpdb->get_results($query);
 
     if (count($columns) < 1) {
-        return '<p class="text-error">Error with daiquiri tableinfo shortcode.</p>';
+        return '<p class="text-error">Error with daiquiri columninfo shortcode.</p>';
     }
 
     $html .= '<table class="table table-bordered">';
     $html .= '<thead><tr><th>Column</th><th>Type</th><th>UCD</th><th>Unit</th><th>Description</th></tr></thead>';
     $html .= '<tbody>';
     foreach ($columns as $column) {
+        $ucd = str_replace(';','<br />',$column->ucd);
         $html .= '<tr>';
         $html .= "<td><strong>{$column->name}</strong></td>";
         $html .= "<td>{$column->type}</td>";
-        $html .= "<td>{$column->ucd}</td>";
+        $html .= "<td>{$ucd}</td>";
         $html .= "<td>{$column->unit}</td>";
         $html .= "<td>{$column->description}</td>";
         $html .= '</tr>';
