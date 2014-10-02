@@ -61,10 +61,9 @@ class Query_Form_RangeQuery extends Query_Form_AbstractFormQuery {
      * Initializes the form.
      */
     public function init() {
-        $this->setAttrib('id', 'daiquiri-form-query-range');
+        // add form elements
         $this->addCsrfElement('range_csrf');
-
-        // add fields
+        $this->addHeadElement('range_head');
         $this->addElement('text', 'range_xmin', array(
             'filters' => array('StringTrim'),
             'required' => true,
@@ -123,18 +122,16 @@ class Query_Form_RangeQuery extends Query_Form_AbstractFormQuery {
             'label' => 'Name of the new table (optional)',
             'class' => 'span9'
         )));
-
-        // add fields
         $this->addPrimaryButtonElement('range_submit', 'Submit new Range Query');
+        $this->addQueueElement('range_queue');
 
-        // add groups
+        // add display groups
         $this->addViewScriptGroup(array('range_xmin', 'range_xmax', 'range_ymin', 'range_ymax', 'range_zmin', 'range_zmax'), '_forms/range.phtml');
         $this->addParagraphGroup(array('range_tablename'), 'table-group', false, true);
-        $this->addInlineGroup(array('range_submit'), 'button-group');
+        $this->addInlineGroup(array('range_submit','range_queue'), 'button-group');
 
-        if (isset($this->_tablename)) {
-            $this->setDefault('range_tablename', $this->_tablename);
-        }
+        // fill elements with default values
+        // todo
     }
 
 }

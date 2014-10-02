@@ -36,9 +36,9 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             throw new Exception('no dec field was specified');
         }
 
-        $ra     = $this->_escape($this->getValue($this->getFieldId('ra')));
-        $dec    = $this->_escape($this->getValue($this->getFieldId('dec')));
-        $radius = $this->_escape($this->getValue($this->getFieldId('radius')));
+        $ra     = $this->_escape($this->getValue('cone_ra'));
+        $dec    = $this->_escape($this->getValue('cone_dec'));
+        $radius = $this->_escape($this->getValue('cone_radius'));
 
         $sql = "SELECT angdist({$ra},{$dec},`{$this->_formOptions['raField']}`,`{$this->_formOptions['decField']}`)";
         $sql .= " * 3600.0 AS distance_arcsec, s.* FROM {$this->_formOptions['table']} AS s";
@@ -53,7 +53,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
      * @return string $tablename
      */
     public function getTablename() {
-        return $this->getValue($this->getFieldId('tablename'));
+        return $this->getValue('cone_tablename');
     }
 
     /**
@@ -61,23 +61,17 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
      * @return string $queue
      */
     public function getQueue() {
-        return $this->getValue($this->getFieldId('queue'));
+        return $this->getValue('cone_queue');
     }
 
     /**
      * Initializes the form.
      */
     public function init() {
-        $this->setAttrib('id', 'daiquiri-form-query-cone');
-        $this->addCsrfElement($this->getFieldId('csrf'));
-
-        // add fields
-        $head = new Daiquiri_Form_Element_Note('head', array(
-            'value' => "<h2>{$this->_formOptions['title']}</h2><p>{$this->_formOptions['help']}</p>"
-        ));
-        $this->addElement($head);
-
-        $this->addElement('text', $this->getFieldId('ra'), array(
+        // add form elements
+        $this->addCsrfElement('cone_csrf');
+        $this->addHeadElement('cone_head');
+        $this->addElement('text','cone_ra', array(
             'filters' => array('StringTrim'),
             'required' => true,
             'validators' => array(
@@ -85,7 +79,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             ),
             'label' => 'RA<sub>deg</sub>'
         ));
-        $this->addElement('text', $this->getFieldId('dec'), array(
+        $this->addElement('text','cone_dec', array(
             'filters' => array('StringTrim'),
             'required' => true,
             'validators' => array(
@@ -93,7 +87,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             ),
             'label' => 'DEC<sub>deg</sub>'
         ));
-        $this->addElement('text', $this->getFieldId('radius'), array(
+        $this->addElement('text','cone_radius', array(
             'filters' => array('StringTrim'),
             'required' => true,
             'validators' => array(
@@ -101,27 +95,23 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
             ),
             'label' => 'Radius<sub>arcsec</sub>'
         ));
-        $this->addElement(new Daiquiri_Form_Element_Tablename($this->getFieldId('tablename'), array(
+        $this->addElement(new Daiquiri_Form_Element_Tablename('cone_tablename', array(
             'label' => 'Name of the new table (optional)',
             'class' => 'span9'
         )));
+        $this->addPrimaryButtonElement('cone_submit', 'Submit new cone search');
+        $this->addQueuesElement('cone_queues');
 
-        // add fields
-        $this->addPrimaryButtonElement($this->getFieldId('submit'), 'Submit new cone search');
+        // add display groups
+        $this->addParagraphGroup(array('cone_head'),'cone_head-group');
+        $this->addHorizontalGroup(array('cone_ra','cone_dec','cone_radius'), 'cone_values-group');
+        $this->addParagraphGroup(array('cone_tablename'), 'cone_table-group', false, true);
+        $this->addInlineGroup(array('cone_submit','cone_queues'), 'cone_button-group');
 
-        // add groups
-        $this->addParagraphGroup(array('head'), 'sql-head-group');
-        $this->addHorizontalGroup(array($this->getFieldId('ra'), $this->getFieldId('dec'), $this->getFieldId('radius')));
-        $this->addParagraphGroup(array($this->getFieldId('tablename')), 'table-group', false, true);
-        $this->addInlineGroup(array($this->getFieldId('submit')), 'button-group');
-
-        if (isset($this->_tablename)) {
-            $this->setDefault($this->getFieldId('tablename'), $this->_tablename);
-        }
-
-        $this->setDefault($this->getFieldId('ra'), $this->_formOptions['raDefault']);
-        $this->setDefault($this->getFieldId('dec'), $this->_formOptions['decDefault']);
-        $this->setDefault($this->getFieldId('radius'), $this->_formOptions['radiusDefault']);
+        // fill elements with default values
+        $this->setDefault('cone_ra', $this->_formOptions['raDefault']);
+        $this->setDefault('cone_dec', $this->_formOptions['decDefault']);
+        $this->setDefault('cone_radius', $this->_formOptions['radiusDefault']);
     }
 
 }

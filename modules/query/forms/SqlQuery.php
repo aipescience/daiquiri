@@ -65,44 +65,30 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
      * Initializes the form.
      */
     public function init() {
-        $this->setAttrib('id', 'daiquiri-form-query-sql');
+        // add form elements
         $this->addCsrfElement('sql_csrf');
-
-        // add fields
-        $head = new Daiquiri_Form_Element_Note('head', array(
-            'value' => "<h2>{$this->_formOptions['title']}</h2><p>{$this->_formOptions['help']}</p>"
-        ));
-        $this->addElement($head);
-        
+        $this->addHeadElement('sql_head');
         $this->addElement('textarea', 'sql_query', array(
             'filters' => array('StringTrim'),
             'required' => true,
             'label' => 'Query:',
             'class' => 'span9 mono codemirror',
-            'style' => "resize: none;"
+            'style' => "resize: none;",
+            'rows' => 8
         ));
         $this->addElement(new Daiquiri_Form_Element_Tablename('sql_tablename', array(
             'label' => 'Name of the new table (optional)',
             'class' => 'span9'
         )));
-
-        $this->addQueueElements('sql_queue_');
         $this->addPrimaryButtonElement('sql_submit', 'Submit new SQL Query');
         $this->addDumbButtonElement('sql_clear', 'Clear input window');
+        $this->addQueueElement('sql_queue');
 
-        $this->addParagraphGroup(array('head'), 'sql-head-group');
+        // add display groups
+        $this->addParagraphGroup(array('sql_head'), 'sql-head-group');
         $this->addParagraphGroup(array('sql_query'), 'sql-input-group');
         $this->addParagraphGroup(array('sql_tablename'), 'sql-table-group', false, true);
-        $this->addQueueGroup('sql_queue_', 'sql-queue-group');
-        $this->addInlineGroup(array('sql_submit', 'sql_clear'), 'sql-button-group');
-
-        if (isset($this->_tablename)) {
-            $this->setDefault('sql_tablename', $this->_tablename);
-        }
-
-        if (isset($this->_query)) {
-            $this->setDefault('sql_query', $this->_query);
-        }
+        $this->addInlineGroup(array('sql_submit','sql_clear','sql_queue'), 'sql-button-group');
     }
 
 }

@@ -94,81 +94,39 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
      * @return string $queue
      */
     abstract public function getQueue();
-
-    /**
-     * Returns the form element name of a database field.
-     * @param  string $string  database field  
-     * @return string $fieldId 
-     */
-    public function getFieldId($string) {
-        if (!isset($this->_formOptions['name'])) {
-	    throw new Exception('no name was specified');
-        }
-        return $this->_formOptions['name'] . '_' . $string;
-    }
     
     /**
-     * Adds the queue selection buttons to the form.
-     * @param string $prefix prefix for this form
+     * Adds the queue selection select field to the form.
+     * @param string $name name of the form element
      */
-    public function addQueueElements($prefix) {
+    public function addQueuesElement($name) {
         if (!empty($this->_queues)) {
-            $buttons = array();
-            foreach ($this->_queues as $key => $queue) {
-                if ($queue['name'] === $this->_defaultQueue['name']) {
-                    $buttons[] = array(
-                        'name' => $prefix . $key . "_def",
-                        'label' => ucfirst($queue['name']) . ' queue',
-                        'tooltip' => "Priority: {$queue['priority']} Timeout: {$queue['timeout']}"
-                    );
-                } else {
-                    $buttons[] = array(
-                        'name' => $prefix . $key,
-                        'label' => ucfirst($queue['name']) . ' queue',
-                        'tooltip' => "Priority: {$queue['priority']} Timeout: {$queue['timeout']}"
-                    );
-                }
+            $entries = array();
+            $attribs = array();
+            foreach ($this->_queues as $queue) {
+                $entries[$queue['id']] = ucfirst($queue['name']);
+                $attribs["data-option-{$queue['id']}-priority"] = $queue['priority'];
+                $attribs["data-option-{$queue['id']}-timeout"] = $queue['timeout'];
             }
-
-            if (count($buttons) <= 5) {
-                $this->addToggleButtonElements($buttons, $prefix);
-            } else {
-                $entries = array();
-                foreach ($buttons as $button) {
-                    $entries[$button['name']] = $button['label'];
-                }
-                $this->addElement('select', $prefix . 'select', array(
-                    'required' => false,
-                    'ignore' => false,
-                    'decorators' => array('ViewHelper', 'Label'),
-                    'multiOptions' => $entries
-                ));
-            }
+            $element = $this->addElement('select',$name, array(
+                'required' => false,
+                'ignore' => false,
+                'decorators' => array('ViewHelper', 'Label'),
+                'multiOptions' => $entries
+            ));
+            $this->getElement($name)->setAttribs($attribs);
         }
     }
 
     /**
-     * Adds the display group for queue selection buttons to the form.
-     * @param string $prefix prefix for this form
-     * @param string $name   name of the group
+     * Adds the head field to the form.
+     * @param string $name name of the form element
      */
-    public function addQueueGroup($prefix, $name) {
-        if (!empty($this->_queues)) {
-            if (count($this->_queues) <= 5) {
-                $elements = array();
-                foreach ($this->_queues as $key => $queue) {
-                    if ($queue['name'] === $this->_defaultQueue['name']) {
-                        $elements[] = $prefix . $key . "_def";
-                    } else {
-                        $elements[] = $prefix . $key;
-                    }
-                }
-
-                $this->addToggleButtonsGroup($elements, $name, $prefix);
-            } else {
-                $this->addInlineRightGroup(array($prefix . 'select'), $name);
-            }
-        }
+    public function addHeadElement($name) {
+        $this->addElement(new Query_Form_Element_Head($name, array(
+            'title' => $this->_formOptions['title'],
+            'help' => $this->_formOptions['help']
+        )));
     }
 
     /**

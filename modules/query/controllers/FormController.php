@@ -34,16 +34,7 @@ class Query_FormController extends Daiquiri_Controller_Abstract {
 
         // overide form action
         if (isset($this->view->form)) {
-           $this->view->form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/query/form/?form=' . $form);
-        }
-           
-        // render a different view script if set
-        if ($this->view->status != 'error') {
-        $viewScript = Daiquiri_Config::getInstance()->query->forms->$form->view;
-            if ($viewScript) {
-                $this->view->setScriptPath(dirname($viewScript));
-                $this->renderScript(basename($viewScript));
-            }
+            $this->view->form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/query/form/?form=' . $form);
         }
     }
 

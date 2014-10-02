@@ -57,8 +57,8 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         'daiquiri_imageview.css' => 'daiquiri/css/daiquiri_imageview.css',
         'daiquiri_imageview.js' => 'daiquiri/js/daiquiri_imageview.js',
         // daiquiri query
-        'daiquiri_query.css' => 'daiquiri/css/daiquiri_query.css',
-        'daiquiri_query.js' => 'daiquiri/js/daiquiri_query.js',
+        // 'daiquiri_query.css' => 'daiquiri/css/daiquiri_query.css',
+        // 'daiquiri_query.js' => 'daiquiri/js/daiquiri_query.js',
         // daiquiri data management
         'daiquiri_data.css' => 'daiquiri/css/daiquiri_data.css',
         'daiquiri_data.js' => 'daiquiri/js/daiquiri_data.js',
