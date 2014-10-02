@@ -94,29 +94,6 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
      * @return string $queue
      */
     abstract public function getQueue();
-    
-    /**
-     * Adds the queue selection select field to the form.
-     * @param string $name name of the form element
-     */
-    public function addQueuesElement($name) {
-        if (!empty($this->_queues)) {
-            $entries = array();
-            $attribs = array();
-            foreach ($this->_queues as $queue) {
-                $entries[$queue['id']] = ucfirst($queue['name']);
-                $attribs["data-option-{$queue['id']}-priority"] = $queue['priority'];
-                $attribs["data-option-{$queue['id']}-timeout"] = $queue['timeout'];
-            }
-            $element = $this->addElement('select',$name, array(
-                'required' => false,
-                'ignore' => false,
-                'decorators' => array('ViewHelper', 'Label'),
-                'multiOptions' => $entries
-            ));
-            $this->getElement($name)->setAttribs($attribs);
-        }
-    }
 
     /**
      * Adds the head field to the form.
@@ -127,6 +104,55 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
             'title' => $this->_formOptions['title'],
             'help' => $this->_formOptions['help']
         )));
+    }
+
+    /**
+     * Adds a text field for a float to the form.
+     * @param string $name name of the form element
+     */
+    public function addFloatElement($name, $label) {
+        $this->addElement(new Query_Form_Element_Float($name, array(
+            'label' => $label
+        )));
+    }
+
+    /**
+     * Adds the tablename field to the form.
+     * @param string $name name of the form element
+     */
+    public function addTablenameElement($name) {
+        $this->addElement(new Daiquiri_Form_Element_Tablename($name, array(
+            'label' => 'Name of the new table (optional)',
+            'class' => 'span9'
+        )));
+    }
+
+    /**
+     * Adds the queue selection select field to the form.
+     * @param string $name name of the form element
+     */
+    public function addQueuesElement($name) {
+
+        // $this->_queues = array(
+        //     array(
+        //         'id' => 1,
+        //         'name' => 'foo',
+        //         'timeout' => 23,
+        //         'priority' => 42
+        //     ),
+        //     array(
+        //         'id' => 2,
+        //         'name' => 'bar',
+        //         'timeout' => 23,
+        //         'priority' => 42
+        //     )
+        // );
+
+        if (!empty($this->_queues)) {
+            $this->addElement(new Query_Form_Element_Queues($name, array(
+                'queues' => $this->_queues
+            )));
+        }
     }
 
     /**

@@ -82,7 +82,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         )));
         $this->addPrimaryButtonElement('sql_submit', 'Submit new SQL Query');
         $this->addDumbButtonElement('sql_clear', 'Clear input window');
-        $this->addQueueElement('sql_queue');
+        $this->addQueuesElement('sql_queue');
 
         // add display groups
         $this->addParagraphGroup(array('sql_head'), 'sql-head-group');

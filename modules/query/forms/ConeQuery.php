@@ -71,34 +71,10 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         // add form elements
         $this->addCsrfElement('cone_csrf');
         $this->addHeadElement('cone_head');
-        $this->addElement('text','cone_ra', array(
-            'filters' => array('StringTrim'),
-            'required' => true,
-            'validators' => array(
-                array('validator' => 'float')
-            ),
-            'label' => 'RA<sub>deg</sub>'
-        ));
-        $this->addElement('text','cone_dec', array(
-            'filters' => array('StringTrim'),
-            'required' => true,
-            'validators' => array(
-                array('validator' => 'float')
-            ),
-            'label' => 'DEC<sub>deg</sub>'
-        ));
-        $this->addElement('text','cone_radius', array(
-            'filters' => array('StringTrim'),
-            'required' => true,
-            'validators' => array(
-                array('validator' => 'float')
-            ),
-            'label' => 'Radius<sub>arcsec</sub>'
-        ));
-        $this->addElement(new Daiquiri_Form_Element_Tablename('cone_tablename', array(
-            'label' => 'Name of the new table (optional)',
-            'class' => 'span9'
-        )));
+        $this->addFloatElement('cone_ra', 'RA<sub>deg</sub>');
+        $this->addFloatElement('cone_dec', 'DEC<sub>deg</sub>');
+        $this->addFloatElement('cone_radius', 'Radius<sub>arcsec</sub>');
+        $this->addTablenameElement('cone_tablename');
         $this->addPrimaryButtonElement('cone_submit', 'Submit new cone search');
         $this->addQueuesElement('cone_queues');
 
