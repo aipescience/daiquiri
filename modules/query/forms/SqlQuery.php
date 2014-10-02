@@ -27,7 +27,6 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
      */
     protected $_query;
 
-
     /**
      * Sets $_query.
      * @param string $query the default value for the query field
@@ -76,10 +75,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             'style' => "resize: none;",
             'rows' => 8
         ));
-        $this->addElement(new Daiquiri_Form_Element_Tablename('sql_tablename', array(
-            'label' => 'Name of the new table (optional)',
-            'class' => 'span9'
-        )));
+        $this->addTablenameElement('sql_tablename');
         $this->addPrimaryButtonElement('sql_submit', 'Submit new SQL Query');
         $this->addDumbButtonElement('sql_clear', 'Clear input window');
         $this->addQueuesElement('sql_queue');
