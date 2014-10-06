@@ -58,12 +58,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 'order' => array($this->getResource()->getTimeField() . ' DESC'),
             ));
         } catch (Exception $e) {
-            return array(
-                'status' => 'ok',
-                'message' => $message,
-                'nactive' => false,
-                'jobs' => array()
-            );
+            $dbRows = array();
         }
 
         foreach ($dbRows as $dbRow) {
@@ -140,11 +135,13 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         return array(
             'status' => 'ok',
-            'nactive' => $nactive,
-            'guest' => (Daiquiri_Auth::getInstance()->getCurrentRole() === 'guest'),
-            'quota' => $quota,
-            'message' => $message,
-            'jobs' => $rows
+            'jobs' => $rows,
+            'database' => array(
+                'message' => $message,
+                'nactive' => $nactive,
+                'guest' => (Daiquiri_Auth::getInstance()->getCurrentRole() === 'guest'),
+                'quota' => $quota,
+            )
         );
     }
 

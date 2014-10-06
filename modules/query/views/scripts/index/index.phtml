@@ -19,21 +19,73 @@
  */
 ?>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        daiquiri.common.startPoll(3000);
-        var query = new daiquiri.query.Query('<?php echo Daiquiri_Config::getInstance()->getSiteUrl() ?>');
-    });
-</script>
+<link href="<?php echo $this->baseUrl('/daiquiri/css/query.css'); ?>" media="screen" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="<?php echo $this->baseUrl('/daiquiri/js/query.js'); ?>"></script>
 
-<div class="main">
+<div class="main" ng-app="query">
     <h2>Query interface</h2>
 
     <div class="row">
-        <div class="span3">
-            <div id="jobs">
-                <!-- ajax widget for job display -->
+        <div class="span3" ng-controller="jobController">
+
+            <!-- database status -->
+
+            <div id="database-status" class="daiquiri-widget">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="nav-header">Database status</li>
+                    <li class="nav-item">
+                        <p ng-show="database.message">
+                            {{database.message}}
+                        </p>
+                        <p ng-show="database.nactive == 0">
+                            There is no job in the queue.
+                        </p>
+                        <p ng-show="database.nactive == 1">
+                            There is one job in the queue.
+                        </p>
+                        <p ng-show="database.nactive > 1">
+                            There are {{database.nactive}} jobs in the queue.
+                        </p>
+                        <p ng-show="database.guest == true">
+                            You are using the guest user. For a personal account, please sign up <a href="/auth/registration/register">here</a>.
+                        </p>
+                        <p ng-show="database.guest == true">
+                            The guest user is using {{database.quota.used}} of its quota of {{database.quota.max}}.
+                        </p>
+                        <p ng-show="database.guest == false">
+                            You are using {{database.quota.used}} of your quota of {{database.quota.max}}.
+                        </p>
+                        <p ng-show="database.quota.exceeded">
+                            Please remove some jobs to free space or contact the administrators.
+                        </p>
+                    </li>
+                </ul>
             </div>
+
+            <!-- end database status -->
+
+            <!-- jobs -->
+            <div id="jobs" class="daiquiri-widget">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="nav-header">Jobs</li>
+                    <li class="nav-item {{job.id == jobData.job.id.value ? 'active' : ''}}"
+                        ng-repeat="job in jobData.jobs  | orderBy:'-timestamp'">
+                        <a href="" ng-click="loadJob(job.id)" >
+                            <i class="icon-ok pull-right" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
+                            <i class="icon-warning-sign pull-right" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
+                            <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
+                            <i class="icon-remove pull-right" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
+                            <i class="icon-trash pull-right" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
+                            <i class="icon-pause pull-right" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
+                            <i class="icon-ban-circle pull-right" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
+                            <div class="daiquiri-query-jobs-item">{{job.table}}</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- end jobs -->
+
         </div>
         <div class="span9">
             <div id="query" class=""> 
@@ -45,18 +97,6 @@
                                 <a href="#<?php echo $key ?>-form-tab" data-toggle="tab"><?php echo $this->escape($form['title']); ?></a>
                             </li>
                         <?php endforeach; ?>
-                        <li id="details-tab-header">
-                            <a href="#details-tab" data-toggle="tab">Job Details</a>
-                        </li>
-                        <li id="results-tab-header">
-                            <a href="#results-tab" data-toggle="tab">Results Table</a>
-                        </li>
-                        <li id="plot-tab-header">
-                            <a href="#plot-tab" data-toggle="tab">Plot</a>
-                        </li>
-                        <li id="download-tab-header">
-                            <a href="#download-tab" data-toggle="tab">Download</a>
-                        </li>
                     </ul>
                     <div class="tab-content">
                         <?php foreach ($this->forms as $key => $form): ?>
@@ -64,57 +104,6 @@
                                 <?php echo $this->action('index', 'form', 'query', array('form' => $key)); ?>
                             </div>
                         <?php endforeach; ?>
-                        <div class="tab-pane" id="details-tab"></div>
-                        <div class="tab-pane" id="results-tab">
-                            <div id="results-table"></div>
-                            <?php if ($this->samp): ?>
-                            <div id="daiquiri-samp"></div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="tab-pane row" id="plot-tab">
-                            <div class="span6">
-                                <div id="plot-container">
-                                    <div id="plot"></div>
-                                </div>
-                            </div>
-                            <div id="plot-form" class="span3"></div>
-                        </div>
-                        <div class="tab-pane" id="download-tab">
-                            <h4>Select format for download</h4>
-                            <?php
-                                echo $this->message('query.download'); 
-                                echo $this->downloadForm;
-                            ?>
-                            <?php if (!empty($this->adapter)): ?>
-                            <div id="daiquiri-query-download-description">
-                            <h4>Available formats</h4>
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th class="onehundredfifty">
-                                                Format
-                                            </th>
-                                            <th>
-                                                Description
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                <?php foreach($this->adapter as $adapter): ?>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <?php echo $adapter['name']; ?>
-                                            </td>
-                                            <td>
-                                                <?php echo $adapter['description']; ?>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                <?php endforeach; ?>
-                                </table>
-                            </div>
-                            <?php endif; ?>
-                        </div>
                     </div>
                 </div>
             </div>
