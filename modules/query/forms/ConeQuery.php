@@ -68,9 +68,10 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
      * Initializes the form.
      */
     public function init() {
+        parent::init();
+
         // add form elements
         $this->addCsrfElement('cone_csrf');
-        $this->addHeadElement('cone_head');
         $this->addFloatElement('cone_ra', 'RA<sub>deg</sub>');
         $this->addFloatElement('cone_dec', 'DEC<sub>deg</sub>');
         $this->addFloatElement('cone_radius', 'Radius<sub>arcsec</sub>');
@@ -79,7 +80,6 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         $this->addQueuesElement('cone_queues');
 
         // add display groups
-        $this->addParagraphGroup(array('cone_head'),'cone_head-group');
         $this->addHorizontalGroup(array('cone_ra','cone_dec','cone_radius'), 'cone_values-group');
         $this->addParagraphGroup(array('cone_tablename'), 'cone_table-group', false, true);
         $this->addInlineGroup(array('cone_submit','cone_queues'), 'cone_button-group');

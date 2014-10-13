@@ -20,22 +20,33 @@
 ?>
 
 <div class="main">
-    <h2>Job details</h2>
+    <h2>Details for job <?php echo $this->escape($this->job['table']); ?></h2>
 
-    <table class='table table-bordered'>
-        <?php foreach ($this->job as $element): ?>
-            <tr>
-                <td class="onehundredfifty"><?php echo $this->escape($element['name']); ?></td>
-                <td>
-                    <?php
-                    if ($element['key'] === "query" || $element['key'] === "actualQuery") {
-                        echo nl2br($this->escape($element['value']));
-                    } else {
-                        echo $this->escape($element['value']);
-                    }
-                    ?>
-                </td>
-            </tr>   
+    <h4>Job parameters</h4>
+
+    <dl class="dl-horizontal">
+        <dt>Internal job id</dt>
+        <dd><?php echo $this->escape($this->job['id']); ?></dd>
+
+        <dt>Full database table name</dt>
+        <dd><?php echo $this->escape($this->job['database']); ?>.<?php echo $this->escape($this->job['table']); ?></dd>
+
+        <dt>Query</dt>
+        <dd><?php echo $this->escape($this->job['query']); ?></dd>
+
+        <dt>Time submitted</dt>
+        <dd><?php echo $this->escape($this->job['time']); ?></dd>
+
+        <dt>Status</dt>
+        <dd><?php echo $this->escape($this->job['status']); ?></dd>
+    <dl>
+
+    <h4>Additional infomation</h4>
+
+    <dl class="dl-horizontal">
+        <?php foreach ($this->job['additional'] as $element): ?>
+        <dt><?php echo $this->escape($element['name']); ?></dt>
+        <dd><?php echo $this->escape($element['value']); ?></dd>
         <?php endforeach; ?>
-    </table>
+    <dl>
 </div>

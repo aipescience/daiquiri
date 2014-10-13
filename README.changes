@@ -5,6 +5,15 @@ New static file functionality, run ./init.php -si to add the new table.
 
 Resources neew to be updated as well.
 
+2014/10/10
+==========
+
+Query_Model_Account::listJobs() has been renamed to index().
+Query_Model_Download::regen() has been renamed to regenerate().
+
+Dropping and re-initing Auth_Rules or manually changing the strings in
+Auth_Rules.permissions is required.
+
 2014/09/22
 ==========
 

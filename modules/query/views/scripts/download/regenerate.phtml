@@ -21,11 +21,16 @@
 ?>
 
 <div class="main">
-    <?php if ($this->status === 'ok'): ?>
-        <p>The file has been regenerated.</p>
-    <?php elseif ($this->status === 'pending'): ?>
-        <p>The file is being regenerated...</p>
+    <?php if ($this->status === 'pending'): ?>
+        <p>Your file is being regenerated... Please wait...</p>
+    <?php elseif ($this->status === 'ok'): ?>
+        <p>You can now download the file using:</p>
+        <p>
+            <a target="_blank" href="<?php echo $this->escape($this->link); ?>">
+                <?php echo $this->escape($this->link); ?>
+            </a>
+        </p>
     <?php else: ?>
-        <p class="text-error"><?php echo $this->escape($this->errors); ?></p>
+        <?php echo $this->form; ?>
     <?php endif; ?>
 </div>

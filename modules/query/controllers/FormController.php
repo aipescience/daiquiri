@@ -30,12 +30,18 @@ class Query_FormController extends Daiquiri_Controller_Abstract {
     public function indexAction() {
         // get form from request default is sql
         $form = $this->_getParam('form', 'sql');
-        $this->getControllerHelper('form')->submit($form);
 
-        // overide form action
-        if (isset($this->view->form)) {
-            $this->view->form->setAction(Daiquiri_Config::getInstance()->getBaseUrl() . '/query/form/?form=' . $form);
+        // check if POST or GET
+        if ($this->getRequest()->isPost()) {
+            // validate form and do stuff
+            $response = $this->_model->submit($form, $this->getRequest()->getPost());
+        } else {
+            // just display the form
+            $response = $this->_model->submit($form);
         }
+
+        // assign to view
+        $this->view->assign($response);
     }
 
     public function planAction() {

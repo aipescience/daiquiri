@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Form_DisplayGroup_Paragraph extends Zend_Form_DisplayGroup {
+class Daiquiri_Form_DisplayGroup_Div extends Zend_Form_DisplayGroup {
 
     /**
      * Show labels or not.
@@ -40,7 +40,7 @@ class Daiquiri_Form_DisplayGroup_Paragraph extends Zend_Form_DisplayGroup {
      */
     function init() {
         // set css class for html element
-        $this->setAttrib('class', 'daiquiri-form-paragraph-group');
+        $this->setAttrib('class', 'daiquiri-form-div-group');
 
         // set decorators for DisplayGroup
         $this->setDecorators(array('FormElements','Fieldset'));
@@ -52,7 +52,7 @@ class Daiquiri_Form_DisplayGroup_Paragraph extends Zend_Form_DisplayGroup {
                 'Errors',
                 array(
                     'HtmlTag',
-                    array('tag' => 'p',),
+                    array('tag' => 'div',),
                 )
             ));
 
@@ -60,7 +60,7 @@ class Daiquiri_Form_DisplayGroup_Paragraph extends Zend_Form_DisplayGroup {
                 $element->addDecorators(array(
                     array(
                         'Label',
-                        array('tag' => 'p', 'escape' => false)
+                        array('tag' => 'div', 'escape' => false)
                     )
                 ));
             }

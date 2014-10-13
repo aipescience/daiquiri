@@ -22,10 +22,10 @@
 class Query_Model_Account extends Daiquiri_Model_Abstract {
 
     /**
-     * Returns all jobs for the current user.
+     * Returns the message, the database information, and the jobs for the current user.
      * @return array $response
      */
-    public function listJobs() {
+    public function index() {
         // set job resource
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
@@ -66,6 +66,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             foreach (array('id', 'table', 'status') as $col) {
                 $row[$col] = $dbRow[$col];
             }
+            $row['time'] = $dbRow[$this->getResource()->getTimeField()];
             $rows[] = $row;
         }
 
@@ -76,6 +77,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         } else {
             $nactive = false;
         }
+
+        // check if guest or not
+        $guest = (Daiquiri_Auth::getInstance()->getCurrentRole() === 'guest');
 
         // get the quota information
         $usrGrp = Daiquiri_Auth::getInstance()->getCurrentRole();
@@ -114,9 +118,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             }
 
             if ($usedSpace > $quotaSpace) {
-                $quota['exeeded'] = true;
+                $quota['exceeded'] = true;
             } else {
-                $quota['exeeded'] = false;
+                $quota['exceeded'] = false;
             }
 
             $unit = ' byte';
@@ -139,7 +143,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'database' => array(
                 'message' => $message,
                 'nactive' => $nactive,
-                'guest' => (Daiquiri_Auth::getInstance()->getCurrentRole() === 'guest'),
+                'guest' => $guest,
                 'quota' => $quota,
             )
         );
@@ -163,28 +167,42 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             throw new Daiquiri_Exception_Forbidden();
         }
 
+        // create return array
+        $job = array(
+            'time' => $dbRow[$this->getResource()->getTimeField()],
+            'additional' => array()
+        );
+
+        foreach(array('id','database','table','query','status','error') as $key) {
+            if (!empty($dbRow[$key])) {
+                $job[$key] = $dbRow[$key];
+            }
+            unset($dbRow[$key]);
+        }
+
         // fetch table statistics
         $stat = $this->getResource()->fetchTableStats($id);
 
-        // create return array
-        $row = array();
+        // create additional array
         $translations = $this->getResource()->getTranslations();
         foreach (array_merge($dbRow, $stat) as $key => $value) {
-            $row[$key] = array(
+            $job['additional'][] = array(
                 'key' => $key,
                 'name' => $translations[$key],
                 'value' => $value
             );
         }
 
-        // add username
-        $row['username'] = array(
-            'key' => 'username',
-            'name' => 'Username',
-            'value' => Daiquiri_Auth::getInstance()->getCurrentUsername()
-        );
+        // add columns if the job was a success
+        if ($job['status'] == 'success') {
+            $descResource = new Data_Model_Resource_Description();
+            $descResource->init($job['database']);
+            $tableMeta = $descResource->describeTable($job['table']);
 
-        return array('job' => $row, 'status' => 'ok');
+            $job['cols'] = $tableMeta['columns'];
+        }
+
+        return array('job' => $job, 'status' => 'ok');
     }
 
     /**

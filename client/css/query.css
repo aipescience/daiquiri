@@ -1,3 +1,22 @@
-#query .tab-content form {
+.tab-content form {
     margin-top: 0;
+}
+
+.tab-content form#download {
+    margin-top: 10px;
+}
+
+
+.angular-hidden {
+    visibility: visible;
+}
+
+#fieldset-downloadtablegroup {
+    display: none;
+}
+
+#fieldset-downloadformatgroup {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 12px;
 }

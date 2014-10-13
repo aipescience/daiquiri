@@ -177,6 +177,21 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
+     * Adds a form group using a div for every element.
+     * @param array $elements array of form element names
+     * @param string $name    name of the group
+     * @param string $legend  legend for the formgroup
+     * @param bool $label     show labels of the form elements 
+     */
+    public function addDivGroup(array $elements, $name = 'div-group', $legend = Null, $label = False) {
+        $this->addDisplayGroup($elements, $name, array(
+            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Div',
+            'legend' => $legend,
+            'label' => $label
+        ));
+    }
+
+    /**
      * Adds a form group using a p for every element.
      * @param array $elements array of form element names
      * @param string $name    name of the group

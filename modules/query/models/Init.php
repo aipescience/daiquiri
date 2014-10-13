@@ -48,11 +48,9 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             $rules['guest'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
-                    'listJobs','showJob','killJob','removeJob','renameJob','databases','functions','examples'
+                    'index','showJob','killJob','removeJob','renameJob','databases','functions','examples'
                 ),
-                'Query_Model_Database' => array(
-                    'download', 'file', 'stream', 'regen'
-                ),
+                'Query_Model_Database' => array('download','regenerate','file','stream'),
                 'Query_Model_Examples' => array('index', 'show')
             );
 
@@ -66,11 +64,9 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             $rules['user'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
-                    'listJobs','showJob','killJob','removeJob','renameJob','databases','functions','examples'
+                    'index','showJob','killJob','removeJob','renameJob','databases','functions','examples'
                 ),
-                'Query_Model_Database' => array(
-                    'download', 'file', 'stream', 'regen'
-                ),
+                'Query_Model_Database' => array('download','regenerate','file','stream'),
                 'Query_Model_Examples' => array('index', 'show')
             );
 
@@ -190,7 +186,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                             'compress' => 'none',
                         ),
                         'votable' => array(
-                            'name' => "IVOA VOTable XML file - ASCII Format",
+                            'name' => "VOTable ASCII Format",
                             'description' => "A XML file using the IVOA VOTable format. Use this option if you intend to use VO compatible software to further process the data.",
                             'suffix' => "votable.xml",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/votable.sh",
@@ -198,7 +194,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                             'compress' => 'none',
                         ),
                         'votableB1' => array(
-                            'name' => "IVOA VOTable XML file - BINARY 1 Format",
+                            'name' => "VOTable BINARY 1 Format",
                             'description' => "A XML file using the IVOA VOTable format (BINARY Serialization). Use this option if you intend to use VO compatible software to process the data and prefer the use of a binary file.",
                             'suffix' => "votableB1.xml",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/votable-binary1.sh",
@@ -206,7 +202,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                             'compress' => 'none',
                         ),
                         'votableB2' => array(
-                            'name' => "IVOA VOTable XML file - BINARY 2 Format",
+                            'name' => "VOTable BINARY 2 Format",
                             'description' => "A XML file using the IVOA VOTable format (BINARY2 Serialization). Use this option if you intend to use VO compatible software to process the data and prefer the use of a binary file.",
                             'suffix' => "votableB2.xml",
                             'adapter' => $this->_init->daiquiri_path . "/modules/query/scripts/download/adapter/votable-binary2.sh",

@@ -1,0 +1,74 @@
+<?php
+/*
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+
+<div class="main">
+    <h2>Account information for <?php echo $this->escape(Daiquiri_Auth::getInstance()->getCurrentUsername()); ?> </h2>
+
+    <h4>Database status</h4>
+
+    <?php if ($this->database['message'] !== false): ?>
+    <p>
+        <?php echo $this->escape($this->database['message']); ?>
+    </p>
+    <?php endif; ?>
+
+    <?php if ($this->database['guest'] !== false): ?>
+    <p>
+        You are using the guest user. For a personal account, please sign up <?php echo $this->internalLink(array('text' => 'here', 'href' => '/auth/registration/register')); ?>.
+    </p>
+    <?php endif; ?>
+
+    <?php if ($this->database['nactive'] !== false): ?>
+    <p>
+        Currently, there <?php echo (($this->database['nactive'] === 1) ? 'is ' : 'are ') . $this->escape($this->database['nactive']). (($this->database['nactive'] === 1) ? ' job' : ' jobs'); ?> in the queue.
+    </p>
+    <?php endif; ?>
+
+    <p class="<?php echo (($this->database['quota']['exceeded'] === true) ? 'text-error' : '') ?>">
+        <?php if ($this->database['guest'] === true): ?>
+        The guest user is using <?php echo $this->escape($this->database['quota']['used']); ?> of its quota of <?php echo $this->escape($this->database['quota']['max']); ?>.
+        <?php else: ?>
+        You are using <?php echo $this->escape($this->database['quota']['used']); ?> of your quota of <?php echo $this->escape($this->database['quota']['max']); ?>.
+        <?php endif; ?>
+    </p>
+
+    <h4>Job list</h4>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Table</th>
+                <th>Status</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($this->jobs as $job): ?>
+            <tr>
+            <?php foreach ($job as $key => $value): ?>
+                <td><?php echo $this->escape($value); ?></td>
+            <?php endforeach; ?>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>

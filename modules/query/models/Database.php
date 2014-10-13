@@ -25,63 +25,50 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
 
     /**
      * Creates the file to download.
-     * @param string $table table in the users database
-     * @param string $format format for the download
+     * @param array $formParams
      * @return array $response
      */
-    public function download($table, $format) {
-        if (empty($table)) {
-            return array('status' => 'error', 'errors' => 'Table is not set');
-        }
-        if (empty($format)) {
-            return array('status' => 'error', 'errors' => 'Format is not set');
+    public function download(array $formParams = array()) {
+        // create the form object
+        $form = new Query_Form_Download(array(
+            'adapter' => Daiquiri_Config::getInstance()->getQueryDownloadAdapter()
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $values = $form->getValues();
+                return $this->_createDownloadFile($values['download_tablename'],$values['download_format']);
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
         }
 
-        return $this->_createDownloadFile($table, $format);
+        return array('form' => $form, 'status' => 'form');
     }
 
     /**
      * Regenerates the file to download.
-     * @param string $table table in the users database
-     * @param string $format format for the download
      * @param array $formParams
      * @return array $response
      */
-    public function regen($table, $format) {
-        if (empty($table)) {
-            return array('status' => 'error', 'errors' => 'Table is not set');
-        }
-        if (empty($format)) {
-            return array('status' => 'error', 'errors' => 'Format is not set');
+    public function regenerate(array $formParams = array()) {
+        // create the form object
+        $form = new Query_Form_Download(array(
+            'adapter' => Daiquiri_Config::getInstance()->getQueryDownloadAdapter()
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                $values = $form->getValues();
+                return $this->_createDownloadFile($values['download_tablename'],$values['download_format'], true);
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
         }
 
-        // create link and file sysytem path for table dump
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
-        $compress = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->compress;
-        $filename = $this->_generateFileName($table, $suffix);
-        $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
-        $file = $dir . DIRECTORY_SEPARATOR . $filename;
-
-        // security
-        if (!is_dir($dir)) {
-            throw new Daiquiri_Exception_Forbidden();
-        }
-        if (file_exists($file . ".lock")) {
-            throw new Daiquiri_Exception_Forbidden();
-        }
-
-        // delete the files...
-        if (file_exists($file)) {
-            unlink($file);
-        }
-
-        if (file_exists($file . ".err")) {
-            unlink($file . ".err");
-        }
-
-        // now resubmit the download request (without csrf)
-        return $this->_createDownloadFile($table, $format);
+        return array('form' => $form, 'status' => 'form');
     }
 
     /**
@@ -253,7 +240,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
      * @param string $suffix
      * @return array $response
      */
-    private function _createDownloadFile($table, $format) {
+    private function _createDownloadFile($table, $format, $regen = false) {
         // sanity check for format
         if (!in_array($format, Daiquiri_Config::getInstance()->query->download->adapter->enabled->toArray())) {
             throw new Exception('Error: format not valid.');
@@ -264,7 +251,6 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
         $filename = $this->_generateFileName($table, $suffix);
         $url = '/query/download/file?table=' . $table . '&format=' . $format;
-        $regenUrl = '/query/download/regen?table=' . $table . '&format=' . $format;
         $dir = Daiquiri_Config::getInstance()->query->download->dir . DIRECTORY_SEPARATOR . $username;
         $file = $dir . DIRECTORY_SEPARATOR . $filename;
 
@@ -284,6 +270,22 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             }
 
             chmod($dir, 0775);
+        }
+
+        // delete the old file if regen is set
+        if ($regen === true) {
+            if (file_exists($file . ".lock")) {
+                throw new Daiquiri_Exception_Forbidden();
+            }
+
+            // delete the files...
+            if (file_exists($file)) {
+                unlink($file);
+            }
+
+            if (file_exists($file . ".err")) {
+                unlink($file . ".err");
+            }
         }
 
         if (!file_exists($file) && ($queueType === "direct" || empty($queueType))) {
@@ -398,7 +400,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         return array(
             'status' => 'ok',
             'link' => Daiquiri_Config::getInstance()->getSiteUrl() . $url,
-            'regenerateLink' => Daiquiri_Config::getInstance()->getSiteUrl() . $regenUrl
+            'format' => $format
         );
     }
 }

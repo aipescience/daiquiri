@@ -22,35 +22,67 @@
 class Query_Form_Download extends Daiquiri_Form_Abstract {
 
     /**
-     * The set of formats to choose from.
+     * The set of adapter to choose from.
      * @var array
      */
-    protected $_formats;
+    protected $_adapter;
 
     /**
      * Sets $_formats.
-     * @param array $formats the set of formats to choose from
+     * @param array $adapter the set of adapter to choose from
      */
-    public function setFormats(array $formats) {
-        $this->_formats = $formats;
+    public function setAdapter(array $adapter) {
+        $this->_adapter = $adapter;
     }
 
     /**
      * Initializes the form.
      */
     public function init() {
-        $this->addElement('select', 'download_format', array(
-            'required' => true,
-            'label' => 'Select format:',
-            'multiOptions' => $this->_formats,
-            'decorators' => array('ViewHelper'),
-            'class' => 'input-xxlarge'
-        ));
-        $this->addElement('button','download_submit',array(
-            'label' => 'Download',
-            'class' => 'btn btn-primary'
+        // add elements
+        $this->addCsrfElement('download_csrf');
+        $this->addElement(new Daiquiri_Form_Element_Tablename('download_tablename', array(
+            'label' => 'Name of the new table (optional)',
+            'class' => 'span9',
+            'required' => true
+        )));
+        $this->addElement(new Query_Form_Element_DownloadFormat('download_format', array(
+            'adapter' => $this->_adapter
+        )));
+        $this->addPrimaryButtonElement('download_submit',array(
+            'label' => 'Download table'
         ));
 
-        $this->addInlineGroup(array('download_format','download_submit'));
+        $this->addParagraphGroup(array('download_tablename'),'download-table-group', false, true);
+        $this->addDivGroup(array('download_format'),'download-format-group');
+        $this->addInlineGroup(array('download_submit'));
+
+        // add angular directives
+        $this->setAttrib('name',"download");
+        $this->setAttrib('ng-submit',"downloadTable()");
+        $this->setDecorators(array(
+            'FormElements',
+            array('Callback', array(
+                'callback' => function($content, $element, $options) {
+                    $ngErrorModel = 'errors.form';
+
+                    return '<ul class="unstyled text-error angular-hidden" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">Error: {{error}}</li></ul>';
+                },
+                'placement' => 'append'
+            )),
+            'Form'
+        ));
+        foreach (array('download_csrf','download_tablename','download_format') as $name) {
+            $element = $this->getElement($name);
+            $element->setAttrib('ng-model','values.' . $name);
+            $element->addDecorators(array(array('Callback', array(
+                'callback' => function($content, $element, $options) {
+                    $ngErrorModel = 'errors.' . $element->getName();
+
+                    return '<ul class="unstyled text-error angular-hidden" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">Error: {{error}}</li></ul>';
+                },
+                'placement' => 'append'
+            ))));
+        }
     }
 }

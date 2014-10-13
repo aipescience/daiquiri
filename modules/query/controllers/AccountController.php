@@ -27,8 +27,8 @@ class Query_AccountController extends Daiquiri_Controller_Abstract {
         $this->_model = Daiquiri_Proxy::factory('Query_Model_Account');
     }
 
-    public function listJobsAction() {
-        $response = $this->_model->listJobs();
+    public function indexAction() {
+        $response = $this->_model->index();
         $this->view->assign($response);
     }
 

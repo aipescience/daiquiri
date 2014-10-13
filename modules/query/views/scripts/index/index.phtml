@@ -26,84 +26,242 @@
     <h2>Query interface</h2>
 
     <div class="row">
-        <div class="span3" ng-controller="jobController">
+        <div class="span3" ng-controller="sidebarController">
 
             <!-- database status -->
 
-            <div id="database-status" class="daiquiri-widget">
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="nav-header">Database status</li>
-                    <li class="nav-item">
-                        <p ng-show="database.message">
-                            {{database.message}}
-                        </p>
-                        <p ng-show="database.nactive == 0">
-                            There is no job in the queue.
-                        </p>
-                        <p ng-show="database.nactive == 1">
-                            There is one job in the queue.
-                        </p>
-                        <p ng-show="database.nactive > 1">
-                            There are {{database.nactive}} jobs in the queue.
-                        </p>
-                        <p ng-show="database.guest == true">
-                            You are using the guest user. For a personal account, please sign up <a href="/auth/registration/register">here</a>.
-                        </p>
-                        <p ng-show="database.guest == true">
-                            The guest user is using {{database.quota.used}} of its quota of {{database.quota.max}}.
-                        </p>
-                        <p ng-show="database.guest == false">
-                            You are using {{database.quota.used}} of your quota of {{database.quota.max}}.
-                        </p>
-                        <p ng-show="database.quota.exceeded">
-                            Please remove some jobs to free space or contact the administrators.
-                        </p>
-                    </li>
-                </ul>
+            <div id="database-status" class="daiquiri-widget nav nav-pills nav-stacked">
+                <div class="nav-header">Database status</div>
+                <div class="nav-item">
+                    <p ng-show="account.database.message">
+                        {{account.database.message}}
+                    </p>
+                    <p ng-show="account.database.nactive === 0">
+                        There is no job in the queue.
+                    </p>
+                    <p ng-show="account.database.nactive === 1">
+                        There is one job in the queue.
+                    </p>
+                    <p ng-show="account.database.nactive > 1">
+                        There are {{account.database.nactive}} jobs in the queue.
+                    </p>
+                    <p ng-show="account.database.guest == true">
+                        You are using the guest user. For a personal account, please sign up <a href="/auth/registration/register">here</a>.
+                    </p>
+                    <p ng-show="account.database.guest === true">
+                        The guest user is using {{account.database.quota.used}} of its quota of {{account.database.quota.max}}.
+                    </p>
+                    <p ng-show="account.database.guest === false">
+                        You are using {{account.database.quota.used}} of your quota of {{account.database.quota.max}}.
+                    </p>
+                    <p ng-show="account.database.quota.exceeded" class="text-error">
+                        Please remove some jobs to free space or contact the administrators.
+                    </p>
+                </div>
             </div>
 
-            <!-- end database status -->
+            <!-- new query status -->
+
+            <ul id="database-status" class="daiquiri-widget nav nav-pills nav-stacked">
+                <li class="nav-header">New Query</li>
+                <?php foreach ($this->forms as $key => $form): ?>
+                    <li class="nav-item"
+                        ng-class="{active: account.active.form == '<?php echo $this->escape($key); ?>'}"
+                        ng-click="activateForm('<?php echo $this->escape($key); ?>')"
+                        <?php echo (isset($form['default']) ? "ng-init=\"activateForm('{$this->escape($key)}')\"" : ''); ?>>
+                        <a href="" ><?php echo $this->escape($form['title']); ?></a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
 
             <!-- jobs -->
-            <div id="jobs" class="daiquiri-widget">
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="nav-header">Jobs</li>
-                    <li class="nav-item {{job.id == jobData.job.id.value ? 'active' : ''}}"
-                        ng-repeat="job in jobData.jobs  | orderBy:'-timestamp'">
-                        <a href="" ng-click="loadJob(job.id)" >
-                            <i class="icon-ok pull-right" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
-                            <i class="icon-warning-sign pull-right" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
-                            <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
-                            <i class="icon-remove pull-right" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
-                            <i class="icon-trash pull-right" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
-                            <i class="icon-pause pull-right" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
-                            <i class="icon-ban-circle pull-right" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
-                            <div class="daiquiri-query-jobs-item">{{job.table}}</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
 
-            <!-- end jobs -->
+            <ul id="jobs" class="daiquiri-widget nav nav-pills nav-stacked">
+                <li class="nav-header">Job list</li>
+                <li class="nav-item {{job.id == account.active.job ? 'active' : ''}}"
+                    ng-repeat="job in account.jobs  | orderBy:'-timestamp'">
+                    <a href="" ng-click="activateJob(job.id)" >
+                        <i class="icon-ok pull-right" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
+                        <i class="icon-warning-sign pull-right" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
+                        <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
+                        <i class="icon-remove pull-right" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
+                        <i class="icon-trash pull-right" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
+                        <i class="icon-pause pull-right" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
+                        <i class="icon-ban-circle pull-right" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
+                        <div class="daiquiri-query-jobs-item">{{job.table}}</div>
+                    </a>
+                </li>
+            </ul>
 
         </div>
         <div class="span9">
             <div id="query" class=""> 
-                <div class="tabbable">
+                <div class="tabbable" ng-controller="tabsController">
                     <ul class="nav nav-tabs">
-                        <?php foreach ($this->forms as $key => $form): ?>
-                            <li id="<?php echo $this->escape($key); ?>-form-tab-header" 
-                                class="<?php if (!empty($form['default'])) echo 'active default-tab'; ?>" >
-                                <a href="#<?php echo $key ?>-form-tab" data-toggle="tab"><?php echo $this->escape($form['title']); ?></a>
-                            </li>
-                        <?php endforeach; ?>
+                        <li id="form-tab-header" ng-show="account.active.form" ng-class="{active: account.active.form}">
+                            <a href="#form-tab" data-toggle="tab">New Query</a>
+                        </li>
+                        <li id="overview-tab-header" ng-show="account.active.job">
+                            <a href="#overview-tab" data-toggle="tab">Job Overview</a>
+                        </li>
+                        <li id="results-tab-header" ng-show="account.active.job">
+                            <a href="#results-tab" data-toggle="tab">Results Table</a>
+                        </li>
+                        <li id="plot-tab-header" ng-show="account.active.job">
+                            <a href="#plot-tab" data-toggle="tab">Plot</a>
+                        </li>
+                        <li id="download-tab-header" ng-show="account.active.job">
+                            <a href="#download-tab" data-toggle="tab">Download</a>
+                        </li>
                     </ul>
                     <div class="tab-content">
-                        <?php foreach ($this->forms as $key => $form): ?>
-                            <div class="tab-pane <?php if (isset($form['default']) && $form['default'] == true) echo 'active'; ?>" id="<?php echo $this->escape($key); ?>-form-tab">
+
+                        <!-- query form tab -->
+
+                        <div class="tab-pane" id="form-tab" ng-show="account.active.form" ng-controller="formController">
+                            <?php foreach ($this->forms as $key => $form): ?>
+                            <div ng-show="account.active.form == '<?php echo $key; ?>'">
                                 <?php echo $this->action('index', 'form', 'query', array('form' => $key)); ?>
                             </div>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <!-- job overview tab -->
+
+                        <div class="tab-pane" id="overview-tab" ng-show="account.active.job">
+                            <h4>Overview for job `{{account.job.table}}`</h4>
+                            <p>
+                                On this page, you can find an overview about a submitted query job. For a table view of the results, the plotting tool, and to access the download form, please use the tabs at the top of the page.
+                            </p>
+                            <div class="daiquiri-widget nav">
+                                <div class="nav-header">Query</div>
+                                <div class="nav-item">
+                                    <p id="overview-query" class="cm-s-default"></p>
+                                </div>
+                                <div class="nav-item">
+                                    <button class="linkbutton" ng-click="pasteQuery()">
+                                        Open new query form with this query
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="daiquiri-widget nav">
+                                <div class="nav-header">Job parameters</div>
+                                <div class="nav-item">
+                                    <dl class="dl-horizontal">
+                                        <dt>Job status</dt>
+                                        <dd ng-class="{'text-success': account.job.status == 'success',
+                                                  'text-error': account.job.status == 'error',
+                                                  'text-info': account.job.status == 'queued'}">
+                                            {{account.job.status}}
+                                        </dd>
+
+                                        <dt>Full database table name</dt>
+                                        <dd>{{account.job.database}}.{{account.job.table}}</dd>
+
+                                        <dt>Internal job id</dt>
+                                        <dd>{{account.job.id}}</dd>
+
+                                        <dt>Time submitted</dt>
+                                        <dd>{{account.job.time}}</dd>
+                                    </dl>
+                                </div>
+                                <div class="nav-item">
+                                    <div>
+                                        <button class="linkbutton" ng-click="renameJob()">
+                                            Rename the job's database table
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button class="linkbutton" ng-click="renameJob()">
+                                            Remove the job
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="daiquiri-widget nav">
+                                <div class="nav-header">Additional infomation</div>
+                                <div class="nav-item">
+                                    <dl class="dl-horizontal">
+                                        <div ng-repeat="element in account.job.additional">
+                                            <dt>{{element.name}}</dt>
+                                            <dd>{{element.value}}</dd>
+                                        </div>
+                                    <dl>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- results table tab -->
+
+                        <div class="tab-pane" id="results-tab" ng-show="account.active.job">
+                            {{account.job.columns}}
+                        </div>
+
+                        <!-- plot tab -->
+
+                        <div class="tab-pane row" id="plot-tab" ng-show="account.active.job" ng-controller="plotController">
+                            <div class="span6">
+                                <div id="plot-container">
+                                    <div id="plot-canvas"></div>
+                                </div>
+                            </div>
+
+                            <div id="plot-form" class="span3">
+                                <h4>Select Colums for plot</h4><p>
+                                <form id="plot" name="plot" ng-submit="createPlot(plot.$valid)" novalidate>
+                                    <div class="control-group" ng-class="{'error': plot.plot_x.$invalid && plot.$submitted}">
+                                        <label for="plot_x">Column for X axis:</label>
+                                        <select id="plot_x" name="plot_x" 
+                                                ng-options="col.name for col in account.job.cols"
+                                                ng-model="values.plot_x"
+                                                required>
+                                                <option value="" class="muted">Select a column</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-group" ng-class="{'error': plot.plot_y.$invalid && plot.$submitted}">
+                                        <label for="plot_y">Column for X axis:</label>
+                                        <select id="plot_y" name="plot_y"
+                                                ng-options="col.name for col in account.job.cols"
+                                                ng-model="values.plot_y"
+                                                required>
+                                                <option value="" class="muted">Select a column</option>
+                                        </select>
+                                    </div>
+                                    <label for="number">Number of rows to plot:</label>
+                                    <input type="text" name="number" id="number" ng-model="values.plot_nrows" />
+
+                                    <input type="submit" name="plot_submit" id="plot_submit" value="Create plot" class="btn btn-primary" />
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- download tab -->
+
+                        <div class="tab-pane" id="download-tab" ng-show="account.active.job" ng-controller="downloadController">
+                            <h4>Download table `{{account.job.table}}`</h4>
+                            <div ng-hide="account.job.download">
+                                <p>
+                                    For further processing of the data, you can download the results table to your local machine. For this file several formats are available. Please choose a format for the download from the list below.
+                                </p>
+                            </div>
+                            <div ng-show="account.job.download">
+                                <p>
+                                    You can now download the file using:
+                                </p>
+                                <p>
+                                    <a target="_blank" href="{{account.job.download.link}}">{{account.job.download.link}}</a>
+                                </p>
+                                <p>
+                                    or <button class="linkbutton" ng-click="regenerateTable()">regenerate</button> the file.
+                                </p>
+                                <p>
+                                    You can also download the file in a different format.
+                                </p>
+                            </div>
+                            <?php echo $this->action('index', 'download', 'query'); ?>
+                        </div>
                     </div>
                 </div>
             </div>

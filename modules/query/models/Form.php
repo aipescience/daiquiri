@@ -96,35 +96,46 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 // validate query
                 $model = new Query_Model_Query();
                 if ($model->validate($sql, false, $tablename, $errors) !== true) {
-                    return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
+                    // set description for form
+                    $form->setDescription(implode('; ',$errors));
+
+                    // construct response array
+                    return array(
+                        'form' => $form,
+                        'formOptions' => $formOptions,
+                        'status' => 'error',
+                        'errors' => array(
+                            'form' => $errors
+                        )
+                    );
                 }
 
                 // take a detour to the query plan
                 if ($model->canShowPlan()) {
-                    // store query, tablename and queue in session
-                    Zend_Session::namespaceUnset('query_plan');
-                    $ns = new Zend_Session_Namespace('query_plan');
-                    $ns->sql = $sql;
-                    $ns->tablename = $tablename;
+                    // // store query, tablename and queue in session
+                    // Zend_Session::namespaceUnset('query_plan');
+                    // $ns = new Zend_Session_Namespace('query_plan');
+                    // $ns->sql = $sql;
+                    // $ns->tablename = $tablename;
 
-                    if (isset($options['queue'])) {
-                        $ns->queue = $options['queue'];
-                    } else {
-                        $ns->queue = null;
-                    }
+                    // if (isset($options['queue'])) {
+                    //     $ns->queue = $options['queue'];
+                    // } else {
+                    //     $ns->queue = null;
+                    // }
 
-                    $ns->plan = $model->plan($sql, $errors);
+                    // $ns->plan = $model->plan($sql, $errors);
 
-                    if (!empty($errors)) {
-                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
-                    }
+                    // if (!empty($errors)) {
+                    //     return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
+                    // }
 
-                    // construct response with redirect to plan
-                    $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
-                    return array(
-                        'status' => 'plan',
-                        'redirect' => $baseurl . '/query/form/plan?form=' . $formstring,
-                    );
+                    // // construct response with redirect to plan
+                    // $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
+                    // return array(
+                    //     'status' => 'plan',
+                    //     'redirect' => $baseurl . '/query/form/plan?form=' . $formstring,
+                    // );
                 } else {
                     // submit query
                     $response = $model->query($sql, false, $tablename, $options);
@@ -133,15 +144,35 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                         // submitting the query was successful
                         return $response;
                     } else {
-                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$response['errors']);
+                        // set description for form
+                        $form->setDescription(implode('; ',$response['errors']));
+
+                        // construct response array
+                        return array(
+                            'form' => $form,
+                            'formOptions' => $formOptions,
+                            'status' => 'error',
+                            'errors' => array(
+                                'form' => $response['errors']
+                            )
+                        );
                     }
                 }
             } else {
-                return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
+                return array(
+                    'form' => $form,
+                    'formOptions' => $formOptions,
+                    'status' => 'error',
+                    'errors' => $form->getMessages() // the validation errors
+                );
             }
         }
 
-        return array('form' => $form, 'status' => 'form');
+        return array(
+            'form' => $form,
+            'formOptions' => $formOptions,
+            'status' => 'form'
+        );
     }
 
     /**

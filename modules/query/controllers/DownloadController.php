@@ -28,16 +28,30 @@ class Query_DownloadController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        $table = $this->_getParam('table');
-        $format = $this->_getParam('format');
-        $response = $this->_model->download($table, $format);
+        // check if POST or GET
+        if ($this->getRequest()->isPost()) {
+            // validate form and do stuff
+            $response = $this->_model->download($this->getRequest()->getPost());
+        } else {
+            // just display the form
+            $response = $this->_model->download();
+        }
+
+        // assign to view
         $this->view->assign($response);
     }
 
-    public function regenAction() {
-        $table = $this->_getParam('table');
-        $format = $this->_getParam('format');
-        $response = $this->_model->regen($table, $format);
+    public function regenerateAction() {
+        // check if POST or GET
+        if ($this->getRequest()->isPost()) {
+            // validate form and do stuff
+            $response = $this->_model->regenerate($this->getRequest()->getPost());
+        } else {
+            // just display the form
+            $response = $this->_model->regenerate();
+        }
+
+        // assign to view
         $this->view->assign($response);
     }
 

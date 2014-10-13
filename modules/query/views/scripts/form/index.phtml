@@ -24,9 +24,9 @@
         <p>Query successfully submitted.</p>
     <?php elseif ($this->status === 'redirect'): ?>
         <?php $this->redirector($this->redirect); ?>
-    <?php elseif ($this->status === 'error'): ?>
-        <p>The database is currently not available.</p>
     <?php else: ?>
+        <h4><?php echo $this->formOptions['title']; ?></h4>
+        <p><?php echo $this->formOptions['help']; ?></p>
         <?php echo $this->form; ?>
     <?php endif ?>
 </div>

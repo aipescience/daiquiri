@@ -37,7 +37,7 @@ form .captcha img {
     margin-bottom: 10px;
 }
 form fieldset {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 /*form .control-group input[type="checkbox"] {
     margin-top: 9px;
@@ -185,11 +185,13 @@ button::-moz-focus-inner {
 /* overides the bold keys in the bootstrap horizontal dl */
 dl.dl-horizontal dt {
     font-weight: normal;
+    text-align: left;
 }
 dl.dl-horizontal dd {
     /* one pixel more on the left to better aling with form fields */
     padding-left: 1px
 }
+
 .daiquiri-nav .nav {
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -209,12 +211,13 @@ dl.dl-horizontal dd {
 .daiquiri-nav ul {
     margin-bottom: 2px;
 }
+
 .daiquiri-widget {
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-bottom: 20px;
 }
-.daiquiri-widget .nav .nav-header {
+.daiquiri-widget.nav .nav-header {
     border-bottom: 1px solid #ddd;
 }
 .daiquiri-widget li.nav-item a,
@@ -231,12 +234,23 @@ dl.dl-horizontal dd {
     padding-left: 15px;
     padding-right: 15px;
 }
-
 .daiquiri-widget a:hover {
     border-radius: 0;
 }
-.daiquiri-widget ul {
-    margin-bottom: 2px;
+.daiquiri-widget.nav div.nav-item {
+    padding: 5px 12px 0 12px;
+    font-size: small;
+    border-bottom: 1px solid #ddd;
+}
+.daiquiri-widget.nav div.nav-item:last-child {
+    border-bottom: none;
+}
+.daiquiri-widget.nav div.nav-item p,
+.daiquiri-widget.nav div.nav-item button,
+.daiquiri-widget.nav div.nav-item dl {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: small;
 }
 
 .no-transition {
@@ -273,4 +287,33 @@ li.dropdown ul ul {
 .table [class^="icon-"],
 .table [class*=" icon-"] {
     margin-top: 3px;
+}
+
+.angular-hidden {
+    visibility: hidden;
+}
+
+.daiquiri-download-format {
+    display: block;
+    width: 20px;
+    float: left;
+}
+
+.daiquiri-download-format-name {
+    width: 200px;
+    margin-left: 10px;
+    float: left;
+}
+.daiquiri-download-format-description {
+    margin-left: 225px;
+}
+
+form[novalidate] input:focus:invalid,
+form[novalidate] textarea:focus:invalid,
+form[novalidate] select:focus:invalid {
+    color: inherit;
+    border-color: inherit;
+    -webkit-box-shadow: inherit;
+    -moz-box-shadow: inherit;
+    box-shadow: inherit;
 }
