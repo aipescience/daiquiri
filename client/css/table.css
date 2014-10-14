@@ -1,0 +1,40 @@
+.daiquiri-table {
+    margin-bottom: 20px;
+    font-size: small;
+}
+.daiquiri-table th,
+.daiquiri-table td {
+    overflow: hidden;
+    white-space: nowrap;
+    border-left: 1px solid #ddd;
+}
+.daiquiri-table th:first-child,
+.daiquiri-table td:first-child {
+    border-left: none;
+}
+.daiquiri-table .pagination {
+    margin: 0 0 0 20px;
+}
+.daiquiri-table-pane {
+    overflow: auto;
+    width: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.daiquiri-table-pane table {
+    margin: 0;
+}
+.daiquiri-table-header,
+.daiquiri-table-footer {
+    height: 30px;
+}
+.daiquiri-table-header p,
+.daiquiri-table-footer p {
+    line-height: 30px;
+}
+.daiquiri-table-search button {
+    padding-top: 7px;
+    padding-bottom: 6px;
+}

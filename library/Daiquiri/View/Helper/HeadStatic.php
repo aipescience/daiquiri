@@ -45,40 +45,40 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         'bootstrap-datepicker.css' => 'daiquiri/lib/bootstrap-datepicker/css/datepicker.css',
         'bootstrap-datepicker.js' => 'daiquiri/lib/bootstrap-datepicker/js/bootstrap-datepicker.js',
         // other libs
-        'insert_at_caret.js' => 'daiquiri/lib/insert_at_caret.js',
-        'samp.js' => 'daiquiri/lib/sampjs/samp.js',
+        // 'insert_at_caret.js' => 'daiquiri/lib/insert_at_caret.js',
+        // 'samp.js' => 'daiquiri/lib/sampjs/samp.js',
         //daiquiri common
-        'daiquiri_common.css' => 'daiquiri/css/daiquiri_common.css',
-        'daiquiri_common.js' => 'daiquiri/js/daiquiri_common.js',
+        'daiquiri_common.css' => 'daiquiri/css/common.css',
+        // 'daiquiri_common.js' => 'daiquiri/js/daiquiri_common.js',
         // daiquiri browser
-        'daiquiri_browser.css' => 'daiquiri/css/daiquiri_browser.css',
-        'daiquiri_browser.js' => 'daiquiri/js/daiquiri_browser.js',
+        // 'daiquiri_browser.css' => 'daiquiri/css/daiquiri_browser.css',
+        // 'daiquiri_browser.js' => 'daiquiri/js/daiquiri_browser.js',
         // daiquiri table
-        'daiquiri_table.css' => 'daiquiri/css/daiquiri_table.css',
-        'daiquiri_table.js' => 'daiquiri/js/daiquiri_table.js',
+        // 'daiquiri_table.css' => 'daiquiri/css/daiquiri_table.css',
+        // 'daiquiri_table.js' => 'daiquiri/js/daiquiri_table.js',
         // daiquiri table
-        'daiquiri_imageview.css' => 'daiquiri/css/daiquiri_imageview.css',
-        'daiquiri_imageview.js' => 'daiquiri/js/daiquiri_imageview.js',
+        // 'daiquiri_imageview.css' => 'daiquiri/css/daiquiri_imageview.css',
+        // 'daiquiri_imageview.js' => 'daiquiri/js/daiquiri_imageview.js',
         // daiquiri query
         // 'daiquiri_query.css' => 'daiquiri/css/daiquiri_query.css',
         // 'daiquiri_query.js' => 'daiquiri/js/daiquiri_query.js',
         // 'query.css' => 'daiquiri/css/query.css',
         // 'query.js' => 'daiquiri/js/query.js',
         // daiquiri data management
-        'daiquiri_data.css' => 'daiquiri/css/daiquiri_data.css',
-        'daiquiri_data.js' => 'daiquiri/js/daiquiri_data.js',
+        // 'daiquiri_data.css' => 'daiquiri/css/daiquiri_data.css',
+        // 'daiquiri_data.js' => 'daiquiri/js/daiquiri_data.js',
         // daiquiri modal
-        'daiquiri_modal.css' => 'daiquiri/css/daiquiri_modal.css',
-        'daiquiri_modal.js' => 'daiquiri/js/daiquiri_modal.js',
+        // 'daiquiri_modal.css' => 'daiquiri/css/daiquiri_modal.css',
+        // 'daiquiri_modal.js' => 'daiquiri/js/daiquiri_modal.js',
         // daiquiri codemirror
-        'daiquiri_codemirror.css' => 'daiquiri/css/daiquiri_codemirror.css',
-        'daiquiri_codemirror.js' => 'daiquiri/js/daiquiri_codemirror.js',
+        // 'daiquiri_codemirror.css' => 'daiquiri/css/daiquiri_codemirror.css',
+        // 'daiquiri_codemirror.js' => 'daiquiri/js/daiquiri_codemirror.js',
         // daiquiri wordpress stylesheet
-        'daiquiri_wp.css' => 'daiquiri/css/daiquiri_wp.css',
+        // 'daiquiri_wp.css' => 'daiquiri/css/daiquiri_wp.css',
         // daiquiri misc
-        'daiquiri_plot.js' => 'daiquiri/js/daiquiri_plot.js',
-        'daiquiri_query_buttons.js' => 'daiquiri/js/daiquiri_query_buttons.js',
-        'daiquiri_samp.js' => 'daiquiri/js/daiquiri_samp.js'
+        // 'daiquiri_plot.js' => 'daiquiri/js/daiquiri_plot.js',
+        // 'daiquiri_query_buttons.js' => 'daiquiri/js/daiquiri_query_buttons.js',
+        // 'daiquiri_samp.js' => 'daiquiri/js/daiquiri_samp.js'
     );
 
     /**
@@ -156,8 +156,7 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         }
 
         // echo the view helpers
-        echo $hl;
-        echo $hs;
+        echo PHP_EOL . PHP_EOL . $hl . PHP_EOL . PHP_EOL . $hs . PHP_EOL . PHP_EOL;
     }
 
 }

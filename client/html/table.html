@@ -1,0 +1,58 @@
+<div class="daiquiri-table" ng-controller="tableController">
+
+    <div class="daiquiri-table-header">
+        <form class="daiquiri-table-search input-append pull-left">
+            <input placeholder="Search" type="text" class="input-mini input-large" ng-model="searchString"/>
+            <button class="btn" ng-click="search()"><i class="icon-search"></i></button>
+        </form>
+
+        <div class="pagination pull-right">
+            <ul>
+                <li>
+                    <a href="#" ng-click="reset()">Reset table</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="pagination pull-right">
+            <ul>
+                <li>
+                    <a href="" ng-click="first()">First</a>
+                </li>
+                <li>
+                    <a href="" ng-click="prev()">Previous</a>
+                </li>
+                <li>
+                    <a href="" ng-click="next()">Next</a>
+                </li>
+                <li>
+                    <a href="" ng-click="last()">Last</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="daiquiri-table-pane">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th ng-repeat="col in tableData.cols" style="width: {{col.width}};">{{col.name}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in tableData.rows">
+                    <td ng-repeat="element in row.cell track by $index">{{element}}</td>
+                </tr>
+            </tbody>  
+        </table>
+    </div>
+
+    <div class="daiquiri-table-footer">
+        <div class="pull-left">
+            <p>Page {{tableMeta.page}} of {{tableMeta.pages}} ({{tableMeta.total}} rows total)</p>
+        </div>
+        {{nrows}}{{options}}
+        <select class="pull-right" ng-options="option.value as option.name for option in options" ng-model="nrows" ng-change="rows()"></select>
+    </div>
+
+</div>
