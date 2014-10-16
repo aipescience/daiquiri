@@ -1,4 +1,4 @@
-<div class="daiquiri-table" ng-controller="tableController">
+<div class="daiquiri-table" ng-controller="TableController">
 
     <div class="daiquiri-table-header">
         <form class="daiquiri-table-search input-append pull-left">
@@ -41,7 +41,7 @@
             </thead>
             <tbody>
                 <tr ng-repeat="row in tableData.rows">
-                    <td ng-repeat="element in row.cell track by $index">{{element}}</td>
+                    <td ng-repeat="element in row.cell track by $index" ng-bind-html="element"></td>
                 </tr>
             </tbody>  
         </table>
@@ -51,7 +51,6 @@
         <div class="pull-left">
             <p>Page {{tableMeta.page}} of {{tableMeta.pages}} ({{tableMeta.total}} rows total)</p>
         </div>
-        {{nrows}}{{options}}
         <select class="pull-right" ng-options="option.value as option.name for option in options" ng-model="nrows" ng-change="rows()"></select>
     </div>
 

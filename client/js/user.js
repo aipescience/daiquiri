@@ -5,12 +5,11 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.controller('UserController', ['$scope','tableService',function($scope,tableService) {
+app.controller('UserController', ['$scope','TableService',function($scope,TableService) {
     
-    tableService.data.colsUrl = '/auth/user/cols';
-    tableService.data.rowsUrl = '/auth/user/rows';
+    TableService.url.cols = '/auth/user/cols';
+    TableService.url.rows = '/auth/user/rows';
 
-    tableService.fetchCols();
-    tableService.fetchRows();
+    TableService.init();
 
 }]);

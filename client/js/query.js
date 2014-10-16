@@ -1,11 +1,11 @@
-var app = angular.module('query',[]);
+var app = angular.module('query',['table']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.factory('accountService', ['$http','$timeout','$q',function($http,$timeout,$q) {
+app.factory('AccountService', ['$http','$timeout','$q',function($http,$timeout,$q) {
     var account = {
         active: {
             form: false,
@@ -37,7 +37,7 @@ app.factory('accountService', ['$http','$timeout','$q',function($http,$timeout,$
     };
 }]);
 
-app.factory('formService', ['$http','accountService',function($http,accountService) {
+app.factory('FormService', ['$http','AccountService',function($http,AccountService) {
     var values = {};
     var errors = {};
 
@@ -53,7 +53,7 @@ app.factory('formService', ['$http','accountService',function($http,accountServi
 
             $http.post('query/form/?form=' + formName,$.param(data)).success(function(response) {
                 if (response['status'] == 'ok') {
-                    accountService.fetchAccount();
+                    AccountService.fetchAccount();
                 } else if (response['status'] == 'error') {
                     errors[formName] = {};
                     angular.forEach(response['errors'], function(object, key) {
@@ -73,7 +73,7 @@ app.factory('formService', ['$http','accountService',function($http,accountServi
     };
 }]);
 
-app.factory('plotService', ['$http','accountService',function($http,accountService) {
+app.factory('PlotService', ['$http','AccountService',function($http,AccountService) {
     var values = {};
     var errors = {};
 
@@ -102,8 +102,8 @@ app.factory('plotService', ['$http','accountService',function($http,accountServi
 
             $http.get('data/viewer/rows/',{
                 'params': {
-                    'db': accountService.account.job.database,
-                    'table': accountService.account.job.table,
+                    'db': AccountService.account.job.database,
+                    'table': AccountService.account.job.table,
                     'cols': values.plot_x.name + ',' + values.plot_y.name,
                     'nrows': values.plot_nrows
                 }
@@ -116,7 +116,7 @@ app.factory('plotService', ['$http','accountService',function($http,accountServi
                         plot.y.push(response.rows[i].cell[1]);
                     }
 
-                    accountService.account.job.plot = plot;
+                    AccountService.account.job.plot = plot;
 
                 } else {
                     console.log('Error: Unknown response.');
@@ -128,7 +128,7 @@ app.factory('plotService', ['$http','accountService',function($http,accountServi
     };
 }]);
 
-app.factory('downloadService', ['$http','accountService',function($http,accountService) {
+app.factory('DownloadService', ['$http','AccountService',function($http,AccountService) {
     var values = {};
     var errors = {};
 
@@ -139,7 +139,7 @@ app.factory('downloadService', ['$http','accountService',function($http,accountS
             var data = {};
             data = {
                 'download_csrf': $('#download_csrf').attr('value'),
-                'download_tablename': accountService.account.job.table
+                'download_tablename': AccountService.account.job.table
             };
 
             // merge with form values
@@ -147,7 +147,7 @@ app.factory('downloadService', ['$http','accountService',function($http,accountS
 
             $http.post('query/download/',$.param(data)).success(function(response) {
                 if (response.status == 'ok') {
-                    accountService.account.job.download = {
+                    AccountService.account.job.download = {
                         'link': response.link,
                         'format': response.format
                     }
@@ -171,13 +171,13 @@ app.factory('downloadService', ['$http','accountService',function($http,accountS
             var data = {};
             data = {
                 'download_csrf': $('#download_csrf').attr('value'),
-                'download_tablename': accountService.account.job.table,
-                'download_format': accountService.account.job.download.format
+                'download_tablename': AccountService.account.job.table,
+                'download_format': AccountService.account.job.download.format
             };
 
             $http.post('query/download/regenerate/',$.param(data)).success(function(response) {
                 if (response.status == 'ok') {
-                    accountService.account.job.download = {
+                    AccountService.account.job.download = {
                         'link': response.link,
                         'format': response.format
                     }
@@ -200,81 +200,91 @@ app.factory('downloadService', ['$http','accountService',function($http,accountS
     };
 }]);
 
-app.controller('sidebarController',['$scope','accountService',function($scope,accountService) {
+app.controller('SidebarController',['$scope','AccountService',function($scope,AccountService) {
 
-    $scope.account = accountService.account;
+    $scope.account = AccountService.account;
 
     $scope.activateForm = function(formName) {
-        accountService.account.active.form = formName;
-        accountService.account.active.job = false;
+        AccountService.account.active.form = formName;
+        AccountService.account.active.job = false;
 
         $('#form-tab-header a').tab('show');
 
-        // $scope.activateJob(1);
-        // $('#plot-tab-header a').tab('show');
+        $scope.activateJob(1);
+        $('#results-tab-header a').tab('show');
     };
 
     $scope.activateJob = function(jobId) {
 
-        accountService.fetchJob(jobId).then(function() {
+        AccountService.fetchJob(jobId).then(function() {
             // codemirrorfy the query
-            CodeMirror.runMode(accountService.account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
+            CodeMirror.runMode(AccountService.account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
         });
 
         // if a form was active, switch to job overview tab
-        if (accountService.account.active.form != false) {
+        if (AccountService.account.active.form != false) {
             $('#overview-tab-header a').tab('show');
         }
 
-        accountService.account.active.form = false;
-        accountService.account.active.job = jobId;
+        AccountService.account.active.form = false;
+        AccountService.account.active.job = jobId;
     };
 
-    accountService.fetchAccount();
-    $scope.activateForm(accountService.account.active.form)
+    AccountService.fetchAccount();
+    $scope.activateForm(AccountService.account.active.form);
 }]);
 
-app.controller('tabsController',['$scope','accountService',function($scope,accountService) {
-    $scope.account = accountService.account;
+app.controller('TabsController',['$scope','AccountService',function($scope,AccountService) {
+    $scope.account = AccountService.account;
 }]);
 
-app.controller('formController',['$scope','accountService','formService',function($scope,accountService,formService) {
+app.controller('FormController',['$scope','AccountService','FormService',function($scope,AccountService,FormService) {
 
-    $scope.values = formService.values;
-    $scope.errors = formService.errors;
+    $scope.values = FormService.values;
+    $scope.errors = FormService.errors;
 
     $scope.submitQuery = function(formName) {
-        formService.submitQuery(formName);
-    }
+        FormService.submitQuery(formName);
+    };
 
 }]);
 
-app.controller('plotController',['$scope','plotService',function($scope,plotService) {
+app.controller('ResultsController',['$scope','AccountService','TableService',function($scope,AccountService,TableService) {
 
-    $scope.values = plotService.values;
-    $scope.errors = plotService.errors;
+    TableService.url.cols = '/data/viewer/cols?db=daiquiri_user_admin&table=test';
+    TableService.url.rows = '/data/viewer/rows?db=daiquiri_user_admin&table=test';
+
+    TableService.data.cols = AccountService.account.job.cols;
+
+    TableService.init();
+}]);
+
+app.controller('PlotController',['$scope','PlotService',function($scope,PlotService) {
+
+    $scope.values = PlotService.values;
+    $scope.errors = PlotService.errors;
     $scope.values.plot_nrows = 100;
     $scope.values.plot_y = 2;
 
     $scope.createPlot = function(isValid) {
         if (isValid) {
-            plotService.createPlot();
+            PlotService.createPlot();
         }
-    }
+    };
 
 }]);
 
-app.controller('downloadController',['$scope','downloadService',function($scope,downloadService) {
+app.controller('DownloadController',['$scope','DownloadService',function($scope,DownloadService) {
 
-    $scope.values = downloadService.values;
-    $scope.errors = downloadService.errors;
+    $scope.values = DownloadService.values;
+    $scope.errors = DownloadService.errors;
 
     $scope.downloadTable = function() {
-        downloadService.downloadTable();
-    }
+        DownloadService.downloadTable();
+    };
 
     $scope.regenerateTable = function() {
-        downloadService.regenerateTable();
-    }
+        DownloadService.regenerateTable();
+    };
 
 }]);

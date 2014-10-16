@@ -7,6 +7,7 @@
     overflow: hidden;
     white-space: nowrap;
     border-left: 1px solid #ddd;
+    padding: 5px;
 }
 .daiquiri-table th:first-child,
 .daiquiri-table td:first-child {

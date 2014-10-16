@@ -19,14 +19,17 @@
  */
 ?>
 
-<link href="<?php echo $this->baseUrl('/daiquiri/css/query.css'); ?>" media="screen" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="<?php echo $this->baseUrl('/daiquiri/js/query.js'); ?>"></script>
+<link href="/daiquiri/css/table.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/daiquiri/css/query.css" media="screen" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="/daiquiri/js/table.js"></script>
+<script type="text/javascript" src="/daiquiri/js/query.js"></script>
 
 <div class="main" ng-app="query">
     <h2>Query interface</h2>
 
     <div class="row">
-        <div class="span3" ng-controller="sidebarController">
+        <div class="span3" ng-controller="SidebarController">
 
             <!-- database status -->
 
@@ -96,7 +99,7 @@
         </div>
         <div class="span9">
             <div id="query" class=""> 
-                <div class="tabbable" ng-controller="tabsController">
+                <div class="tabbable" ng-controller="TabsController">
                     <ul class="nav nav-tabs">
                         <li id="form-tab-header" ng-show="account.active.form" ng-class="{active: account.active.form}">
                             <a href="#form-tab" data-toggle="tab">New Query</a>
@@ -118,7 +121,7 @@
 
                         <!-- query form tab -->
 
-                        <div class="tab-pane" id="form-tab" ng-show="account.active.form" ng-controller="formController">
+                        <div class="tab-pane" id="form-tab" ng-show="account.active.form" ng-controller="FormController">
                             <?php foreach ($this->forms as $key => $form): ?>
                             <div ng-show="account.active.form == '<?php echo $key; ?>'">
                                 <?php echo $this->action('index', 'form', 'query', array('form' => $key)); ?>
@@ -195,13 +198,13 @@
 
                         <!-- results table tab -->
 
-                        <div class="tab-pane" id="results-tab" ng-show="account.active.job">
-                            {{account.job.columns}}
+                        <div class="tab-pane" id="results-tab" ng-show="account.active.job" ng-controller="ResultsController">
+                            <div daiquiri-table></div>
                         </div>
 
                         <!-- plot tab -->
 
-                        <div class="tab-pane row" id="plot-tab" ng-show="account.active.job" ng-controller="plotController">
+                        <div class="tab-pane row" id="plot-tab" ng-show="account.active.job" ng-controller="PlotController">
                             <div class="span6">
                                 <div id="plot-container">
                                     <div id="plot-canvas"></div>
@@ -239,7 +242,7 @@
 
                         <!-- download tab -->
 
-                        <div class="tab-pane" id="download-tab" ng-show="account.active.job" ng-controller="downloadController">
+                        <div class="tab-pane" id="download-tab" ng-show="account.active.job" ng-controller="DownloadController">
                             <h4>Download table `{{account.job.table}}`</h4>
                             <div ng-hide="account.job.download">
                                 <p>

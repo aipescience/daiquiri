@@ -58,33 +58,33 @@ class Daiquiri_View_Helper_InternalLink extends Zend_View_Helper_Abstract {
             }
         }
 
-        $prepend = '';
-        $id = '';
-        $class = '';
-        $target = '';
-        $href = '';
-        $append = '';
+        $html = '';
 
-        foreach (array('id', 'class', 'target') as $key) {
-            if (array_key_exists($key, $options)) {
-                $$key = $key . '="' . $options[$key] . '"';
-            }
+        // prepend stuff
+        if (array_key_exists('prepend', $options)) {
+            $html .= $options['prepend'];
         }
-        if (array_key_exists('href', $options)) {
-            $href = 'href="' . $this->view->baseUrl($options['href']);
-            if (array_key_exists('redirect', $options)) {
-                $href .= '?redirect=' . $options['redirect'];
-            }
-            $href .= '"';
-        }
-        foreach (array('prepend', 'append') as $key) {
-            if (array_key_exists($key, $options)) {
-                $$key = $options[$key];
+
+        $html .= '<a';
+
+        foreach($options as $key => $value) {
+            if (!in_array($key, array('resource','permission','prepend','append','text'))) {
+                $html .= " {$key}=\"{$value}\"";
             }
         }
 
-        // create link string and return
-        return $prepend . '<a ' . $id . ' ' . $class . ' ' . $target . ' ' . $href . '>' . $options['text'] . '</a>' . $append;
+        $html .= '>';
+
+        // prepend stuff
+        if (array_key_exists('text', $options)) {
+            $html .= $options['text'];
+        } else {
+            $html .= $options['href'];
+        }
+
+        $html .= '</a>' ;
+
+        return $html;
     }
 
 }

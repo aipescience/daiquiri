@@ -28,60 +28,51 @@ class Auth_Model_User extends Daiquiri_Model_Table {
     private $_options = array(
         'Show' => array(
             'url' => '/auth/user/show',
-            'class' => 'daiquiri-user-show',
             'permission' => 'show',
             'resource' => 'Auth_Model_User'
         ),
         'Update' => array(
             'url' => '/auth/user/update',
-            'class' => 'daiquiri-user-update',
             'permission' => 'update',
             'resource' => 'Auth_Model_User'
         ),
         'Delete' => array(
             'url' => '/auth/user/delete',
-            'class' => 'daiquiri-user-delete',
             'permission' => 'delete',
             'resource' => 'Auth_Model_User'
         ),
         'Confirm' => array(
             'url' => '/auth/registration/confirm',
-            'class' => 'daiquiri-user-confirm',
             'permission' => 'confirm',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('registered')
         ),
         'Reject' => array(
             'url' => '/auth/registration/reject',
-            'class' => 'daiquiri-user-reject',
             'permission' => 'reject',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('registered')
         ),
         'Activate' => array(
             'url' => '/auth/registration/activate',
-            'class' => 'daiquiri-user-activate',
             'permission' => 'activate',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('registered', 'confirmed')
         ),
         'Disable' => array(
             'url' => '/auth/registration/disable',
-            'class' => 'daiquiri-user-disable',
             'permission' => 'disable',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('active')
         ),
         'Reenable' => array(
             'url' => '/auth/registration/reenable',
-            'class' => 'daiquiri-user-reenable',
             'permission' => 'reenable',
             'resource' => 'Auth_Model_Registration',
             'prerequisites' => array('disabled')
         ),
         'Password' => array(
             'url' => '/auth/password/set',
-            'class' => 'daiquiri-user-password',
             'permission' => 'set',
             'resource' => 'Auth_Model_Password'
          )
@@ -162,8 +153,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                         'text' => $key,
                         'href' => $value['url'] . '/id/' . $dbRow['id'],
                         'resource' => $value['resource'],
-                        'permission' => $value['permission'],
-                        'class' => $value['class']));
+                        'permission' => $value['permission']));
                     if (!empty($option)) {
                        $options[] = $option;
                     }

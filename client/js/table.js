@@ -1,4 +1,4 @@
-var daiquiriTable = angular.module('table', []);
+var daiquiriTable = angular.module('table', ['ngSanitize']);
 
 daiquiriTable.directive('daiquiriTable', function() {
     return {
@@ -6,7 +6,7 @@ daiquiriTable.directive('daiquiriTable', function() {
     };
 });
 
-daiquiriTable.factory('tableService', ['$http',function($http) {
+daiquiriTable.factory('TableService', ['$http',function($http) {
     
     var url = {
         cols: null,
@@ -37,47 +37,47 @@ daiquiriTable.factory('tableService', ['$http',function($http) {
             params.page = 1;
             fetchRows();
         }
-    };
+    }
 
     function prev() {
         if (params.page > 1) {
             params.page -= 1;
             fetchRows();
         }
-    };
+    }
 
     function next() {
         if (params.page < meta.pages) {
             params.page += 1;
             fetchRows();
         }
-    };
+    }
 
     function last() {
         if (params.page != meta.pages) {
             params.page = meta.pages;
             fetchRows();
         }
-    };
+    }
 
     function reset() {
         params.page = 1;
         params.sort = null;
         params.search = null;
         fetchRows();
-    };
+    }
 
     function search(searchString) {
         params.page = 1;
         params.sort = null;
         params.search = searchString;
         fetchRows();
-    };
+    }
 
     function rows(nrows) {
         params.nrows = nrows;
         reset();
-    };
+    }
 
     function fetchCols() {
         $http.get(url.cols,{'params': params})
@@ -91,13 +91,14 @@ daiquiriTable.factory('tableService', ['$http',function($http) {
             .error(function(response) {
                 console.log('Error');
             });
-    };
+    }
 
     function fetchRows() {
         $http.get(url.rows,{'params': params})
             .success(function(response) {
                 if (response.status == 'ok') {
                     data.rows = response.rows;
+
                     meta.nrows = response.nrows;
                     meta.page = response.page;
                     meta.pages = response.pages;
@@ -109,7 +110,7 @@ daiquiriTable.factory('tableService', ['$http',function($http) {
             .error(function(response) {
                 console.log('Error');
             });
-    };
+    }
 
     function init() {
         // fetch cols if they where not loaded before
@@ -118,14 +119,14 @@ daiquiriTable.factory('tableService', ['$http',function($http) {
         }
 
         fetchRows();
-    };
+    }
 
     return {
         url: url,
         data: data,
         meta: meta,
         first: first,
-        prev: prev,   
+        prev: prev,
         next: next,
         last: last,
         reset: reset,
@@ -137,10 +138,10 @@ daiquiriTable.factory('tableService', ['$http',function($http) {
     };
 }]);
 
-daiquiriTable.controller('tableController', ['$scope','tableService',function($scope,tableService) {
+daiquiriTable.controller('TableController', ['$scope','TableService',function($scope,TableService) {
 
-    $scope.tableData = tableService.data;
-    $scope.tableMeta = tableService.meta;
+    $scope.tableData = TableService.data;
+    $scope.tableMeta = TableService.meta;
 
     $scope.nrows = 10;
     $scope.options = [
@@ -150,31 +151,31 @@ daiquiriTable.controller('tableController', ['$scope','tableService',function($s
     ];
 
     $scope.first = function() {
-        tableService.first();
+        TableService.first();
     };
 
     $scope.prev = function() {
-        tableService.prev();
+        TableService.prev();
     };
 
     $scope.next = function() {
-        tableService.next();
+        TableService.next();
     };
 
     $scope.last = function() {
-        tableService.last();
+        TableService.last();
     };
 
     $scope.reset = function() {
-        tableService.reset();
+        TableService.reset();
     };
 
     $scope.search = function() {
-        tableService.search($scope.searchString);
+        TableService.search($scope.searchString);
     };
 
     $scope.rows = function() {
-        tableService.rows($scope.nrows);
+        TableService.rows($scope.nrows);
     };
 
 }]);
