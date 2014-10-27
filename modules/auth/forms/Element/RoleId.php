@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_Element_RoleId extends Zend_Form_Element_Select {
+class Auth_Form_Element_RoleId extends Daiquiri_Form_Element_Select {
 
     /**
      * Construtor. Sets the name of the element.

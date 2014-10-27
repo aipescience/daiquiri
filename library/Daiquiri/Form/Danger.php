@@ -38,6 +38,9 @@ class Daiquiri_Form_Danger extends Daiquiri_Form_Abstract {
     public function init() {
         $this->addCsrfElement();
         
+        // add class
+        $this->setAttrib('class','daiquiri-form-danger');
+
         // add fields
         $this->addDangerButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');

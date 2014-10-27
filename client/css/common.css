@@ -45,7 +45,7 @@ form .captcha img {
     margin-bottom: 10px;
 }
 form fieldset {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 form .control-group .controls > label {
     padding-top: 5px;
@@ -158,6 +158,8 @@ http://stackoverflow.com/questions/1367409/how-to-make-button-look-like-a-link
 
 /* alignment */
 
+ul.align-form-horizontal,
+ol.align-form-horizontal,
 .align-form-horizontal,
 .margin-left {
     /* align a block with a form-horizontal form from bootstrap */
@@ -313,8 +315,8 @@ li.dropdown ul ul {
     margin-top: 3px;
 }*/
 
-.angular-hidden {
-    visibility: hidden;
+form ul.text-error.angular {
+    /*display: none;*/
 }
 
 .daiquiri-download-format {

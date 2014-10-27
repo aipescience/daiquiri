@@ -27,6 +27,7 @@ class Daiquiri_Form_Element_Button extends Zend_Form_Element_Submit {
     function init() {
         // set css class for html element
         $this->setAttrib('class', 'btn');
+        $this->setAttrib('ng-click', 'cancel');
 
         // set decorators
         $this->setDecorators(array('ViewHelper'));

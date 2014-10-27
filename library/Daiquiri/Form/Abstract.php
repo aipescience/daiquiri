@@ -30,6 +30,26 @@
 abstract class Daiquiri_Form_Abstract extends Zend_Form {
 
     /**
+     * Constructor.
+     *
+     * @param mixed $options
+     * @return void
+     */
+    public function __construct($options = null)
+    {
+        if ($options === null) {
+            $options = array();
+        }
+        if (empty($options['name'])) {
+            $options['name'] = array_pop(explode('_',get_class($this))) . 'Form';
+        }
+        if (empty($options['ng-submit'])) {
+            $options['ng-submit'] = "submitForm()";
+        }
+        parent::__construct($options);
+    }
+
+    /**
      * Sets the default decorators for the form.
      * @return Daiquiri_Form_Abstract the form object
      */
@@ -44,8 +64,14 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
             $this->addDecorator('Description', array(
                 'tag' => 'div',
                 'placement' => 'append',
-                'class' => 'text-error align-form-horizontal',
+                'class' => 'unstyled text-error align-form-horizontal',
                 'escape' => false
+            ));
+            $this->addDecorator('Callback', array(
+                'callback' => function($content, $element, $options) {
+                    return '<ul class="unstyled text-error align-form-horizontal angular" ng-show="errors.form"><li ng-repeat="error in errors.form">{{error}}</li></ul>';
+                },
+                'placement' => 'append'
             ));
             $this->addDecorator('Form');
         }
@@ -83,6 +109,28 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      */
     public function addButtonElement($name, $label) {
         $this->addElement(new Daiquiri_Form_Element_Button($name, $label));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for a submit button (for angular).
+     * @param  string $name  name of the element
+     * @param  string $label label for the button
+     * @return string $name  name of the element
+     */
+    public function addSubmitButtonElement($name, $label) {
+        $this->addElement(new Daiquiri_Form_Element_SubmitButton($name, $label));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for a cancel button (for angular).
+     * @param  string $name  name of the element
+     * @param  string $label label for the button
+     * @return string $name  name of the element
+     */
+    public function addCancelButtonElement($name, $label) {
+        $this->addElement(new Daiquiri_Form_Element_CancelButton($name, $label));
         return $name;
     }
 

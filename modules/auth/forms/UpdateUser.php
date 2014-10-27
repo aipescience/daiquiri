@@ -41,8 +41,9 @@ class Auth_Form_UpdateUser extends Auth_Form_Abstract {
         }
         $elements[] = $this->addRoleIdElement();
         $elements[] = $this->addStatusIdElement();
-        $this->addPrimaryButtonElement('submit', 'Update user profile');
-        $this->addButtonElement('cancel', 'Cancel');
+
+        $this->addSubmitButtonElement('submit', 'Update user');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array_merge($details,$elements));

@@ -19,91 +19,59 @@
  */
 ?>
 
-<script type="text/javascript">
-    // $(document).ready(function() {
-    //     // create the user table inside the div
-    //     $('#user-table').daiquiri_table({
-    //         "rowsurl": "<?php echo $this->baseUrl('/auth/user/rows') ?>",
-    //         "colsurl": "<?php echo $this->baseUrl('/auth/user/cols') ?>",
-    //         'success': function() {
-    //             $('#user-table tbody a').click(function(){
-    //                 new daiquiri.Modal({
-    //                     'url': this.href,
-    //                     'width': 700,
-    //                     'success': function() {
-    //                         daiquiri.table.items['user-table'].rows();
-    //                     }
-    //                 });
-    //                 return false;
-    //             });
-    //         }
-    //     });
-    //     $('#show-registered').on('click', function() {
-    //         $('#user-table-pager-search input').val('registered');
-    //         $('#user-table-pager-search').submit();
-    //         return false;
-    //     });
-    // });
-</script>
-
 <link href="/daiquiri/css/table.css" media="screen" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="/daiquiri/js/table.js"></script>
+<link href="/daiquiri/css/modal.css" media="screen" rel="stylesheet" type="text/css" />
 
-<script type="text/javascript" src="<?php echo $this->baseUrl('/daiquiri/js/user.js'); ?>"></script>
+<script type="text/javascript" src="/daiquiri/js/table.js"></script>
+<script type="text/javascript" src="/daiquiri/js/modal.js"></script>
+
+<script type="text/javascript" src="/daiquiri/js/user.js"></script>
 
 <div class="main" ng-app="user" ng-controller="UserController">
     <h2>User management</h2>
 
-    <div>{{test}}</div>
-
     <div daiquiri-table></div>
+    <div daiquiri-modal></div>
 
+    <div>
+        <?php
+        echo $this->internalLink(array(
+            'href' => '/auth/user/create',
+            'text' => 'Create a new user',
+            'resource' => 'Auth_Model_User',
+            'permission' => 'create',
+            'prepend' => '<p>',
+            'append' => '</p>',
+            'ng-click' => 'fetchHtml($event)'));
+        echo $this->internalLink(array(
+            'href' => '/auth/registration/',
+            'text' => 'Manage registrations',
+            'resource' => 'Auth_Model_Registration',
+            'permission' => 'index',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        echo $this->internalLink(array(
+            'text' => 'Export to init.php syntax',
+            'href' => '/auth/user/export/',
+            'resource' => 'Auth_Model_User',
+            'permission' => 'export',
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        echo $this->internalLink(array(
+            'text' => 'Export mail addresses',
+            'href' => '/auth/user/export/mode/mail',
+            'resource' => 'Auth_Model_User',
+            'permission' => 'export',
+            'prepend' => '<p>',
+            'append' => '&nbsp'));
+        echo $this->internalLink(array(
+            'text' => '(active)',
+            'href' => '/auth/user/export/mode/mail/status/active',
+            'resource' => 'Auth_Model_User',
+            'permission' => 'export',
+            'append' => '</p>'));
+        echo $this->adminLink();
+        ?>
+    </div>
 
-
-
-<!--         <p>
-            <a href="#" id="show-registered">Show registered users only</a>
-        </p> -->
-
-
-
-    <?php
-    /*
-    echo $this->internalLink(array(
-        'href' => '/auth/user/create',
-        'text' => 'Create new user',
-        'resource' => 'Auth_Model_User',
-        'permission' => 'create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'href' => '/auth/registration/',
-        'text' => 'Manage registrations',
-        'resource' => 'Auth_Model_Registration',
-        'permission' => 'index',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Export to init.php syntax',
-        'href' => '/auth/user/export/',
-        'resource' => 'Auth_Model_User',
-        'permission' => 'export',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Export mail addresses',
-        'href' => '/auth/user/export/mode/mail',
-        'resource' => 'Auth_Model_User',
-        'permission' => 'export',
-        'prepend' => '<p>',
-        'append' => '&nbsp'));
-    echo $this->internalLink(array(
-        'text' => '(active)',
-        'href' => '/auth/user/export/mode/mail/status/active',
-        'resource' => 'Auth_Model_User',
-        'permission' => 'export',
-        'append' => '</p>'));
-    echo $this->adminLink();
-    */
-    ?>
 </div>

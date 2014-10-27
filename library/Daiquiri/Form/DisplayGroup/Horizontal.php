@@ -30,30 +30,5 @@ class Daiquiri_Form_DisplayGroup_Horizontal extends Zend_Form_DisplayGroup {
 
         // set decorators for DisplayGroup
         $this->setDecorators(array('FormElements','Fieldset'));
-
-        // loop over elements and set decorators
-        foreach ($this->getElements() as $element) {
-            $element->setDecorators(array(
-                'ViewHelper',
-                'Errors',
-                array(
-                    'Description',
-                    array('tag' => 'div', 'placement' => 'append', 'escape' => true)),
-                array(
-                    array('control-group' => 'HtmlTag'),
-                    array('tag' => 'div', 'class' => 'controls')),
-                array(
-                    'Label',
-                    array('escape' => false, 'class' => 'control-label')),
-                array(
-                    array('controls' => 'HtmlTag'),
-                    array('tag' => 'div', 'class' => 'control-group'))
-            ));
-
-            // modify Error decorators retroactively
-            $element->getDecorator('Errors')->setOptions(array(
-                'class' => 'text-error help-inline daiquiri-form-error unstyled',
-            ));
-        }
     }
 }

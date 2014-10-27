@@ -95,7 +95,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
         $cols = array();
         foreach ($this->_cols as $colname) {
             $col = array(
-                'name' => $colname,
+                'name' => ucfirst($colname),
                 'sortable' => 'true'
             );
             if ($colname === 'id') {
@@ -153,7 +153,8 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                         'text' => $key,
                         'href' => $value['url'] . '/id/' . $dbRow['id'],
                         'resource' => $value['resource'],
-                        'permission' => $value['permission']));
+                        'permission' => $value['permission'],
+                        'class' => 'daiquiri-user-option'));
                     if (!empty($option)) {
                        $options[] = $option;
                     }

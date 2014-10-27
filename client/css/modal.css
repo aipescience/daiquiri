@@ -1,0 +1,94 @@
+.daiquiri-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1040;
+
+    background: rgba(1,1,1,0.5);
+}
+.daiquiri-modal-dialog {
+    position: relative;
+
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid silver;
+
+    margin: auto;
+
+    -webkit-box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+}
+button.daiquiri-modal-close,
+button.daiquiri-modal-close:active,
+button.daiquiri-modal-close:hover,
+button.daiquiri-modal-close:focus {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    z-index: 200;
+    font-size: 20px;
+    font-weight: bold;
+}
+button.daiquiri-modal-close {
+    color: #ddd;
+}
+button.daiquiri-modal-close:hover {
+    text-decoration: none;
+}
+.daiquiri-modal-body {
+    overflow: auto;
+    position: relative;
+}
+.daiquiri-modal-body h2 {
+    
+    font-size: 25px;
+    line-height: 30px;
+
+    padding: 15px;
+    margin: 0;
+}
+.daiquiri-modal-body h4,
+.daiquiri-modal-body dl,
+.daiquiri-modal-body p {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.daiquiri-modal-body .main > :nth-child(2) {
+    border-top: 1px solid #eee;
+    margin-top: 0;
+    padding-top: 10px;
+}
+.daiquiri-modal-body .main > :last-child {
+    padding-bottom: 20px;
+    margin-bottom: 0;
+}
+.daiquiri-modal-body .main > form:nth-child(2) {
+    padding-top: 20px;
+}
+.daiquiri-modal-body .main > form:last-child {
+    padding-bottom: 0;
+}
+
+.daiquiri-modal-body .main > form.daiquiri-form-confirm,
+.daiquiri-modal-body .main > form.daiquiri-form-danger {
+    border-top: none;
+    padding-top: 0;
+}
+.daiquiri-modal-body .main > form.daiquiri-form-confirm fieldset,
+.daiquiri-modal-body .main > form.daiquiri-form-danger fieldset {
+    margin-top: 0;
+}
+.daiquiri-modal-body .daiquiri-form-horizontal-button-group {
+    border-top: 1px solid #ddd;
+    background-color: #f5f5f5;
+
+    padding: 15px;
+    margin: 20px 0 0 0;
+}
+.daiquiri-modal-body .daiquiri-form-horizontal-button-group .control-group .controls {
+    margin: 0;
+    float: right;
+}

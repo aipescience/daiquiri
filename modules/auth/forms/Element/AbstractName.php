@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-abstract class Auth_Form_Element_AbstractName extends Zend_Form_Element_Text {
+abstract class Auth_Form_Element_AbstractName extends Daiquiri_Form_Element_Text {
 
     /**
      * Exclude a certain id from the unique-ness validator.

@@ -30,70 +30,40 @@ unset($this->row['status_id']);
 
     <h4>User information</h4>
 
-    <table class="table table-condensed">
-        <thead>
-            <tr>
-                <th class="span3">Key</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach (array('id', 'username', 'email', 'role', 'status') as $key): ?>
-                <tr>
-                    <td><?php echo ucfirst($this->escape($key)); ?></td>
-                    <td><?php echo $this->escape($this->row[$key]); ?></td>
-                </tr>
-                <?php unset($this->row[$key]); ?>
-            <?php endforeach; ?>
-            <?php foreach (Daiquiri_Auth::getInstance()->getDetailKeys() as $key): ?>
-                <?php if (isset($this->row[$key])): ?>
-                <tr>
-                    <td><?php echo ucfirst($this->escape($key)); ?></td>
-                    <td><?php echo $this->escape($this->row[$key]); ?></td>
-                </tr>
-                <?php unset($this->row[$key]); ?>
-                <?php endif ?>
-            <?php endforeach; ?>   
-        </tbody>
-    </table>
+    <dl class="dl-horizontal">
+        <?php foreach (array_merge(
+            array('id', 'username', 'email', 'role', 'status'),
+            Daiquiri_Config::getInstance()->auth->details->toArray()
+        ) as $key): ?>
+        <dt><?php echo $this->escape(ucfirst($key)); ?></dt>
+        <dd><?php echo $this->escape($this->row[$key]); ?></dd>
+        <?php unset($this->row[$key]); ?>
+        <?php endforeach; ?>
+    </dl>
 
     <h4>Additional information</h4> 
 
-    <table class="table table-condensed">
-        <thead>
-            <tr>
-                <th class="span3">Key</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($this->row as $key => $value): ?>
-                <tr>
-                    <td><?php echo ucfirst($this->escape($key)); ?></td>
-                    <td><?php echo $this->escape($value); ?></td>
-                    <td>
-                    <?php
-                    echo $this->internalLink(array(
-                        'text' => '<i class="icon-pencil"></i>',
-                        'href' => "/auth/details/update?id={$id}&key={$key}",
-                        'target' => '_blank',
-                        'append' => '&nbsp;'));
-                    echo $this->internalLink(array(
-                        'text' => '<i class="icon-remove"></i>',
-                        'href' => "/auth/details/delete?id={$id}&key={$key}",
-                        'target' => '_blank'));
-                    ?>
-                </tr>
-            <?php endforeach; ?>  
-        </tbody>
-    </table>
-    
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'class' => 'daiquiri-modal-close',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <?php if (!empty($this->row)): ?>
+    <dl class="dl-horizontal">
+        <?php foreach ($this->row as $key => $value): ?>
+        <dt><?php echo $this->escape(ucfirst($key)); ?></dt>
+        <dd>
+            <?php echo $this->escape($value); ?>
+            <?php
+                echo $this->internalLink(array(
+                    'text' => '<i class="icon-pencil"></i>',
+                    'href' => "/auth/details/update?id={$id}&key={$key}",
+                    'target' => '_blank',
+                    'append' => '&nbsp;'));
+                echo $this->internalLink(array(
+                    'text' => '<i class="icon-remove"></i>',
+                    'href' => "/auth/details/delete?id={$id}&key={$key}",
+                    'target' => '_blank'));
+            ?>
+        </dd>
+        <?php endforeach; ?>
+    </dl>
+    <?php else: ?>
+        <p>none</p>
+    <?php endif; ?>
 </div>

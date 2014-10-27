@@ -40,8 +40,8 @@ class Auth_Form_CreateUser extends Auth_Form_Abstract {
             $this->addRoleIdElement(),
             $this->addStatusIdElement()
         );
-        $this->addPrimaryButtonElement('submit', 'Create user');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', 'Create user');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup($details, 'detail-group');

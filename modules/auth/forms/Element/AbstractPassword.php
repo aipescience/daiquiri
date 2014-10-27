@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_Element_AbstractPassword extends Zend_Form_Element_Password {
+class Auth_Form_Element_AbstractPassword extends Daiquiri_Form_Element_Password {
 
     /**
      * Initializes the form element.

@@ -38,6 +38,9 @@ class Daiquiri_Form_Confirm extends Daiquiri_Form_Abstract {
     public function init() {
         $this->addCsrfElement();
         
+        // add class
+        $this->setAttrib('class','daiquiri-form-confirm');
+
         // add fields
         $this->addPrimaryButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');

@@ -62,7 +62,7 @@ class Daiquiri_Controller_Helper_Form extends Daiquiri_Controller_Helper_Abstrac
         }
 
         // set action for form
-        $this->getController()->setFormAction($response);
+        //$this->getController()->setFormAction($response);
 
         // assign to view
         $this->getView()->title = $this->_options['title'];

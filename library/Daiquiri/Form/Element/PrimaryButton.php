@@ -27,6 +27,7 @@ class Daiquiri_Form_Element_PrimaryButton extends Zend_Form_Element_Submit {
     function init() {
         // set css class for html element
         $this->setAttrib('class', 'btn btn-primary');
+        $this->setAttrib('ng-click', 'submit=true');
 
         // set decorators
         $this->setDecorators(array('ViewHelper'));

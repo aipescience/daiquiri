@@ -1,4 +1,5 @@
 <?php
+
 /*
  *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
@@ -17,13 +18,16 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-?>
 
-<div class="main">
-    <?php if ($this->status === 'ok'): ?>
-        <p>User deleted.</p>
-    <?php else: ?>
-        <h2>Delete user</h2>
-        <?php echo $this->form; ?>
-    <?php endif; ?>
-</div>
+class Daiquiri_Form_Element_CancelButton extends Daiquiri_Form_Element_Button {
+
+    /**
+     * Initializes the form element
+     */
+    function init() {
+        parent::init();
+
+        // set directive for angular
+        $this->setAttrib('ng-click', 'submit=false');
+    }
+}

@@ -1,12 +1,35 @@
 var daiquiriTable = angular.module('table', ['ngSanitize']);
 
-daiquiriTable.directive('daiquiriTable', function() {
+daiquiriTable.directive('daiquiriTable', ['$compile','TableService',function($compile,TableService) {
     return {
-        templateUrl: '/daiquiri/html/table.html'
-    };
-});
+        templateUrl: '/daiquiri/html/table.html',
+        link: function (scope, element, attrs) {
+            // watch the cols for a change, and perform callback
+            if (angular.isFunction(TableService.callback.cols)) {
+                scope.$watch(function () {
+                    return TableService.data.cols;
+                }, function(newValue, oldValue) {
+                    scope.$evalAsync(function($scope) {
+                        TableService.callback.cols($scope);
+                    });
+                }, true);
+            }
 
-daiquiriTable.factory('TableService', ['$http',function($http) {
+            // watch the rows for a change, and perform callback
+            if (angular.isFunction(TableService.callback.rows)) {
+                scope.$watch(function () {
+                    return TableService.data.rows;
+                }, function(newValue, oldValue) {
+                    scope.$evalAsync(function($scope) {
+                        TableService.callback.rows($scope);
+                    });
+                }, true);
+            }
+        }
+    };
+}]);
+
+daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q,$timeout) {
     
     var url = {
         cols: null,
@@ -30,6 +53,11 @@ daiquiriTable.factory('TableService', ['$http',function($http) {
         'page': 1,
         'sort': null,
         'search': null
+    };
+
+    var callback = {
+        'rows': null,
+        'cols': null
     };
 
     function first() {
@@ -74,50 +102,40 @@ daiquiriTable.factory('TableService', ['$http',function($http) {
         fetchRows();
     }
 
-    function rows(nrows) {
+    function changeNRows(nrows) {
         params.nrows = nrows;
         reset();
     }
 
     function fetchCols() {
-        $http.get(url.cols,{'params': params})
-            .success(function(response) {
-                if (response.status == 'ok') {
-                    data.cols = response.cols;
-                } else {
-                    console.log('Error');
-                }
-            })
-            .error(function(response) {
+        $http.get(url.cols,{'params': params}).success(function(response) {
+            if (response.status == 'ok') {
+                data.cols = response.cols;
+            } else {
                 console.log('Error');
-            });
+            }
+        })
     }
 
     function fetchRows() {
-        $http.get(url.rows,{'params': params})
-            .success(function(response) {
-                if (response.status == 'ok') {
-                    data.rows = response.rows;
-
-                    meta.nrows = response.nrows;
-                    meta.page = response.page;
-                    meta.pages = response.pages;
-                    meta.total = response.total;
-                } else {
-                    console.log('Error');
-                }
-            })
-            .error(function(response) {
+        $http.get(url.rows,{'params': params}).success(function(response) {
+            if (response.status == 'ok') {
+                data.rows = response.rows;
+                meta.nrows = response.nrows;
+                meta.page = response.page;
+                meta.pages = response.pages;
+                meta.total = response.total;
+            } else {
                 console.log('Error');
-            });
+            }
+        })
     }
 
     function init() {
         // fetch cols if they where not loaded before
-        if (data.cols.length === 0) {
-            fetchCols();
-        }
+        if (data.cols.length === 0) fetchCols();
 
+        // fetch cols
         fetchRows();
     }
 
@@ -125,13 +143,14 @@ daiquiriTable.factory('TableService', ['$http',function($http) {
         url: url,
         data: data,
         meta: meta,
+        callback: callback,
         first: first,
         prev: prev,
         next: next,
         last: last,
         reset: reset,
         search: search,
-        rows: rows,
+        changeNRows: changeNRows,
         fetchCols: fetchCols,
         fetchRows: fetchRows,
         init: init
@@ -174,8 +193,7 @@ daiquiriTable.controller('TableController', ['$scope','TableService',function($s
         TableService.search($scope.searchString);
     };
 
-    $scope.rows = function() {
-        TableService.rows($scope.nrows);
+    $scope.changeNRows = function() {
+        TableService.changeNRows($scope.nrows);
     };
-
 }]);

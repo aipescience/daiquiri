@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Auth_Form_Element_Detail extends Zend_Form_Element_Text {
+class Auth_Form_Element_Detail extends Daiquiri_Form_Element_Text {
 
     /**
      * Initializes the form element.
