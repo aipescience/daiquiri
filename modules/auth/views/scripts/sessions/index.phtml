@@ -19,32 +19,25 @@
  */
 ?>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        // create the user table inside the div
-        $('#daiquiri-sessions-table').daiquiri_table({
-            "rowsurl": "<?php echo $this->baseUrl('/auth/sessions/rows') ?>",
-            "colsurl": "<?php echo $this->baseUrl('/auth/sessions/cols') ?>",
-            'success': function() {
-                $('#daiquiri-sessions-table tbody a').click(function(){
-                    new daiquiri.Modal({
-                        'url': this.href,
-                        'width': 700,
-                        'success': function() {
-                            daiquiri.table.items['daiquiri-sessions-table'].rows();
-                        }
-                    });
-                    return false;
-                });
-            }
-        });
-    });  
-</script>
+<link href="/daiquiri/css/table.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/daiquiri/css/modal.css" media="screen" rel="stylesheet" type="text/css" />
 
-<div class="main">
-    <h2>Session management</h2>
+<script type="text/javascript" src="/daiquiri/js/table.js"></script>
+<script type="text/javascript" src="/daiquiri/js/modal.js"></script>
+<script type="text/javascript" src="/daiquiri/js/admin.js"></script>
 
-    <div id="daiquiri-sessions-table"></div>
+<div class="main" ng-app="admin" ng-controller="AdminController">
+    <h2>Sessions management</h2>
 
-    <?php echo $this->adminLink(); ?>
+    <div daiquiri-table data-cols="/auth/sessions/cols" data-rows="/auth/sessions/rows"></div>
+    <div daiquiri-modal></div>
+
+    <div class="row">
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
 </div>
+

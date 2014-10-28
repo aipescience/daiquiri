@@ -24,13 +24,12 @@
 
 <script type="text/javascript" src="/daiquiri/js/table.js"></script>
 <script type="text/javascript" src="/daiquiri/js/modal.js"></script>
+<script type="text/javascript" src="/daiquiri/js/admin.js"></script>
 
-<script type="text/javascript" src="/daiquiri/js/user.js"></script>
-
-<div class="main" ng-app="user" ng-controller="UserController">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>User management</h2>
 
-    <div daiquiri-table></div>
+    <div daiquiri-table data-cols="/auth/user/cols" data-rows="/auth/user/rows"></div>
     <div daiquiri-modal></div>
 
     <div class="row">

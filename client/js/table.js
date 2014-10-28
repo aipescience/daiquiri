@@ -3,11 +3,21 @@ var daiquiriTable = angular.module('table', ['ngSanitize']);
 daiquiriTable.directive('daiquiriTable', ['$compile','TableService',function($compile,TableService) {
     return {
         templateUrl: '/daiquiri/html/table.html',
-        link: function (scope, element, attrs) {
+        link: { pre: function (scope, element, attrs) {
+            // look for the cols url in the attributes
+            if (!angular.isUndefined(attrs.cols)) {
+                TableService.url.cols = attrs.cols;
+            }
+
+            // look for the rows url in the attributes
+            if (!angular.isUndefined(attrs.rows)) {
+                TableService.url.rows = attrs.rows;
+            }
+
             // watch the cols for a change, and perform callback
             if (angular.isFunction(TableService.callback.cols)) {
                 scope.$watch(function () {
-                    return TableService.data.cols;
+                    return TableService.trigger.cols;
                 }, function(newValue, oldValue) {
                     scope.$evalAsync(function($scope) {
                         TableService.callback.cols($scope);
@@ -18,14 +28,17 @@ daiquiriTable.directive('daiquiriTable', ['$compile','TableService',function($co
             // watch the rows for a change, and perform callback
             if (angular.isFunction(TableService.callback.rows)) {
                 scope.$watch(function () {
-                    return TableService.data.rows;
+                    return TableService.trigger.rows;
                 }, function(newValue, oldValue) {
                     scope.$evalAsync(function($scope) {
                         TableService.callback.rows($scope);
                     });
                 }, true);
             }
-        }
+
+            // init the table
+            TableService.init();
+        }}
     };
 }]);
 
@@ -58,6 +71,11 @@ daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q
     var callback = {
         'rows': null,
         'cols': null
+    };
+
+    var trigger = {
+        'rows': false,
+        'cols': false
     };
 
     function first() {
@@ -108,27 +126,33 @@ daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q
     }
 
     function fetchCols() {
-        $http.get(url.cols,{'params': params}).success(function(response) {
-            if (response.status == 'ok') {
-                data.cols = response.cols;
-            } else {
-                console.log('Error');
-            }
-        })
+        if (!angular.isUndefined(url.cols)) {
+            $http.get(url.cols,{'params': params}).success(function(response) {
+                if (response.status == 'ok') {
+                    data.cols = response.cols;
+                    trigger.cols = !trigger.cols;
+                } else {
+                    console.log('Error');
+                }
+            });
+        }
     }
 
     function fetchRows() {
-        $http.get(url.rows,{'params': params}).success(function(response) {
-            if (response.status == 'ok') {
-                data.rows = response.rows;
-                meta.nrows = response.nrows;
-                meta.page = response.page;
-                meta.pages = response.pages;
-                meta.total = response.total;
-            } else {
-                console.log('Error');
-            }
-        })
+        if (!angular.isUndefined(url.rows)) {
+            $http.get(url.rows,{'params': params}).success(function(response) {
+                if (response.status == 'ok') {
+                    data.rows = response.rows;
+                    meta.nrows = response.nrows;
+                    meta.page = response.page;
+                    meta.pages = response.pages;
+                    meta.total = response.total;
+                    trigger.rows = !trigger.rows;
+                } else {
+                    console.log('Error');
+                }
+            });
+        }
     }
 
     function init() {
@@ -144,6 +168,7 @@ daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q
         data: data,
         meta: meta,
         callback: callback,
+        trigger: trigger,
         first: first,
         prev: prev,
         next: next,

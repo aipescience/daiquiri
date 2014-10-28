@@ -85,7 +85,8 @@ class Auth_Model_Sessions extends Daiquiri_Model_Table {
                 'text' => 'Destroy',
                 'href' => '/auth/sessions/destroy/session/' . $dbRow['session'],
                 'resource' => 'Auth_Model_Sessions',
-                'permission' => 'destroy'
+                'permission' => 'destroy',
+                'class' => 'daiquiri-admin-option'
             ));
 
             $rows[] = $row;

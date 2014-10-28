@@ -1,23 +1,19 @@
-var app = angular.module('user',['table','modal','ngSanitize']);
+var app = angular.module('admin',['table','modal','ngSanitize']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.factory('UserService', ['$http','$timeout','ModalService','TableService',function($http,$timeout,ModalService,TableService) {
+app.factory('AdminService', ['$http','ModalService','TableService',function($http,ModalService,TableService) {
 
     var values = {};
     var errors = {};
     var activeUrl = null;
 
-    // initialize table
-    TableService.url.cols = '/auth/user/cols';
-    TableService.url.rows = '/auth/user/rows';
     TableService.callback.rows = function(scope) {
-        angular.element('.daiquiri-user-option').on('click', scope.fetchHtml);
+        angular.element('.daiquiri-admin-option').on('click', scope.fetchHtml);
     }
-    TableService.init();
 
     return {
         values: values,
@@ -65,18 +61,17 @@ app.factory('UserService', ['$http','$timeout','ModalService','TableService',fun
     };
 }]);
 
-app.controller('UserController', ['$scope','UserService',function($scope,UserService) {
+app.controller('AdminController', ['$scope','AdminService',function($scope,AdminService) {
 
-    $scope.values = UserService.values;
-    $scope.errors = UserService.errors;
+    $scope.values = AdminService.values;
+    $scope.errors = AdminService.errors;
 
     $scope.fetchHtml = function(event) {
-        UserService.fetchHtml(event.target.href);
+        AdminService.fetchHtml(event.target.href);
         event.preventDefault();
     }
 
     $scope.submitForm = function() {
-        UserService.submitForm($scope.submit);
+        AdminService.submitForm($scope.submit);
     }
-
 }]);

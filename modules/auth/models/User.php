@@ -154,7 +154,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                         'href' => $value['url'] . '/id/' . $dbRow['id'],
                         'resource' => $value['resource'],
                         'permission' => $value['permission'],
-                        'class' => 'daiquiri-user-option'));
+                        'class' => 'daiquiri-admin-option'));
                     if (!empty($option)) {
                        $options[] = $option;
                     }
