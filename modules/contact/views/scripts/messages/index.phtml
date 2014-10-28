@@ -19,20 +19,24 @@
  */
 ?>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        // create the table inside the div
-        $('#daiquiri-messages-table').daiquiri_table({
-            'rowsurl': "<?php echo $this->baseUrl('/contact/messages/rows') ?>",
-            'colsurl': "<?php echo $this->baseUrl('/contact/messages/cols') ?>",
-        });
-    });
-</script>
+<link href="/daiquiri/css/table.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/daiquiri/css/modal.css" media="screen" rel="stylesheet" type="text/css" />
 
-<div class="main">
+<script type="text/javascript" src="/daiquiri/js/table.js"></script>
+<script type="text/javascript" src="/daiquiri/js/modal.js"></script>
+<script type="text/javascript" src="/daiquiri/js/admin.js"></script>
+
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Contact messages management</h2>
 
-    <p id="daiquiri-messages-table"></p>
+    <div daiquiri-table data-cols="/contact/messages/cols" data-rows="/contact/messages/rows"></div>
+    <div daiquiri-modal></div>
 
-    <?php echo $this->adminLink(); ?>
+    <div class="row">
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
 </div>
