@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <div class="daiquiri-table-pane">
+    <div class="daiquiri-table-pane" ng-show="tableData.rows.length">
         <table class="table">
             <thead>
                 <tr>
@@ -43,8 +43,12 @@
                 <tr ng-repeat="row in tableData.rows">
                     <td ng-repeat="element in row.cell track by $index" ng-bind-html="element"></td>
                 </tr>
-            </tbody>  
+            </tbody>
         </table>
+    </div>
+
+    <div class="daiquiri-table-empty" ng-show="tableData.rows.length == 0">
+        No rows have been retrieved.
     </div>
 
     <div class="daiquiri-table-footer">

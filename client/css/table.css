@@ -24,6 +24,13 @@
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+.daiquiri-table-empty {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 12px;
+}
 .daiquiri-table-pane table {
     margin: 0;
 }
