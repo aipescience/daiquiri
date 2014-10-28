@@ -237,12 +237,16 @@ dl.dl-horizontal dd {
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-bottom: 20px;
+    padding: 5px 12px;
 }
+
+/* nav widget */
+
 .daiquiri-widget.nav .nav-header {
     border-bottom: 1px solid #ddd;
 }
-.daiquiri-widget li.nav-item a,
-.daiquiri-widget li.nav-item p {
+.daiquiri-widget.nav li.nav-item a,
+.daiquiri-widget.nav li.nav-item p {
     margin-top: 0;
     margin-bottom: 0;
     border-radius: 0;
@@ -251,11 +255,11 @@ dl.dl-horizontal dd {
     padding-bottom: 5px;
     font-size: small;
 }
-.daiquiri-widget li.nav-item p {
+.daiquiri-widget.nav li.nav-item p {
     padding-left: 15px;
     padding-right: 15px;
 }
-.daiquiri-widget a:hover {
+.daiquiri-widget.nav a:hover {
     border-radius: 0;
 }
 .daiquiri-widget.nav div.nav-item {
@@ -306,9 +310,6 @@ li.dropdown li li li a {
 li.dropdown ul ul {
     margin-left: 0;
 }
-
-
-
 
 /*.table [class^="icon-"],
 .table [class*=" icon-"] {

@@ -10,7 +10,6 @@ daiquiriModal.directive('daiquiriModal', ['$compile','ModalService',function($co
                 var element = $compile(newValue)(scope);
                 angular.element('.daiquiri-modal-body').children().remove();
                 angular.element('.daiquiri-modal-body').append(element);
-                console.log('modal updated');
             }, true);
         }
     };

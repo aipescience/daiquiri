@@ -45,17 +45,17 @@ app.factory('UserService', ['$http','$timeout','ModalService','TableService',fun
                 angular.extend(data,values);
 
                 $http.post(activeUrl,$.param(data)).success(function(response) {
-                    switch (response.status) {
-                        case 'ok': 
-                            ModalService.modal.enabled = false;
-                            TableService.fetchRows();
-                        case 'error':
-                            for (var error in errors) delete errors[error];
-                            angular.forEach(response.errors, function(object, key) {
-                                errors[key] = object;
-                            });
-                        default:
-                            errors = {'form': ['Error: Unknown response from server.']};
+                    for (var error in errors) delete errors[error];
+
+                    if (response.status === 'ok') {
+                        ModalService.modal.enabled = false;
+                        TableService.fetchRows();
+                    } else if (response.status === 'error') {
+                        angular.forEach(response.errors, function(error, key) {
+                            errors[key] = error;
+                        });
+                    } else {
+                        errors['form'] = {'form': ['Error: Unknown response from server.']};
                     }
                 })
             } else {
@@ -74,6 +74,7 @@ app.controller('UserController', ['$scope','UserService',function($scope,UserSer
         UserService.fetchHtml(event.target.href);
         event.preventDefault();
     }
+
     $scope.submitForm = function() {
         UserService.submitForm($scope.submit);
     }

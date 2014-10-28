@@ -33,45 +33,58 @@
     <div daiquiri-table></div>
     <div daiquiri-modal></div>
 
-    <div>
-        <?php
-        echo $this->internalLink(array(
-            'href' => '/auth/user/create',
-            'text' => 'Create a new user',
-            'resource' => 'Auth_Model_User',
-            'permission' => 'create',
-            'prepend' => '<p>',
-            'append' => '</p>',
-            'ng-click' => 'fetchHtml($event)'));
-        echo $this->internalLink(array(
-            'href' => '/auth/registration/',
-            'text' => 'Manage registrations',
-            'resource' => 'Auth_Model_Registration',
-            'permission' => 'index',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        echo $this->internalLink(array(
-            'text' => 'Export to init.php syntax',
-            'href' => '/auth/user/export/',
-            'resource' => 'Auth_Model_User',
-            'permission' => 'export',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        echo $this->internalLink(array(
-            'text' => 'Export mail addresses',
-            'href' => '/auth/user/export/mode/mail',
-            'resource' => 'Auth_Model_User',
-            'permission' => 'export',
-            'prepend' => '<p>',
-            'append' => '&nbsp'));
-        echo $this->internalLink(array(
-            'text' => '(active)',
-            'href' => '/auth/user/export/mode/mail/status/active',
-            'resource' => 'Auth_Model_User',
-            'permission' => 'export',
-            'append' => '</p>'));
-        echo $this->adminLink();
-        ?>
-    </div>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'href' => '/auth/user/create',
+                'text' => 'Create a new user',
+                'resource' => 'Auth_Model_User',
+                'permission' => 'create',
+                'prepend' => '<p>',
+                'append' => '</p>',
+                'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
 
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'href' => '/auth/registration/',
+                'text' => 'Manage registrations',
+                'resource' => 'Auth_Model_Registration',
+                'permission' => 'index',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            echo $this->internalLink(array(
+                'text' => 'Export to init.php syntax',
+                'href' => '/auth/user/export/',
+                'resource' => 'Auth_Model_User',
+                'permission' => 'export',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            echo $this->internalLink(array(
+                'text' => 'Export mail addresses',
+                'href' => '/auth/user/export/mode/mail',
+                'resource' => 'Auth_Model_User',
+                'permission' => 'export',
+                'prepend' => '<p>'));
+            echo $this->internalLink(array(
+                'text' => '(active)',
+                'href' => '/auth/user/export/mode/mail/status/active',
+                'resource' => 'Auth_Model_User',
+                'permission' => 'export',
+                'prepend' => '&nbsp;',
+                'append' => '</p>'));
+            ?>
+            </div>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
 </div>
