@@ -19,32 +19,24 @@
  */
 ?>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        // create the table inside the div
-        $('#daiquiri-jobs-table').daiquiri_table({
-            'rowsurl': "<?php echo $this->baseUrl('/query/jobs/rows') ?>",
-            'colsurl': "<?php echo $this->baseUrl('/query/jobs/cols') ?>",
-            'success': function() {
-                $('#daiquiri-jobs-table tbody a').click(function(){
-                    new daiquiri.Modal({
-                        'url': this.href,
-                        'width': 700,
-                        'success': function() {
-                            daiquiri.table.items['daiquiri-jobs-table'].rows();
-                        }
-                    });
-                    return false;
-                });
-            }
-        });
-    });
-</script>
+<link href="/daiquiri/css/table.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/daiquiri/css/modal.css" media="screen" rel="stylesheet" type="text/css" />
 
-<div class="main">
+<script type="text/javascript" src="/daiquiri/js/table.js"></script>
+<script type="text/javascript" src="/daiquiri/js/modal.js"></script>
+<script type="text/javascript" src="/daiquiri/js/admin.js"></script>
+
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Query jobs management</h2>
 
-    <p id="daiquiri-jobs-table"></p>
+    <div daiquiri-table data-cols="/query/jobs/cols" data-rows="/query/jobs/rows"></div>
+    <div daiquiri-modal></div>
 
-    <?php echo $this->adminLink(); ?>
+    <div class="row">
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
 </div>
