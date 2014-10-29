@@ -21,6 +21,10 @@
     margin-bottom: 20px;
     font-size: small;
 }
+.daiquiri-table table {
+    table-layout: fixed !important;
+    margin: 0;
+}
 .daiquiri-table th,
 .daiquiri-table td {
     overflow: hidden;
@@ -73,6 +77,13 @@
 .daiquiri-table th .handle-right:hover {
     cursor: move;
 }
+.daiquiri-table table.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
 .daiquiri-table .pagination {
     margin: 0 0 0 20px;
 }
@@ -90,9 +101,6 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 5px 12px;
-}
-.daiquiri-table-pane table {
-    margin: 0;
 }
 .daiquiri-table-header,
 .daiquiri-table-footer {

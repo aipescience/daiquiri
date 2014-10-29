@@ -36,10 +36,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th ng-repeat="col in tableData.cols" style="width: {{col.width}};">
+                    <th ng-repeat="(i,col) in tableData.cols" style="width: {{col.width}}px;" data-col-id="{{i}}">
                         <div class="daiquiri-table-col-head">
-                            <div class="handle-left"></div>
-                            <div class="handle-right"></div>
+                            <div class="handle-left" ng-mousedown="resize(i-1)"></div>
+                            <div class="handle-right" ng-mousedown="resize(i)"></div>
                             <div class="sort" ng-click="sort(col.name)" ng-show="col.sortable == true">
                                 <i ng-class="{
                                     'icon-chevron-down': tableMeta.sort != col.name + ' ASC' && tableMeta.sort != col.name + ' DESC',

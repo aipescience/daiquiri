@@ -221,7 +221,7 @@ daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q
     };
 }]);
 
-daiquiriTable.controller('TableController', ['$scope','TableService',function($scope,TableService) {
+daiquiriTable.controller('TableController', ['$scope','$document','TableService',function($scope,$document,TableService) {
 
     $scope.tableData = TableService.data;
     $scope.tableMeta = TableService.meta;
@@ -264,4 +264,26 @@ daiquiriTable.controller('TableController', ['$scope','TableService',function($s
     $scope.changeNRows = function() {
         TableService.changeNRows($scope.nrows);
     };
+
+    $scope.resize = function (colId) {
+        var zero = event.pageX;
+        var table = angular.element('.daiquiri-table table');
+        var th = angular.element('[data-col-id="' + colId + '"]');
+        var width = th.width();
+
+        table.addClass('no-select');
+        function enterResize(event) {
+            th.width(width + event.pageX - zero);
+        }
+
+        function exitResize() {
+            table.removeClass('no-select');
+            $document.off('mousemove',enterResize);
+            $document.off('mouseup',exitResize);
+        }
+
+        $document.on('mousemove', enterResize);
+        $document.on('mouseup', exitResize);
+    };
+
 }]);
