@@ -26,11 +26,52 @@
     overflow: hidden;
     white-space: nowrap;
     border-left: 1px solid #ddd;
+}
+.daiquiri-table th {
+    padding: 0;
+}
+.daiquiri-table td {
     padding: 5px;
 }
 .daiquiri-table th:first-child,
 .daiquiri-table td:first-child {
     border-left: none;
+}
+.daiquiri-table th div.daiquiri-table-col-head {
+    padding: 5px 22px 5px 5px;
+    position: relative;
+}
+.daiquiri-table th div.name {
+    overflow: hidden;
+}
+.daiquiri-table th div.sort {
+    position: absolute;
+    right: 2px;
+    cursor: pointer;
+}
+.daiquiri-table th i {
+    margin-top: 2px;
+    opacity: 0.2;
+}
+.daiquiri-table th i.sorted {
+    opacity: 1;
+}
+.daiquiri-table th .handle-left,
+.daiquiri-table th .handle-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+.daiquiri-table th .handle-left {
+    left: 0;
+}
+.daiquiri-table th .handle-right {
+    right: 0;
+}
+.daiquiri-table th .handle-left:hover,
+.daiquiri-table th .handle-right:hover {
+    cursor: move;
 }
 .daiquiri-table .pagination {
     margin: 0 0 0 20px;

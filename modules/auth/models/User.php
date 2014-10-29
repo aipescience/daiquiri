@@ -95,8 +95,8 @@ class Auth_Model_User extends Daiquiri_Model_Table {
         $cols = array();
         foreach ($this->_cols as $colname) {
             $col = array(
-                'name' => ucfirst($colname),
-                'sortable' => 'true'
+                'name' => $colname,
+                'sortable' => true
             );
             if ($colname === 'id') {
                 $col['width'] = '22px';

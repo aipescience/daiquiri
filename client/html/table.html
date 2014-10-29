@@ -36,7 +36,20 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th ng-repeat="col in tableData.cols" style="width: {{col.width}};">{{col.name}}</th>
+                    <th ng-repeat="col in tableData.cols" style="width: {{col.width}};">
+                        <div class="daiquiri-table-col-head">
+                            <div class="handle-left"></div>
+                            <div class="handle-right"></div>
+                            <div class="sort" ng-click="sort(col.name)" ng-show="col.sortable == true">
+                                <i ng-class="{
+                                    'icon-chevron-down': tableMeta.sort != col.name + ' ASC' && tableMeta.sort != col.name + ' DESC',
+                                    'sorted icon-chevron-down': tableMeta.sort == col.name + ' ASC',
+                                    'sorted icon-chevron-up': tableMeta.sort == col.name + ' DESC'
+                                }"></i>
+                            </div>
+                            <div class="name">{{col.name|ucfirst}}</div>
+                        </div>
+                    </th>
                 </tr>
             </thead>
             <tbody>

@@ -19,6 +19,12 @@
 
 var daiquiriTable = angular.module('table', ['ngSanitize']);
 
+daiquiriTable.filter('ucfirst', function() {
+    return function(input,arg) {
+        return input.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+    };
+});
+
 daiquiriTable.directive('daiquiriTable', ['$compile','TableService',function($compile,TableService) {
     return {
         templateUrl: '/daiquiri/html/table.html',
@@ -77,7 +83,8 @@ daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q
         nrows: null,
         page: null,
         pages: null,
-        total: null
+        total: null,
+        sorted: null
     };
 
     var params = {
@@ -139,6 +146,18 @@ daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q
         fetchRows();
     }
 
+    function sort(colname) {
+        if (params.sort == colname + ' ASC') {
+            params.sort = colname + ' DESC';
+        } else {
+            params.sort = colname + ' ASC';
+        }
+
+        meta.sort = params.sort;
+
+        fetchRows();
+    }
+
     function changeNRows(nrows) {
         params.nrows = nrows;
         reset();
@@ -194,6 +213,7 @@ daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q
         last: last,
         reset: reset,
         search: search,
+        sort: sort,
         changeNRows: changeNRows,
         fetchCols: fetchCols,
         fetchRows: fetchRows,
@@ -235,6 +255,10 @@ daiquiriTable.controller('TableController', ['$scope','TableService',function($s
 
     $scope.search = function() {
         TableService.search($scope.searchString);
+    };
+
+    $scope.sort = function(col) {
+        TableService.sort(col);
     };
 
     $scope.changeNRows = function() {
