@@ -20,37 +20,32 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->row['lastname'] . ', ' . $this->row['firstname']); ?></h2>
+    <h2>Participant: <?php echo $this->escape($this->row['firstname'] . ' ' . $this->row['lastname']); ?></h2>
 
-    <table class="table table-bordered">
-        <tbody>
-            <?php foreach ($this->row as $key => $value): ?>
-                <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
-                <tr>
-                    <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
-                    <td>
-                        <?php if (is_array($value)): ?>
-                            <?php foreach($value as $contribution): ?>
-                                <table class="table table-bordered">
-                                    <tbody>
-                                        <?php foreach($contribution as $k => $v): ?>
-                                            <tr>
-                                                <td class="onehundredeighty"><?php echo ucfirst($this->escape($k)); ?></td>
-                                                <td><?php echo $this->escape($v); ?></td>
-                                            </tr>
-                                        <?php endforeach; ?> 
-                                    </tbody>
-                                </table>
-                            <?php endforeach; ?>  
-                        <?php else: ?>
-                            <?php echo $this->escape($value); ?>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endif; ?>
-            <?php endforeach; ?>  
-        </tbody>
-    </table>
+    <dl class="dl-horizontal">
+        <?php foreach ($this->row as $key => $value): ?>
+        <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
+        <dt><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></dt>
+        <dd>
+            <?php if (is_array($value)): ?>
+                <ul class="unstyled">
+                <?php foreach($value as $contribution): ?>
+                    <li><p>
+                            <?php echo $this->escape(ucfirst($contribution['contribution_type'])); ?>: <?php echo $this->escape(ucfirst($contribution['title'])); ?>
+                        </p>
+                        <p>
+                            <?php echo $this->escape(ucfirst($contribution['abstract'])); ?>
+                        </p>
+                    </li>
+                <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <?php echo $this->escape($value); ?>
+            <?php endif; ?>
+        </dd>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </dl>
 
     <?php
     echo $this->internalLink(array(

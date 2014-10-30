@@ -131,6 +131,16 @@ form[novalidate] select:focus:invalid {
     -moz-box-shadow: inherit;
     box-shadow: inherit;
 }
+form .help-inline.angular,
+form .form-error.angular {
+    display: none;
+}
+.ng-scope form .help-inline.angular {
+    display: inline-block;
+}
+.ng-scope form .form-error.angular  {
+    display: block;
+}
 
 /* 
 a button that looks like a link, see
@@ -209,7 +219,7 @@ dl.dl-horizontal dd {
     padding-left: 1px
 }
 
-/* navigarion */
+/* navigation */
 
 .daiquiri-nav .nav {
     border: 1px solid #ddd;
@@ -311,15 +321,6 @@ li.dropdown ul ul {
     margin-left: 0;
 }
 
-/*.table [class^="icon-"],
-.table [class*=" icon-"] {
-    margin-top: 3px;
-}*/
-
-form ul.text-error.angular {
-    /*display: none;*/
-}
-
 .daiquiri-download-format {
     display: block;
     width: 20px;
@@ -335,3 +336,10 @@ form ul.text-error.angular {
     margin-left: 225px;
 }
 
+/* table */
+
+.table.table-condensed th,
+.table.table-condensed td {
+    padding: 5px;
+    font-size: small;
+}

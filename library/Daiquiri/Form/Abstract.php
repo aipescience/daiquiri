@@ -64,12 +64,12 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
             $this->addDecorator('Description', array(
                 'tag' => 'div',
                 'placement' => 'append',
-                'class' => 'unstyled text-error align-form-horizontal',
+                'class' => 'unstyled form-error text-error align-form-horizontal',
                 'escape' => false
             ));
             $this->addDecorator('Callback', array(
                 'callback' => function($content, $element, $options) {
-                    return '<ul class="unstyled text-error align-form-horizontal angular" ng-show="errors.form"><li ng-repeat="error in errors.form">{{error}}</li></ul>';
+                    return '<ul class="unstyled form-error text-error align-form-horizontal angular" ng-show="errors.form"><li ng-repeat="error in errors.form">{{error}}</li></ul>';
                 },
                 'placement' => 'append'
             ));
@@ -88,6 +88,83 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     public function setDefault($name, $value) {
         $this->getElement($name)->setAttrib('ng-init',"values.{$name} = '{$value}'");
         return parent::setDefault($name, $value);
+    }
+
+    /**
+     * Adds a form element for text field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addTextElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_Text($name, $options));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for textarea field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addTextareaElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_Textarea($name, $options));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for select field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addSelectElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_Select($name, $options));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for multi select field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addMultiselectElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_Multiselect($name, $options));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for checkbox field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addCheckboxElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_Checkbox($name, $options));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for multi checkbox field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addMultiCheckboxElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_MultiCheckbox($name, $options));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for radio field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addRadioElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_Radio($name, $options));
+        return $name;
     }
 
     /**

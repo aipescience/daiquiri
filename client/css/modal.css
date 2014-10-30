@@ -39,6 +39,10 @@
     -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+    max-height: 600px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 button.daiquiri-modal-close,
 button.daiquiri-modal-close:active,
@@ -62,7 +66,6 @@ button.daiquiri-modal-close:hover {
     position: relative;
 }
 .daiquiri-modal-body h2 {
-    
     font-size: 25px;
     line-height: 30px;
 

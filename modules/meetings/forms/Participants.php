@@ -43,9 +43,8 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         
         // firstname, lastname and affiliation fields
         foreach (array('firstname','lastname','affiliation') as $key) {
-            $this->addElement('text', $key, array(
+            $this->addTextElement($key, array(
                 'label' => ucfirst($key),
-                'class' => 'input-xxlarge',
                 'required' => true,
                 'filters' => array('StringTrim'),
                 'validators' => array(
@@ -57,12 +56,10 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         // email fiels
         if (empty($this->_entry)) {
             $field = new Meetings_Form_Element_Email(array(
-                'class' => 'input-xxlarge',
                 'meetingId' => $this->_meeting['id']
             ));
         } else {
             $field = new Meetings_Form_Element_Email(array(
-                'class' => 'input-xxlarge',
                 'meetingId' => $this->_meeting['id'],
                 'excludeId' => $this->_entry['id']
             ));
@@ -80,35 +77,35 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
 
             switch (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']]) {
                 case "checkbox":
-                    $this->addElement('multiCheckbox', $detailKey['key'], array(
+                    $this->addMultiCheckboxElement($detailKey['key'], array(
                         'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                         'required' => true,
                         'multiOptions' => $options
                     ));
                     break;
                 case "radio":
-                    $this->addElement('radio', $detailKey['key'], array(
+                    $this->addRadioElement($detailKey['key'], array(
                         'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                         'required' => true,
                         'multiOptions' => $options
                     ));
                     break;
                 case "select":
-                    $this->addElement('select', $detailKey['key'], array(
+                    $this->addSelectElement($detailKey['key'], array(
                         'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                         'required' => true,
                         'multiOptions' => $options
                     ));
                     break;
                 case "multiselect":
-                    $this->addElement('multiselect', $detailKey['key'], array(
+                    $this->addMultiselectElement($detailKey['key'], array(
                         'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                         'required' => true,
                         'multiOptions' => $options
                     ));
                     break;
                 default:
-                    $this->addElement('text', $detailKey['key'], array(
+                    $this->addTextElement($detailKey['key'], array(
                         'label' => ucfirst(str_replace('_',' ',$detailKey['key'])),
                         'required' => true,
                         'filters' => array('StringTrim'),
@@ -123,7 +120,7 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
 
         // status
         if (!empty($this->_status)) {
-            $this->addElement('select', 'status_id', array(
+            $this->addSelectElement('status_id', array(
                 'label' => 'Status',
                 'required' => true,
                 'multiOptions' => $this->_status
@@ -131,7 +128,7 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         }
 
         // arrival and departure
-        $this->addElement('text', 'arrival', array(
+        $this->addTextElement('arrival', array(
             'label' => 'Arrival',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -139,7 +136,7 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'departure', array(
+        $this->addTextElement('departure', array(
             'label' => 'Departure',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -151,21 +148,19 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         // contributions
         $contributionElements = array();
         foreach ($this->_meeting['contribution_types'] as $id => $contribution_type) {
-            $this->addElement('checkbox', $contribution_type . '_bool', array(
+            $this->addCheckboxElement($contribution_type . '_bool', array(
                 'label' => ucfirst($contribution_type),
             ));
-            $this->addElement('text', $contribution_type . '_title', array(
+            $this->addTextElement($contribution_type . '_title', array(
                 'label' => 'Title',
-                'class' => 'input-xxlarge',
                 'required' => false,
                 'filters' => array('StringTrim'),
                 'validators' => array(
                     array('validator' => new Daiquiri_Form_Validator_Text()),
                 )
             ));
-            $this->addElement('textarea', $contribution_type . '_abstract', array(
+            $this->addTextareaElement($contribution_type . '_abstract', array(
                 'label' => 'Abstract',
-                'class' => 'input-xxlarge',
                 'rows' => 6,
                 'required' => false,
                 'filters' => array('StringTrim'),
@@ -179,17 +174,17 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         }
 
         // captcha and submit buttons
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array_merge(array('firstname','lastname','affiliation','email'), $participantDetailKeysElements),'personal', 'Personal data');
+        $this->addHorizontalGroup(array_merge(array('firstname','lastname','affiliation','email'), $participantDetailKeysElements),'personal');
         if (!empty($this->_status)) {
-            $this->addHorizontalGroup(array('status_id'),'status', 'Status');
+            $this->addHorizontalGroup(array('status_id'),'status');
         }
-        $this->addHorizontalGroup(array('arrival','departure'),'attendance', 'Attendance');
+        $this->addHorizontalGroup(array('arrival','departure'),'attendance');
         if (!empty($contributionElements)) {
-            $this->addHorizontalGroup($contributionElements,'contributions', 'Contributions');
+            $this->addHorizontalGroup($contributionElements,'contributions');
         }
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 

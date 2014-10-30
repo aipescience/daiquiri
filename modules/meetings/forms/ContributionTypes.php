@@ -28,7 +28,7 @@ class Meetings_Form_ContributionTypes extends Daiquiri_Form_Model {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'contribution_type', array(
+        $this->addTextElement('contribution_type', array(
             'label' => 'Contribution type',
             'class' => 'input-xxlarge',
             'required' => true,
@@ -38,8 +38,8 @@ class Meetings_Form_ContributionTypes extends Daiquiri_Form_Model {
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('contribution_type'));

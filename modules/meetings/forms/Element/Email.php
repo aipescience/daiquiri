@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Meetings_Form_Element_Email extends Zend_Form_Element_Text {
+class Meetings_Form_Element_Email extends Daiquiri_Form_Element_Text {
 
     /**
      * The id of the meeting for this element.

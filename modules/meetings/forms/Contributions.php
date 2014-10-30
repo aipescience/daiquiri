@@ -42,28 +42,26 @@ class Meetings_Form_Contributions extends Meetings_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('select', 'participant_id', array(
+        $this->addSelectElement('participant_id', array(
             'label' => 'Participant',
             'required' => true,
             'multiOptions' => $this->_participants,
         ));
-        $this->addElement('select', 'contribution_type_id', array(
+        $this->addSelectElement('contribution_type_id', array(
             'label' => 'Contribution type',
             'required' => true,
             'multiOptions' => $this->_meeting['contribution_types'],
         ));
-        $this->addElement('text', 'title', array(
+        $this->addTextElement('title', array(
             'label' => 'Title',
-            'class' => 'input-xxlarge',
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('textarea', 'abstract', array(
+        $this->addTextareaElement('abstract', array(
             'label' => 'Abstract',
-            'class' => 'input-xxlarge',
             'rows' => 6,
             'required' => false,
             'filters' => array('StringTrim'),
@@ -72,8 +70,8 @@ class Meetings_Form_Contributions extends Meetings_Form_Abstract {
             )
         ));
         
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('participant_id','contribution_type_id','title','abstract'));

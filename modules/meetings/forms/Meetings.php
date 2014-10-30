@@ -80,7 +80,7 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'title', array(
+        $this->addTextElement('title', array(
             'label' => 'Title of the Meeting',
             'class' => 'input-xxlarge',
             'required' => true,
@@ -89,7 +89,7 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'slug', array(
+        $this->addTextElement('slug', array(
             'label' => 'Short title for URL',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -97,13 +97,13 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
                 array('validator' => new Zend_Validate_Regex(array('pattern' => '/[a-zA-Z0-9\-]*/'))),
             )
         ));
-        $this->addElement('textarea', 'description', array(
+        $this->addTextareaElement('description', array(
             'label' => 'Description',
             'rows' => 4,
             'class' => 'input-xxlarge',
             'filters' => array('StringTrim')
         ));
-        $this->addElement('text', 'begin', array(
+        $this->addTextElement('begin', array(
             'label' => 'First day of the meeting',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -111,57 +111,57 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'end', array(
+        $this->addTextElement('end', array(
             'label' => 'Last day of the meeting',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('textarea', 'registration_message', array(
+        $this->addTextareaElement('registration_message', array(
             'label' => 'Registration messsage',
             'rows' => 6,
             'class' => 'input-xxlarge mono',
             'filters' => array('StringTrim')
         ));
-        $this->addElement('textarea', 'participants_message', array(
+        $this->addTextareaElement('participants_message', array(
             'label' => 'Participants messsage',
             'rows' => 6,
             'class' => 'input-xxlarge mono',
             'filters' => array('StringTrim')
         ));
-        $this->addElement('textarea', 'contributions_message', array(
+        $this->addTextareaElement('contributions_message', array(
             'label' => 'Contributions messsage',
             'rows' => 6,
             'class' => 'input-xxlarge mono',
             'filters' => array('StringTrim')
         ));
-        $this->addElement('select', 'registration_publication_role_id', array(
+        $this->addSelectElement('registration_publication_role_id', array(
             'label' => 'Registration form',
             'required' => true,
             'multiOptions' => $this->_roles
         ));
-        $this->addElement('select', 'participants_publication_role_id', array(
+        $this->addSelectElement('participants_publication_role_id', array(
             'label' => 'Participants list',
             'required' => true,
             'multiOptions' => $this->_roles
         ));
-        $this->addElement('select', 'contributions_publication_role_id', array(
+        $this->addSelectElement('contributions_publication_role_id', array(
             'label' => 'Contributions list',
             'required' => true,
             'multiOptions' => $this->_roles
         ));
-        $this->addElement('multiCheckbox', 'contribution_type_id', array(
+        $this->addMultiCheckboxElement('contribution_type_id', array(
             'label' => 'Contribution types',
             'multiOptions' => $this->_contributionTypes
         ));
-        $this->addElement('multiCheckbox', 'participant_detail_key_id', array(
+        $this->addMultiCheckboxElement('participant_detail_key_id', array(
             'label' => 'Requested details from participlants',
             'multiOptions' => $this->_participantDetailKeys
         ));
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('title','slug','description','begin','end','registration_message','participants_message','contributions_message','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id','contribution_type_id','participant_detail_key_id'));

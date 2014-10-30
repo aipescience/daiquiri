@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Abstract {
+class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Model {
 
     /**
      * Initializes the form.
@@ -28,7 +28,7 @@ class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'status', array(
+        $this->addTextElement('status', array(
             'label' => 'Participant status',
             'class' => 'input-xxlarge',
             'required' => true,
@@ -38,8 +38,8 @@ class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Abstract {
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('status'));

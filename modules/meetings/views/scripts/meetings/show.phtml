@@ -20,120 +20,37 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->row['title']); ?></h2>
-    <table class="table table-bordered">
-        <tbody>
-            <?php foreach ($this->row as $key => $value): ?>
-                <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
-                <tr>
-                    <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
-                    <td>
-                        <?php if ($key === 'participant_detail_keys'): ?>
-                            <ul style="margin-bottom: 0;">
-                            <?php
-                            foreach ($value as $v) {
-                                echo '<li>' . $this->escape($v['key']) . '</li>';
-                            }
-                            ?>
-                            </ul>
-                        <?php elseif ($key === 'contribution_types'): ?>
-                            <ul style="margin-bottom: 0;">
-                            <?php
-                            foreach ($value as $v) {
-                                echo '<li>' . $this->escape($v) . '</li>';
-                            }
-                            ?>
-                            </ul>
-                        <?php else: ?>
-                            <?php echo $this->escape($value); ?>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endif; ?>
-            <?php endforeach; ?>  
-        </tbody>
-    </table>
+    <h2>Meeting "<?php echo $this->escape($this->row['title']); ?>"</h2>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Update meeting details',
-        'href' => '/meetings/meetings/update/id/' . $this->escape($this->row['id']) . '?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
-        'resource' => 'Meetings_Model_Meetings',
-        'permission' => 'update',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Show participants table for this meeting',
-        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
-        'resource' => 'Meetings_Model_Participants',
-        'permission' => 'index',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Show contributions table for this meeting',
-        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/contributions/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
-        'resource' => 'Meetings_Model_Contributions',
-        'permission' => 'index',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Show public registration page for this meeting',
-        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/registration/register/?redirect=/meetings/meetings/show/id/' . $this->escape($this->row['id']),
-        'resource' => 'Meetings_Model_Registration',
-        'permission' => 'register',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Show public participants page for this meeting',
-        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/info/participants/',
-        'resource' => 'Meetings_Model_Participants',
-        'permission' => 'index',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Show public contributions page for for this meeting',
-        'href' => '/meetings/' . $this->escape($this->row['slug']) . '/info/contributions/',
-        'resource' => 'Meetings_Model_Contributions',
-        'permission' => 'index',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-    <p>
-        <?php
-        echo $this->internalLink(array(
-            'text' => 'Export participants',
-            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/export',
-            'resource' => 'Meetings_Model_Participants',
-            'permission' => 'export',
-            'append' => '&nbsp'));
-        echo $this->internalLink(array(
-            'text' => '(mail)',
-            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/export/mode/mail',
-            'resource' => 'Meetings_Model_Participants',
-            'permission' => 'export',
-            'append' => '&nbsp'));
-        echo $this->internalLink(array(
-            'text' => '(affiliation)',
-            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/participants/export/mode/affiliation',
-            'resource' => 'Meetings_Model_Participants',
-            'permission' => 'export'));
-        ?>
-    </p>
-    <p>
-        <?php   
-        echo $this->internalLink(array(
-            'text' => 'Export contributions',
-            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/contributions/export',
-            'resource' => 'Meetings_Model_Contributions',
-            'permission' => 'index',
-            'append' => '&nbsp'));
-        echo $this->internalLink(array(
-            'text' => '(latex)',
-            'href' => '/meetings/' . $this->escape($this->row['slug']) . '/contributions/export/mode/latex',
-            'resource' => 'Meetings_Model_Contributions',
-            'permission' => 'index'));
-        ?>
-    </p>
+    <dl class="dl-horizontal">
+        <?php foreach ($this->row as $key => $value): ?>
+        <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
+        <dt><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></dt>
+        <dd>
+            <?php if ($key === 'participant_detail_keys'): ?>
+                <ul style="margin-bottom: 0;">
+                <?php
+                foreach ($value as $v) {
+                    echo '<li>' . $this->escape($v['key']) . '</li>';
+                }
+                ?>
+                </ul>
+            <?php elseif ($key === 'contribution_types'): ?>
+                <ul style="margin-bottom: 0;">
+                <?php
+                foreach ($value as $v) {
+                    echo '<li>' . $this->escape($v) . '</li>';
+                }
+                ?>
+                </ul>
+            <?php else: ?>
+                <?php echo $this->escape($value); ?>
+            <?php endif; ?>
+        </dd>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </dl>
+
     <?php
     echo $this->internalLink(array(
         'text' => 'Back',

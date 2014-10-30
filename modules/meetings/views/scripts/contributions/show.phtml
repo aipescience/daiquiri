@@ -20,20 +20,16 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->row['title']); ?></h2>
+    <h2>Contribution: <?php echo $this->escape($this->row['title']); ?></h2>
 
-    <table class="table table-bordered">
-        <tbody>
-            <?php foreach ($this->row as $key => $value): ?>
-                <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
-                <tr>
-                    <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
-                    <td><?php echo $this->escape($value); ?></td>
-                </tr>
-                <?php endif; ?>
-            <?php endforeach; ?>  
-        </tbody>
-    </table>
+    <dl class="dl-horizontal">
+        <?php foreach ($this->row as $key => $value): ?>
+        <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
+        <dt><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></dt>
+        <dd><?php echo $this->escape($this->row[$key]); ?></dd>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </dl>
 
     <?php
     echo $this->internalLink(array(

@@ -122,44 +122,58 @@
     <?php endforeach; ?>
     </div>
 
-    <div>
-        <?php
-        echo $this->internalLink(array(
-            'text' => 'Create new meeting',
-            'href' => '/meetings/meetings/create',
-            'resource' => 'Meetings_Model_Meetings',
-            'permission' => 'create',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        echo $this->internalLink(array(
-            'text' => 'Show all registrations',
-            'href' => '/meetings/registration',
-            'resource' => 'Meetings_Model_Registration',
-            'permission' => 'index', 
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        echo $this->internalLink(array(
-            'text' => 'Manage participant detail keys',
-            'href' => '/meetings/participant-detail-keys',
-            'resource' => 'Meetings_Model_ParticipantDetailKeys',
-            'permission' => 'index',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        echo $this->internalLink(array(
-            'text' => 'Manage participant status',
-            'href' => '/meetings/participant-status',
-            'resource' => 'Meetings_Model_ParticipantStatus',
-            'permission' => 'index',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        echo $this->internalLink(array(
-            'text' => 'Manage contribution types',
-            'href' => '/meetings/contribution-types',
-            'resource' => 'Meetings_Model_ContributionTypes',
-            'permission' => 'index',
-            'prepend' => '<p>',
-            'append' => '</p>'));
-        echo $this->adminLink();
-        ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Create new meeting',
+                    'href' => '/meetings/meetings/create',
+                    'resource' => 'Meetings_Model_Meetings',
+                    'permission' => 'create',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Show all registrations',
+                    'href' => '/meetings/registration',
+                    'resource' => 'Meetings_Model_Registration',
+                    'permission' => 'index', 
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Manage participant detail keys',
+                    'href' => '/meetings/participant-detail-keys',
+                    'resource' => 'Meetings_Model_ParticipantDetailKeys',
+                    'permission' => 'index',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                echo $this->internalLink(array(
+                    'text' => 'Manage participant status',
+                    'href' => '/meetings/participant-status',
+                    'resource' => 'Meetings_Model_ParticipantStatus',
+                    'permission' => 'index',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                echo $this->internalLink(array(
+                    'text' => 'Manage contribution types',
+                    'href' => '/meetings/contribution-types',
+                    'resource' => 'Meetings_Model_ContributionTypes',
+                    'permission' => 'index',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+            <div class="daiquiri-widget">
+                <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
     </div>
 </div>

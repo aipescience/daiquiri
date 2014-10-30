@@ -22,56 +22,24 @@
 class Daiquiri_Form_Element_Password extends Zend_Form_Element_Password {
 
     /**
-     * Contructor.
-     * @param string $name    name of the element
-     * @param mixed  $options options for the element
+     * Constructor. Sets the angular model attribute.
      */
-    public function __construct($name, $options = array()) {
-        if (empty($options['ng-model'])) {
-            $options['ng-model'] = "values.{$name}";
-        }
+    public function __construct($name,$options) {
+        $options = Daiquiri_Form_Element_Abstract::addAngularOptions($name,$options);
         parent::__construct($name,$options);
     }
 
     /**
-     * Load default decorators
-     *
-     * @return Zend_Form_Element
+     * Sets the default decorators needed for angular.
      */
-    public function loadDefaultDecorators()
-    {
+    public function loadDefaultDecorators() {
         if ($this->loadDefaultDecoratorsIsDisabled()) {
             return $this;
         }
 
         $decorators = $this->getDecorators();
         if (empty($decorators)) {
-            // the element itself
-            $this->addDecorator('ViewHelper');
-
-            // the zend errors
-            $this->addDecorator('Errors', array(
-                'class' => 'unstyled text-error help-inline',
-            ));
-
-            // the angular errors
-            $this->addDecorator('Callback', array(
-                'callback' => function($content, $element, $options) {
-                        $ngErrorModel = 'errors.' . $element->getName();
-
-                        return '<ul class="unstyled text-error help-inline angular" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">{{error}}</li></ul>';
-                    },
-                'placement' => 'append'
-            ));
-            
-            // wrap in div.controls
-            $this->addDecorator(array('controls' => 'HtmlTag'), array('tag' => 'div', 'class' => 'controls'));
-
-            // the label.control-label
-            $this->addDecorator('Label', array('class' => 'control-label'));
-
-            // wrap in div.control-group
-            $this->addDecorator(array('control-group' => 'HtmlTag'), array('tag' => 'div', 'class' => 'control-group'));
+            Daiquiri_Form_Element_Abstract::addAngularDecorators($this);
         }
 
         return $this;

@@ -20,9 +20,8 @@
 ?>
 
 <div class="main">
-    <h2>Reject contribution</h2>
     <?php if ($this->status === 'ok'): ?>
-        <p>Contribution successfully rejected.</p>
+        <p>Contribution rejected.</p>
         <?php
         echo $this->internalLink(array(
             'text' => 'Back',
@@ -31,6 +30,7 @@
             'append' => '</p>'));
         ?>
     <?php else: ?>
+        <h2>Reject contribution</h2>
         <?php echo $this->form; ?>
     <?php endif; ?>
 </div>

@@ -20,18 +20,31 @@
  */
 ?>
 
-<div class="main">
-    <?php if (isset($this->meeting)): ?>
-    <h2><?php echo $this->escape($this->meeting['title']); ?></h2>
-    <h4>Contributions</h4>
-    <?php else: ?>
-    <h2>Contributions</h4>
-    <?php endif; ?>
+<link href="/daiquiri/css/table.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/daiquiri/css/modal.css" media="screen" rel="stylesheet" type="text/css" />
 
-    <div id="daiquiri-contributions-table"></div>
+<script type="text/javascript" src="/daiquiri/js/table.js"></script>
+<script type="text/javascript" src="/daiquiri/js/modal.js"></script>
+<script type="text/javascript" src="/daiquiri/js/admin.js"></script>
+
+<div class="main" ng-app="admin" ng-controller="AdminController">
+    <?php
+    if (isset($this->meeting)){
+        echo "<h2>Contributions for: {$this->escape($this->meeting['title'])}</h2>";
+        $cols = "/meetings/contributions/cols?meetingId={$this->meeting['id']}";
+        $rows = "/meetings/contributions/rows?meetingId={$this->meeting['id']}";
+    } else {
+        echo "<h2>Contributions for all meetings</h2>";
+        $cols = "/meetings/contributions/cols";
+        $rows = "/meetings/contributions/rows";
+    }
+    ?>
+
+    <div daiquiri-table data-cols="<?php echo $cols; ?>" data-rows="<?php echo $rows; ?>"></div>
+    <div daiquiri-modal></div>
 
     <?php
-    if ($this->slug !== null) {
+    if (isset($this->meeting)) {
         echo $this->internalLink(array(
             'text' => 'Create new contribution for this meeting',
             'href' => '/meetings/' . $this->slug . '/contributions/create/' ,
@@ -45,31 +58,3 @@
         'append' => '</p>'));
     ?>
 </div>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        <?php if ($this->slug !== null): ?>
-            var params = {'meetingId': <?php echo $this->escape($this->meeting['id']); ?>};
-        <?php else: ?>
-            var params = {};
-        <?php endif; ?>
-
-        $('#daiquiri-contributions-table').daiquiri_table({
-            'rowsurl': "<?php echo $this->baseUrl('/meetings/contributions/rows') ?>",
-            'colsurl': "<?php echo $this->baseUrl('/meetings/contributions/cols') ?>",
-            'params': params,
-            'success': function() {
-                $('#daiquiri-contributions-table tbody a').click(function(){
-                    new daiquiri.Modal({
-                        'url': this.href,
-                        'width': 800,
-                        'success': function () {
-                            daiquiri.table.items['daiquiri-contributions-table'].rows();
-                        }
-                    });
-                    return false;
-                });
-            }
-        });
-    });
-</script>

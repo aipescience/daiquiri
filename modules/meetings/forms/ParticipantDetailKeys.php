@@ -28,7 +28,7 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'key', array(
+        $this->addTextElement('key', array(
             'label' => 'Participant detail key',
             'class' => 'input-xxlarge',
             'required' => true,
@@ -37,13 +37,13 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('select', 'type_id', array(
+        $this->addSelectElement('type_id', array(
             'label' => 'Type',
             'required' => true,
             'filters' => array('StringTrim'),
             'multiOptions' => Meetings_Model_ParticipantDetailKeys::$types
         ));
-        $this->addElement('text', 'options', array(
+        $this->addTextElement('options', array(
             'label' => 'Options',
             'class' => 'input-xxlarge',
             'filters' => array('StringTrim'),
@@ -52,8 +52,8 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('key','type_id','options'));

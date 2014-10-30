@@ -84,6 +84,11 @@ class Daiquiri_View_Helper_InternalLink extends Zend_View_Helper_Abstract {
 
         $html .= '</a>' ;
 
+        // append stuff
+        if (array_key_exists('append', $options)) {
+            $html .= $options['append'];
+        }
+
         return $html;
     }
 

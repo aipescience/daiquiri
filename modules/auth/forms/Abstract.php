@@ -203,7 +203,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @return string $name name of the element
      */
     public function addPasswordElement() {
-        $this->addElement(new Auth_Form_ElementPassword());
+        $this->addElement(new Auth_Form_Element_Password());
         return 'password';
     }
 

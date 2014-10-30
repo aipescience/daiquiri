@@ -20,18 +20,14 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->row['status']); ?></h2>
+    <h2>Participant status "<?php echo $this->escape($this->row['status']); ?>"</h2>
 
-    <table class="table table-bordered">
-        <tbody>
-            <?php foreach ($this->row as $key => $value): ?>
-                <tr>
-                    <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
-                    <td><?php echo $this->escape($value); ?></td>
-                </tr>
-            <?php endforeach; ?>  
-        </tbody>
-    </table>
+    <dl class="dl-horizontal">
+        <?php foreach ($this->row as $key => $value): ?>
+        <dt><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></dt>
+        <dd><?php echo $this->escape($this->row[$key]); ?></dd>
+        <?php endforeach; ?>
+    </dl>
 
     <?php
     echo $this->internalLink(array(

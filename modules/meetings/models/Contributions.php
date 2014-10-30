@@ -132,14 +132,15 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
         foreach(array('id','title','type','participant','accepted') as $colname) {
             $col = array('name' => str_replace('_',' ',$colname));
             if ($colname === 'id') {
-                $col['width'] = '22px';
+                $col['width'] = 40;
             } else {
-                $col['width'] = '100px';
+                $col['width'] = 100;
             }
+            $col['sortable'] = true;
             $cols[] = $col;
         }
 
-        $cols[] = array('name' => 'options', 'sortable' => 'false', 'width' => '150px');
+        $cols[] = array('name' => 'options', 'sortable' => false, 'width' => 200);
         return array(
             'status' => 'ok',
             'cols' => $cols
@@ -182,7 +183,8 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
                     'text' => ucfirst($option),
                     'href' => '/meetings/contributions/' . $option . '/id/' . $dbRow['id'],
                     'resource' => 'Meetings_Model_Contributions',
-                    'permission' => $option
+                    'permission' => $option,
+                    'class' => 'daiquiri-admin-option'
                 ));
             }
             if ($dbRow['accepted'] == '0') {
@@ -190,7 +192,8 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
                     'text' => 'Accept',
                     'href' => '/meetings/contributions/accept/id/' . $dbRow['id'],
                     'resource' => 'Meetings_Model_Contributions',
-                    'permission' => 'accept'
+                    'permission' => 'accept',
+                    'class' => 'daiquiri-admin-option'
                 ));
             }
             if ($dbRow['accepted'] == '1') {
@@ -198,7 +201,8 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
                     'text' => 'Reject',
                     'href' => '/meetings/contributions/reject/id/' . $dbRow['id'],
                     'resource' => 'Meetings_Model_Contributions',
-                    'permission' => 'reject'
+                    'permission' => 'reject',
+                    'class' => 'daiquiri-admin-option'
                 ));
             }
 

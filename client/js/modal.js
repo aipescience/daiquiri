@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var daiquiriModal = angular.module('modal', ['ngSanitize','ngAnimate']);
+var daiquiriModal = angular.module('modal', ['ngSanitize']);
 
 daiquiriModal.directive('daiquiriModal', ['$compile','ModalService',function($compile,ModalService) {
     return {
