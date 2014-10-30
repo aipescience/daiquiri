@@ -273,7 +273,8 @@ daiquiriTable.controller('TableController', ['$scope','$document','TableService'
 
         table.addClass('no-select');
         function enterResize(event) {
-            th.width(width + event.pageX - zero);
+            var newWidth = width + event.pageX - zero;
+            if (newWidth >= 40) th.width(newWidth);
         }
 
         function exitResize() {

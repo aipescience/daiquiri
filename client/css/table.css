@@ -27,22 +27,21 @@
 }
 .daiquiri-table th,
 .daiquiri-table td {
-    overflow: hidden;
-    white-space: nowrap;
     border-left: 1px solid #ddd;
-}
-.daiquiri-table th {
     padding: 0;
-}
-.daiquiri-table td {
-    padding: 5px;
 }
 .daiquiri-table th:first-child,
 .daiquiri-table td:first-child {
     border-left: none;
 }
-.daiquiri-table th div.daiquiri-table-col-head {
-    padding: 5px 22px 5px 5px;
+.daiquiri-table th .cell,
+.daiquiri-table td .cell {
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 5px;
+}
+.daiquiri-table th .cell {
+    padding-right: 20px;
     position: relative;
 }
 .daiquiri-table th div.name {
@@ -65,7 +64,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 4px;
+    width: 5px;
 }
 .daiquiri-table th .handle-left {
     left: 0;

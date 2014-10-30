@@ -42,13 +42,13 @@ class Auth_Model_Sessions extends Daiquiri_Model_Table {
                 'sortable' => 'true'
             );
             if ($colname === 'session') {
-                $col['width'] = '80px';
-            } else if ($colname === 'userAgent') {
-                $col['width'] = '80px';
+                $col['width'] = 80;
             } else if ($colname === 'modified') {
-                $col['width'] = '80px';
+                $col['width'] = 140;
+            } else if ($colname === 'userAgent') {
+                $col['width'] = 400;
             } else {
-                $col['width'] = '80px';
+                $col['width'] = 100;
             }
             $cols[] = $col;
         }

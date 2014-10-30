@@ -37,7 +37,7 @@
             <thead>
                 <tr>
                     <th ng-repeat="(i,col) in tableData.cols" style="width: {{col.width}}px;" data-col-id="{{i}}">
-                        <div class="daiquiri-table-col-head">
+                        <div class="cell">
                             <div class="handle-left" ng-mousedown="resize(i-1)"></div>
                             <div class="handle-right" ng-mousedown="resize(i)"></div>
                             <div class="sort" ng-click="sort(col.name)" ng-show="col.sortable == true">
@@ -54,7 +54,9 @@
             </thead>
             <tbody>
                 <tr ng-repeat="row in tableData.rows">
-                    <td ng-repeat="element in row.cell track by $index" ng-bind-html="element"></td>
+                    <td ng-repeat="element in row.cell track by $index">
+                        <div class="cell" ng-bind-html="element"></div>
+                    </td>
                 </tr>
             </tbody>
         </table>

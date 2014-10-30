@@ -25,7 +25,7 @@
     left: 0;
     z-index: 1040;
 
-    background: rgba(1,1,1,0.5);
+    background: rgba(1,1,1,0.2);
 }
 .daiquiri-modal-dialog {
     position: relative;
@@ -36,9 +36,9 @@
 
     margin: auto;
 
-    -webkit-box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 button.daiquiri-modal-close,
 button.daiquiri-modal-close:active,
