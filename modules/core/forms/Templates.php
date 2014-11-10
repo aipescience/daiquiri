@@ -28,7 +28,7 @@ class Core_Form_Templates extends Daiquiri_Form_Model {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('text', 'template', array(
+        $this->addTextElement('template', array(
             'label' => 'Template',
             'class' => 'input-xxlarge mono',
             'required' => true,
@@ -37,7 +37,7 @@ class Core_Form_Templates extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'subject', array(
+        $this->addTextareaElement('subject', array(
             'label' => 'Subject',
             'class' => 'input-xxlarge mono',
             'required' => true,
@@ -46,7 +46,7 @@ class Core_Form_Templates extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('textarea', 'body', array(
+        $this->addTextareaElement('body', array(
             'label' => 'Body',
             'class' => 'input-xxlarge mono',
             'rows' => '20',
@@ -56,7 +56,7 @@ class Core_Form_Templates extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
-        $this->addPrimaryButtonElement('submit', $this->_submit);
+        $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

@@ -28,6 +28,9 @@ class Daiquiri_Form_Element_DangerButton extends Zend_Form_Element_Submit {
         // set css class for html element
         $this->setAttrib('class', 'btn btn-danger');
 
+        // add angular attribute
+        $this->setAttrib('ng-click', 'submit=true');
+
         // set decorators
         $this->setDecorators(array('ViewHelper'));
     }

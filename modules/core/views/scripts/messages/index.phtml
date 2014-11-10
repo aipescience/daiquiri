@@ -19,10 +19,10 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Messages</h2>
 
-    <table class="table table-condensed">
+    <table class="table table-condensed table-bordered">
         <thead>
             <tr>
                 <th>Key</th>
@@ -41,13 +41,15 @@
                             'text' => 'Update',
                             'href' => '/core/messages/update/id/' . $this->escape($row['id']),
                             'resource' => 'Core_Model_Messages',
-                            'permission' => 'update'));
+                            'permission' => 'update',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/core/messages/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Core_Model_Messages',
                             'permission' => 'delete',
-                            'prepend' => '&nbsp;'));
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         ?>
                     </td>
                 </tr>
@@ -56,19 +58,37 @@
         </tbody>
     </table>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create new message',
-        'href' => '/core/messages/create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Export to init.php syntax',
-        'href' => '/core/messages/export',
-        'resource' => 'Core_Model_Messages',
-        'permission' => 'export',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->adminLink();
-    ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create new message',
+                'href' => '/core/messages/create',
+                'prepend' => '<p>',
+                'append' => '</p>',
+                'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Export to init.php syntax',
+                'href' => '/core/messages/export',
+                'resource' => 'Core_Model_Messages',
+                'permission' => 'export',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            ?>
+            </div>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+            <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>

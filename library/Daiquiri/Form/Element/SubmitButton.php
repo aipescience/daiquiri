@@ -19,15 +19,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Form_Element_SubmitButton extends Daiquiri_Form_Element_PrimaryButton {
+class Daiquiri_Form_Element_SubmitButton extends Zend_Form_Element_Submit {
 
     /**
      * Initializes the form element
      */
     function init() {
-        parent::init();
+        // set css class for html element
+        $this->setAttrib('class', 'btn btn-primary');
 
-        // set directive for angular
+        // add angular attribute
         $this->setAttrib('ng-click', 'submit=true');
+
+        // set decorators
+        $this->setDecorators(array('ViewHelper'));
     }
 }

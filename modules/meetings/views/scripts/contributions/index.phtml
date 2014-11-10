@@ -34,20 +34,33 @@
     ?>
 
     <div daiquiri-table data-cols="<?php echo $cols; ?>" data-rows="<?php echo $rows; ?>"></div>
-    <div daiquiri-modal></div>
 
-    <?php
-    if (isset($this->meeting)) {
-        echo $this->internalLink(array(
-            'text' => 'Create new contribution for this meeting',
-            'href' => '/meetings/' . $this->slug . '/contributions/create/' ,
-            'prepend' => '<p>',
-            'append' => '</p>'));
-    }
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create new contribution',
+                'href' => '/meetings/' . $this->slug . '/contributions/create/' ,
+                'prepend' => '<p>',
+                'append' => '</p>',
+                'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Back',
+                    'href' => $this->redirect,
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                    ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>

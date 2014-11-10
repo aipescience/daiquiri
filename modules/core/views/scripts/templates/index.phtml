@@ -19,7 +19,7 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Template configuration</h2>
 
     <table class="table table-condensed">
@@ -41,13 +41,15 @@
                             'text' => 'Update',
                             'href' => '/core/templates/update/id/' . $this->escape($row['id']),
                             'resource' => 'Core_Model_Templates',
-                            'permission' => 'update'));
+                            'permission' => 'update',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/core/templates/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Core_Model_Templates',
                             'permission' => 'delete',
-                            'prepend' => '&nbsp;'));
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         ?>
                     </td>
                 </tr>
@@ -55,21 +57,39 @@
         </tbody>
     </table>
 
-    <?php
-        echo $this->internalLink(array(
-        'text' => 'Create new mail template',
-        'href' => '/core/templates/create',
-        'resource' => 'Core_Model_Templates',
-        'permission' => 'create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Export to init.php syntax',
-        'href' => '/core/templates/export',
-        'resource' => 'Core_Model_Templates',
-        'permission' => 'export',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->adminLink(); 
-    ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create new mail template',
+                'href' => '/core/templates/create',
+                'resource' => 'Core_Model_Templates',
+                'permission' => 'create',
+                'prepend' => '<p>',
+                'append' => '</p>',
+                'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Export to init.php syntax',
+                'href' => '/core/templates/export',
+                'resource' => 'Core_Model_Templates',
+                'permission' => 'export',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            ?>
+            </div>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+            <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>

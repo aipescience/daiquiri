@@ -20,10 +20,10 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Registration</h4>
 
-    <table class="table table-condensed">
+    <table class="table table-condensed table-bordered">
         <thead>
             <tr>
                 <th>Email</th>
@@ -45,7 +45,8 @@
                             'text' => 'Delete',
                             'href' => '/auth/registration/delete/id/' . $row['id'],
                             'resource' => 'Meetings_Model_Registration',
-                            'permission' => 'delete'));
+                            'permission' => 'delete',
+                            'ng-click' => 'fetchHtml($event)'));
                         ?>
                     </td>
                 </tr>
@@ -53,11 +54,19 @@
         </tbody>
     </table>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back to user management',
-        'href' => '/auth/user',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <div class="row">
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Back to user management',
+                'href' => '/auth/user',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>

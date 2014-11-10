@@ -42,8 +42,8 @@ class Daiquiri_Form_Confirm extends Daiquiri_Form_Abstract {
         $this->setAttrib('class','daiquiri-form-confirm');
 
         // add fields
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));

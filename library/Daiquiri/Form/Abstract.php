@@ -173,8 +173,8 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * @param  string $label label for the button
      * @return string $name  name of the element
      */
-    public function addPrimaryButtonElement($name, $label) {
-        $this->addElement(new Daiquiri_Form_Element_PrimaryButton($name, $label));
+    public function addSubmitButtonElement($name, $label) {
+        $this->addElement(new Daiquiri_Form_Element_SubmitButton($name, $label));
         return $name;
     }
 
@@ -190,28 +190,6 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form element for a secondary button.
-     * @param  string $name  name of the element
-     * @param  string $label label for the button
-     * @return string $name  name of the element
-     */
-    public function addButtonElement($name, $label) {
-        $this->addElement(new Daiquiri_Form_Element_Button($name, $label));
-        return $name;
-    }
-
-    /**
-     * Adds a form element for a submit button (for angular).
-     * @param  string $name  name of the element
-     * @param  string $label label for the button
-     * @return string $name  name of the element
-     */
-    public function addSubmitButtonElement($name, $label) {
-        $this->addElement(new Daiquiri_Form_Element_SubmitButton($name, $label));
-        return $name;
-    }
-
-    /**
      * Adds a form element for a cancel button (for angular).
      * @param  string $name  name of the element
      * @param  string $label label for the button
@@ -219,6 +197,17 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      */
     public function addCancelButtonElement($name, $label) {
         $this->addElement(new Daiquiri_Form_Element_CancelButton($name, $label));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for a secondary button.
+     * @param  string $name  name of the element
+     * @param  string $label label for the button
+     * @return string $name  name of the element
+     */
+    public function addButtonElement($name, $label) {
+        $this->addElement(new Daiquiri_Form_Element_Button($name, $label));
         return $name;
     }
 

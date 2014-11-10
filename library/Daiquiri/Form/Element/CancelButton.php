@@ -19,15 +19,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Form_Element_CancelButton extends Daiquiri_Form_Element_Button {
+class Daiquiri_Form_Element_CancelButton extends Zend_Form_Element_Submit {
 
     /**
      * Initializes the form element
      */
     function init() {
-        parent::init();
+        // set css class for html element
+        $this->setAttrib('class', 'btn');
 
-        // set directive for angular
+        // add angular attribute
         $this->setAttrib('ng-click', 'submit=false');
+
+        // set decorators
+        $this->setDecorators(array('ViewHelper'));
     }
 }
