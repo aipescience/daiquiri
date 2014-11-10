@@ -17,15 +17,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var daiquiriTable = angular.module('table', ['ngSanitize']);
+angular.module('table', ['ngSanitize'])
 
-daiquiriTable.filter('ucfirst', function() {
+.filter('ucfirst', function() {
     return function(input,arg) {
         return input.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
     };
-});
+})
 
-daiquiriTable.directive('daiquiriTable', ['$compile','TableService',function($compile,TableService) {
+.directive('daiquiriTable', ['TableService',function(TableService) {
     return {
         templateUrl: '/daiquiri/html/table.html',
         link: { pre: function (scope, element, attrs) {
@@ -65,9 +65,9 @@ daiquiriTable.directive('daiquiriTable', ['$compile','TableService',function($co
             TableService.init();
         }}
     };
-}]);
+}])
 
-daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q,$timeout) {
+.factory('TableService', ['$http',function($http) {
     
     var url = {
         cols: null,
@@ -219,9 +219,9 @@ daiquiriTable.factory('TableService', ['$http','$q','$timeout',function($http,$q
         fetchRows: fetchRows,
         init: init
     };
-}]);
+}])
 
-daiquiriTable.controller('TableController', ['$scope','$document','TableService',function($scope,$document,TableService) {
+.controller('TableController', ['$scope','$document','TableService',function($scope,$document,TableService) {
 
     $scope.tableData = TableService.data;
     $scope.tableMeta = TableService.meta;

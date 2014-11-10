@@ -24,16 +24,17 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.factory('AdminService', ['$http','ModalService','TableService',function($http,ModalService,TableService) {
+app.factory('AdminService', ['$http','$window','TableService','ModalService',function($http,$window,TableService,ModalService) {
 
     var values = {};
     var errors = {};
     var activeUrl = null;
 
-    // check if we have a paginated table or not
-    var paginated = Boolean(angular.element('[daiquiri-table]').length);
+    // check if we have a daiquiri table or not
+    var table = Boolean(angular.element('[daiquiri-table]').length);
 
-    if (paginated) {
+    // enable links in daiquiri table
+    if (table) {
         TableService.callback.rows = function(scope) {
             angular.element('.daiquiri-admin-option').on('click', scope.fetchHtml);
         }
@@ -70,10 +71,10 @@ app.factory('AdminService', ['$http','ModalService','TableService',function($htt
                     if (response.status === 'ok') {
                         ModalService.modal.enabled = false;
 
-                        if (paginated) {
+                        if (table) {
                             TableService.fetchRows();
                         } else {
-                            console.log('hey');
+                            $window.location.reload();
                         }
                     } else if (response.status === 'error') {
                         angular.forEach(response.errors, function(error, key) {

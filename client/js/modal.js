@@ -17,9 +17,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var daiquiriModal = angular.module('modal', ['ngSanitize']);
+angular.module('modal', ['ngSanitize'])
 
-daiquiriModal.directive('daiquiriModal', ['$compile','ModalService',function($compile,ModalService) {
+.directive('daiquiriModal', ['$compile','ModalService',function($compile,ModalService) {
     return {
         templateUrl: '/daiquiri/html/modal.html',
         link: function(scope, element) {
@@ -32,9 +32,9 @@ daiquiriModal.directive('daiquiriModal', ['$compile','ModalService',function($co
             }, true);
         }
     };
-}]);
+}])
 
-daiquiriModal.factory('ModalService', function() {
+.factory('ModalService', [function() {
     var modal = {
         'enabled': false,
         'top': '100px',
@@ -45,9 +45,9 @@ daiquiriModal.factory('ModalService', function() {
     return {
         modal: modal
     };
-});
+}])
 
-daiquiriModal.controller('ModalController', ['$scope','ModalService',function($scope,ModalService) {
+.controller('ModalController', ['$scope','ModalService',function($scope,ModalService) {
 
     $scope.modal = ModalService.modal;
 

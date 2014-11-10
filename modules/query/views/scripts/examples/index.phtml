@@ -26,8 +26,7 @@
 <script type="text/javascript" src="/daiquiri/js/modal.js"></script>
 <script type="text/javascript" src="/daiquiri/js/admin.js"></script>
 
-<div class="main" ng-app="admin" ng-controller="AdminController" 
-     ng-init='rows = <?php echo json_encode($this->rows); ?>'>
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Examples</h2>
 
     <table class="table table-condensed table-bordered">
@@ -39,20 +38,21 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="row in rows">
-                <td>{{row.name}}</td>
-                <td>{{row.publication_role}}</td>
+            <?php foreach ($this->rows as $row): ?>
+            <tr>
+                <td><?php echo $this->escape($row['name']); ?></td>
+                <td><?php echo $this->escape($row['publication_role']); ?></td>
                 <td>
                     <?php
                     echo $this->internalLink(array(
                         'text' => 'Update',
-                        'href' => '/query/examples/update/id/{{row.id}}',
+                        'href' => '/query/examples/update/id/' . $row['id'],
                         'resource' => 'Query_Model_Examples',
                         'permission' => 'update',
                         'ng-click' => 'fetchHtml($event)'));
                     echo $this->internalLink(array(
                         'text' => 'Delete',
-                        'href' => '/query/examples/delete/id/{{row.id}}',
+                        'href' => '/query/examples/delete/id/' . $row['id'],
                         'resource' => 'Query_Model_Examples',
                         'permission' => 'delete',
                         'prepend' => '&nbsp;',
@@ -60,6 +60,7 @@
                     ?>
                 </td>
             </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 
