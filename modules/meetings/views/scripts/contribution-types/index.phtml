@@ -20,7 +20,7 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Manage contribution types</h2>
 
     <table class="table table-bordered table-condensed">
@@ -43,19 +43,22 @@
                             'text' => 'Show',
                             'href' => '/meetings/contribution-types/show/id/' . $this->escape($row['id']),
                             'resource' => 'Meetings_Model_ContributionTypes',
-                            'permission' => 'show'));
+                            'permission' => 'show',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Update',
                             'href' => '/meetings/contribution-types/update/id/' . $this->escape($row['id']),
                             'resource' => 'Meetings_Model_ContributionTypes',
                             'permission' => 'update',
-                            'prepend' => '&nbsp;'));
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/meetings/contribution-types/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Meetings_Model_ContributionTypes',
                             'permission' => 'delete',
-                            'prepend' => '&nbsp;')); 
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)')); 
                         ?>
                     </td>
                 </tr>
@@ -63,20 +66,34 @@
         </tbody>
     </table>
 
-    <div daiquiri-modal></div>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+        echo $this->internalLink(array(
+            'text' => 'Create contribution type',
+            'href' => '/meetings/contribution-types/create',
+            'resource' => 'Meetings_Model_ContributionTypes',
+            'permission' => 'create',
+            'prepend' => '<p>',
+            'append' => '</p>',
+            'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
+        </div>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create contribution type',
-        'href' => '/meetings/contribution-types/create',
-        'resource' => 'Meetings_Model_ContributionTypes',
-        'permission' => 'create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Back to meetings management',
-        'href' => '/meetings/',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Back to meetings management',
+                    'href' => '/meetings/',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>

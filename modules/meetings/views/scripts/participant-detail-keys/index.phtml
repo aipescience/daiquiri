@@ -20,7 +20,7 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Manage participant detail keys</h2>
 
     <table class="table table-bordered table-condensed">
@@ -45,19 +45,22 @@
                             'text' => 'Show',
                             'href' => '/meetings/participant-detail-keys/show/id/' . $this->escape($row['id']),
                             'resource' => 'Meetings_Model_ParticipantDetailKeys',
-                            'permission' => 'show'));
+                            'permission' => 'show',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Update',
                             'href' => '/meetings/participant-detail-keys/update/id/' . $this->escape($row['id']),
                             'resource' => 'Meetings_Model_ParticipantDetailKeys',
                             'permission' => 'update',
-                            'prepend' => '&nbsp;'));
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/meetings/participant-detail-keys/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Meetings_Model_ParticipantDetailKeys',
                             'permission' => 'delete',
-                            'prepend' => '&nbsp;')); 
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)')); 
                         ?>
                     </td>
                 </tr>
@@ -65,16 +68,32 @@
         </tbody>
     </table>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create Participant Detail Key',
-        'href' => '/meetings/participant-detail-keys/create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Back to meetings management',
-        'href' => '/meetings/',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create Participant Detail Key',
+                'href' => '/meetings/participant-detail-keys/create',
+                'prepend' => '<p>',
+                'append' => '</p>',
+                'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Back to meetings management',
+                    'href' => '/meetings/',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>

@@ -20,7 +20,7 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Manage non-validated meeting registrations</h4>
 
     <table class="table table-bordered table-condensed">
@@ -42,13 +42,15 @@
                             'href' => '/meetings/registration/show/id/' . $row['id'],
                             'resource' => 'Meetings_Model_Registration',
                             'permission' => 'show',
-                            'append' => '&nbsp;'));
+                            'append' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/meetings/registration/delete/id/' . $row['id'],
                             'resource' => 'Meetings_Model_Registration',
                             'permission' => 'delete',
-                            'append' => '&nbsp;'));
+                            'append' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Validate',
                             'href' => $link));
@@ -60,16 +62,18 @@
     </table>
 
     <div class="row">
-        <div class="span3">
+        <div class="span3 pull-right">
             <div class="daiquiri-widget">
-            <?php
-            echo $this->internalLink(array(
-                'text' => 'Back to meetings management',
-                'href' => '/meetings',
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            ?>
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Back to meetings management',
+                    'href' => '/meetings/',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
             </div>
         </div>
     </div>
+
+    <div daiquiri-modal></div>
 </div>

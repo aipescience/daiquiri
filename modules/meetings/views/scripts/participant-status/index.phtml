@@ -20,7 +20,7 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Manage participant status</h2>
 
     <table class="table table-bordered table-condensed">
@@ -43,19 +43,22 @@
                             'text' => 'Show',
                             'href' => '/meetings/participant-status/show/id/' . $this->escape($row['id']),
                             'resource' =>'Meetings_Model_ParticipantStatus',
-                            'permission' => 'show'));
+                            'permission' => 'show',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Update',
                             'href' => '/meetings/participant-status/update/id/' . $this->escape($row['id']),
                             'resource' => 'Meetings_Model_ParticipantStatus',
                             'permission' => 'update',
-                            'prepend' => '&nbsp;'));
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/meetings/participant-status/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Meetings_Model_ParticipantStatus',
                             'permission' => 'delete',
-                            'prepend' => '&nbsp;')); 
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)')); 
                         ?>
                     </td>
                 </tr>
@@ -63,18 +66,34 @@
         </tbody>
     </table>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create participant status',
-        'href' => '/meetings/participant-status/create',
-        'resource' => 'Meetings_Model_ParticipantStatus',
-        'permission' => 'create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Back to meetings management',
-        'href' => '/meetings/',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create participant status',
+                'href' => '/meetings/participant-status/create',
+                'resource' => 'Meetings_Model_ParticipantStatus',
+                'permission' => 'create',
+                'prepend' => '<p>',
+                'append' => '</p>',
+                'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Back to meetings management',
+                    'href' => '/meetings/',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>
