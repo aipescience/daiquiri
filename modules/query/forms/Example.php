@@ -42,18 +42,16 @@ class Query_Form_Example extends Daiquiri_Form_Model {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('text', 'name', array(
+        $this->addTextElement('name', array(
             'label' => 'Name',
-            'class' => 'input-xxlarge',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('textarea', 'query', array(
+        $this->addTextareaElement('query', array(
             'label' => 'Query',
-            'class' => 'input-xxlarge',
             'rows' => '6',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -61,9 +59,8 @@ class Query_Form_Example extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('textarea', 'description', array(
+        $this->addTextareaElement('description', array(
             'label' => 'Description (optional)',
-            'class' => 'input-xxlarge',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),
@@ -71,13 +68,13 @@ class Query_Form_Example extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('select', 'publication_role_id', array(
+        $this->addSelectElement('publication_role_id', array(
             'label' => 'Published for',
             'required' => true,
             'multiOptions' => $this->_roles,
         ));
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('name', 'query', 'description', 'publication_role_id'));

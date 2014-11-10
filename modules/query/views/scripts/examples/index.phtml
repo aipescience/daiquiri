@@ -19,10 +19,18 @@
  */
 ?>
 
-<div class="main">
+<link href="/daiquiri/css/table.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/daiquiri/css/modal.css" media="screen" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="/daiquiri/js/table.js"></script>
+<script type="text/javascript" src="/daiquiri/js/modal.js"></script>
+<script type="text/javascript" src="/daiquiri/js/admin.js"></script>
+
+<div class="main" ng-app="admin" ng-controller="AdminController" 
+     ng-init='rows = <?php echo json_encode($this->rows); ?>'>
     <h2>Examples</h2>
 
-    <table class="table table-condensed">
+    <table class="table table-condensed table-bordered">
         <thead>
             <tr>
                 <th>Name</th>
@@ -31,44 +39,62 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($this->rows as $example): ?>
-                <tr>
-                    <td><?php echo $this->escape($example['name']); ?></td>
-                    <td><?php echo $this->escape($example['publication_role']); ?></td>
-                    <td>
-                        <?php
-                        echo $this->internalLink(array(
-                            'text' => 'Update',
-                            'href' => '/query/examples/update/id/' . $this->escape($example['id']),
-                            'resource' => 'Query_Model_Examples',
-                            'permission' => 'update'));
-                        echo $this->internalLink(array(
-                            'text' => 'Delete',
-                            'href' => '/query/examples/delete/id/' . $this->escape($example['id']),
-                            'resource' => 'Query_Model_Examples',
-                            'permission' => 'delete',
-                            'prepend' => '&nbsp;'));
-                        ?>
-                    </td>
-                </tr>
-            <?php endforeach;
-            ?>
+            <tr ng-repeat="row in rows">
+                <td>{{row.name}}</td>
+                <td>{{row.publication_role}}</td>
+                <td>
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'Update',
+                        'href' => '/query/examples/update/id/{{row.id}}',
+                        'resource' => 'Query_Model_Examples',
+                        'permission' => 'update',
+                        'ng-click' => 'fetchHtml($event)'));
+                    echo $this->internalLink(array(
+                        'text' => 'Delete',
+                        'href' => '/query/examples/delete/id/{{row.id}}',
+                        'resource' => 'Query_Model_Examples',
+                        'permission' => 'delete',
+                        'prepend' => '&nbsp;',
+                        'ng-click' => 'fetchHtml($event)'));
+                    ?>
+                </td>
+            </tr>
         </tbody>
     </table>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create new example',
-        'href' => '/query/examples/create',
-        'resource' => 'Query_Model_Examples',
-        'permission' => 'create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Export to init.php syntax',
-        'href' => '/query/examples/export',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->adminLink();
-    ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create new example',
+                'href' => '/query/examples/create',
+                'resource' => 'Query_Model_Examples',
+                'permission' => 'create',
+                'prepend' => '<p>',
+                'append' => '</p>',
+                'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
+
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Export to init.php syntax',
+                'href' => '/query/examples/export',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            ?>
+            </div>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>

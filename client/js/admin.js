@@ -30,8 +30,13 @@ app.factory('AdminService', ['$http','ModalService','TableService',function($htt
     var errors = {};
     var activeUrl = null;
 
-    TableService.callback.rows = function(scope) {
-        angular.element('.daiquiri-admin-option').on('click', scope.fetchHtml);
+    // check if we have a paginated table or not
+    var paginated = Boolean(angular.element('[daiquiri-table]').length);
+
+    if (paginated) {
+        TableService.callback.rows = function(scope) {
+            angular.element('.daiquiri-admin-option').on('click', scope.fetchHtml);
+        }
     }
 
     return {
@@ -64,7 +69,12 @@ app.factory('AdminService', ['$http','ModalService','TableService',function($htt
 
                     if (response.status === 'ok') {
                         ModalService.modal.enabled = false;
-                        TableService.fetchRows();
+
+                        if (paginated) {
+                            TableService.fetchRows();
+                        } else {
+                            console.log('hey');
+                        }
                     } else if (response.status === 'error') {
                         angular.forEach(response.errors, function(error, key) {
                             errors[key] = error;
@@ -72,7 +82,7 @@ app.factory('AdminService', ['$http','ModalService','TableService',function($htt
                     } else {
                         errors['form'] = {'form': ['Error: Unknown response from server.']};
                     }
-                })
+                });
             } else {
                 ModalService.modal.enabled = false;
             }
@@ -88,9 +98,9 @@ app.controller('AdminController', ['$scope','AdminService',function($scope,Admin
     $scope.fetchHtml = function(event) {
         AdminService.fetchHtml(event.target.href);
         event.preventDefault();
-    }
+    };
 
     $scope.submitForm = function() {
         AdminService.submitForm($scope.submit);
-    }
+    };
 }]);
