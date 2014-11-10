@@ -70,12 +70,12 @@ class Data_Form_Columns extends Data_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('select', 'table_id', array(
+        $this->addSelectElement('table_id', array(
             'label' => 'Table:',
             'required' => true,
             'multiOptions' => $this->_tables
         ));
-        $this->addElement('text', 'name', array(
+        $this->addTextElement('name', array(
             'label' => 'Column name',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -83,14 +83,14 @@ class Data_Form_Columns extends Data_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('text', 'order', array(
+        $this->addTextElement('order', array(
             'label' => 'Order of column',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => 'int'),
             )
         ));
-        $this->addElement('text', 'type', array(
+        $this->addTextElement('type', array(
             'label' => 'Column type',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -98,34 +98,34 @@ class Data_Form_Columns extends Data_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('text', 'unit', array(
+        $this->addTextElement('unit', array(
             'label' => 'Column unit',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('text', 'ucd', array(
+        $this->addTextElement('ucd', array(
             'label' => 'Column UCD',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('select', 'publication_role_id', array(
+        $this->addSelectElement('publication_role_id', array(
             'label' => 'Published for: ',
             'multiOptions' => $this->_roles,
         ));
-        $this->addElement('checkbox', 'publication_select', array(
+        $this->addCheckboxElement('publication_select', array(
             'label' => 'Allow SELECT',
             'value' => '1',
             'class' => 'checkbox'
         ));
-        $this->addElement('checkbox', 'publication_update', array(
+        $this->addCheckboxElement('publication_update', array(
             'label' => 'Allow UPDATE',
             'class' => 'checkbox'
         ));
-        $this->addElement('checkbox', 'publication_insert', array(
+        $this->addCheckboxElement('publication_insert', array(
             'label' => 'Allow INSERT',
             'class' => 'checkbox'
         ));
@@ -136,12 +136,12 @@ class Data_Form_Columns extends Data_Form_Abstract {
             $ucdStrings[$ucd['word']] = $ucd['word'] . " | " . $ucd['type'] . " | " . $ucd['description'];
         }
         
-        $this->addElement('select', 'ucd_list', array(
+        $this->addSelectElement('ucd_list', array(
             'label' => 'List of UCDs: ',
             'required' => false,
             'multiOptions' => $ucdStrings,
         ));
-        $this->addElement('textarea', 'description', array(
+        $this->addTextareaElement('description', array(
             'label' => 'Column description',
             'rows' => '4',
             'required' => false,
@@ -151,7 +151,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
+        $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

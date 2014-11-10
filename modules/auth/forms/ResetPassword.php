@@ -28,13 +28,13 @@ class Auth_Form_ResetPassword extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('text','username', array(
+        $this->addTextElement('username', array(
             'label' => 'Username',
             'required' => true
         ));
         $this->addNewPasswordElement();
         $this->addConfirmPasswordElement();
-        $this->addPrimaryButtonElement('submit', 'Set new password');
+        $this->addSubmitButtonElement('submit', 'Set new password');
         $this->addButtonElement('cancel', 'Cancel');
 
         // set decorators

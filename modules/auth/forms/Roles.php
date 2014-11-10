@@ -28,7 +28,7 @@ class Auth_Form_Roles extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('text', 'role', array(
+        $this->addTextElement('role', array(
             'label' => 'Role',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -37,7 +37,7 @@ class Auth_Form_Roles extends Daiquiri_Form_Abstract {
                 array('stringLength', false, array(0, 16))
             )
         ));
-        $this->addPrimaryButtonElement('submit', 'Create user role');
+        $this->addSubmitButtonElement('submit', 'Create user role');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

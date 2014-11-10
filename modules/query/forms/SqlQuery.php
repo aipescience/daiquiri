@@ -67,7 +67,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
 
         // add form elements
         $this->addCsrfElement('sql_csrf');
-        $this->addElement('textarea', 'sql_query', array(
+        $this->addTextareaElement('sql_query', array(
             'filters' => array('StringTrim'),
             'required' => true,
             'label' => 'Query:',
@@ -76,7 +76,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             'rows' => 8
         ));
         $this->addTablenameElement('sql_tablename');
-        $this->addPrimaryButtonElement('sql_submit', 'Submit new SQL Query');
+        $this->addSubmitButtonElement('sql_submit', 'Submit new SQL Query');
         $this->addDumbButtonElement('sql_clear', 'Clear input window');
         $this->addQueuesElement('sql_queue');
 

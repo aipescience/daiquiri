@@ -28,7 +28,7 @@ class Auth_Form_Rules extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'role', array(
+        $this->addTextElement('role', array(
             'label' => 'Role',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -37,7 +37,7 @@ class Auth_Form_Rules extends Daiquiri_Form_Abstract {
                 array('stringLength', false, array(0, 256))
             )
         ));
-        $this->addElement('text', 'resource', array(
+        $this->addTextElement('resource', array(
             'label' => 'Resource',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -46,7 +46,7 @@ class Auth_Form_Rules extends Daiquiri_Form_Abstract {
                 array('stringLength', false, array(0, 256))
             )
         ));
-        $this->addElement('text', 'permissions', array(
+        $this->addTextElement('permissions', array(
             'label' => 'Permissions',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -56,7 +56,7 @@ class Auth_Form_Rules extends Daiquiri_Form_Abstract {
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', 'Create user role');
+        $this->addSubmitButtonElement('submit', 'Create user role');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

@@ -56,7 +56,7 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('text', 'firstname', array(
+        $this->addTextElement('firstname', array(
             'label' => 'Your first name',
             'size' => '30',
             'required' => true,
@@ -65,7 +65,7 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'lastname', array(
+        $this->addTextElement('lastname', array(
             'label' => 'Your last name',
             'size' => '30',
             'required' => true,
@@ -74,7 +74,7 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'email', array(
+        $this->addTextElement('email', array(
             'label' => 'Your email address',
             'size' => '30',
             'required' => true,
@@ -83,13 +83,13 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
                 array('validator' => 'EmailAddress'),
             )
         ));
-        $this->addElement('select', 'category_id', array(
+        $this->addSelectElement('category_id', array(
             'label' => 'Category',
             'multiOptions' => $this->_categories,
             'cols' => '30',
             'required' => true
         ));
-        $this->addElement('text', 'subject', array(
+        $this->addTextElement('subject', array(
             'label' => 'Subject',
             'class' => 'input-xxlarge',
             'required' => true,
@@ -99,7 +99,7 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text())
             )
         ));
-        $this->addElement('textarea', 'message', array(
+        $this->addTextareaElement('message', array(
             'label' => 'Message<br/><span class="hint">(max. 2048<br/>characters)',
             'class' => 'input-xxlarge',
             'rows' => '10',
@@ -112,9 +112,9 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
         ));
         if (empty($this->_user)) {
             // display captcha if no user is logged in
-            $this->addElement(new Daiquiri_Form_Element_Captcha('captcha'));
+            $this->addCaptchaElement();
         }
-        $this->addPrimaryButtonElement('submit', 'Send message');
+        $this->addSubmitButtonElement('submit', 'Send message');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

@@ -76,7 +76,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         $this->addFloatElement('cone_dec', 'DEC<sub>deg</sub>');
         $this->addFloatElement('cone_radius', 'Radius<sub>arcsec</sub>');
         $this->addTablenameElement('cone_tablename');
-        $this->addPrimaryButtonElement('cone_submit', 'Submit new cone search');
+        $this->addSubmitButtonElement('cone_submit', 'Submit new cone search');
         $this->addQueuesElement('cone_queues');
 
         // add display groups

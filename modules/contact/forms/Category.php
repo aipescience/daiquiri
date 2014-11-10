@@ -28,7 +28,7 @@ class Contact_Form_Category extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'category', array(
+        $this->addTextElement('category', array(
             'label' => 'Category',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -37,7 +37,7 @@ class Contact_Form_Category extends Daiquiri_Form_Abstract {
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', 'Create user status');
+        $this->addSubmitButtonElement('submit', 'Create user status');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

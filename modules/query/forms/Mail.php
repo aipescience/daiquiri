@@ -70,21 +70,21 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('textarea', 'sql', array(
+        $this->addTextareaElement('sql', array(
             'filters' => array('StringTrim'),
             'class' => 'mono input-xxlarge',
             'label' => 'Original query<br/><span class="hint">(not editable)</span><br/>',
             'rows' => '5',
             'ignore' => true
         ));
-        $this->addElement('textarea', 'plan', array(
+        $this->addTextareaElement('plan', array(
             'filters' => array('StringTrim'),
             'class' => 'mono input-xxlarge',
             'label' => 'Query plan<br/><span class="hint">(not editable)</span>',
             'rows' => '15',
             'ignore' => true
         ));
-        $this->addElement('textarea', 'message', array(
+        $this->addTextareaElement('message', array(
             'label' => 'Message',
             'class' => 'input-xxlarge',
             'rows' => '10',
@@ -95,7 +95,7 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Textarea())
             )
         ));
-        $this->addElement('text', 'firstname', array(
+        $this->addTextElement('firstname', array(
             'label' => 'First Name',
             'size' => '30',
             'required' => true,
@@ -105,7 +105,7 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'lastname', array(
+        $this->addTextElement('lastname', array(
             'label' => 'Last Name',
             //'description' => 'Please enter your last name',
             'size' => '30',
@@ -116,7 +116,7 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'email', array(
+        $this->addTextElement('email', array(
             'label' => 'Email',
             'size' => '30',
             'required' => true,
@@ -130,7 +130,7 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
             // display captcha if no user is logged in
             $this->addCaptchaElement();
         }
-        $this->addPrimaryButtonElement('submit', 'Send message');
+        $this->addSubmitButtonElement('submit', 'Send message');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

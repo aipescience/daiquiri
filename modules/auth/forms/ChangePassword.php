@@ -31,7 +31,7 @@ class Auth_Form_ChangePassword extends Auth_Form_Abstract {
         $this->addOldPasswordElement();
         $this->addNewPasswordElement();
         $this->addConfirmPasswordElement();
-        $this->addPrimaryButtonElement('submit', 'Change Password');
+        $this->addSubmitButtonElement('submit', 'Change Password');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

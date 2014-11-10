@@ -28,7 +28,7 @@ class Data_Form_Databases extends Data_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'name', array(
+        $this->addTextElement('name', array(
             'label' => 'Database name',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -36,7 +36,7 @@ class Data_Form_Databases extends Data_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('textarea', 'description', array(
+        $this->addTextareaElement('description', array(
             'label' => 'Database description',
             'rows' => '4',
             'filters' => array('StringTrim'),
@@ -44,43 +44,43 @@ class Data_Form_Databases extends Data_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('text', 'order', array(
+        $this->addTextElement('order', array(
             'label' => 'Order in list',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => 'int'),
             )
         ));
-        $this->addElement('select', 'publication_role_id', array(
+        $this->addSelectElement('publication_role_id', array(
             'label' => 'Published for',
             'multiOptions' => $this->_roles,
         ));
-        $this->addElement('checkbox', 'publication_select', array(
+        $this->addCheckboxElement('publication_select', array(
             'label' => 'Allow SELECT',
             'value' => '1',
             'class' => 'checkbox'
         ));
-        $this->addElement('checkbox', 'publication_update', array(
+        $this->addCheckboxElement('publication_update', array(
             'label' => 'Allow UPDATE',
             'class' => 'checkbox'
         ));
-        $this->addElement('checkbox', 'publication_insert', array(
+        $this->addCheckboxElement('publication_insert', array(
             'label' => 'Allow INSERT',
             'class' => 'checkbox'
         ));
-        $this->addElement('checkbox', 'publication_show', array(
+        $this->addCheckboxElement('publication_show', array(
             'label' => 'Allow SHOW TABLES',
             'value' => '1',
             'class' => 'checkbox'
         ));
         if (empty($this->_entry)) {
-            $this->addElement('checkbox', 'autofill', array(
+            $this->addCheckboxElement('autofill', array(
                 'label' => 'Autofill tables',
                 'class' => 'checkbox'
             ));
         }
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
+        $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

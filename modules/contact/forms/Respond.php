@@ -56,7 +56,7 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('text', 'subject', array(
+        $this->addTextElement('subject', array(
             'label' => 'Subject',
             'class' => 'input-xxlarge mono',
             'required' => true,
@@ -65,7 +65,7 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('textarea', 'body', array(
+        $this->addTextareaElement('body', array(
             'label' => 'Message',
             'class' => 'input-xxlarge mono',
             'rows' => '10',
@@ -76,7 +76,7 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', 'Respond to contact message');
+        $this->addSubmitButtonElement('submit', 'Respond to contact message');
         $this->addButtonElement('cancel', 'Cancel');
 
         // create groups

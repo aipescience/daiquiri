@@ -28,7 +28,7 @@ class Data_Form_Functions extends Data_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'name', array(
+        $this->addTextElement('name', array(
             'label' => 'Function name',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -36,7 +36,7 @@ class Data_Form_Functions extends Data_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('textarea', 'description', array(
+        $this->addTextareaElement('description', array(
             'label' => 'Function description',
             'rows' => '4',
             'filters' => array('StringTrim'),
@@ -44,20 +44,20 @@ class Data_Form_Functions extends Data_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addElement('text', 'order', array(
+        $this->addTextElement('order', array(
             'label' => 'Order in list',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => 'int'),
             )
         ));
-        $this->addElement('select', 'publication_role_id', array(
+        $this->addSelectElement('publication_role_id', array(
             'label' => 'Published for',
             'required' => true,
             'multiOptions' => $this->_roles,
         ));
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
+        $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

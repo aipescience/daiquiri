@@ -69,7 +69,7 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
     public function init() {
         $this->addCsrfElement('plan_csrf');
 
-        $this->addElement('textarea', 'plan_query', array(
+        $this->addTextareaElement('plan_query', array(
             'filters' => array('StringTrim'),
             'required' => true,
             'rows' => 12,
@@ -86,7 +86,7 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
             $this->getElement('plan_query')->setAttrib('readonly', 'readonly');
         }
 
-        $this->addPrimaryButtonElement('plan_submit', 'Submit this plan');
+        $this->addSubmitButtonElement('plan_submit', 'Submit this plan');
         $this->addButtonElement('plan_cancel', 'Cancel');
 
         $this->addParagraphGroup(array('plan_query'), 'input-group');

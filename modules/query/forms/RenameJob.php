@@ -48,7 +48,7 @@ class Query_Form_RenameJob extends Daiquiri_Form_Abstract {
             'required' => true
         )));
 
-        $this->addPrimaryButtonElement('submit', 'Rename table');
+        $this->addSubmitButtonElement('submit', 'Rename table');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

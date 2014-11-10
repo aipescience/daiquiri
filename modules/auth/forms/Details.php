@@ -69,7 +69,7 @@ class Auth_Form_Details extends Auth_Form_Abstract {
     public function init() {
         $this->addCsrfElement();
 
-        $this->addElement('text', 'key', array(
+        $this->addTextElement('key', array(
             'label' => 'Key',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -78,8 +78,8 @@ class Auth_Form_Details extends Auth_Form_Abstract {
                 array('stringLength', false, array(0, 256))
             )
         ));
-        $this->addElement(new Auth_Form_Element_Detail('value'));
-        $this->addPrimaryButtonElement('submit', $this->_submit);
+        $this->addDetailElement('value');
+        $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 
         // set decorators

@@ -49,7 +49,7 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
         $this->addElement(new Query_Form_Element_DownloadFormat('download_format', array(
             'adapter' => $this->_adapter
         )));
-        $this->addPrimaryButtonElement('download_submit',array(
+        $this->addSubmitButtonElement('download_submit',array(
             'label' => 'Download table'
         ));
 

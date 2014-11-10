@@ -30,7 +30,7 @@ class Auth_Form_SetPassword extends Auth_Form_Abstract {
         // add elements
         $this->addNewPasswordElement();
         $this->addConfirmPasswordElement();
-        $this->addPrimaryButtonElement('submit', 'Set new password');
+        $this->addSubmitButtonElement('submit', 'Set new password');
         $this->addButtonElement('cancel', 'Cancel');
 
         // set decorators

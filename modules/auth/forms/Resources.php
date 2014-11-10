@@ -28,7 +28,7 @@ class Auth_Form_Resources extends Daiquiri_Form_Abstract {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text', 'resource', array(
+        $this->addTextElement('resource', array(
             'label' => 'Resource',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -37,7 +37,7 @@ class Auth_Form_Resources extends Daiquiri_Form_Abstract {
                 array('stringLength', false, array(0, 256))
             )
         ));
-        $this->addPrimaryButtonElement('submit', 'Create Resource');
+        $this->addSubmitButtonElement('submit', 'Create Resource');
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups

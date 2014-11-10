@@ -40,7 +40,7 @@ class Auth_Form_Login extends Auth_Form_Abstract {
             'label' => 'Remember login'
         ));
 
-        $this->addPrimaryButtonElement('submit', 'Login');
+        $this->addSubmitButtonElement('submit', 'Login');
         $this->addButtonElement('cancel', 'Cancel');
 
         // set decorators
