@@ -48,7 +48,6 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         // 'insert_at_caret.js' => 'daiquiri/lib/insert_at_caret.js',
         // 'samp.js' => 'daiquiri/lib/sampjs/samp.js',
         //daiquiri common
-        'daiquiri_common.css' => 'daiquiri/css/common.css',
         // 'daiquiri_common.js' => 'daiquiri/js/daiquiri_common.js',
         // daiquiri browser
         // 'daiquiri_browser.css' => 'daiquiri/css/daiquiri_browser.css',
@@ -80,10 +79,13 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         // 'daiquiri_query_buttons.js' => 'daiquiri/js/daiquiri_query_buttons.js',
         // 'daiquiri_samp.js' => 'daiquiri/js/daiquiri_samp.js'
         // 
+        'daiquiri_common.css' => 'daiquiri/css/common.css',
         'daiquiri_table.css' => '/daiquiri/css/table.css',
         'daiquiri_table.js' => '/daiquiri/js/table.js',
         'daiquiri_modal.css' => '/daiquiri/css/modal.css',
         'daiquiri_modal.js' => '/daiquiri/js/modal.js',
+        'daiquiri_browser.css' => '/daiquiri/css/browser.css',
+        'daiquiri_browser.js' => '/daiquiri/js/browser.js',
         'daiquiri_admin.css' => '/daiquiri/js/admin.js'
     );
 

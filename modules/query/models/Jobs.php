@@ -96,7 +96,8 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
                     'text' => 'Show',
                     'href' => '/query/jobs/show/id/' . $dbRow['id'],
                     'resource' => 'Query_Model_Jobs',
-                    'permission' => 'show'
+                    'permission' => 'show',
+                    'class' => 'daiquiri-admin-option'
                 ))
             );
             if ($this->getResource()->isStatusKillable($dbRow['status'])) {
@@ -104,14 +105,16 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
                     'text' => 'Kill',
                     'href' => '/query/jobs/kill/id/' . $dbRow['id'],
                     'resource' => 'Query_Model_Jobs',
-                    'permission' => 'kill'
+                    'permission' => 'kill',
+                    'class' => 'daiquiri-admin-option'
                 ));
             }
             $options[] = $this->internalLink(array(
                 'text' => 'Remove',
                 'href' => '/query/jobs/remove/id/' . $dbRow['id'],
                 'resource' => 'Query_Model_Jobs',
-                'permission' => 'remove'
+                'permission' => 'remove',
+                'class' => 'daiquiri-admin-option'
             ));
             $row[] = implode('&nbsp;',$options);
 

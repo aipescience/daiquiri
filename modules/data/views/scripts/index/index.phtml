@@ -19,76 +19,63 @@
  */
 ?>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        var data = new daiquiri.data.Data('<?php echo $this->baseUrl(); ?>');
-        data.init();
-    });
-</script>
-
-<div class="main">
+<div class="main" ng-app="data" ng-controller="DataController">
     <h2>Database management</h2>
 
-    <div id="data">
+    <p>Please click on a database, a table, a column or a function to show or edit its metadata.</p>
 
-        <p>Please click on a database, a table, a column or a function to show or edit its metadata.</p>
-        <div class="row">
-            <div class="span9">
-                <div id="database-browser"></div>
-            </div>
-            <div class="span3">
-                <div id="function-browser"></div>
-            </div>
+    <div class="row">
+        <div class="span9">
+            <div daiquiri-browser></div>
         </div>
-
-        <div id="display">
-            <div class="row">
-                <div class="span3">
-                    <div class="box">
-                        <?php
-                        echo $this->internalLink(array(
-                            'text' => 'Create new database entry',
-                            'href' => '/data/databases/create',
-                            'class' => 'daiquiri-modal-open',
-                            'prepend' => '<p>',
-                            'append' => '</p>'));
-                        echo $this->internalLink(array(
-                            'text' => 'Create new table entry',
-                            'href' => '/data/tables/create',
-                            'class' => 'daiquiri-modal-open',
-                            'prepend' => '<p>',
-                            'append' => '</p>'));
-                        echo $this->internalLink(array(
-                            'text' => 'Create new column entry',
-                            'href' => '/data/columns/create',
-                            'class' => 'daiquiri-modal-open',
-                            'prepend' => '<p>',
-                            'append' => '</p>'));
-                        echo $this->internalLink(array(
-                            'text' => 'Create new function entry',
-                            'href' => '/data/functions/create',
-                            'class' => 'daiquiri-modal-open',
-                            'prepend' => '<p>',
-                            'append' => '</p>'));
-                        echo $this->internalLink(array(
-                            'text' => 'Export to init.php syntax',
-                            'href' => '/data/index/export',
-                            'prepend' => '<p>',
-                            'append' => '</p>'));
-                        ?>
-                    </div>
-                </div>
-            </div>
+        <div class="span3">
+            <div daiquiri-browser></div>
         </div>
     </div>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Manage static file aliases',
-        'href' => '/data/static',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
-    <?php echo $this->adminLink(); ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Create new database entry',
+                    'href' => '/data/databases/create',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                echo $this->internalLink(array(
+                    'text' => 'Create new table entry',
+                    'href' => '/data/tables/create',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                echo $this->internalLink(array(
+                    'text' => 'Create new column entry',
+                    'href' => '/data/columns/create',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                echo $this->internalLink(array(
+                    'text' => 'Create new function entry',
+                    'href' => '/data/functions/create',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+
+            <div class="daiquiri-widget">
+                <?php
+                echo $this->internalLink(array(
+                    'text' => 'Export to init.php syntax',
+                    'href' => '/data/index/export',
+                    'prepend' => '<p>',
+                    'append' => '</p>'));
+                ?>
+            </div>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
 </div>
 

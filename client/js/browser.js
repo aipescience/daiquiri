@@ -1,5 +1,4 @@
-<?php
-/*
+/*  
  *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>, 
  *                           AIP E-Science (www.aip.de)
@@ -17,15 +16,30 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-?>
 
-<div class="main">
-    <h2>Details for job <?php echo $this->escape($this->row['table']); ?></h2>
+angular.module('browser',[])
 
-    <dl class="dl-horizontal">
-        <?php foreach ($this->row as $key => $value): ?>
-        <dt><?php echo $this->escape($key); ?></dt>
-        <dd><?php echo $this->escape($value); ?></dd>
-        <?php endforeach; ?>
-    </dl>
-</div>
+.directive('daiquiriBrowser', ['BrowserService',function(BrowserService) {
+    return {
+        templateUrl: '/daiquiri/html/browser.html',
+        link: function(scope, element) {
+            // scope.$watch(function () {
+            //     return ModalService.modal.html;
+            // }, function(newValue, oldValue) {
+            //     var element = $compile(newValue)(scope);
+            //     angular.element('.daiquiri-modal-body').children().remove();
+            //     angular.element('.daiquiri-modal-body').append(element);
+            // }, true);
+        }
+    };
+}])
+
+.factory('BrowserService', [function() {
+    return {
+
+    };
+}])
+
+.controller('BrowserController', ['$scope','BrowserService',function($scope,BrowserService) {
+
+}]);
