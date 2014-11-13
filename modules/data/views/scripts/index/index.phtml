@@ -19,6 +19,8 @@
  */
 ?>
 
+<script type="text/javascript" src="/daiquiri/js/data.js"></script>
+
 <div class="main" ng-app="data" ng-controller="DataController">
     <h2>Database management</h2>
 
@@ -26,10 +28,10 @@
 
     <div class="row">
         <div class="span9">
-            <div daiquiri-browser></div>
+            <div daiquiri-browser data-browser="databases"></div>
         </div>
         <div class="span3">
-            <div daiquiri-browser></div>
+            <div daiquiri-browser data-browser="functions"></div>
         </div>
     </div>
 

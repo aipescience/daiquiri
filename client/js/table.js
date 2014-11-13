@@ -28,42 +28,44 @@ angular.module('table', ['ngSanitize'])
 .directive('daiquiriTable', ['TableService',function(TableService) {
     return {
         templateUrl: '/daiquiri/html/table.html',
-        link: { pre: function (scope, element, attrs) {
-            // look for the cols url in the attributes
-            if (!angular.isUndefined(attrs.cols)) {
-                TableService.url.cols = attrs.cols;
-            }
+        link: {
+            pre: function (scope, element, attrs) {
+                // look for the cols url in the attributes
+                if (!angular.isUndefined(attrs.cols)) {
+                    TableService.url.cols = attrs.cols;
+                }
 
-            // look for the rows url in the attributes
-            if (!angular.isUndefined(attrs.rows)) {
-                TableService.url.rows = attrs.rows;
-            }
+                // look for the rows url in the attributes
+                if (!angular.isUndefined(attrs.rows)) {
+                    TableService.url.rows = attrs.rows;
+                }
 
-            // watch the cols for a change, and perform callback
-            if (angular.isFunction(TableService.callback.cols)) {
-                scope.$watch(function () {
-                    return TableService.trigger.cols;
-                }, function(newValue, oldValue) {
-                    scope.$evalAsync(function($scope) {
-                        TableService.callback.cols($scope);
-                    });
-                }, true);
-            }
+                // watch the cols for a change, and perform callback
+                if (angular.isFunction(TableService.callback.cols)) {
+                    scope.$watch(function () {
+                        return TableService.trigger.cols;
+                    }, function(newValue, oldValue) {
+                        scope.$evalAsync(function($scope) {
+                            TableService.callback.cols($scope);
+                        });
+                    }, true);
+                }
 
-            // watch the rows for a change, and perform callback
-            if (angular.isFunction(TableService.callback.rows)) {
-                scope.$watch(function () {
-                    return TableService.trigger.rows;
-                }, function(newValue, oldValue) {
-                    scope.$evalAsync(function($scope) {
-                        TableService.callback.rows($scope);
-                    });
-                }, true);
-            }
+                // watch the rows for a change, and perform callback
+                if (angular.isFunction(TableService.callback.rows)) {
+                    scope.$watch(function () {
+                        return TableService.trigger.rows;
+                    }, function(newValue, oldValue) {
+                        scope.$evalAsync(function($scope) {
+                            TableService.callback.rows($scope);
+                        });
+                    }, true);
+                }
 
-            // init the table
-            TableService.init();
-        }}
+                // init the table
+                TableService.init();
+            }
+        }
     };
 }])
 
@@ -164,7 +166,7 @@ angular.module('table', ['ngSanitize'])
     }
 
     function fetchCols() {
-        if (!angular.isUndefined(url.cols)) {
+        if (url.cols !== null) {
             $http.get(url.cols,{'params': params}).success(function(response) {
                 if (response.status == 'ok') {
                     data.cols = response.cols;
@@ -177,7 +179,7 @@ angular.module('table', ['ngSanitize'])
     }
 
     function fetchRows() {
-        if (!angular.isUndefined(url.rows)) {
+        if (url.cols !== null) {
             $http.get(url.rows,{'params': params}).success(function(response) {
                 if (response.status == 'ok') {
                     data.rows = response.rows;

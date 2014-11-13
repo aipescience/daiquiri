@@ -1,36 +1,12 @@
 <div class="daiquiri-browser" ng-controller="BrowserController">
-    <div class="daiquiri-browser-left pull-left">
+    <div ng-repeat="(colId,col) in browser.cols" ng-style="{'width': col.width}">
         <ul class="daiquiri-browser-head nav nav-pills nav-stacked">
-            <li class="nav-header">databases</li>
+            <li class="nav-header">{{col.name}}</li>
         </ul>
-        <ul class="daiquiri-browser-body nav nav-pills nav-stacked">
-            <li class="nav-item active">
-                <a href="" data-toggle="tooltip" title="" data-placement="right" data-original-title="">
-                    daiquiri_files
-                </a>
-            </li>
-        </ul>
-    </div>
-    <div class="daiquiri-browser-center pull-left">
-        <ul class="daiquiri-browser-head nav nav-pills nav-stacked">
-            <li class="nav-header">tables</li>
-        </ul>
-        <ul class="daiquiri-browser-body nav nav-pills nav-stacked">
-            <li class="nav-item active">
-                <a href="" data-toggle="tooltip" title="" data-placement="right" data-original-title="">
-                    testfiles
-                </a>
-            </li>
-        </ul>
-    </div>
-    <div class="daiquiri-browser-right pull-left">
-        <ul class="daiquiri-browser-head nav nav-pills nav-stacked">
-            <li class="nav-header">columns</li>
-        </ul>
-        <ul class="daiquiri-browser-body nav nav-pills nav-stacked">
-            <li class="nav-item">
-                <a href="" data-toggle="tooltip" title="" data-placement="left" data-original-title="">
-                    id
+        <ul class="daiquiri-browser-body nav nav-pills nav-stacked" ng-style="{'height': col.height}">
+            <li class="nav-item" ng-repeat="(itemId,item) in col.items" ng-class="{'selected': itemId == col.selected}">
+                <a href="" data-toggle="tooltip" title="" data-placement="right" data-original-title="" ng-click="updateBrowser(browser.id,colId,itemId)">
+                    {{item.name}}
                 </a>
             </li>
         </ul>

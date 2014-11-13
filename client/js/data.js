@@ -30,7 +30,22 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
     var errors = {};
     var activeUrl = null;
 
+    // init databases browser
+    BrowserService.browser.databases = {
+        'url': '/data/databases/',
+        'keys': ['databases','tables','columns']
+    };
+    BrowserService.initBrowser('databases');
+
+    BrowserService.browser.functions = {
+        'url': '/data/functions/',
+        'keys': ['functions']
+    };
+    BrowserService.initBrowser('functions');
+
     return {
+        databases: BrowserService.browser.databases,
+        functions: BrowserService.browser.functions,
         values: values,
         errors: errors,
         fetchHtml: function (url) {
@@ -82,6 +97,9 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
 }]);
 
 app.controller('DataController', ['$scope','DataService',function($scope,DataService) {
+
+    $scope.databases = DataService.databases;
+    $scope.functions = DataService.functions;
 
     $scope.values = DataService.values;
     $scope.errors = DataService.errors;
