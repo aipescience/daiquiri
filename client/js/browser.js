@@ -50,32 +50,26 @@ angular.module('browser',[])
         var key2 = browser[browserId].keys[2];
 
         // the FIRST column was clicked
-        if (colId == 0 && !angular.isUndefined(key0) && !angular.isUndefined(key1)) {
-            // update active item
-            if (itemId != browser[browserId].cols[0].selected) {
-                browser[browserId].cols[0].selected = itemId;
-                browser[browserId].cols[1].selected = 0;
+        if (colId == 0 && !angular.isUndefined(key1) && itemId != browser[browserId].cols[0].selected) {
+            browser[browserId].cols[0].selected = itemId;
+            browser[browserId].cols[1].selected = 0;
 
-                // update SECOND column
-                browser[browserId].cols[1].items = getItems(browser[browserId].data[key0][itemId][key1]);
+            // update SECOND column
+            browser[browserId].cols[1].items = getItems(browser[browserId].data[key0][itemId][key1]);
 
-
-                // update THIRD column
-                if (!angular.isUndefined(key2)) {
-                    browser[browserId].cols[2].items = getItems(browser[browserId].data[key0][itemId][key1][0][key2]);
-                }
+            // update THIRD column
+            if (!angular.isUndefined(key2)) {
+                browser[browserId].cols[2].items = getItems(browser[browserId].data[key0][itemId][key1][0][key2]);
             }
         }
 
-        if (colId == 1 && !angular.isUndefined(key2)) {
-            // update active item
-            if (itemId != browser[browserId].cols[0].selected) {
-                var active0 = browser[browserId].cols[0].selected;
-                browser[browserId].cols[1].selected = itemId;
+        // the SECOND column was clicked
+        if (colId == 1 && !angular.isUndefined(key2) && itemId != browser[browserId].cols[1].selected) {
+            var active0 = browser[browserId].cols[0].selected;
+            browser[browserId].cols[1].selected = itemId;
 
-                // update THIRD column
-                browser[browserId].cols[2].items = getItems(browser[browserId].data[key0][active0][key1][itemId][key2]);
-            }
+            // update THIRD column
+            browser[browserId].cols[2].items = getItems(browser[browserId].data[key0][active0][key1][itemId][key2]);
         }
     };
 

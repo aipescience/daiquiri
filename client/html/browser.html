@@ -4,9 +4,10 @@
             <li class="nav-header">{{col.name}}</li>
         </ul>
         <ul class="daiquiri-browser-body nav nav-pills nav-stacked" ng-style="{'height': col.height}">
-            <li class="nav-item" ng-repeat="(itemId,item) in col.items" ng-class="{'selected': itemId == col.selected}">
+            <li class="nav-item" ng-repeat="(itemId,item) in col.items">
                 <a href="" data-toggle="tooltip" title="" data-placement="right" data-original-title="" ng-click="updateBrowser(browser.id,colId,itemId)">
-                    {{item.name}}
+                    <span>{{item.name}}</span>
+                    <i class="pull-right icon-chevron-right" ng-show="itemId == col.selected"></i>
                 </a>
             </li>
         </ul>

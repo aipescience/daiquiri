@@ -52,6 +52,9 @@
     padding-bottom: 5px;
     font-size: small;
 }
+.daiquiri-browser .daiquiri-browser-body li a i {
+    opacity: 0.3;
+}
 .daiquiri-browser .nav-pills > .selected > a,
 .daiquiri-browser .nav-pills > .selected > a:hover,
 .daiquiri-browser .nav-pills > .selected > a:focus {
