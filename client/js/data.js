@@ -25,7 +25,7 @@ app.config(['$httpProvider', function($httpProvider) {
 }]);
 
 app.factory('DataService', ['$http','BrowserService','ModalService',function($http,BrowserService,ModalService) {
-
+    var view = {};
     var values = {};
     var errors = {};
     var activeUrl = null;
@@ -33,29 +33,86 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
     // init databases browser
     BrowserService.browser.databases = {
         'url': '/data/databases/',
-        'keys': ['databases','tables','columns']
+        'colnames': ['databases','tables','columns']
     };
     BrowserService.initBrowser('databases');
 
     BrowserService.browser.functions = {
         'url': '/data/functions/',
-        'keys': ['functions']
+        'colnames': ['functions']
     };
     BrowserService.initBrowser('functions');
 
     return {
+        view: view,
         databases: BrowserService.browser.databases,
         functions: BrowserService.browser.functions,
         values: values,
         errors: errors,
+        fetchView: function (model,id) {
+            var url = '/data/' + model + '/show/id/' + id;
+            $http.get(url).success(function(data) {
+                view.showUrl = '/data/' + model + '/show/id/' + id;
+                view.updateUrl = '/data/' + model + '/update/id/' + id;
+                view.deleteUrl = '/data/' + model + '/delete/id/' + id;
+
+                view.model = model.substring(0,1).toUpperCase() + model.substring(1,model.length-1);
+
+                view.name = '';
+                if (!angular.isUndefined(data.row.database)) {
+                    view.name += data.row.database + '.';
+                }
+                if (!angular.isUndefined(data.row.table)) {
+                    view.name += data.row.table + '.';
+                }
+                view.name += data.row.name;
+
+                view.description = data.row.description;
+
+                if (!angular.isUndefined(data.row.type)) {
+                    view.type = data.row.type;
+                }
+                if (!angular.isUndefined(data.row.unit)) {
+                    view.unit = data.row.unit;
+                }
+                if (!angular.isUndefined(data.row.ucd)) {
+                    view.ucd = data.row.ucd;
+                }
+
+                if (data.row.order !== null) {
+                    view.order = data.row.order;
+                }
+
+                view.description = data.row.description;
+
+                if (data.row.publication_role !== 'false') {
+                    view.publication_role = data.row.publication_role;
+                }
+
+                var permissions = [];
+                console.log(data.row.publication_select);
+                if (data.row.publication_select === '1') {
+                    permissions.push('select');
+                }
+                if (data.row.publication_update === '1') {
+                    permissions.push('update');
+                }
+                if (data.row.publication_insert === '1') {
+                    permissions.push('insert');
+                }
+                view.permissions = permissions.join();
+
+                if (data.row.publication_role !== 'false') {
+                    view.publication_role = data.row.publication_role;
+                }
+            });
+        },
         fetchHtml: function (url) {
             $http.get(url,{'headers': {'Accept': 'application/html'}}).success(function(html) {
                 for (var value in values) delete values[value];
                 for (var error in errors) delete errors[error];
 
-                if (ModalService.modal.html != html) {
-                    ModalService.modal.html = html;
-                }
+                ModalService.modal.html = html;
 
                 activeUrl = url;
                 ModalService.modal.enabled = true;
@@ -76,11 +133,7 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
                     if (response.status === 'ok') {
                         ModalService.modal.enabled = false;
 
-                        if (table) {
-                            TableService.fetchRows();
-                        } else {
-                            $window.location.reload();
-                        }
+                        console.log(response);
                     } else if (response.status === 'error') {
                         angular.forEach(response.errors, function(error, key) {
                             errors[key] = error;
@@ -98,9 +151,9 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
 
 app.controller('DataController', ['$scope','DataService',function($scope,DataService) {
 
+    $scope.view = DataService.view;
     $scope.databases = DataService.databases;
     $scope.functions = DataService.functions;
-
     $scope.values = DataService.values;
     $scope.errors = DataService.errors;
 
@@ -112,4 +165,10 @@ app.controller('DataController', ['$scope','DataService',function($scope,DataSer
     $scope.submitForm = function() {
         DataService.submitForm($scope.submit);
     };
+
+    $scope.$on('browserItemClicked', function(event,browsername,colname,id) {
+        $scope.$broadcast('browserItemActive',browsername,colname,id);
+        DataService.fetchView(colname,id);
+    });
+
 }]);

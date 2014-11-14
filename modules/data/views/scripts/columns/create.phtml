@@ -31,8 +31,6 @@
         ?>
     <?php else: ?>
         <h2>Create column entry</h2>
-        <?php echo $this->form; ?>
-
         <script type="text/javascript">
             $(document).ready(function() {
                 $('#ucd_list').after('<button name="add_ucd" id="add_ucd" type="button" class="btn">Add UCD</button>');
@@ -45,5 +43,6 @@
                 });
             });
         </script>
+        <?php echo $this->form; ?>
     <?php endif; ?>
 </div>

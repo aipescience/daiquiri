@@ -39,8 +39,7 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
 
             $database['publication_role'] = Daiquiri_Auth::getInstance()->getRole($database['publication_role_id']);
             foreach ($database['tables'] as $key => $table) {
-                $database['tables'][$key]['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['p\
-ublication_role_id']);
+                $database['tables'][$key]['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
             }
 
             $databases[] = $database;
@@ -117,6 +116,8 @@ ublication_role_id']);
         if (empty($row)) {
             throw new Daiquiri_Exception_NotFound();
         }
+
+        $row['publication_role'] = Daiquiri_Auth::getInstance()->getRole($row['publication_role_id']);
 
         return array('status' => 'ok','row' => $row);
     }

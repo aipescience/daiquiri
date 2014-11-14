@@ -1,13 +1,13 @@
 <div class="daiquiri-browser" ng-controller="BrowserController">
-    <div ng-repeat="(colId,col) in browser.cols" ng-style="{'width': col.width}">
+    <div ng-repeat="col in browser.cols" ng-style="{'width': col.width}">
         <ul class="daiquiri-browser-head nav nav-pills nav-stacked">
             <li class="nav-header">{{col.name}}</li>
         </ul>
         <ul class="daiquiri-browser-body nav nav-pills nav-stacked" ng-style="{'height': col.height}">
-            <li class="nav-item" ng-repeat="(itemId,item) in col.items">
-                <a href="" data-toggle="tooltip" title="" data-placement="right" data-original-title="" ng-click="updateBrowser(browser.id,colId,itemId)">
+            <li class="nav-item" ng-repeat="(i,item) in col.items" ng-class="{'active': browser.active.browsername == browser.name && browser.active.colname == col.name && browser.active.id == item.id}">
+                <a href="" data-toggle="tooltip" title="" data-placement="right" data-original-title="" ng-click="browserItemClicked(browser.name,col.name,item,i);">
                     <span>{{item.name}}</span>
-                    <i class="pull-right icon-chevron-right" ng-show="itemId == col.selected"></i>
+                    <i class="pull-right icon-chevron-right" ng-show="i == col.selected"></i>
                 </a>
             </li>
         </ul>

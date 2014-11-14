@@ -20,95 +20,16 @@
 ?>
 
 <div class="main">
-    <?php if ($this->status === 'ok'): ?>
-        <div class="row">
-            <div class="span9">
-                <div class="box">
-                    <p>
-                        <span class="meta">DATABASE</span>
-                        <strong><?php echo $this->escape($this->row['name']); ?></strong>
-                    </p>
-                </div>
-                <table class='table table-bordered'>
-                    <?php foreach($this->row as $key => $value): ?>
-                    <?php if ($key !== 'tables'): ?>
-                    <tr>
-                        <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
-                        <td>
-                            <?php echo $this->escape($value); ?>
-                        </td>
-                    </tr>
-                    <?php endif; ?>
-                    <?php endforeach ?>
-                    <?php if (!empty($this->row['tables'])): ?>
-                    <tr>
-                        <td class="onehundredtwenty">Tables</td>
-                        <td>
-                            <ul class="unstyled">
-                                <?php foreach($this->row['tables'] as $table): ?>
-                                <li>
-                                    <div><?php echo $this->escape($table['name']); ?></div>
-                                    <ul>
-                                        <?php foreach($table['columns'] as $column): ?>
-                                        <li><?php echo $this->escape($column['name']); ?></li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </td>
-                    </tr>
-                    <?php endif; ?>
-                </table>
-            </div>
-            <div class="span3">
-                <div class="box">
-                    <?php
-                    echo $this->internalLink(array(
-                        'text' => 'Update this database entry',
-                        'href' => '/data/databases/update?id=' . $this->escape($this->row['id']),
-                        'class' => 'daiquiri-modal-open',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Delete this database entry',
-                        'href' => '/data/databases/delete?id=' . $this->escape($this->row['id']),
-                        'class' => 'daiquiri-modal-open',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    ?>
-                </div>
-                <div class="box">
-                    <?php
-                    echo $this->internalLink(array(
-                        'text' => 'Create new database entry',
-                        'href' => '/data/databases/create',
-                        'class' => 'daiquiri-modal-open',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Create new table entry',
-                        'href' => '/data/tables/create?databaseId=' . $this->escape($this->row['id']),
-                        'class' => 'daiquiri-modal-open',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Create new column entry',
-                        'href' => '/data/columns/create',
-                        'class' => 'daiquiri-modal-open',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    echo $this->internalLink(array(
-                        'text' => 'Create new function entry',
-                        'href' => '/data/functions/create',
-                        'class' => 'daiquiri-modal-open',
-                        'prepend' => '<p>',
-                        'append' => '</p>'));
-                    ?>
-                </div>
-            </div>
-        </div>
-    <?php else: ?>
-    <h5>Error retrieving database information</h5>
-    <?php endif; ?>
+    <h2>Database <?php echo $this->escape($this->row['name']); ?></h2>
+
+    <dl class="dl-horizontal">
+        <?php foreach($this->row as $key => $value): ?>
+        <dt><?php echo $this->escape(ucfirst($key)); ?></dt>
+        <?php if(!empty($this->row[$key])): ?>
+        <dd><?php echo $this->escape($this->row[$key]); ?></dd>
+        <?php else: ?>
+        <dd class="text-error">&nbsp;</dd>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </dl>
 </div>

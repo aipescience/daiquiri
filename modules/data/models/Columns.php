@@ -104,6 +104,8 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
             throw new Daiquiri_Exception_NotFound();
         }
 
+        $row['publication_role'] = Daiquiri_Auth::getInstance()->getRole($row['publication_role_id']);
+
         return array('status' => 'ok','row' => $row);
     }
 

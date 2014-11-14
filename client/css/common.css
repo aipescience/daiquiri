@@ -19,7 +19,8 @@
  
 /* paragraphs */
 
-p:last-child {
+p:last-child,
+dl:last-child {
     margin-bottom: 0;
 }
 
@@ -247,7 +248,7 @@ dl.dl-horizontal dd {
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-bottom: 20px;
-    padding: 5px 12px;
+    padding: 8px 12px;
 }
 
 /* nav widget */
