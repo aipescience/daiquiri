@@ -154,6 +154,7 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
             $this->addTextElement($contribution_type . '_title', array(
                 'label' => 'Title',
                 'required' => false,
+                'class' => 'span6 mono',
                 'filters' => array('StringTrim'),
                 'validators' => array(
                     array('validator' => new Daiquiri_Form_Validator_Text()),
@@ -161,6 +162,7 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
             ));
             $this->addTextareaElement($contribution_type . '_abstract', array(
                 'label' => 'Abstract',
+                'class' => 'span6 mono',
                 'rows' => 6,
                 'required' => false,
                 'filters' => array('StringTrim'),

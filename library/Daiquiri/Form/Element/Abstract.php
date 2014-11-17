@@ -40,7 +40,7 @@ abstract class Daiquiri_Form_Element_Abstract {
 
         // the zend errors
         $element->addDecorator('Errors', array(
-            'class' => 'unstyled text-error help-inline',
+            'class' => 'unstyled text-error',
         ));
 
         // the angular errors

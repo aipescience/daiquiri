@@ -21,7 +21,7 @@
 
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
-        <p>Column entry updated.</p>
+        <p>Table entry updated.</p>
         <?php
         echo $this->internalLink(array(
             'text' => 'Back',
@@ -30,7 +30,7 @@
             'append' => '</p>'));
         ?>
     <?php else: ?>
-        <h2>Update column entry</h2>
+        <h2>Update table entry</h2>
         <?php echo $this->form; ?>
     <?php endif; ?>
 </div>

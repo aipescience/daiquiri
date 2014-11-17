@@ -38,7 +38,7 @@ angular.module('modal', ['ngSanitize'])
     var modal = {
         'enabled': false,
         'top': 100,
-        'width': 700,
+        'width': 660,
         'maxHeight': $window.innerHeight - 100 - 100,
         'html': ''
     };

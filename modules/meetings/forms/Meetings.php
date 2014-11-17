@@ -82,7 +82,7 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
         // add elements
         $this->addTextElement('title', array(
             'label' => 'Title of the Meeting',
-            'class' => 'input-xxlarge',
+            'class' => 'span6 mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -92,6 +92,7 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
         $this->addTextElement('slug', array(
             'label' => 'Short title for URL',
             'required' => true,
+            'class' => 'mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Zend_Validate_Regex(array('pattern' => '/[a-zA-Z0-9\-]*/'))),
@@ -99,8 +100,8 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
         ));
         $this->addTextareaElement('description', array(
             'label' => 'Description',
+            'class' => 'span6 mono',
             'rows' => 4,
-            'class' => 'input-xxlarge',
             'filters' => array('StringTrim')
         ));
         $this->addTextElement('begin', array(
@@ -121,19 +122,19 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
         $this->addTextareaElement('registration_message', array(
             'label' => 'Registration messsage',
             'rows' => 6,
-            'class' => 'input-xxlarge mono',
+            'class' => 'span6 mono',
             'filters' => array('StringTrim')
         ));
         $this->addTextareaElement('participants_message', array(
             'label' => 'Participants messsage',
             'rows' => 6,
-            'class' => 'input-xxlarge mono',
+            'class' => 'span6 mono',
             'filters' => array('StringTrim')
         ));
         $this->addTextareaElement('contributions_message', array(
             'label' => 'Contributions messsage',
             'rows' => 6,
-            'class' => 'input-xxlarge mono',
+            'class' => 'span6 mono',
             'filters' => array('StringTrim')
         ));
         $this->addSelectElement('registration_publication_role_id', array(

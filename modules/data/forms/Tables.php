@@ -64,21 +64,26 @@ class Data_Form_Tables extends Data_Form_Abstract {
         $this->addTextElement('name', array(
             'label' => 'Table name:',
             'required' => true,
+            'class' => 'span6 mono',
             'filters' => array('StringTrim'),
+            'class' => 'span6',
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
         $this->addTextareaElement('description', array(
             'label' => 'Database description',
+            'class' => 'span6 mono',
             'rows' => '4',
             'filters' => array('StringTrim'),
+            'class' => 'span6',
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
         $this->addTextElement('order', array(
             'label' => 'Order',
+            'class' => 'span1 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => 'int'),

@@ -78,6 +78,17 @@ class Data_Form_Columns extends Data_Form_Abstract {
         $this->addTextElement('name', array(
             'label' => 'Column name',
             'required' => true,
+            'class' => 'span6 mono',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+            )
+        ));
+        $this->addTextareaElement('description', array(
+            'label' => 'Column description',
+            'class' => 'span6 mono',
+            'rows' => '4',
+            'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
@@ -85,6 +96,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
         ));
         $this->addTextElement('order', array(
             'label' => 'Order of column',
+            'class' => 'span1 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => 'int'),
@@ -93,6 +105,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
         $this->addTextElement('type', array(
             'label' => 'Column type',
             'required' => true,
+            'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
@@ -100,6 +113,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
         ));
         $this->addTextElement('unit', array(
             'label' => 'Column unit',
+            'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
@@ -107,6 +121,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
         ));
         $this->addTextElement('ucd', array(
             'label' => 'Column UCD',
+            'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
@@ -140,15 +155,6 @@ class Data_Form_Columns extends Data_Form_Abstract {
             'label' => 'List of UCDs: ',
             'required' => false,
             'multiOptions' => $ucdStrings,
-        ));
-        $this->addTextareaElement('description', array(
-            'label' => 'Column description',
-            'rows' => '4',
-            'required' => false,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
-            )
         ));
 
         $this->addSubmitButtonElement('submit', $this->_submit);

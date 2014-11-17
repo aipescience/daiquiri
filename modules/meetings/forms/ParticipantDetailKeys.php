@@ -30,7 +30,7 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
         // add elements
         $this->addTextElement('key', array(
             'label' => 'Participant detail key',
-            'class' => 'input-xxlarge',
+            'class' => 'span6 mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -45,7 +45,7 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
         ));
         $this->addTextElement('options', array(
             'label' => 'Options',
-            'class' => 'input-xxlarge',
+            'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),

@@ -30,7 +30,7 @@ class Core_Form_Messages extends Daiquiri_Form_Model {
         // add elements
         $this->addTextElement('key', array(
             'label' => 'Key',
-            'class' => 'input-xxlarge mono',
+            'class' => 'span6 mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -39,7 +39,7 @@ class Core_Form_Messages extends Daiquiri_Form_Model {
         ));
         $this->addTextareaElement('value', array(
             'label' => 'Value',
-            'class' => 'input-xxlarge mono',
+            'class' => 'span6 mono',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),

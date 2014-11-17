@@ -30,7 +30,7 @@ class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Model {
         // add elements
         $this->addTextElement('status', array(
             'label' => 'Participant status',
-            'class' => 'input-xxlarge',
+            'class' => 'span6 mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(

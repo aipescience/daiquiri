@@ -199,15 +199,6 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
     }
 
     /**
-     * Creates a form element for the password and adds it to the form.
-     * @return string $name name of the element
-     */
-    public function addPasswordElement() {
-        $this->addElement(new Auth_Form_Element_Password());
-        return 'password';
-    }
-
-    /**
      * Creates a form element for the old password and adds it to the form.
      * @return string $name name of the element
      */

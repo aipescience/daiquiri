@@ -42,22 +42,23 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
             $params['cols'] = explode(',', $params['cols']);
         }
 
-        foreach ($this->_cols as $name) {
+        foreach ($this->_cols as $colname) {
             $col = array(
-                'name' => $name,
-                'sortable' => 'true'
+                'name' => $colname,
+                'sortable' => true
             );
-            if ($name === 'id') {
-                $col['width'] = '3em';
-                $col['align'] = 'center';
-            } else if ($name === 'email') {
-                $col['width'] = '15em';
-            } else if ($name === 'subject') {
-                $col['width'] = '18em';
-            }else if ($name === 'datetime') {
-                $col['width'] = '12em';
+            if ($colname === 'id') {
+                $col['width'] = 40;
+            } else if ($colname === 'email') {
+                $col['width'] = 180;
+            } else if ($colname === 'datetime') {
+                $col['width'] = 140;
+            } else if ($colname === 'category') {
+                $col['width'] = 100;
+            } else if ($colname === 'status') {
+                $col['width'] = 80;
             } else {
-                $col['width'] = '8em';
+                $col['width'] = 100;
             }
             $cols[] = $col;
         }

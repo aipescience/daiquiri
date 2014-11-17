@@ -31,6 +31,7 @@ class Data_Form_Databases extends Data_Form_Abstract {
         $this->addTextElement('name', array(
             'label' => 'Database name',
             'required' => true,
+            'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
@@ -38,6 +39,7 @@ class Data_Form_Databases extends Data_Form_Abstract {
         ));
         $this->addTextareaElement('description', array(
             'label' => 'Database description',
+            'class' => 'span6 mono',
             'rows' => '4',
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -46,6 +48,7 @@ class Data_Form_Databases extends Data_Form_Abstract {
         ));
         $this->addTextElement('order', array(
             'label' => 'Order in list',
+            'class' => 'span1 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => 'int'),

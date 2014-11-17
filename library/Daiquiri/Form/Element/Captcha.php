@@ -27,6 +27,34 @@ class Daiquiri_Form_Element_Captcha extends Zend_Form_Element_Captcha {
      */
     public $helper = 'formNote';
 
+    /**
+     * Sets the default decorators needed for angular.
+     */
+    public function loadDefaultDecorators() {
+        if ($this->loadDefaultDecoratorsIsDisabled()) {
+            return $this;
+        }
+
+        $decorators = $this->getDecorators();
+        if (empty($decorators)) {
+            // the zend errors
+            $this->addDecorator('Errors', array(
+                'class' => 'unstyled text-error',
+            ));
+
+            // wrap in div.controls
+            $this->addDecorator(array('controls' => 'HtmlTag'), array('tag' => 'div', 'class' => 'controls captcha'));
+
+            // the label.control-label
+            $this->addDecorator('Label', array('class' => 'control-label'));
+
+            // wrap in div.control-group
+            $this->addDecorator(array('control-group' => 'HtmlTag'), array('tag' => 'div', 'class' => 'control-group'));
+        }
+
+        return $this;
+    }
+
     function init() {
         $this->setOptions(array(
             'label' => "Please prove that<br/>you are human",

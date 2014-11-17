@@ -30,7 +30,7 @@ class Meetings_Form_ContributionTypes extends Daiquiri_Form_Model {
         // add elements
         $this->addTextElement('contribution_type', array(
             'label' => 'Contribution type',
-            'class' => 'input-xxlarge',
+            'class' => 'span6 mono',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(

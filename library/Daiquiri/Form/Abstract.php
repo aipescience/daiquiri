@@ -91,7 +91,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form element for text field.
+     * Adds a form element for a text field.
      * @param  string $name  name of the element
      * @param  array $options options for the element
      * @return string $name  name of the element
@@ -102,7 +102,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form element for textarea field.
+     * Adds a form element for a textarea field.
      * @param  string $name  name of the element
      * @param  array $options options for the element
      * @return string $name  name of the element
@@ -113,7 +113,18 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form element for select field.
+     * Adds a form element for a password field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addPasswordElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_Password($name, $options));
+        return $name;
+    }
+
+    /**
+     * Adds a form element for a select field.
      * @param  string $name  name of the element
      * @param  array $options options for the element
      * @return string $name  name of the element
@@ -124,7 +135,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form element for multi select field.
+     * Adds a form element for a multi select field.
      * @param  string $name  name of the element
      * @param  array $options options for the element
      * @return string $name  name of the element
@@ -135,7 +146,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form element for checkbox field.
+     * Adds a form element for a checkbox field.
      * @param  string $name  name of the element
      * @param  array $options options for the element
      * @return string $name  name of the element
@@ -146,7 +157,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form element for multi checkbox field.
+     * Adds a form element for a multi checkbox field.
      * @param  string $name  name of the element
      * @param  array $options options for the element
      * @return string $name  name of the element
@@ -157,7 +168,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form element for radio field.
+     * Adds a form element for a radio field.
      * @param  string $name  name of the element
      * @param  array $options options for the element
      * @return string $name  name of the element

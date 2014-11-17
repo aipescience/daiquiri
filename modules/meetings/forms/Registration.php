@@ -131,7 +131,7 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
             ));
             $this->addTextElement($contribution_type . '_title', array(
                 'label' => 'Title',
-                'class' => 'input-xxlarge daiquiri-hide-control-group',
+                'class' => 'span6 daiquiri-hide-control-group',
                 'required' => false,
                 'filters' => array('StringTrim'),
                 'validators' => array(
@@ -140,7 +140,7 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
             ));
             $this->addTextareaElement($contribution_type . '_abstract', array(
                 'label' => 'Abstract',
-                'class' => 'input-xxlarge daiquiri-hide-control-group',
+                'class' => 'span6 daiquiri-hide-control-group',
                 'rows' => 6,
                 'required' => false,
                 'filters' => array('StringTrim')
