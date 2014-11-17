@@ -44,7 +44,7 @@ angular.module('browser',[])
         return items;
     }
 
-    function updateBrowser(name, colname, item, i) {
+    function updateBrowser(name, colname, i) {
         var colname0 = browser[name].colnames[0];
         var colname1 = browser[name].colnames[1];
         var colname2 = browser[name].colnames[2];
@@ -69,22 +69,40 @@ angular.module('browser',[])
             browser[name].cols[1].selected = i;
 
             // update THIRD column            
-            if (!angular.isUndefined()) {
-                browser[name].cols[2].items = getItems(browser[name].data[colname0][active0][colname1][i][colname2]);
-            }
+            browser[name].cols[2].items = getItems(browser[name].data[colname0][active0][colname1][i][colname2]);
         }
     };
 
     function initBrowser(name) {
-        browser[name].name = name;
-        browser[name].cols = [];
-
         // with of one column of the browser
         var width = Math.floor(220 + (1 - 1 / browser[name].colnames.length) * 20 - 1);
+
+        var selected0;
+        if (angular.isUndefined(browser[name].cols) || angular.isUndefined(browser[name].cols[0])) {
+            selected0 = 0;
+        } else {
+            selected0 = browser[name].cols[0].selected;
+        }
+
+        var selected1;
+        if (angular.isUndefined(browser[name].cols) || angular.isUndefined(browser[name].cols[1])) {
+            selected1 = 0;
+        } else {
+            selected1 = browser[name].cols[1].selected;
+        }
+
+        var active = browser[name].active;
+
+        var colname0 = browser[name].colnames[0];
+        var colname1 = browser[name].colnames[1];
+        var colname2 = browser[name].colnames[2];
 
         $http.get(browser[name].url).success(function(response) {
             if (response.status == 'ok') {
                 browser[name].data = response;
+
+                browser[name].name = name;
+                browser[name].cols = [];
 
                 for (var i=0; i<browser[name].colnames.length; i++) {
                     var colname = browser[name].colnames[i];
@@ -99,25 +117,43 @@ angular.module('browser',[])
                     }
                 }
 
-                var colname0 = browser[name].colnames[0];
-                var colname1 = browser[name].colnames[1];
-                var colname2 = browser[name].colnames[2];
-
                 // init FIRST column
                 if (!angular.isUndefined(colname0)) {
                     browser[name].cols[0].items = getItems(browser[name].data[colname0]);
-                }
 
-                // init SECOND column
-                if (!angular.isUndefined(colname1)) {
-                    browser[name].cols[1].items = getItems(browser[name].data[colname0][0][colname1]);
-                    browser[name].cols[0].selected = 0;
-                }
+                    // check if something in the FIRST column is active
+                    if (!angular.isUndefined(active) && active.colname === colname0) {
+                        for (var i=0; i<browser[name].cols[0].items.length;i++) {
+                            if (browser[name].cols[0].items[i].id == active.id) {
+                                selected0 = i;
+                                break;
+                            }
+                        }
+                    }
 
-                // init THIRD column
-                if (!angular.isUndefined(colname2)) {
-                    browser[name].cols[2].items = getItems(browser[name].data[colname0][0][colname1][0][colname2]);
-                    browser[name].cols[1].selected = 0;
+                    // init SECOND column
+                    var data0 = browser[name].data[colname0][selected0];
+                    if (!angular.isUndefined(colname1) && !angular.isUndefined(data0)) {
+                        browser[name].cols[1].items = getItems(data0[colname1]);
+                        browser[name].cols[0].selected = selected0;
+
+                        // check if something in the SECOND column is active
+                        if (!angular.isUndefined(active) && active.colname === colname1) {
+                            for (var i=0; i<browser[name].cols[1].items.length;i++) {
+                                if (browser[name].cols[1].items[i].id == active.id) {
+                                    selected1 = i;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // init THIRD column
+                        var data1 = data0[colname1][selected1];
+                        if (!angular.isUndefined(colname2) && !angular.isUndefined(data1)) {
+                            browser[name].cols[2].items = getItems(data1[colname2]);
+                            browser[name].cols[1].selected = selected1;
+                        }
+                    }
                 }
 
             } else {
@@ -135,17 +171,19 @@ angular.module('browser',[])
 
 .controller('BrowserController', ['$scope','BrowserService',function($scope,BrowserService) {
 
-    $scope.browserItemClicked = function(browsername,colname,item,i) {
-        BrowserService.updateBrowser(browsername,colname,item,i);
-        $scope.$emit('browserItemClicked',browsername,colname,item.id);
-    };
+    $scope.browserItemClicked = function(browsername,colname,id,i) {
+        BrowserService.updateBrowser(browsername,colname,i);
 
-    $scope.$on('browserItemActive', function(event,browsername,colname,id) {
-        $scope.browser.active = {
+        var active = {
             'browsername': browsername,
             'colname': colname,
             'id': id
-        }
-    });
+        };
+        angular.forEach(BrowserService.browser, function(browser, key) {
+            browser.active = active;
+        })
+
+        $scope.$emit('browserItemClicked',browsername,colname,id);
+    };
 
 }]);

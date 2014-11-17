@@ -47,126 +47,149 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
     };
     BrowserService.initBrowser('functions');
 
+    function fetchView(model,id) {
+        var url = '/data/' + model + '/show/id/' + id;
+
+        $http.get(url).success(function(data) {
+            view.showUrl = '/data/' + model + '/show/id/' + id;
+            view.updateUrl = '/data/' + model + '/update/id/' + id;
+            view.deleteUrl = '/data/' + model + '/delete/id/' + id;
+
+            view.model = model.substring(0,1).toUpperCase() + model.substring(1,model.length-1);
+
+            view.name = '';
+            if (!angular.isUndefined(data.row.database)) {
+                view.name += data.row.database + '.';
+            }
+            if (!angular.isUndefined(data.row.table)) {
+                view.name += data.row.table + '.';
+            }
+            view.name += data.row.name;
+
+            view.description = data.row.description;
+
+            if (!angular.isUndefined(data.row.type)) {
+                view.type = data.row.type;
+            }
+            if (!angular.isUndefined(data.row.unit)) {
+                view.unit = data.row.unit;
+            }
+            if (!angular.isUndefined(data.row.ucd)) {
+                view.ucd = data.row.ucd;
+            }
+
+            if (data.row.order !== null) {
+                view.order = data.row.order;
+            }
+
+            view.description = data.row.description;
+
+            if (data.row.publication_role !== 'false') {
+                view.publication_role = data.row.publication_role;
+            }
+
+            var permissions = [];
+            if (data.row.publication_select === '1') {
+                permissions.push('select');
+            }
+            if (data.row.publication_update === '1') {
+                permissions.push('update');
+            }
+            if (data.row.publication_insert === '1') {
+                permissions.push('insert');
+            }
+            view.permissions = permissions.join();
+
+            if (data.row.publication_role !== 'false') {
+                view.publication_role = data.row.publication_role;
+            }
+
+            // store database or table ids for later
+            if (model == 'databases') {
+                active.database_id = data.row.id;
+            } else {
+                active.database_id = data.row.database_id;
+            }
+            if (model == 'tables') {
+                active.table_id = data.row.id;
+            } else {
+                active.table_id = data.row.table_id;
+            }
+        });
+    }
+
+    function fetchHtml(url) {
+        $http.get(url,{'headers': {'Accept': 'application/html'}}).success(function(html) {
+            for (var value in values) delete values[value];
+            for (var error in errors) delete errors[error];
+
+            ModalService.modal.html = html;
+
+            if (url.indexOf('/data/tables/create') != -1 && !angular.isUndefined(active.database_id)) {
+                values.database_id = active.database_id;
+            }
+            if (url.indexOf('/data/columns/create') != -1 && !angular.isUndefined(active.table_id)) {
+                values.table_id = active.table_id;
+            }
+
+            active.url = url;
+            ModalService.modal.enabled = true;
+        });
+    }
+
+    function submitForm(submit) {
+        if (submit) {
+            var data = {
+                'csrf': angular.element('#csrf').attr('value')
+            };
+
+            // merge with form values
+            angular.extend(data,values);
+
+            $http.post(active.url,$.param(data)).success(function(response) {
+                for (var error in errors) delete errors[error];
+
+                if (response.status === 'ok') {
+                    ModalService.modal.enabled = false;
+
+                    var m = active.url.match(/\/data\/(\w+)\/(\w+)/);
+                    var model = m[1];
+                    var action = m[2];
+
+                    if (model === 'functions') {
+                        BrowserService.initBrowser('functions');
+                    } else {
+                        BrowserService.initBrowser('databases');
+                    }
+
+                    if (action === 'update') {
+                        var id = active.url.match(/\/(\d+)$/)[1];
+                        fetchView(model, id);
+                    } else {
+                        for (var value in view) delete view[value];
+                    }
+                } else if (response.status === 'error') {
+                    angular.forEach(response.errors, function(error, key) {
+                        errors[key] = error;
+                    });
+                } else {
+                    errors['form'] = {'form': ['Error: Unknown response from server.']};
+                }
+            });
+        } else {
+            ModalService.modal.enabled = false;
+        }
+    }
+
     return {
         view: view,
         databases: BrowserService.browser.databases,
         functions: BrowserService.browser.functions,
         values: values,
         errors: errors,
-        fetchView: function (model,id) {
-            var url = '/data/' + model + '/show/id/' + id;
-
-            $http.get(url).success(function(data) {
-                view.showUrl = '/data/' + model + '/show/id/' + id;
-                view.updateUrl = '/data/' + model + '/update/id/' + id;
-                view.deleteUrl = '/data/' + model + '/delete/id/' + id;
-
-                view.model = model.substring(0,1).toUpperCase() + model.substring(1,model.length-1);
-
-                view.name = '';
-                if (!angular.isUndefined(data.row.database)) {
-                    view.name += data.row.database + '.';
-                }
-                if (!angular.isUndefined(data.row.table)) {
-                    view.name += data.row.table + '.';
-                }
-                view.name += data.row.name;
-
-                view.description = data.row.description;
-
-                if (!angular.isUndefined(data.row.type)) {
-                    view.type = data.row.type;
-                }
-                if (!angular.isUndefined(data.row.unit)) {
-                    view.unit = data.row.unit;
-                }
-                if (!angular.isUndefined(data.row.ucd)) {
-                    view.ucd = data.row.ucd;
-                }
-
-                if (data.row.order !== null) {
-                    view.order = data.row.order;
-                }
-
-                view.description = data.row.description;
-
-                if (data.row.publication_role !== 'false') {
-                    view.publication_role = data.row.publication_role;
-                }
-
-                var permissions = [];
-                if (data.row.publication_select === '1') {
-                    permissions.push('select');
-                }
-                if (data.row.publication_update === '1') {
-                    permissions.push('update');
-                }
-                if (data.row.publication_insert === '1') {
-                    permissions.push('insert');
-                }
-                view.permissions = permissions.join();
-
-                if (data.row.publication_role !== 'false') {
-                    view.publication_role = data.row.publication_role;
-                }
-
-                // store database or table ids for later
-                if (model == 'databases') {
-                    active.database_id = data.row.id;
-                } else {
-                    active.database_id = data.row.database_id;
-                }
-                if (model == 'tables') {
-                    active.table_id = data.row.id;
-                } else {
-                    active.table_id = data.row.table_id;
-                }
-            });
-        },
-        fetchHtml: function (url) {
-            $http.get(url,{'headers': {'Accept': 'application/html'}}).success(function(html) {
-                for (var value in values) delete values[value];
-                for (var error in errors) delete errors[error];
-
-                ModalService.modal.html = html;
-
-                if (url.indexOf('/data/tables/create') != -1 && !angular.isUndefined(active.database_id)) {
-                    values.database_id = active.database_id;
-                }
-                if (url.indexOf('/data/columns/create') != -1 && !angular.isUndefined(active.table_id)) {
-                    values.table_id = active.table_id;
-                }
-
-                active.url = url;
-                ModalService.modal.enabled = true;
-            });
-        },
-        submitForm: function(submit) {
-            if (submit) {
-                var data = {
-                    'csrf': angular.element('#csrf').attr('value')
-                };
-
-                // merge with form values
-                angular.extend(data,values);
-
-                $http.post(active.url,$.param(data)).success(function(response) {
-                    for (var error in errors) delete errors[error];
-
-                    if (response.status === 'ok') {
-                        ModalService.modal.enabled = false;
-                    } else if (response.status === 'error') {
-                        angular.forEach(response.errors, function(error, key) {
-                            errors[key] = error;
-                        });
-                    } else {
-                        errors['form'] = {'form': ['Error: Unknown response from server.']};
-                    }
-                });
-            } else {
-                ModalService.modal.enabled = false;
-            }
-        }
+        fetchView: fetchView,
+        fetchHtml: fetchHtml,
+        submitForm: submitForm
     };
 }]);
 
@@ -188,7 +211,6 @@ app.controller('DataController', ['$scope','DataService',function($scope,DataSer
     };
 
     $scope.$on('browserItemClicked', function(event,browsername,colname,id) {
-        $scope.$broadcast('browserItemActive',browsername,colname,id);
         DataService.fetchView(colname,id);
     });
 

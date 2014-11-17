@@ -61,7 +61,7 @@ class Data_Form_Functions extends Data_Form_Abstract {
         ));
         $this->setDefault('publication_role_id', 0);
         $this->addSubmitButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('name','description','order','publication_role_id'));

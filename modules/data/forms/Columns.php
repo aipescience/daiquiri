@@ -161,7 +161,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
         ));
 
         $this->addSubmitButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('table_id','name','description','order','type','unit','ucd','ucd_list','description','publication_role_id', 'publication_select', 'publication_update', 'publication_insert'));

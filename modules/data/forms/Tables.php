@@ -116,7 +116,7 @@ class Data_Form_Tables extends Data_Form_Abstract {
         }
 
         $this->addSubmitButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $inputelements = array('database_id', 'name', 'description', 'order', 'publication_role_id', 'publication_select',
