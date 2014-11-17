@@ -28,7 +28,11 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
     var view = {};
     var values = {};
     var errors = {};
-    var activeUrl = null;
+    var active = {
+        databaseId: null,
+        tableId: null,
+        url: null
+    };
 
     // init databases browser
     BrowserService.browser.databases = {
@@ -51,6 +55,7 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
         errors: errors,
         fetchView: function (model,id) {
             var url = '/data/' + model + '/show/id/' + id;
+
             $http.get(url).success(function(data) {
                 view.showUrl = '/data/' + model + '/show/id/' + id;
                 view.updateUrl = '/data/' + model + '/update/id/' + id;
@@ -90,7 +95,6 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
                 }
 
                 var permissions = [];
-                console.log(data.row.publication_select);
                 if (data.row.publication_select === '1') {
                     permissions.push('select');
                 }
@@ -105,6 +109,18 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
                 if (data.row.publication_role !== 'false') {
                     view.publication_role = data.row.publication_role;
                 }
+
+                // store database or table ids for later
+                if (model == 'databases') {
+                    active.database_id = data.row.id;
+                } else {
+                    active.database_id = data.row.database_id;
+                }
+                if (model == 'tables') {
+                    active.table_id = data.row.id;
+                } else {
+                    active.table_id = data.row.table_id;
+                }
             });
         },
         fetchHtml: function (url) {
@@ -114,7 +130,14 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
 
                 ModalService.modal.html = html;
 
-                activeUrl = url;
+                if (url.indexOf('/data/tables/create') != -1 && !angular.isUndefined(active.database_id)) {
+                    values.database_id = active.database_id;
+                }
+                if (url.indexOf('/data/columns/create') != -1 && !angular.isUndefined(active.table_id)) {
+                    values.table_id = active.table_id;
+                }
+
+                active.url = url;
                 ModalService.modal.enabled = true;
             });
         },
@@ -127,13 +150,11 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
                 // merge with form values
                 angular.extend(data,values);
 
-                $http.post(activeUrl,$.param(data)).success(function(response) {
+                $http.post(active.url,$.param(data)).success(function(response) {
                     for (var error in errors) delete errors[error];
 
                     if (response.status === 'ok') {
                         ModalService.modal.enabled = false;
-
-                        console.log(response);
                     } else if (response.status === 'error') {
                         angular.forEach(response.errors, function(error, key) {
                             errors[key] = error;

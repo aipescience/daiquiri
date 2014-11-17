@@ -58,7 +58,7 @@ angular.module('browser',[])
             browser[name].cols[1].items = getItems(browser[name].data[colname0][i][colname1]);
 
             // update THIRD column
-            if (!angular.isUndefined(colname2)) {
+            if (!angular.isUndefined(colname2) && browser[name].data[colname0][i][colname1].length !== 0) {
                 browser[name].cols[2].items = getItems(browser[name].data[colname0][i][colname1][0][colname2]);
             }
         }
@@ -68,8 +68,10 @@ angular.module('browser',[])
             var active0 = browser[name].cols[0].selected;
             browser[name].cols[1].selected = i;
 
-            // update THIRD column
-            browser[name].cols[2].items = getItems(browser[name].data[colname0][active0][colname1][i][colname2]);
+            // update THIRD column            
+            if (!angular.isUndefined()) {
+                browser[name].cols[2].items = getItems(browser[name].data[colname0][active0][colname1][i][colname2]);
+            }
         }
     };
 

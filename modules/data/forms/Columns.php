@@ -128,9 +128,11 @@ class Data_Form_Columns extends Data_Form_Abstract {
             )
         ));
         $this->addSelectElement('publication_role_id', array(
-            'label' => 'Published for: ',
+            'label' => 'Published for',
+            'required' => true,
             'multiOptions' => $this->_roles,
         ));
+        $this->setDefault('publication_role_id', 0);
         $this->addCheckboxElement('publication_select', array(
             'label' => 'Allow SELECT',
             'value' => '1',
@@ -146,11 +148,12 @@ class Data_Form_Columns extends Data_Form_Abstract {
         ));
 
         // obtain UCD data and provide a usable form (but only if called from a non scriptable context)
-        $ucdStrings = array();
+        $ucdStrings = array(
+            '' => 'Please select a UCD'
+        );
         foreach ($this->_ucds as $ucd) {
             $ucdStrings[$ucd['word']] = $ucd['word'] . " | " . $ucd['type'] . " | " . $ucd['description'];
         }
-        
         $this->addSelectElement('ucd_list', array(
             'label' => 'List of UCDs: ',
             'required' => false,
@@ -161,7 +164,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('table_id', 'name', 'order', 'type', 'unit', 'ucd', 'ucd_list', 'description', 'publication_role_id', 'publication_select', 'publication_update', 'publication_insert'));
+        $this->addHorizontalGroup(array('table_id','name','description','order','type','unit','ucd','ucd_list','description','publication_role_id', 'publication_select', 'publication_update', 'publication_insert'));
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields

@@ -59,7 +59,7 @@ class Data_Form_Functions extends Data_Form_Abstract {
             'required' => true,
             'multiOptions' => $this->_roles,
         ));
-
+        $this->setDefault('publication_role_id', 0);
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addButtonElement('cancel', 'Cancel');
 

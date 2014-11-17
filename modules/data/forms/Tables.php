@@ -90,9 +90,11 @@ class Data_Form_Tables extends Data_Form_Abstract {
             )
         ));
         $this->addSelectElement('publication_role_id', array(
-            'label' => 'Published for: ',
+            'label' => 'Published for',
+            'required' => true,
             'multiOptions' => $this->_roles,
         ));
+        $this->setDefault('publication_role_id', 0);
         $this->addCheckboxElement('publication_select', array(
             'label' => 'Allow SELECT',
             'value' => '1',

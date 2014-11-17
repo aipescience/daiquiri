@@ -56,8 +56,10 @@ class Data_Form_Databases extends Data_Form_Abstract {
         ));
         $this->addSelectElement('publication_role_id', array(
             'label' => 'Published for',
-            'multiOptions' => $this->_roles,
+            'required' => true,
+            'multiOptions' => $this->_roles
         ));
+        $this->setDefault('publication_role_id', 0);
         $this->addCheckboxElement('publication_select', array(
             'label' => 'Allow SELECT',
             'value' => '1',
@@ -84,7 +86,7 @@ class Data_Form_Databases extends Data_Form_Abstract {
         }
 
         $this->addSubmitButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $inputelements = array('name', 'description', 'order', 'publication_role_id', 'publication_select',
