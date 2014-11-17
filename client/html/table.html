@@ -32,19 +32,19 @@
         </div>
     </div>
 
-    <div class="daiquiri-table-pane" ng-show="tableData.rows.length">
+    <div class="daiquiri-table-pane" ng-show="table.data.rows.length">
         <table class="table">
             <thead>
                 <tr>
-                    <th ng-repeat="(i,col) in tableData.cols" style="width: {{col.width}}px;" data-col-id="{{i}}">
+                    <th ng-repeat="(i,col) in table.data.cols" style="width: {{col.width}}px;" data-col-id="{{i}}">
                         <div class="cell">
                             <div class="handle-left" ng-mousedown="resize(i-1)"></div>
                             <div class="handle-right" ng-mousedown="resize(i)"></div>
                             <div class="sort" ng-click="sort(col.name)" ng-show="col.sortable == true">
                                 <i ng-class="{
-                                    'icon-chevron-down': tableMeta.sort != col.name + ' ASC' && tableMeta.sort != col.name + ' DESC',
-                                    'sorted icon-chevron-down': tableMeta.sort == col.name + ' ASC',
-                                    'sorted icon-chevron-up': tableMeta.sort == col.name + ' DESC'
+                                    'icon-chevron-down': table.meta.sort != col.name + ' ASC' && table.meta.sort != col.name + ' DESC',
+                                    'sorted icon-chevron-down': table.meta.sort == col.name + ' ASC',
+                                    'sorted icon-chevron-up': table.meta.sort == col.name + ' DESC'
                                 }"></i>
                             </div>
                             <div class="name">{{col.name|ucfirst}}</div>
@@ -53,7 +53,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="row in tableData.rows">
+                <tr ng-repeat="row in table.data.rows">
                     <td ng-repeat="element in row.cell track by $index">
                         <div class="cell" ng-bind-html="element"></div>
                     </td>
@@ -62,15 +62,15 @@
         </table>
     </div>
 
-    <div class="daiquiri-table-empty" ng-show="tableData.rows.length == 0">
+    <div class="daiquiri-table-empty" ng-show="table.data.rows.length == 0">
         No rows have been retrieved.
     </div>
 
     <div class="daiquiri-table-footer">
         <div class="pull-left">
-            <p>Page {{tableMeta.page}} of {{tableMeta.pages}} ({{tableMeta.total}} rows total)</p>
+            <p>Page {{table.meta.page}} of {{table.meta.pages}} ({{table.meta.total}} rows total)</p>
         </div>
-        <select class="pull-right" ng-options="option.value as option.name for option in options" ng-model="nrows" ng-change="changeNRows()"></select>
+        <select class="pull-right" ng-options="option.value as option.name for option in table.options" ng-model="table.nrows" ng-change="changeNRows()"></select>
     </div>
 
 </div>

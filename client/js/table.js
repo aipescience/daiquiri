@@ -225,15 +225,16 @@ angular.module('table', ['ngSanitize'])
 
 .controller('TableController', ['$scope','$document','TableService',function($scope,$document,TableService) {
 
-    $scope.tableData = TableService.data;
-    $scope.tableMeta = TableService.meta;
-
-    $scope.nrows = 10;
-    $scope.options = [
-        {'name': 'Show 10 rows', 'value': 10},
-        {'name': 'Show 20 rows', 'value': 20},
-        {'name': 'Show 100 rows', 'value': 100}
-    ];
+    $scope.table = {
+        'data': TableService.data,
+        'meta': TableService.meta,
+        'nrows': 10,
+        'options': [
+            {'name': 'Show 10 rows', 'value': 10},
+            {'name': 'Show 20 rows', 'value': 20},
+            {'name': 'Show 100 rows', 'value': 100}
+        ]
+    };
 
     $scope.first = function() {
         TableService.first();
