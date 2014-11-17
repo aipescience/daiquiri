@@ -1,5 +1,5 @@
 <div class="daiquiri-modal" ng-show="modal.enabled" ng-controller="ModalController">
-    <div class="daiquiri-modal-dialog" style="width: {{modal.width}}; top: {{modal.top}}">
+    <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
         <button class="linkbutton daiquiri-modal-close" href="" ng-click="modal.enabled = false">&times;</button>
         <div class="daiquiri-modal-body"></div>
     </div>

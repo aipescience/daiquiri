@@ -34,11 +34,12 @@ angular.module('modal', ['ngSanitize'])
     };
 }])
 
-.factory('ModalService', [function() {
+.factory('ModalService', ['$window',function($window) {
     var modal = {
         'enabled': false,
-        'top': '100px',
-        'width': '700px',
+        'top': 100,
+        'width': 700,
+        'maxHeight': $window.innerHeight - 100 - 100,
         'html': ''
     };
 
@@ -48,6 +49,12 @@ angular.module('modal', ['ngSanitize'])
 }])
 
 .controller('ModalController', ['$scope','ModalService',function($scope,ModalService) {
+
+    $(window).resize(function(){
+        $scope.$apply(function(){
+            $scope.modal.maxHeight = window.innerHeight - 100 - 100;
+        });
+    });
 
     $scope.modal = ModalService.modal;
 
