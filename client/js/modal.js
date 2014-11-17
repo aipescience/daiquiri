@@ -50,12 +50,28 @@ angular.module('modal', ['ngSanitize'])
 
 .controller('ModalController', ['$scope','ModalService',function($scope,ModalService) {
 
-    $(window).resize(function(){
-        $scope.$apply(function(){
+    $(window).resize(function() {
+        $scope.$apply(function() {
             $scope.modal.maxHeight = window.innerHeight - 100 - 100;
         });
     });
 
+    // enable esc key
+    $(document).keyup(function(e) {
+        if (e.keyCode == 27) {
+            $scope.$apply(function() {
+                $scope.modal.enabled = false;
+            });
+            return false;
+        }
+    });
+
     $scope.modal = ModalService.modal;
+
+    $scope.closeModal = function($event) {
+        if ($event.target === angular.element('.daiquiri-modal')[0]) {
+            $scope.modal.enabled = false;
+        };
+    }
 
 }]);
