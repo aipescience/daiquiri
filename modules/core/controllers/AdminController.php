@@ -22,87 +22,109 @@
 class Core_AdminController extends Daiquiri_Controller_Abstract {
 
     protected $_links = array();
+    protected $_icons = array();
 
     public function init() {
-        $items = array(
+        $this->_links = array(
+            'admin' => array(
+                'text' => 'Admin overview',
+                'href' => '/core/admin'),
             'config' => array(
                 'text' => 'Configuration',
                 'href' => '/core/config',
                 'resource' => 'Core_Model_Config',
-                'permission' => 'index'),
+                'permission' => 'index',
+                'icon' => 'fa-wrench'),
             'templates' => array(
                 'text' => 'Mail templates',
                 'href' => '/core/templates',
                 'resource' => 'Core_Model_Templates',
-                'permission' => 'index'),
+                'permission' => 'index',
+                'icon' => 'fa-envelope-o'),
             'messages' => array(
-                'text' => 'Messages',
+                'text' => 'Status messages',
                 'href' => '/core/messages',
                 'resource' => 'Core_Model_Messages',
-                'permission' => 'index'),
+                'permission' => 'index',
+                'icon' => 'fa-comment'),
             'user' => array(
                 'text' => 'User management',
                 'href' => '/auth/user',
                 'resource' => 'Auth_Model_User',
-                'permission' => 'rows'),
+                'permission' => 'rows',
+                'icon' => 'fa-users'),
             'sessions' => array(
                 'text' => 'Sessions management',
                 'href' => '/auth/sessions',
                 'resource' => 'Auth_Model_Sessions',
-                'permission' => 'rows'),
+                'permission' => 'rows',
+                'icon' => 'fa-laptop'),
             'data' => array(
                 'text' => 'Database management',
                 'href' => '/data',
                 'resource' => 'Data_Model_Databases',
-                'permission' => 'show'),
+                'permission' => 'show',
+                'icon' => 'fa-database'),
             'meetings' => array(
                 'text' => 'Meetings management',
                 'href' => '/meetings/',
                 'resource' => 'Meetings_Model_Meetings',
-                'permission' => 'index'),
+                'permission' => 'index',
+                'icon' => 'fa-calendar'),
             'contact' => array(
                 'text' => 'Contact messages',
                 'href' => '/contact/messages',
                 'resource' => 'Contact_Model_Messages',
-                'permission' => 'rows'),
+                'permission' => 'rows',
+                'icon' => 'fa-envelope'),
             'examples' => array(
-                'text' => 'Examples',
+                'text' => 'Query examples',
                 'href' => '/query/examples',
                 'resource' => 'Query_Model_Examples',
-                'permission' => 'index'),
+                'permission' => 'index',
+                'icon' => 'fa-code'),
             'query' => array(
                 'text' => 'Query jobs',
                 'href' => '/query/jobs',
                 'resource' => 'Query_Model_Jobs',
-                'permission' => 'rows')
+                'permission' => 'rows',
+                'icon' => 'fa-gears')
         );
         if (Daiquiri_Config::getInstance()->core->cms->enabled
             && Daiquiri_Auth::getInstance()->getCurrentRole() === 'admin') {
-            $items['cms'] = array(
+            $this->_links['cms'] = array(
                 'text' => 'CMS Admin',
-                'href' => rtrim(Daiquiri_Config::getInstance()->core->cms->url,'/') . '/wp-admin/'
+                'href' => rtrim(Daiquiri_Config::getInstance()->core->cms->url,'/') . '/wp-admin/',
+                'icon' => 'fa-pencil'
             );
-        }
-
-        foreach ($items as $item) {
-            $link = $this->internalLink($item);
-
-            if(!empty($link)) {
-                $this->_links[] = $link;
-            }
         }
     }
 
     public function indexAction() {
-        if (empty($this->_links)) {
+        array_shift($this->_links);
+
+        $links = array();
+        foreach ($this->_links as $link) {
+            $link['text'] = "<i class=\"fa {$link['icon']}\"></i><span>{$link['text']}</span>";
+            $links[] = $this->internalLink($link);
+        }
+
+        if (empty($links)) {
             throw new Daiquiri_Exception_Unauthorized();
         }
 
-        $this->view->links = $this->_links;
+        $this->view->links = $links;
     }
 
     public function menuAction() {
-        $this->view->links = $this->_links;
+
+        $links = array();
+        foreach ($this->_links as $link) {
+            unset($link['icon']);
+            $links[] = $this->internalLink($link);
+        }
+
+        $this->view->links = $links;
 
         // disable layout
         $this->_helper->layout->disableLayout();

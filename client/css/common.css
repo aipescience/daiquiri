@@ -353,3 +353,32 @@ li.dropdown ul ul {
     padding: 5px 8px;
     font-size: small;
 }
+
+/* admin overview */
+
+.daiquiri-widget.daiquiri-admin-widget {
+    padding: 0;
+    text-align: center;
+    cursor: pointer;
+}
+.daiquiri-admin-widget:hover {
+    text-align: center;
+    background-color: #efefef;
+}
+.daiquiri-admin-widget a {
+    display: block;
+    padding: 20px;
+}
+.daiquiri-admin-widget i {
+    display: block;
+    font-size: 64px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #333;
+}
+.daiquiri-admin-widget span {
+    display: block;
+}
+.daiquiri-admin-widget a:hover {
+    text-decoration: none;
+}

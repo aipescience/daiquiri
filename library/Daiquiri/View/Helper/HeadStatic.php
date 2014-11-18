@@ -34,6 +34,8 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         // angular
         'angular.js' => 'daiquiri/lib/angular/angular.min.js',
         'angular-sanitize.js' => 'daiquiri/lib/angular/angular-sanitize.min.js',
+        // font-awesome
+        'font-awesome.css' => 'daiquiri/lib/font-awesome/css/font-awesome.min.css',
         // flot
         'jquery.flot.js' => 'daiquiri/lib/jquery.flot.min.js',
         // code mirror

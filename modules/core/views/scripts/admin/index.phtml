@@ -19,11 +19,15 @@
  */
 ?>
 <div class="main">
-    <h2>Administration Overview</h2>
+    <h2>Administration overview</h2>
 
-    <ul class="nav nav-tabs nav-stacked">
-    <?php foreach ($this->links as $link): ?>
-    <li class="nav-item"><?php echo $link; ?></li>
-    <?php endforeach; ?>
-    </ul>
+    <div class="row">
+    <?php for ($i=0; $i < count($this->links); $i++): ?>
+    <div class="span3">
+        <div class="daiquiri-widget daiquiri-admin-widget">
+        <?php echo $this->links[$i]; ?>
+        </div>
+    </div>
+    <?php endfor; ?>
+    </div>
 </div>
