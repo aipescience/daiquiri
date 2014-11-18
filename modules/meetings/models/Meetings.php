@@ -33,10 +33,7 @@ class Meetings_Model_Meetings extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function index() {
-        $rows = $this->getResource()->fetchRows(array(
-            'order' => 'begin DESC' 
-        ));
-
+        $rows = $this->getResource()->fetchRows();
         return array('status' => 'ok', 'rows' => $rows);
     }
 

@@ -39,7 +39,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
         $select->from('Meetings_Meetings');
 
         // order by begin
-        $select->order('begin ASC');
+        $select->order('begin DESC');
 
         // get result convert to array and return
         return $this->fetchAll($select);
