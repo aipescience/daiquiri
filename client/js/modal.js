@@ -24,11 +24,13 @@ angular.module('modal', ['ngSanitize'])
         templateUrl: '/daiquiri/html/modal.html',
         link: function(scope, element) {
             scope.$watch(function () {
-                return ModalService.modal.html;
+                return ModalService.modal.enabled;
             }, function(newValue, oldValue) {
-                var element = $compile(newValue)(scope);
-                angular.element('.daiquiri-modal-body').children().remove();
-                angular.element('.daiquiri-modal-body').append(element);
+                if (newValue === true) {
+                    var element = $compile(ModalService.modal.html)(scope);
+                    angular.element('.daiquiri-modal-body').children().remove();
+                    angular.element('.daiquiri-modal-body').append(element);
+                }
             }, true);
         }
     };
