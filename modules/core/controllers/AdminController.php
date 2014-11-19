@@ -21,11 +21,10 @@
 
 class Core_AdminController extends Daiquiri_Controller_Abstract {
 
-    protected $_links = array();
-    protected $_icons = array();
+    protected $_items;
 
     public function init() {
-        $this->_links = array(
+        $this->_items = array(
             'admin' => array(
                 'text' => 'Admin overview',
                 'href' => '/core/admin'),
@@ -92,7 +91,7 @@ class Core_AdminController extends Daiquiri_Controller_Abstract {
         );
         if (Daiquiri_Config::getInstance()->core->cms->enabled
             && Daiquiri_Auth::getInstance()->getCurrentRole() === 'admin') {
-            $this->_links['cms'] = array(
+            $this->_items['cms'] = array(
                 'text' => 'CMS Admin',
                 'href' => rtrim(Daiquiri_Config::getInstance()->core->cms->url,'/') . '/wp-admin/',
                 'icon' => 'fa-pencil'
@@ -101,30 +100,37 @@ class Core_AdminController extends Daiquiri_Controller_Abstract {
     }
 
     public function indexAction() {
-        array_shift($this->_links);
+        array_shift($this->_items);
 
-        $links = array();
-        foreach ($this->_links as $link) {
-            $link['text'] = "<i class=\"fa {$link['icon']}\"></i><span>{$link['text']}</span>";
-            $links[] = $this->internalLink($link);
+        $this->view->links = array();
+        foreach ($this->_items as $item) {
+            $item['text'] = "<i class=\"fa {$item['icon']}\"></i><span>{$item['text']}</span>";
+            unset($item['icon']);
+
+            $link = $this->internalLink($item);
+
+            if (!empty($link)) {
+                $this->view->links[] = $this->internalLink($item);
+            }
         }
 
-        if (empty($links)) {
+        if (empty($this->view->links)) {
             throw new Daiquiri_Exception_Unauthorized();
         }
-
-        $this->view->links = $links;
     }
 
     public function menuAction() {
 
-        $links = array();
-        foreach ($this->_links as $link) {
-            unset($link['icon']);
-            $links[] = $this->internalLink($link);
-        }
+        $this->view->links = array();
+        foreach ($this->_items as $item) {
+            unset($item['icon']);
+            
+            $link = $this->internalLink($item);
 
-        $this->view->links = $links;
+            if (!empty($link)) {
+                $this->view->links[] = $this->internalLink($item);
+            }
+        }
 
         // disable layout
         $this->_helper->layout->disableLayout();
