@@ -47,14 +47,15 @@
                                     'sorted icon-chevron-up': table.meta.sort == col.name + ' DESC'
                                 }"></i>
                             </div>
-                            <div class="name">{{col.name|ucfirst}}</div>
+                            <div class="name" ng-if="col.ucfirst == false">{{col.name}}</div>
+                            <div class="name" ng-if="col.ucfirst != false">{{col.name|ucfirst}}</div>
                         </div>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="row in table.data.rows">
-                    <td ng-repeat="element in row.cell track by $index">
+                    <td ng-repeat="(i,element) in row.cell track by $index">
                         <div class="cell" ng-bind-html="element"></div>
                     </td>
                 </tr>
@@ -70,7 +71,7 @@
         <div class="pull-left">
             <p>Page {{table.meta.page}} of {{table.meta.pages}} ({{table.meta.total}} rows total)</p>
         </div>
-        <select class="pull-right" ng-options="option.value as option.name for option in table.options" ng-model="table.nrows" ng-change="changeNRows()"></select>
+        <select class="pull-right" ng-options="option.value as option.name for option in options" ng-model="nrows" ng-change="reset()"></select>
     </div>
 
 </div>

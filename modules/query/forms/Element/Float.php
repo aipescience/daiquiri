@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Query_Form_Element_Float extends Zend_Form_Element_Text {
+class Query_Form_Element_Float extends Daiquiri_Form_Element_Text {
 
     /**
      * Initializes the form element.
@@ -30,5 +30,8 @@ class Query_Form_Element_Float extends Zend_Form_Element_Text {
 
         // add validator for max string length
         $this->addValidator('Float');
+
+        // add class
+        $this->setAttrib('class', 'span1');
     }
 }

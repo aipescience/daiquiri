@@ -19,11 +19,14 @@
  */
 ?>
 
-<div class="main" ng-app="query">
+<link href="/daiquiri/css/query.css" media="screen" rel="stylesheet" type="text/css" >
+<script type="text/javascript" src="/daiquiri/js/query.js"></script>
+
+<div class="main" ng-app="query" ng-controller="QueryController">
     <h2>Query interface</h2>
 
     <div class="row">
-        <div class="span3" ng-controller="SidebarController">
+        <div class="span3">
 
             <!-- database status -->
 
@@ -93,7 +96,7 @@
         </div>
         <div class="span9">
             <div id="query" class=""> 
-                <div class="tabbable" ng-controller="TabsController">
+                <div class="tabbable">
                     <ul class="nav nav-tabs">
                         <li id="form-tab-header" ng-show="account.active.form" ng-class="{active: account.active.form}">
                             <a href="#form-tab" data-toggle="tab">New Query</a>

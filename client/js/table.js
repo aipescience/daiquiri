@@ -134,10 +134,21 @@ angular.module('table', ['ngSanitize'])
         }
     }
 
-    function reset() {
+    function reset(nrows) {
         params.page = 1;
         params.sort = null;
         params.search = null;
+        params.nrows = nrows;
+
+        fetchRows();
+    }
+
+    function init() {
+        params.page = 1;
+        params.sort = null;
+        params.search = null;
+
+        fetchCols();
         fetchRows();
     }
 
@@ -160,11 +171,6 @@ angular.module('table', ['ngSanitize'])
         fetchRows();
     }
 
-    function changeNRows(nrows) {
-        params.nrows = nrows;
-        reset();
-    }
-
     function fetchCols() {
         if (url.cols !== null) {
             $http.get(url.cols,{'params': params}).success(function(response) {
@@ -179,7 +185,7 @@ angular.module('table', ['ngSanitize'])
     }
 
     function fetchRows() {
-        if (url.cols !== null) {
+        if (url.rows !== null) {
             $http.get(url.rows,{'params': params}).success(function(response) {
                 if (response.status == 'ok') {
                     data.rows = response.rows;
@@ -195,14 +201,6 @@ angular.module('table', ['ngSanitize'])
         }
     }
 
-    function init() {
-        // fetch cols if they where not loaded before
-        if (data.cols.length === 0) fetchCols();
-
-        // fetch cols
-        fetchRows();
-    }
-
     return {
         url: url,
         data: data,
@@ -216,7 +214,6 @@ angular.module('table', ['ngSanitize'])
         reset: reset,
         search: search,
         sort: sort,
-        changeNRows: changeNRows,
         fetchCols: fetchCols,
         fetchRows: fetchRows,
         init: init
@@ -227,14 +224,15 @@ angular.module('table', ['ngSanitize'])
 
     $scope.table = {
         'data': TableService.data,
-        'meta': TableService.meta,
-        'nrows': 10,
-        'options': [
-            {'name': 'Show 10 rows', 'value': 10},
-            {'name': 'Show 20 rows', 'value': 20},
-            {'name': 'Show 100 rows', 'value': 100}
-        ]
+        'meta': TableService.meta
     };
+
+    $scope.nrows = 10;
+    $scope.options = [
+        {'name': 'Show 10 rows', 'value': 10},
+        {'name': 'Show 20 rows', 'value': 20},
+        {'name': 'Show 100 rows', 'value': 100}
+    ];
 
     $scope.first = function() {
         TableService.first();
@@ -253,19 +251,15 @@ angular.module('table', ['ngSanitize'])
     };
 
     $scope.reset = function() {
-        TableService.reset();
+        TableService.reset($scope.nrows);
     };
 
     $scope.search = function() {
-        TableService.search($scope.searchString);
+        TableService.search();
     };
 
     $scope.sort = function(col) {
         TableService.sort(col);
-    };
-
-    $scope.changeNRows = function() {
-        TableService.changeNRows($scope.nrows);
     };
 
     $scope.resize = function (colId) {

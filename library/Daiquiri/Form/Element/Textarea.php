@@ -21,10 +21,10 @@
 
 class Daiquiri_Form_Element_Textarea extends Zend_Form_Element_Textarea {
 
-        /**
+    /**
      * Constructor. Sets the angular model attribute.
      */
-    public function __construct($name,$options) {
+    public function __construct($name,$options = array()) {
         $options = Daiquiri_Form_Element_Abstract::addAngularOptions($name,$options);
         parent::__construct($name,$options);
     }

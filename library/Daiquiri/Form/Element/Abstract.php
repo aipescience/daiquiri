@@ -46,10 +46,10 @@ abstract class Daiquiri_Form_Element_Abstract {
         // the angular errors
         $element->addDecorator('Callback', array(
             'callback' => function($content, $element, $options) {
-                    $ngErrorModel = 'errors.' . $element->getName();
+                $ngErrorModel = 'errors.' . $element->getName();
 
-                    return '<ul class="unstyled text-error help-inline angular" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">{{error}}</li></ul>';
-                },
+                return '<ul class="unstyled text-error help-inline angular" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">{{error}}</li></ul>';
+            },
             'placement' => 'append'
         ));
         
@@ -61,5 +61,8 @@ abstract class Daiquiri_Form_Element_Abstract {
 
         // wrap in div.control-group
         $element->addDecorator(array('control-group' => 'HtmlTag'), array('tag' => 'div', 'class' => 'control-group'));
+
+        // enable html for label
+        $element->getDecorator('Label')->setOption('escape', false);
     }
 }

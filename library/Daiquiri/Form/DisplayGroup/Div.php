@@ -46,29 +46,29 @@ class Daiquiri_Form_DisplayGroup_Div extends Zend_Form_DisplayGroup {
         $this->setDecorators(array('FormElements','Fieldset'));
 
         // loop over elements and set decorators
-        foreach ($this->getElements() as $element) {
-            $element->setDecorators(array(
-                'ViewHelper',
-                'Errors',
-                array(
-                    'HtmlTag',
-                    array('tag' => 'div',),
-                )
-            ));
+        // foreach ($this->getElements() as $element) {
+        //     $element->setDecorators(array(
+        //         'ViewHelper',
+        //         'Errors',
+        //         array(
+        //             'HtmlTag',
+        //             array('tag' => 'div',),
+        //         )
+        //     ));
 
-            if ($this->_label) {
-                $element->addDecorators(array(
-                    array(
-                        'Label',
-                        array('tag' => 'div', 'escape' => false)
-                    )
-                ));
-            }
+        //     if ($this->_label) {
+        //         $element->addDecorators(array(
+        //             array(
+        //                 'Label',
+        //                 array('tag' => 'div', 'escape' => false)
+        //             )
+        //         ));
+        //     }
 
-            // modify Error decorators retroactively
-            $element->getDecorator('Errors')->setOptions(array(
-                'class' => 'daiquiri-form-error unstyled text-error'
-            ));
-        }
+        //     // modify Error decorators retroactively
+        //     $element->getDecorator('Errors')->setOptions(array(
+        //         'class' => 'daiquiri-form-error unstyled text-error'
+        //     ));
+        // }
     }
 }

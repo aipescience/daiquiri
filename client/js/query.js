@@ -24,7 +24,7 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.factory('AccountService', ['$http','$timeout','$q',function($http,$timeout,$q) {
+app.factory('QueryService', ['$http','$timeout','$q',function($http,$timeout,$q) {
     var account = {
         active: {
             form: false,
@@ -56,7 +56,7 @@ app.factory('AccountService', ['$http','$timeout','$q',function($http,$timeout,$
     };
 }]);
 
-app.factory('FormService', ['$http','AccountService',function($http,AccountService) {
+app.factory('FormService', ['$http','QueryService',function($http,QueryService) {
     var values = {};
     var errors = {};
 
@@ -67,24 +67,31 @@ app.factory('FormService', ['$http','AccountService',function($http,AccountServi
             var data = {};
             data[formName + '_csrf'] = $('#' + formName + '_csrf').attr('value');
 
-            // merge with form values
-            angular.extend(data,values[formName]);
+            // merge with form values of THIS form
+            angular.forEach(values, function (value, key) {
+                if (key.indexOf(formName + '_') === 0) {
+                    data[key] = value;
+                }
+            })
+
+            // reset errors for all forms
+            for (var error in errors) delete errors[error];
 
             $http.post('query/form/?form=' + formName,$.param(data)).success(function(response) {
-                if (response['status'] == 'ok') {
-                    AccountService.fetchAccount();
-                } else if (response['status'] == 'error') {
-                    errors[formName] = {};
-                    angular.forEach(response['errors'], function(object, key) {
-                        errors[formName][key] = object;
+                if (response.status == 'ok') {
+                    QueryService.fetchAccount();
+                } else if (response.status == 'error') {
+                    console.log(response.errors);
+                    angular.forEach(response.errors, function(error, key) {
+                        errors[key] = error;
                     });
                 } else {
-                    errors[formName] = {
+                    errors = {
                         'form': ['Unknown response.']
                     };
                 }
             }).error(function () {
-                errors[formName] = {
+                errors = {
                     'form': ['Could not connect to server.']
                 };
             });
@@ -92,7 +99,7 @@ app.factory('FormService', ['$http','AccountService',function($http,AccountServi
     };
 }]);
 
-app.factory('PlotService', ['$http','AccountService',function($http,AccountService) {
+app.factory('PlotService', ['$http','QueryService',function($http,QueryService) {
     var values = {};
     var errors = {};
 
@@ -121,8 +128,8 @@ app.factory('PlotService', ['$http','AccountService',function($http,AccountServi
 
             $http.get('data/viewer/rows/',{
                 'params': {
-                    'db': AccountService.account.job.database,
-                    'table': AccountService.account.job.table,
+                    'db': QueryService.account.job.database,
+                    'table': QueryService.account.job.table,
                     'cols': values.plot_x.name + ',' + values.plot_y.name,
                     'nrows': values.plot_nrows
                 }
@@ -135,7 +142,7 @@ app.factory('PlotService', ['$http','AccountService',function($http,AccountServi
                         plot.y.push(response.rows[i].cell[1]);
                     }
 
-                    AccountService.account.job.plot = plot;
+                    QueryService.account.job.plot = plot;
 
                 } else {
                     console.log('Error: Unknown response.');
@@ -147,7 +154,7 @@ app.factory('PlotService', ['$http','AccountService',function($http,AccountServi
     };
 }]);
 
-app.factory('DownloadService', ['$http','AccountService',function($http,AccountService) {
+app.factory('DownloadService', ['$http','QueryService',function($http,QueryService) {
     var values = {};
     var errors = {};
 
@@ -158,7 +165,7 @@ app.factory('DownloadService', ['$http','AccountService',function($http,AccountS
             var data = {};
             data = {
                 'download_csrf': $('#download_csrf').attr('value'),
-                'download_tablename': AccountService.account.job.table
+                'download_tablename': QueryService.account.job.table
             };
 
             // merge with form values
@@ -166,7 +173,7 @@ app.factory('DownloadService', ['$http','AccountService',function($http,AccountS
 
             $http.post('query/download/',$.param(data)).success(function(response) {
                 if (response.status == 'ok') {
-                    AccountService.account.job.download = {
+                    QueryService.account.job.download = {
                         'link': response.link,
                         'format': response.format
                     }
@@ -190,13 +197,13 @@ app.factory('DownloadService', ['$http','AccountService',function($http,AccountS
             var data = {};
             data = {
                 'download_csrf': $('#download_csrf').attr('value'),
-                'download_tablename': AccountService.account.job.table,
-                'download_format': AccountService.account.job.download.format
+                'download_tablename': QueryService.account.job.table,
+                'download_format': QueryService.account.job.download.format
             };
 
             $http.post('query/download/regenerate/',$.param(data)).success(function(response) {
                 if (response.status == 'ok') {
-                    AccountService.account.job.download = {
+                    QueryService.account.job.download = {
                         'link': response.link,
                         'format': response.format
                     }
@@ -219,45 +226,38 @@ app.factory('DownloadService', ['$http','AccountService',function($http,AccountS
     };
 }]);
 
-app.controller('SidebarController',['$scope','AccountService',function($scope,AccountService) {
+app.controller('QueryController',['$scope','QueryService',function($scope,QueryService) {
 
-    $scope.account = AccountService.account;
+    $scope.account = QueryService.account;
 
     $scope.activateForm = function(formName) {
-        AccountService.account.active.form = formName;
-        AccountService.account.active.job = false;
+        QueryService.account.active.form = formName;
+        QueryService.account.active.job = false;
 
         $('#form-tab-header a').tab('show');
-
-        $scope.activateJob(1);
-        $('#results-tab-header a').tab('show');
     };
 
     $scope.activateJob = function(jobId) {
 
-        AccountService.fetchJob(jobId).then(function() {
+        QueryService.fetchJob(jobId).then(function() {
             // codemirrorfy the query
-            CodeMirror.runMode(AccountService.account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
+            CodeMirror.runMode(QueryService.account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
         });
 
         // if a form was active, switch to job overview tab
-        if (AccountService.account.active.form != false) {
+        if (QueryService.account.active.form != false) {
             $('#overview-tab-header a').tab('show');
         }
 
-        AccountService.account.active.form = false;
-        AccountService.account.active.job = jobId;
+        QueryService.account.active.form = false;
+        QueryService.account.active.job = jobId;
     };
 
-    AccountService.fetchAccount();
-    $scope.activateForm(AccountService.account.active.form);
+    QueryService.fetchAccount();
+    $scope.activateForm(QueryService.account.active.form);
 }]);
 
-app.controller('TabsController',['$scope','AccountService',function($scope,AccountService) {
-    $scope.account = AccountService.account;
-}]);
-
-app.controller('FormController',['$scope','AccountService','FormService',function($scope,AccountService,FormService) {
+app.controller('FormController',['$scope','QueryService','FormService',function($scope,QueryService,FormService) {
 
     $scope.values = FormService.values;
     $scope.errors = FormService.errors;
@@ -268,14 +268,18 @@ app.controller('FormController',['$scope','AccountService','FormService',functio
 
 }]);
 
-app.controller('ResultsController',['$scope','AccountService','TableService',function($scope,AccountService,TableService) {
+app.controller('ResultsController',['$scope','QueryService','TableService',function($scope,QueryService,TableService) {
 
-    TableService.url.cols = '/data/viewer/cols?db=daiquiri_user_admin&table=test';
-    TableService.url.rows = '/data/viewer/rows?db=daiquiri_user_admin&table=test';
+    $scope.$watch(function() {
+        return QueryService.account.job;
+    }, function (job) {
+        if (!angular.isUndefined(job.cols)) {
+            TableService.url.cols = '/data/viewer/cols?db=' + job.database + '&table=' + job.table;
+            TableService.url.rows = '/data/viewer/rows?db=' + job.database + '&table=' + job.table;
+            TableService.init();
+        }
+    });
 
-    TableService.data.cols = AccountService.account.job.cols;
-
-    TableService.init();
 }]);
 
 app.controller('PlotController',['$scope','PlotService',function($scope,PlotService) {

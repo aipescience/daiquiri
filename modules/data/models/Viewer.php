@@ -91,22 +91,19 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
             throw new Exception('Some Columns are not in the database table');
         }
 
-        // return columns ot this table
+        // return columns of this table
         $cols = array();
         foreach ($colnames as $colname) {
             $col = array(
                 'id' => $meta[$colname]['id'],
                 'name' => $colname,
-                'sortable' => true
+                'sortable' => true,
+                'ucfirst' => false
             );
 
-            if ($colname === 'row_id') {
-                $col['width'] = '4em';
-                $col['hidden'] = true;
-
-            } else if (in_array('meta.ref', $meta[$colname]['ucd'])) {
+            if (in_array('meta.ref', $meta[$colname]['ucd'])) {
                 // this is a link, it needs more space
-                $col['width'] = '20em';
+                $col['width'] = 140;
 
                 // is this a file daiquiri hosts or just a link?
                 if (in_array('meta.file', $meta[$colname]['ucd']) || in_array('meta.fits', $meta[$colname]['ucd'])) {
@@ -128,7 +125,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
                 // regular column, take the with from the config or a default one
                 $width = Daiquiri_Config::getInstance()->data->viewer->columnWidth;
                 if (empty($width)) {
-                    $col['width'] = '12em';
+                    $col['width'] = 100;
                 } else {
                     $col['width'] = $width;
                 }

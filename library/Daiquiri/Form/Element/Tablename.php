@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Form_Element_Tablename extends Zend_Form_Element_Text {
+class Daiquiri_Form_Element_Tablename extends Daiquiri_Form_Element_Text {
 
     /**
      * Initializes the form element
@@ -28,9 +28,6 @@ class Daiquiri_Form_Element_Tablename extends Zend_Form_Element_Text {
         // set filter
         $this->addFilter('StringTrim');
         $this->addFilter('PregReplace', array('match' => '/ /', 'replace' => '_'));
-
-        // set decorators
-        $this->setDecorators(array('ViewHelper'));
 
         // set validator
         $this->addValidator(new Daiquiri_Form_Validator_Tablename());

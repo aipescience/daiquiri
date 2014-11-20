@@ -64,13 +64,11 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
      * Initializes the form.
      */
     public function init() {
-
         // add form elements
         $this->addCsrfElement('sql_csrf');
         $this->addTextareaElement('sql_query', array(
             'filters' => array('StringTrim'),
             'required' => true,
-            'label' => 'Query:',
             'class' => 'span9',
             'style' => "resize: none;",
             'rows' => 8
@@ -85,33 +83,9 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         $this->addDivGroup(array('sql_tablename'), 'sql-table-group', false, true);
         $this->addInlineGroup(array('sql_submit','sql_clear','sql_queue'), 'sql-button-group');
 
-        // add angular directives
+        // override angular directives
         $this->setAttrib('name',"sql");
         $this->setAttrib('ng-submit',"submitQuery('sql')");
-        $this->setDecorators(array(
-            'FormElements',
-            array('Callback', array(
-                'callback' => function($content, $element, $options) {
-                    $ngErrorModel = 'errors.sql.form';
-
-                    return '<ul class="unstyled text-error angular-hidden" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">Error: {{error}}</li></ul>';
-                },
-                'placement' => 'append'
-            )),
-            'Form'
-        ));
-        foreach (array('sql_csrf','sql_query','sql_tablename') as $name) {
-            $element = $this->getElement($name);
-            $element->setAttrib('ng-model','values.sql.' . $name);
-            $element->addDecorators(array(array('Callback', array(
-                'callback' => function($content, $element, $options) {
-                    $ngErrorModel = 'errors.sql.' . $element->getName();
-
-                    return '<ul class="unstyled text-error angular-hidden" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">Error: {{error}}</li></ul>';
-                },
-                'placement' => 'append'
-            ))));
-        }
     }
 
 }

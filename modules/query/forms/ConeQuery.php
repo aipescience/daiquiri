@@ -68,8 +68,6 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
      * Initializes the form.
      */
     public function init() {
-        parent::init();
-
         // add form elements
         $this->addCsrfElement('cone_csrf');
         $this->addFloatElement('cone_ra', 'RA<sub>deg</sub>');
@@ -81,13 +79,17 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
 
         // add display groups
         $this->addHorizontalGroup(array('cone_ra','cone_dec','cone_radius'), 'cone_values-group');
-        $this->addParagraphGroup(array('cone_tablename'), 'cone_table-group', false, true);
+        $this->addDivGroup(array('cone_tablename'), 'cone_table-group', false, true);
         $this->addInlineGroup(array('cone_submit','cone_queues'), 'cone_button-group');
 
         // fill elements with default values
         $this->setDefault('cone_ra', $this->_formOptions['raDefault']);
         $this->setDefault('cone_dec', $this->_formOptions['decDefault']);
         $this->setDefault('cone_radius', $this->_formOptions['radiusDefault']);
+
+        // override angular directives
+        $this->setAttrib('name','cone');
+        $this->setAttrib('ng-submit',"submitQuery('cone')");
     }
 
 }

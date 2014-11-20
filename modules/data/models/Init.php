@@ -75,7 +75,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
             'writeToDB' => 0,
             'viewer' => array(
                 'removeNewline' => false,
-                'columnWidth' => '12em'
+                'columnWidth' => 100
             )
         );
 
