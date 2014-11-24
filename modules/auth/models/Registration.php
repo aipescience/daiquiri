@@ -75,9 +75,12 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function register(array $formParams = array()) {
+        // get user detail keys model
+        $detailKeyModel = new Auth_Model_DetailKeys();
+
         // create the form object
         $form = new Auth_Form_Registration(array(
-            'details' => Daiquiri_Config::getInstance()->auth->details->toArray()
+            'detailKeys' => $detailKeyModel->getResource()->fetchRows(),
         ));
 
         // check if request is POST

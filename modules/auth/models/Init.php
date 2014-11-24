@@ -34,6 +34,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Auth_Model_Account',
             'Auth_Model_Sessions',
             'Auth_Model_Details',
+            'Auth_Model_DetailKeys'
         );
     }
 
@@ -72,7 +73,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $rules['admin'] = array(
             'Auth_Model_User' => array('rows','cols','show','create','update','delete','export'),
             'Auth_Model_Password' => array('set'),
-            'Auth_Model_Details' => array('show','create','update', 'delete'),
+            'Auth_Model_Details' => array('show','create','update','delete'),
+            'Auth_Model_DetailKeys' => array('index','show','create','update','delete'),
             'Auth_Model_Sessions' => array('rows','cols','destroy'),
             'Auth_Model_Registration' => array('index','delete','activate','disable','reenable')
         );
@@ -101,10 +103,6 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 'default' => array(
                     'algo' => 'cryptSha512'
                 )
-            ),
-            'details' => array(
-                'firstname',
-                'lastname'
             ),
             'timeout' => 0,
             'mailOnChangePassword' => false,
@@ -177,6 +175,21 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             $output['roles'][] = 'manager';
         }
         $output['roles'][] = 'admin';
+
+        // construct detail keys array
+        $output['detailKeys'] = array();
+        if (isset($input['detailKeys'])) {
+            if (is_array($input['detailKeys'])) {
+                $output['detailKeys'] = $input['detailKeys'];
+            } else {
+                $this->_error("Auth init option 'detailKeys' needs to be an array.");
+            }
+        } else {
+            $output['detailKeys'] = array(
+                array('key' => 'firstname'),
+                array('key' => 'lastname')
+            );
+        }
 
         // construct user array
         $output['user'] = array();
@@ -271,6 +284,18 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             foreach ($this->_init->options['init']['auth']['roles'] as $role) {
                 $a = array('role' => $role);
                 $r = $authRoleModel->create($a);
+                $this->_check($r, $a);
+            }
+        }
+
+        // create detail keys entries
+        $authDetailKeysModel = new Auth_Model_DetailKeys();
+        if ($authDetailKeysModel->getResource()->countRows() === 0) {
+            foreach ($this->_init->options['init']['auth']['detailKeys'] as $a) {
+                if (!isset($a['type_id'])) {
+                    $a['type_id'] = 0;
+                }
+                $r = $authDetailKeysModel->create($a);
                 $this->_check($r, $a);
             }
         }

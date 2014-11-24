@@ -51,10 +51,13 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
         // get user
         $user = $this->getResource()->fetchRow($id);
 
+        // get user detail keys model
+        $detailKeyModel = new Auth_Model_DetailKeys();
+
         // create the form object
         $form = new Auth_Form_Account(array(
             'user' => $this->getResource()->fetchRow($id),
-            'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
+            'detailKeys' => $detailKeyModel->getResource()->fetchRows(),
             'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
             'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,
         ));

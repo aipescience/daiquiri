@@ -43,10 +43,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
     protected $_status = array();
 
     /**
-     * Array which holds the details of the user to be edited.
+     * Array which holds the detail keys.
      * @var array 
      */
-    protected $_details = array();
+    protected $_detailKeys = array();
 
     /**
      * Switch if usernames can be changed.
@@ -86,18 +86,18 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
 
     /**
      * Sets the detail array.
-     * @param array $details 
+     * @param array $detailKeys 
      */
-    public function setDetails($details) {
-        $this->_details = $details;
+    public function setDetailKeys($detailKeys) {
+        $this->_detailKeys = $detailKeys;
     }
 
     /**
      * Returns the detail array.
      * @return array
      */
-    public function getDetails() {
-        return $this->_details;
+    public function getDetailKeys() {
+        return $this->_detailKeys;
     }
 
     /**
@@ -116,12 +116,12 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
 
     /**
      * Creates a form element for a detail and adds it to the form.
-     * @param  string $detail key of the user detail
+     * @param  array  $detailKey description of the user detail
      * @return string $name   name of the element
      */
-    public function addDetailElement($detail) {
-        $this->addElement(new Auth_Form_Element_Detail($detail));
-        return $detail;
+    public function addDetailElement($detailKey) {
+        $this->addElement(new Auth_Form_Element_Detail($detailKey['key']));
+        return $detailKey['key'];
     }
 
     /**

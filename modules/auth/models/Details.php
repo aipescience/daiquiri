@@ -142,7 +142,7 @@ class Auth_Model_Details extends Daiquiri_Model_Abstract {
         // check if the key is there
         if ($this->getResource()->fetchValue($userId, $key) === false) {
             return array('status' => 'error', 'error' => 'Key not found');
-        } else if (in_array($key, Daiquiri_Config::getInstance()->auth->details->toArray())) {
+        } else if (in_array($key, Daiquiri_Auth::getInstance()->getDetailKeys())) {
             return array('status' => 'error', 'error' => 'Key is protected');
         }
 

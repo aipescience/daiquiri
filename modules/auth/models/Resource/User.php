@@ -29,23 +29,6 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
     }
 
     /**
-     * Returns the colums of (joined) Auth tables.
-     * @return array $cols
-     */
-    public function fetchCols() {
-        $cols = parent::fetchCols();
-
-        foreach (Daiquiri_Config::getInstance()->auth->details as $key) {
-            if (substr($key, 0, 8) !== 'password') {
-                $cols[$key] = $this->quoteIdentifier('Auth_Details',$key);
-            }
-        }
-        $cols['status'] = $this->quoteIdentifier('Auth_Status','status');
-        $cols['role'] = $this->quoteIdentifier('Auth_Roles','role');
-        return $cols;
-    }
-
-    /**
      * Fetches a set of rows from the (joined) Auth tables specified by $sqloptions.
      * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows
@@ -57,7 +40,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         $select->join('Auth_Status', '`Auth_Status`.`id` = `Auth_User`.`status_id`', array('status'));
 
         // add an left join for every detail key
-        foreach (Daiquiri_Config::getInstance()->auth->details as $key) {
+        foreach (Daiquiri_Auth::getInstance()->getDetailKeys() as $key) {
             if (substr($key, 0, 8) !== 'password') {
                 $detailSelect = $this->select();
                 $detailSelect->from('Auth_Details', array('user_id', 'value'));

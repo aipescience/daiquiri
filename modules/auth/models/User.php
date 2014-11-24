@@ -197,9 +197,12 @@ class Auth_Model_User extends Daiquiri_Model_Table {
         $roles = Daiquiri_Auth::getInstance()->getRoles();
         unset($roles[1]); // unset the guest user
 
+        // get user detail keys model
+        $detailKeyModel = new Auth_Model_DetailKeys();
+
         // create the form object
         $form = new Auth_Form_CreateUser(array(
-            'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
+            'detailKeys' => $detailKeyModel->getResource()->fetchRows(),
             'status' => $status,
             'roles' => $roles
         ));
@@ -244,9 +247,12 @@ class Auth_Model_User extends Daiquiri_Model_Table {
             throw new Daiquiri_Exception_NotFound();
         }
 
+        // get user detail keys model
+        $detailKeyModel = new Auth_Model_DetailKeys();
+
         // create the form object
         $form = new Auth_Form_UpdateUser(array(
-            'details' => Daiquiri_Config::getInstance()->auth->details->toArray(),
+            'detailKeys' => $detailKeyModel->getResource()->fetchRows(),
             'status' => $status,
             'roles' => $roles,
             'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,

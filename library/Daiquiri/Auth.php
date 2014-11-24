@@ -56,6 +56,10 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         $statusModel = new Auth_Model_Status();
         $this->_status = $statusModel->getResource()->fetchValues('status');
 
+        // get user detail keys
+        $detailKeysModel = new Auth_Model_DetailKeys();
+        $this->_detailKeys = $detailKeysModel->getResource()->fetchValues('key');
+
         // get treatment from default crypt object
         try {
             $crypt = Daiquiri_Crypt_Abstract::factory();
@@ -494,6 +498,10 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
 
     public function getStatusId($status) {
         return array_search($status, $this->_status);
+    }
+
+    public function getDetailKeys() {
+        return $this->_detailKeys;
     }
 
 }

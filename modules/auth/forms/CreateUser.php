@@ -28,8 +28,9 @@ class Auth_Form_CreateUser extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        foreach ($this->getDetails() as $detail) {
-            $this->addDetailElement($detail);
+        $details = array();
+        foreach ($this->getDetailKeys() as $detailKey) {
+            $details[] = $this->addDetailElement($detailKey);
         }
         $elements = array(
             $this->addUsernameElement(),
@@ -43,7 +44,7 @@ class Auth_Form_CreateUser extends Auth_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup($this->getDetails(), 'detail-group');
+        $this->addHorizontalGroup($details, 'detail-group');
         $this->addHorizontalGroup($elements, 'user-group');
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
     }

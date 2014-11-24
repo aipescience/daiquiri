@@ -28,8 +28,9 @@ class Auth_Form_Registration extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        foreach ($this->getDetails() as $detail) {
-            $this->addElement(new Auth_Form_Element_Detail($detail));
+        $details = array();
+        foreach ($this->getDetailKeys() as $detailKey) {
+            $details[] = $this->addDetailElement($detailKey);
         }
         $elements = array(
             $this->addUsernameElement(),
@@ -42,7 +43,7 @@ class Auth_Form_Registration extends Auth_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup($this->getDetails(), 'detail-group');
+        $this->addHorizontalGroup($details, 'detail-group');
         $this->addHorizontalGroup($elements, 'user-group');
         $this->addHorizontalCaptchaGroup('captcha');
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));

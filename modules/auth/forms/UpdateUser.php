@@ -29,8 +29,8 @@ class Auth_Form_UpdateUser extends Auth_Form_Abstract {
         
         // add elements
         $elements = array();
-        foreach ($this->getDetails() as $detail) {
-            $elements[] = $this->addDetailElement($detail);
+        foreach ($this->getDetailKeys() as $detailKey) {
+            $elements[] = $this->addDetailElement($detailKey);
         }
         if ($this->_changeUsername) {
             $elements[] = $this->addUsernameElement($this->_user['id']);
@@ -49,7 +49,9 @@ class Auth_Form_UpdateUser extends Auth_Form_Abstract {
 
         // set fields
         foreach ($elements as $element) {
-            $this->setDefault($element, $this->_user[$element]);
+            if (isset($this->_user[$element])) {
+                $this->setDefault($element, $this->_user[$element]);
+            }
         }
     }
 }
