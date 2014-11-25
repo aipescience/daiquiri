@@ -1,0 +1,81 @@
+<?php
+
+/*
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+
+<div class="main">
+    <h2>Manage user detail keys</h2>
+
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Key</th>
+                <th>Hint</th>
+                <th>Type</th>
+                <th>Options</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($this->rows as $row): ?>
+                <tr>
+                    <?php foreach ($row as $element): ?>
+                    <td><?php echo $this->escape($element); ?></td>
+                    <?php endforeach; ?>
+                    <td>
+                        <?php 
+                        echo $this->internalLink(array(
+                            'text' => 'Show',
+                            'href' => '/auth/detail-keys/show/id/' . $this->escape($row['id']),
+                            'resource' => 'Auth_Model_DetailKeys',
+                            'permission' => 'show'));
+                        echo $this->internalLink(array(
+                            'text' => 'Update',
+                            'href' => '/auth/detail-keys/update/id/' . $this->escape($row['id']),
+                            'resource' => 'Auth_Model_DetailKeys',
+                            'permission' => 'update',
+                            'prepend' => '&nbsp;'));
+                        echo $this->internalLink(array(
+                            'text' => 'Delete',
+                            'href' => '/auth/detail-keys/delete/id/' . $this->escape($row['id']),
+                            'resource' => 'Auth_Model_DetailKeys',
+                            'permission' => 'delete',
+                            'prepend' => '&nbsp;')); 
+                        ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <?php
+    echo $this->internalLink(array(
+        'text' => 'Create detail Key',
+        'href' => '/auth/detail-keys/create',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    echo $this->internalLink(array(
+        'text' => 'Back to meetings management',
+        'href' => '/meetings/',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
+</div>

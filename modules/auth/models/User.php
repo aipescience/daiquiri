@@ -183,7 +183,30 @@ class Auth_Model_User extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function show($id) {
-        return $this->getModelHelper('CRUD')->show($id);
+        // get user detail keys model
+        $detailKeyModel = new Auth_Model_DetailKeys();
+        $detailKeys = $detailKeyModel->getResource()->fetchRows();
+
+        $row = $this->getResource()->fetchRow($id);
+
+        foreach($detailKeys as $detailKey) {
+            if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('radio','select'))) {
+                $options = Zend_Json::decode($detailKey['options']);
+
+                $row[$detailKey['key']] = $options[$row[$detailKey['key']]];
+            } else if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
+                $options = Zend_Json::decode($detailKey['options']);
+
+                $values = array();
+                foreach (Zend_Json::decode($row[$detailKey['key']]) as $value_id) {
+                    $values[] = $options[$value_id];
+                }
+
+                $row[$detailKey['key']] = implode(', ',$values);
+            }
+        }
+
+        return array('status' => 'ok', 'row' => $row);
     }
 
     /**
@@ -199,10 +222,11 @@ class Auth_Model_User extends Daiquiri_Model_Table {
 
         // get user detail keys model
         $detailKeyModel = new Auth_Model_DetailKeys();
+        $detailKeys = $detailKeyModel->getResource()->fetchRows();
 
         // create the form object
         $form = new Auth_Form_CreateUser(array(
-            'detailKeys' => $detailKeyModel->getResource()->fetchRows(),
+            'detailKeys' => $detailKeys,
             'status' => $status,
             'roles' => $roles
         ));
@@ -215,6 +239,13 @@ class Auth_Model_User extends Daiquiri_Model_Table {
 
                 // unset some elements
                 unset($values['confirm_password']);
+
+                // process arrays in the details (for checkbox and multiselect)
+                foreach ($detailKeys as $detailKey) {
+                    if (is_array($values[$detailKey['key']])) {
+                        $values[$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                    }
+                }
 
                 // create the user
                 $id = $this->getResource()->insertRow($values);
@@ -249,10 +280,11 @@ class Auth_Model_User extends Daiquiri_Model_Table {
 
         // get user detail keys model
         $detailKeyModel = new Auth_Model_DetailKeys();
+        $detailKeys = $detailKeyModel->getResource()->fetchRows();
 
         // create the form object
         $form = new Auth_Form_UpdateUser(array(
-            'detailKeys' => $detailKeyModel->getResource()->fetchRows(),
+            'detailKeys' => $detailKeys,
             'status' => $status,
             'roles' => $roles,
             'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
@@ -265,6 +297,13 @@ class Auth_Model_User extends Daiquiri_Model_Table {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // process arrays in the details (for checkbox and multiselect)
+                foreach ($detailKeys as $detailKey) {
+                    if (is_array($values[$detailKey['key']])) {
+                        $values[$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                    }
+                }
 
                 // update the user and redirect
                 $this->getResource()->updateRow($id, $values);

@@ -120,7 +120,47 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @return string $name   name of the element
      */
     public function addDetailElement($detailKey) {
-        $this->addElement(new Auth_Form_Element_Detail($detailKey['key']));
+
+        switch (Auth_Model_DetailKeys::$types[$detailKey['type_id']]) {
+            case "checkbox":
+                $this->addElement('multiCheckbox', $detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'required' => true,
+                    'multiOptions' => Zend_Json::decode($detailKey['options'])
+                ));
+                break;
+            case "radio":
+                $this->addElement('radio', $detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'required' => true,
+                    'multiOptions' => Zend_Json::decode($detailKey['options'])
+                ));
+                break;
+            case "select":
+                $this->addElement('select', $detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'required' => true,
+                    'multiOptions' => Zend_Json::decode($detailKey['options'])
+                ));
+                break;
+            case "multiselect":
+                $this->addElement('multiselect', $detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'required' => true,
+                    'multiOptions' => Zend_Json::decode($detailKey['options'])
+                ));
+                break;
+            default:
+                $this->addElement('text', $detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ',$detailKey['key'])),
+                    'required' => true,
+                    'filters' => array('StringTrim'),
+                    'validators' => array(
+                        array('validator' => new Daiquiri_Form_Validator_Text()),
+                    )
+                ));
+        }
+
         return $detailKey['key'];
     }
 

@@ -53,11 +53,12 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
 
         // get user detail keys model
         $detailKeyModel = new Auth_Model_DetailKeys();
+        $detailKeys = $detailKeyModel->getResource()->fetchRows();
 
         // create the form object
         $form = new Auth_Form_Account(array(
             'user' => $this->getResource()->fetchRow($id),
-            'detailKeys' => $detailKeyModel->getResource()->fetchRows(),
+            'detailKeys' => $detailKeys,
             'changeUsername' => Daiquiri_Config::getInstance()->auth->changeUsername,
             'changeEmail' => Daiquiri_Config::getInstance()->auth->changeEmail,
         ));
@@ -67,6 +68,13 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // process arrays in the details (for checkbox and multiselect)
+                foreach ($detailKeys as $detailKey) {
+                    if (is_array($values[$detailKey['key']])) {
+                        $values[$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                    }
+                }
 
                 // update the user and redirect
                 $this->getResource()->updateRow($id, $values);

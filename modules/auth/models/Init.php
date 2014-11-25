@@ -291,9 +291,12 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create detail keys entries
         $authDetailKeysModel = new Auth_Model_DetailKeys();
         if ($authDetailKeysModel->getResource()->countRows() === 0) {
-            foreach ($this->_init->options['init']['auth']['detailKeys'] as $a) {
-                if (!isset($a['type_id'])) {
+            foreach ($this->_init->options['init']['auth']['detailKeys'] as &$a) {
+                if (!isset($a['type'])) {
                     $a['type_id'] = 0;
+                } else {
+                    $a['type_id'] = array_search($a['type'], Auth_Model_DetailKeys::$types);
+                    unset($a['type']);
                 }
                 $r = $authDetailKeysModel->create($a);
                 $this->_check($r, $a);
@@ -314,6 +317,24 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 $credentials['new_password'] = $credentials['password'];
                 $credentials['confirm_password'] = $credentials['password'];
                 unset($credentials['password']);
+
+                // process detail keys
+                foreach ($this->_init->options['init']['auth']['detailKeys'] as $detailKey) {
+                    if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('radio','select'))) {
+                        $options = Zend_Json::decode($detailKey['options']);
+                        $option_id = array_search($credentials[$detailKey['key']],$options);
+                        $credentials[$detailKey['key']] = $option_id;
+                    } else if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
+                        $options = Zend_Json::decode($detailKey['options']);
+
+                        $values = array();
+                        foreach ($credentials[$detailKey['key']] as $value) {
+                            $values[] = array_search($value,$options);
+                        }
+
+                        $credentials[$detailKey['key']] = $values;
+                    }
+                }
 
                 // fake request parametes to make 
                 Zend_Controller_Front::getInstance()->getRequest()->setParams($credentials);
