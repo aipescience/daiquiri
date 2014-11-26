@@ -125,7 +125,6 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
             case "checkbox":
                 $this->addElement('multiCheckbox', $detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
-                    'required' => true,
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
@@ -146,7 +145,6 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
             case "multiselect":
                 $this->addElement('multiselect', $detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
-                    'required' => true,
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;

@@ -28,9 +28,6 @@ class Auth_Form_Element_Detail extends Zend_Form_Element_Text {
         // set label
         $this->setLabel(ucfirst($this->getName()));
 
-        // set required
-        $this->setRequired(true);
-
         // set filter
         $this->addFilter('StringTrim');
 
