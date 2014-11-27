@@ -436,7 +436,11 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
             if ($row['code'] === $code) {
                 // decode the details again
                 foreach (Zend_Json::decode($row['details']) as $key => $value) {
-                    $row[$key] = $value;
+                    if (is_array($value)) {
+                        $row[$key] = Zend_Json::encode($value);
+                    } else {
+                        $row[$key] = $value;
+                    }
                 }
 
                 // get rid of the code, the id, and the details
