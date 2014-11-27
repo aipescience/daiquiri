@@ -28,36 +28,40 @@ class Auth_Form_DetailKeys extends Daiquiri_Form_Model {
         $this->addCsrfElement();
         
         // add elements
-        $this->addElement('text','key', array(
+        $this->addTextElement('key', array(
             'label' => 'Detail key',
+            'class' => 'span6',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text','hint', array(
+        $this->addTextElement('hint', array(
             'label' => 'Hint for form',
+            'class' => 'span6',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('select', 'type_id', array(
+        $this->addSelectElement('type_id', array(
             'label' => 'Type',
+            'class' => 'span6',
             'required' => true,
             'multiOptions' => Auth_Model_DetailKeys::$types
         ));
-        $this->addElement('text','options', array(
+        $this->addTextElement('options', array(
             'label' => 'Options',
+            'class' => 'span6',
             'filters' => array('StringTrim'),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
 
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('key','hint','type_id','options'));

@@ -20,7 +20,7 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Manage user detail keys</h2>
 
     <table class="table table-condensed">
@@ -46,19 +46,22 @@
                             'text' => 'Show',
                             'href' => '/auth/detail-keys/show/id/' . $this->escape($row['id']),
                             'resource' => 'Auth_Model_DetailKeys',
-                            'permission' => 'show'));
+                            'permission' => 'show',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Update',
                             'href' => '/auth/detail-keys/update/id/' . $this->escape($row['id']),
                             'resource' => 'Auth_Model_DetailKeys',
                             'permission' => 'update',
-                            'prepend' => '&nbsp;'));
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/auth/detail-keys/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Auth_Model_DetailKeys',
                             'permission' => 'delete',
-                            'prepend' => '&nbsp;')); 
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         ?>
                     </td>
                 </tr>
@@ -71,11 +74,14 @@
         'text' => 'Create detail Key',
         'href' => '/auth/detail-keys/create',
         'prepend' => '<p>',
-        'append' => '</p>'));
+        'append' => '</p>',
+        'ng-click' => 'fetchHtml($event)'));
     echo $this->internalLink(array(
         'text' => 'Back to meetings management',
         'href' => '/meetings/',
         'prepend' => '<p>',
         'append' => '</p>'));
     ?>
+
+    <div daiquiri-modal></div>
 </div>

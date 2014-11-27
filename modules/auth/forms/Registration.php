@@ -40,7 +40,7 @@ class Auth_Form_Registration extends Auth_Form_Abstract {
         );
         $this->addCaptchaElement();
         $this->addSubmitButtonElement('submit', 'Register');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup($details, 'detail-group');

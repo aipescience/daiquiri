@@ -20,24 +20,16 @@
 ?>
 
 <div class="main">
-    <h2><?php echo $this->escape($this->row['key']); ?></h2>
+    <h2>User detail key: <?php echo $this->escape($this->row['key']); ?></h2>
 
-    <table class="table table-bordered">
-        <tbody>
-            <?php foreach ($this->row as $key => $value): ?>
-                <tr>
-                    <td class="onehundredeighty"><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></td>
-                    <td><?php echo $this->escape($value); ?></td>
-                </tr>
-            <?php endforeach; ?>  
-        </tbody>
-    </table>
-
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <dl class="dl-horizontal">
+        <?php foreach($this->row as $key => $value): ?>
+        <dt><?php echo ucwords(str_replace('_',' ',$this->escape($key))); ?></dt>
+        <?php if(!empty($this->row[$key])): ?>
+        <dd><?php echo $this->escape($this->row[$key]); ?></dd>
+        <?php else: ?>
+        <dd>&nbsp;</dd>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </dl>
 </div>

@@ -123,33 +123,33 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
 
         switch (Auth_Model_DetailKeys::$types[$detailKey['type_id']]) {
             case "checkbox":
-                $this->addElement('multiCheckbox', $detailKey['key'], array(
+                $this->addMultiCheckboxElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
             case "radio":
-                $this->addElement('radio', $detailKey['key'], array(
+                $this->addRadioElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                     'required' => true,
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
             case "select":
-                $this->addElement('select', $detailKey['key'], array(
+                $this->addSelectElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                     'required' => true,
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
             case "multiselect":
-                $this->addElement('multiselect', $detailKey['key'], array(
+                $this->addMultiselectElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
             default:
-                $this->addElement('text', $detailKey['key'], array(
+                $this->addTextElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ',$detailKey['key'])),
                     'required' => true,
                     'filters' => array('StringTrim'),
