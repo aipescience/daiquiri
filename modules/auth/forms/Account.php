@@ -28,10 +28,11 @@ class Auth_Form_Account extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $elements = array();
+        $details = array();
         foreach ($this->getDetailKeys() as $detailKey) {
-            $elements[] = $this->addDetailElement($detailKey);
+            $details[] = $this->addDetailElement($detailKey);
         }
+        $elements = array();
         if ($this->_changeUsername) {
             $elements[] = $this->addUsernameElement($this->_user['id']);
         }
@@ -42,13 +43,26 @@ class Auth_Form_Account extends Auth_Form_Abstract {
         $this->addButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup($elements);
+        $this->addHorizontalGroup(array_merge($details,$elements));
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
         // set fields
         foreach ($elements as $element) {
             if (isset($this->_user[$element])) {
                 $this->setDefault($element, $this->_user[$element]);
+            }
+        }
+        foreach ($this->getDetailKeys() as $detailKey) {
+            if (isset($this->_user[$detailKey['key']])) {
+                $key = $detailKey['key'];
+
+                if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
+                    $value = Zend_Json::decode($this->_user[$key]);
+                } else {
+                    $value = $this->_user[$key];
+                }
+
+                $this->setDefault($key,$value);
             }
         }
     }
