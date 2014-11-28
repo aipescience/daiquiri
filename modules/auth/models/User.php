@@ -183,19 +183,21 @@ class Auth_Model_User extends Daiquiri_Model_Table {
         $row = $this->getResource()->fetchRow($id);
 
         foreach($detailKeys as $detailKey) {
-            if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('radio','select'))) {
-                $options = Zend_Json::decode($detailKey['options']);
+            if (array_key_exists($detailKey['key'],$row)) {
+                if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('radio','select'))) {
+                    $options = Zend_Json::decode($detailKey['options']);
 
-                $row[$detailKey['key']] = $options[$row[$detailKey['key']]];
-            } else if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
-                $options = Zend_Json::decode($detailKey['options']);
+                    $row[$detailKey['key']] = $options[$row[$detailKey['key']]];
+                } else if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
+                    $options = Zend_Json::decode($detailKey['options']);
 
-                $values = array();
-                foreach (Zend_Json::decode($row[$detailKey['key']]) as $value_id) {
-                    $values[] = $options[$value_id];
+                    $values = array();
+                    foreach (Zend_Json::decode($row[$detailKey['key']]) as $value_id) {
+                        $values[] = $options[$value_id];
+                    }
+
+                    $row[$detailKey['key']] = implode(', ',$values);
                 }
-
-                $row[$detailKey['key']] = implode(', ',$values);
             }
         }
 

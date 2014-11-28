@@ -218,12 +218,27 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
 
         // update user details
         foreach ($details as $key => $value) {
-            $this->getAdapter()->update('Auth_Details', array(
-                'value' => $value
-            ), array(
-                'user_id=?' => $id,
-                $this->quoteIdentifier('key') .  '=?' => $key
-            ));
+            $select = $this->getAdapter()->select();
+            $select->from('Auth_Details');
+            $select->where('user_id=?',$id);
+            $select->where($this->quoteIdentifier('key') .  '=?', $key);
+
+            $row = $this->getAdapter()->fetchRow($select);
+
+            if (empty($row)) {
+                $this->getAdapter()->insert('Auth_Details', array(
+                    'user_id' => $id,
+                    'key' => $key,
+                    'value' => $value
+                ));
+            } else {
+                $this->getAdapter()->update('Auth_Details', array(
+                    'value' => $value
+                ), array(
+                    'user_id=?' => $id,
+                    $this->quoteIdentifier('key') .  '=?' => $key
+                ));
+            }
         }
     }
 

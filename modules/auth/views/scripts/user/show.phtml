@@ -31,17 +31,20 @@ unset($this->row['status_id']);
     <h4>User information</h4>
 
     <dl class="dl-horizontal">
-        <?php foreach (array_merge(
+        <?php
+        foreach (array_merge(
             array('id', 'username', 'email', 'role', 'status'),
-            Daiquiri_Config::getInstance()->auth->details->toArray()
-        ) as $key): ?>
-        <dt><?php echo $this->escape(ucfirst($key)); ?></dt>
-        <dd><?php echo $this->escape($this->row[$key]); ?></dd>
-        <?php unset($this->row[$key]); ?>
-        <?php endforeach; ?>
+            Daiquiri_Auth::getInstance()->getDetailKeys()
+        ) as $key) {
+            if (array_key_exists($key,$this->row)) {
+                echo "<dt>{$this->escape(ucfirst($key))}</dt>";
+                echo "<dd>{$this->escape($this->row[$key])}</dd>";
+                unset($this->row[$key]);
+            }
+        } ?>
     </dl>
 
-    <h4>Additional information</h4> 
+    <h4>Additional information</h4>
 
     <?php if (!empty($this->row)): ?>
     <dl class="dl-horizontal">
