@@ -62,9 +62,25 @@ app.factory('AdminService', ['$http','$window','TableService','ModalService',fun
                     'csrf': angular.element('#csrf').attr('value')
                 };
 
-                // merge with form values
-                angular.extend(data,values);
+                // merge with form values and take arrays into account
+                angular.forEach(values, function(value, key) {
+                    if (angular.isObject(value)) {
+                        data[key] = [];
+                        angular.forEach(value, function(v,k) {
+                            if (v === true) {
+                                // for value from a set of checkboxes use the key
+                                data[key].push(k);
+                            } else {
+                                // for value from a multiselect field use the values
+                                data[key].push(v);
+                            }
+                        });
+                    } else {
+                        data[key] = value;
+                    }
+                });
 
+                // fire up post request
                 $http.post(activeUrl,$.param(data)).success(function(response) {
                     for (var error in errors) delete errors[error];
 

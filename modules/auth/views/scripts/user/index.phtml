@@ -42,13 +42,6 @@
             <div class="daiquiri-widget">
             <?php
             echo $this->internalLink(array(
-                'href' => '/auth/registration/',
-                'text' => 'Manage registrations',
-                'resource' => 'Auth_Model_Registration',
-                'permission' => 'index',
-                'prepend' => '<p>',
-                'append' => '</p>'));
-            echo $this->internalLink(array(
                 'text' => 'Export to init.php syntax',
                 'href' => '/auth/user/export/',
                 'resource' => 'Auth_Model_User',
@@ -73,6 +66,25 @@
         </div>
 
         <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'href' => '/auth/registration/',
+                'text' => 'Manage registrations',
+                'resource' => 'Auth_Model_Registration',
+                'permission' => 'index',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            echo $this->internalLink(array(
+                'href' => '/auth/detail-keys/',
+                'text' => 'Manage user detail keys',
+                'resource' => 'Auth_Model_DetailKeys',
+                'permission' => 'index',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            ?>
+            </div>
+
             <div class="daiquiri-widget">
                 <?php echo $this->adminLink(); ?>
             </div>

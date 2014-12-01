@@ -25,7 +25,10 @@ class Daiquiri_Form_Element_MultiCheckbox extends Zend_Form_Element_MultiCheckbo
      * Constructor. Sets the angular model attribute.
      */
     public function __construct($name,$options) {
-        $options = Daiquiri_Form_Element_Abstract::addAngularOptions($name,$options);
+        // if (empty($options['ng-model'])) {
+        //     $options['ng-model'] = array("values.{$name}[0]","values.{$name}[1]","values.{$name}[2]","values.{$name}[3]");
+        // }
+        // $options = Daiquiri_Form_Element_Abstract::addAngularOptions($name,$options);
         parent::__construct($name,$options);
     }
 

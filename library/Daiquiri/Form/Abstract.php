@@ -80,17 +80,6 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Sets the default value for an element
-     * @param  string $name
-     * @param  mixed  $value
-     * @return Zend_Form
-     */
-    public function setDefault($name, $value) {
-        $this->getElement($name)->setAttrib('ng-init',"values.{$name} = '{$value}'");
-        return parent::setDefault($name, $value);
-    }
-
-    /**
      * Adds a form element for a text field.
      * @param  string $name  name of the element
      * @param  array $options options for the element

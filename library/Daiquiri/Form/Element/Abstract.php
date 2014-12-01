@@ -25,9 +25,9 @@ abstract class Daiquiri_Form_Element_Abstract {
      * Constructor. Sets the angular model attribute.
      */
     static public function addAngularOptions($name,$options) {
-        if (empty($options['ng-model'])) {
-            $options['ng-model'] = "values.{$name}";
-        }
+        // if (empty($options['ng-model'])) {
+        //     $options['ng-model'] = "values.{$name}";
+        // }
         return $options;
     }
 
@@ -44,14 +44,14 @@ abstract class Daiquiri_Form_Element_Abstract {
         ));
 
         // the angular errors
-        $element->addDecorator('Callback', array(
-            'callback' => function($content, $element, $options) {
-                $ngErrorModel = 'errors.' . $element->getName();
+        // $element->addDecorator('Callback', array(
+        //     'callback' => function($content, $element, $options) {
+        //         $ngErrorModel = 'errors.' . $element->getName();
 
-                return '<ul class="unstyled text-error help-inline angular" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">{{error}}</li></ul>';
-            },
-            'placement' => 'append'
-        ));
+        //         return '<ul class="unstyled text-error help-inline angular" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">{{error}}</li></ul>';
+        //     },
+        //     'placement' => 'append'
+        // ));
         
         // wrap in div.controls
         $element->addDecorator(array('controls' => 'HtmlTag'), array('tag' => 'div', 'class' => 'controls'));
