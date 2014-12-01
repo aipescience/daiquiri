@@ -37,7 +37,10 @@ angular.module('modal', ['ngSanitize'])
 
                         // fo different things for different types
                         if (type === 'text') {
-                            angular.element('#' + id, dom).attr('ng-model','values.' + id);
+                            var element = angular.element('#' + id, dom);
+                            element.attr('ng-model','values.' + id)
+                            element.after('<ul class="unstyled text-error help-inline angular" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
+
                             scope.values[id] = angular.element(node).attr('value');
                         } else if (type === 'checkbox') {
                             m = id.match(/(.*)\-(\d+)/);
@@ -69,7 +72,6 @@ angular.module('modal', ['ngSanitize'])
                     // add ng-model to SELECT fields and set model to values
                     angular.forEach(angular.element('select',dom), function(node, key) {
                         var id = angular.element(node).attr('id');
-
                         angular.element('#' + id, dom).attr('ng-model','values.' + id);
 
                         if (angular.element(node).attr('multiple')) {
