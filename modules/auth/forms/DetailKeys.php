@@ -56,7 +56,7 @@ class Auth_Form_DetailKeys extends Daiquiri_Form_Model {
             'class' => 'span6',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('validator' => new Daiquiri_Form_Validator_Json()),
             )
         ));
 
