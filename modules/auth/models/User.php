@@ -297,6 +297,8 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 foreach ($detailKeys as $detailKey) {
                     if (is_array($values[$detailKey['key']])) {
                         $values[$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                    } else if ($values[$detailKey['key']] === null) {
+                        $values[$detailKey['key']] = Zend_Json::encode(array());
                     }
                 }
 

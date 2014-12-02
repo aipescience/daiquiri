@@ -48,7 +48,7 @@ class Core_Form_Messages extends Daiquiri_Form_Model {
             )
         ));
         $this->addSubmitButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('key', 'value'));

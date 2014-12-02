@@ -66,15 +66,21 @@ app.factory('AdminService', ['$http','$window','TableService','ModalService',fun
                 angular.forEach(values, function(value, key) {
                     if (angular.isObject(value)) {
                         data[key] = [];
-                        angular.forEach(value, function(v,k) {
-                            if (v === true) {
-                                // for value from a set of checkboxes use the key
-                                data[key].push(k);
-                            } else {
-                                // for value from a multiselect field use the values
+
+                        if (angular.isArray(value)) {
+                            // this is an array coming from a multiselect
+                            angular.forEach(value, function(v,k) {
                                 data[key].push(v);
-                            }
-                        });
+                            });
+                        } else {
+                            // this is an object coming from a set of checkboxes
+                            angular.forEach(value, function(v,k) {
+                                if (v === true) {
+                                    // for value from a set of checkboxes use the key
+                                    data[key].push(k);
+                                }
+                            });
+                        }
                     } else {
                         data[key] = value;
                     }

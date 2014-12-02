@@ -48,16 +48,35 @@ angular.module('modal', ['ngSanitize'])
                         } else if (type === 'checkbox') {
                             m = id.match(/(.*)\-(\d+)/);
 
-                            // prepare values array
-                            if (angular.isUndefined(scope.values[m[1]])) {
-                                scope.values[m[1]] = {};
-                            }
+                            if (m === null) {
+                                // this is a regular single with a hidden field checkbox
+                                var element = angular.element('#' + id, dom);
+                                element.attr('ng-model','values.' + id)
+                                element.attr('ng-true-value','1');
+                                element.attr('ng-false-value','0');
 
-                            // set values based on checked argument
-                            if (angular.element(node).attr('checked') == 'checked') {
-                                scope.values[m[1]][m[2]] = true;
+                                if (element.attr('checked') == 'checked') {
+                                    scope.values[id] = 1;
+                                } else {
+                                    scope.values[id] = 0;
+                                }
+
                             } else {
-                                scope.values[m[1]][m[2]] = false;
+                                // this belongs to a multible checkbox
+                                var element = angular.element('#' + id, dom);
+                                element.attr('ng-model','values.' + m[1] + '[' + m[2] + ']');
+
+                                // prepare values array
+                                if (angular.isUndefined(scope.values[m[1]])) {
+                                    scope.values[m[1]] = {};
+                                }
+
+                                // set values based on checked argument
+                                if (angular.element(node).attr('checked') == 'checked') {
+                                    scope.values[m[1]][m[2]] = true;
+                                } else {
+                                    scope.values[m[1]][m[2]] = false;
+                                }
                             }
 
                         } else if (type === 'radio') {
@@ -89,6 +108,16 @@ angular.module('modal', ['ngSanitize'])
                             // this is a regular select
                             scope.values[id] = angular.element('option[selected="selected"]',node).attr('value');
                         }
+                    });
+
+                    // add ng-model to TEXTAREA fields and set model to values
+                    angular.forEach(angular.element('textarea',dom), function(node, key) {
+                        var id = angular.element(node).attr('id');
+                        var element = angular.element('#' + id, dom);
+                        element.attr('ng-model','values.' + id);
+                        element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
+
+                        scope.values[id] = angular.element(node).text();
                     });
 
                     // compile to an angular element and add to actual modal

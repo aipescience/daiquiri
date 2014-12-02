@@ -37,7 +37,7 @@ class Core_Form_Templates extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addTextareaElement('subject', array(
+        $this->addTextElement('subject', array(
             'label' => 'Subject',
             'class' => 'span6 mono',
             'required' => true,
@@ -49,7 +49,7 @@ class Core_Form_Templates extends Daiquiri_Form_Model {
         $this->addTextareaElement('body', array(
             'label' => 'Body',
             'class' => 'span6 mono',
-            'rows' => '20',
+            'rows' => 16,
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -57,7 +57,7 @@ class Core_Form_Templates extends Daiquiri_Form_Model {
             )
         ));
         $this->addSubmitButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('template','subject', 'body'));

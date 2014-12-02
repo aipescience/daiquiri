@@ -44,6 +44,7 @@ class Query_Form_Example extends Daiquiri_Form_Model {
         // add elements
         $this->addTextElement('name', array(
             'label' => 'Name',
+            'class' => 'span6',
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -52,6 +53,7 @@ class Query_Form_Example extends Daiquiri_Form_Model {
         ));
         $this->addTextareaElement('query', array(
             'label' => 'Query',
+            'class' => 'span6',
             'rows' => '6',
             'required' => true,
             'filters' => array('StringTrim'),
@@ -61,6 +63,7 @@ class Query_Form_Example extends Daiquiri_Form_Model {
         ));
         $this->addTextareaElement('description', array(
             'label' => 'Description (optional)',
+            'class' => 'span6',
             'rows' => '4',
             'required' => false,
             'filters' => array('StringTrim'),
