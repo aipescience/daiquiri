@@ -23,7 +23,7 @@
 <div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Manage user detail keys</h2>
 
-    <table class="table table-condensed">
+    <table class="table table-condensed table-bordered">
         <thead>
             <tr>
                 <th>Id</th>
@@ -71,19 +71,31 @@
         </tbody>
     </table>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create detail Key',
-        'href' => '/auth/detail-keys/create',
-        'prepend' => '<p>',
-        'append' => '</p>',
-        'ng-click' => 'fetchHtml($event)'));
-    echo $this->internalLink(array(
-        'text' => 'Back to user management',
-        'href' => '/auth/user/',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <div class="row">
+        <div class="span3">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create detail Key',
+                'href' => '/auth/detail-keys/create',
+                'prepend' => '<p>',
+                'append' => '</p>',
+                'ng-click' => 'fetchHtml($event)'));
+            ?>
+            </div>
+        </div>
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Back to user management',
+                'href' => '/auth/user',
+                'prepend' => '<p>',
+                'append' => '</p>'));
+            ?>
+            </div>
+        </div>
+    </div>
 
     <div daiquiri-modal></div>
 </div>

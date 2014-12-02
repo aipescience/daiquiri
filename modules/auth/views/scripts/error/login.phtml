@@ -29,7 +29,7 @@
             <?php echo $this->loginLink(); ?>
         </p>
     <?php else: ?>
-        <h2>You need to be logged in to view this page.</h2>
+        <h3>You need to be logged in to view this page.</h3>
         <?php
         $redirect = preg_replace('`' . preg_quote($this->baseUrl()) . '`', '', $this->url());
         echo $this->action('index', 'login', 'auth', array('redirect' => $redirect));

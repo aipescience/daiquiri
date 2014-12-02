@@ -22,26 +22,31 @@
 class Daiquiri_Form_Element_Multiselect extends Zend_Form_Element_Multiselect {
 
     /**
-     * Constructor. Sets the angular model attribute.
+     * A hint to be displayed with the form element.
+     * @var string
      */
-    public function __construct($name,$options) {
-        $options = Daiquiri_Form_Element_Abstract::addAngularOptions($name,$options);
-        parent::__construct($name,$options);
+    protected $_hint;
+
+    /**
+     * Setter for $_hint.
+     * @param string $hint a hint for the form element
+     */
+    public function setHint($hint) {
+        $this->_hint = $hint;
+    }
+
+    /**
+     * Getter for $_hint.
+     * @return string $hint a hint for the form element
+     */
+    public function getHint() {
+        return $this->_hint;
     }
 
     /**
      * Sets the default decorators needed for angular.
      */
     public function loadDefaultDecorators() {
-        if ($this->loadDefaultDecoratorsIsDisabled()) {
-            return $this;
-        }
-
-        $decorators = $this->getDecorators();
-        if (empty($decorators)) {
-            Daiquiri_Form_Element_Abstract::addAngularDecorators($this);
-        }
-
-        return $this;
+        return Daiquiri_Form_Element_Abstract::loadDaiquiriDecorators($this);
     }
 }

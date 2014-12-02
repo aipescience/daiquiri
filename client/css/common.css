@@ -135,10 +135,7 @@ form .inline {
 .form-horizontal:last-child {
     margin-bottom: 0;
 }
-form .controls ul.text-error {
-    margin: 10px 0 0 0;
-    padding: 0;
-}
+
 button::-moz-focus-inner {
     /* Remove extra space inside buttons in Firefox */
     border: none;
@@ -153,18 +150,18 @@ form[novalidate] select:focus:invalid {
     -moz-box-shadow: inherit;
     box-shadow: inherit;
 }
-form .help-inline.angular,
-form .form-error.angular {
-    display: none;
-}
-.ng-scope form .help-inline.angular {
-    display: block;
-}
-.ng-scope form .form-error.angular  {
-    display: block;
-}
 #add_ucd {
     margin-left: 20px;
+}
+form .controls ul.text-error,
+form .controls div.form-hint {
+    margin: 5px 0 0 0;
+    padding: 0;
+}
+.help-block,
+.help-inline,
+.form-hint {
+    color: #888;
 }
 
 /* 
@@ -400,4 +397,9 @@ li.dropdown ul ul {
 }
 .daiquiri-admin-widget a:hover {
     text-decoration: none;
+}
+
+/* login */
+.login:first-child {
+    margin-top: 60px;
 }

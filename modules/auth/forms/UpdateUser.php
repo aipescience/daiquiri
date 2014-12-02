@@ -26,18 +26,18 @@ class Auth_Form_UpdateUser extends Auth_Form_Abstract {
      */
     public function init() {
         $this->addCsrfElement();
-        
+
         // add elements
         $details = array();
         foreach ($this->getDetailKeys() as $detailKey) {
-            $details[] = $this->addDetailElement($detailKey);
+            $details[] = $this->addDetailElement($detailKey,'span6');
         }
         $elements = array();
         if ($this->_changeUsername) {
-            $elements[] = $this->addUsernameElement($this->_user['id']);
+            $elements[] = $this->addUsernameElement('span6',$this->_user['id']);
         }
         if ($this->_changeEmail) {
-            $elements[] = $this->addEmailElement($this->_user['id']);
+            $elements[] = $this->addEmailElement('span6',$this->_user['id']);
         }
         $elements[] = $this->addRoleIdElement();
         $elements[] = $this->addStatusIdElement();

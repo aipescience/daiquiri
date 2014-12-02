@@ -30,13 +30,13 @@ class Auth_Form_CreateUser extends Auth_Form_Abstract {
         // add elements
         $details = array();
         foreach ($this->getDetailKeys() as $detailKey) {
-            $details[] = $this->addDetailElement($detailKey);
+            $details[] = $this->addDetailElement($detailKey, 'span6');
         }
         $elements = array(
-            $this->addUsernameElement(),
-            $this->addEmailElement(),
-            $this->addNewPasswordElement(),
-            $this->addConfirmPasswordElement(),
+            $this->addUsernameElement('span6'),
+            $this->addEmailElement('span6'),
+            $this->addNewPasswordElement('span6'),
+            $this->addConfirmPasswordElement('span6'),
             $this->addRoleIdElement(),
             $this->addStatusIdElement()
         );

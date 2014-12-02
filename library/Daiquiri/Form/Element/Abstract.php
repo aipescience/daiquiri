@@ -34,35 +34,49 @@ abstract class Daiquiri_Form_Element_Abstract {
     /**
      * Sets the default decorators needed for angular.
      */
-    public function addAngularDecorators($element) {
-        // the element itself
-        $element->addDecorator('ViewHelper');
 
-        // the zend errors
-        $element->addDecorator('Errors', array(
-            'class' => 'unstyled text-error',
-        ));
+    public function loadDaiquiriDecorators($element) {
 
-        // the angular errors
-        // $element->addDecorator('Callback', array(
-        //     'callback' => function($content, $element, $options) {
-        //         $ngErrorModel = 'errors.' . $element->getName();
+        if ($element->loadDefaultDecoratorsIsDisabled()) {
+            return $element;
+        }
 
-        //         return '<ul class="unstyled text-error help-inline angular" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">{{error}}</li></ul>';
-        //     },
-        //     'placement' => 'append'
-        // ));
-        
-        // wrap in div.controls
-        $element->addDecorator(array('controls' => 'HtmlTag'), array('tag' => 'div', 'class' => 'controls'));
+        $decorators = $element->getDecorators();
+        if (empty($decorators)) {
+            // the element itself
+            $element->addDecorator('ViewHelper');
 
-        // the label.control-label
-        $element->addDecorator('Label', array('class' => 'control-label'));
+            // the hint
+            $element->addDecorator('Callback', array(
+                'callback' => function($content, $element, $options) {
+                    $hint = $element->getHint();
+                    if (empty($hint)) {
+                        return "";
+                    } else {
+                        return "<div class=\"form-hint\">{$hint}</div>";
+                    }
+                },
+                'placement' => 'append'
+            ));
 
-        // wrap in div.control-group
-        $element->addDecorator(array('control-group' => 'HtmlTag'), array('tag' => 'div', 'class' => 'control-group'));
+            // the Zend errors
+            $element->addDecorator('Errors', array(
+                'class' => 'unstyled text-error',
+            ));
 
-        // enable html for label
-        $element->getDecorator('Label')->setOption('escape', false);
+            // wrap in div.controls
+            $element->addDecorator(array('controls' => 'HtmlTag'), array('tag' => 'div', 'class' => 'controls'));
+
+            // the label.control-label
+            $element->addDecorator('Label', array('class' => 'control-label'));
+
+            // wrap in div.control-group
+            $element->addDecorator(array('control-group' => 'HtmlTag'), array('tag' => 'div', 'class' => 'control-group'));
+
+            // enable html for label
+            $element->getDecorator('Label')->setOption('escape', false);
+        }
+
+        return $element;
     }
 }

@@ -30,7 +30,7 @@ class Auth_Form_Registration extends Auth_Form_Abstract {
         // add elements
         $details = array();
         foreach ($this->getDetailKeys() as $detailKey) {
-            $details[] = $this->addDetailElement($detailKey);
+            $details[] = $this->addDetailElement($detailKey,'span5');
         }
         $elements = array(
             $this->addUsernameElement(),

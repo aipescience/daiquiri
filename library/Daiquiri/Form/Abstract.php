@@ -67,12 +67,6 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
                 'class' => 'unstyled form-error text-error align-form-horizontal',
                 'escape' => false
             ));
-            $this->addDecorator('Callback', array(
-                'callback' => function($content, $element, $options) {
-                    return '<ul class="unstyled form-error text-error align-form-horizontal angular" ng-show="errors.form"><li ng-repeat="error in errors.form">{{error}}</li></ul>';
-                },
-                'placement' => 'append'
-            ));
             $this->addDecorator('Form');
         }
 

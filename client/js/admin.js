@@ -97,7 +97,7 @@ app.factory('AdminService', ['$http','$window','TableService','ModalService',fun
                             errors[key] = error;
                         });
                     } else {
-                        errors['form'] = {'form': ['Error: Unknown response from server.']};
+                        errors['form'] = {'form': 'Error: Unknown response from server.'};
                     }
                 });
             } else {

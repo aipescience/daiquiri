@@ -28,8 +28,8 @@ class Auth_Form_SetPassword extends Auth_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addNewPasswordElement();
-        $this->addConfirmPasswordElement();
+        $this->addNewPasswordElement('span6');
+        $this->addConfirmPasswordElement('span6');
         $this->addSubmitButtonElement('submit', 'Set new password');
         $this->addButtonElement('cancel', 'Cancel');
 

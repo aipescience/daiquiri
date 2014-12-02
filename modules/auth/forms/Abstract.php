@@ -119,18 +119,20 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @param  array  $detailKey description of the user detail
      * @return string $name   name of the element
      */
-    public function addDetailElement($detailKey) {
+    public function addDetailElement($detailKey, $class = '') {
 
         switch (Auth_Model_DetailKeys::$types[$detailKey['type_id']]) {
             case "checkbox":
                 $this->addMultiCheckboxElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'hint' => $detailKey['hint'],
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
             case "radio":
                 $this->addRadioElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'hint' => $detailKey['hint'],
                     'required' => true,
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
@@ -138,6 +140,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
             case "select":
                 $this->addSelectElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'hint' => $detailKey['hint'],
                     'required' => true,
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
@@ -145,12 +148,15 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
             case "multiselect":
                 $this->addMultiselectElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'hint' => $detailKey['hint'],
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
             default:
                 $this->addTextElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ',$detailKey['key'])),
+                    'hint' => $detailKey['hint'],
+                    'class' => $class,
                     'required' => true,
                     'filters' => array('StringTrim'),
                     'validators' => array(
@@ -167,9 +173,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @param int $excludeId exclude a certain user id from the unique-ness validator
      * @return string $name   name of the element
      */
-    public function addUsernameElement($excludeId = null) {
+    public function addUsernameElement($class = '', $excludeId = null) {
         $this->addElement(new Auth_Form_Element_Username(array(
-            'excludeId' => $excludeId
+            'excludeId' => $excludeId,
+            'class' => $class
         )));
         return 'username';
     }
@@ -179,9 +186,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @param int $excludeId exclude a certain user id from the unique-ness validator
      * @return string $name   name of the element
      */
-    public function addAppnameElement($excludeId = null) {
+    public function addAppnameElement($class = '', $excludeId = null) {
         $this->addElement(new Auth_Form_Element_Appname(array(
-            'excludeId' => $excludeId
+            'excludeId' => $excludeId,
+            'class' => $class
         )));
         return 'appname';
     }
@@ -191,9 +199,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * @param int $excludeId exclude a certain user id from the unique-ness validator
      * @return string $name   name of the element
      */
-    public function addEmailElement($excludeId = null) {
+    public function addEmailElement($class = '', $excludeId = null) {
         $this->addElement(new Auth_Form_Element_Email(array(
-            'excludeId' => $excludeId
+            'excludeId' => $excludeId,
+            'class' => $class
         )));
         return 'email';
     }
@@ -202,8 +211,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * Creates a form element for the old password and adds it to the form.
      * @return string $name name of the element
      */
-    public function addOldPasswordElement() {
-        $this->addElement(new Auth_Form_Element_OldPassword());
+    public function addOldPasswordElement($class = '') {
+        $this->addElement(new Auth_Form_Element_OldPassword(array(
+            'class' => $class
+        )));
         return 'old_password';
     }
 
@@ -211,8 +222,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * Creates a form element for the new password and adds it to the form.
      * @return string $name name of the element
      */
-    public function addNewPasswordElement() {
-        $this->addElement(new Auth_Form_Element_NewPassword());
+    public function addNewPasswordElement($class = '') {
+        $this->addElement(new Auth_Form_Element_NewPassword(array(
+            'class' => $class
+        )));
         return 'new_password';
     }
 
@@ -220,8 +233,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * Creates a form element for the password confirmation and adds it to the form.
      * @return string $name name of the element 
      */
-    public function addConfirmPasswordElement() {
-        $this->addElement(new Auth_Form_Element_ConfirmPassword());
+    public function addConfirmPasswordElement($class = '') {
+        $this->addElement(new Auth_Form_Element_ConfirmPassword(array(
+            'class' => $class
+        )));
         return 'confirm_password';
     }
 
@@ -229,9 +244,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * Creates a form element for the role id and adds it to the form.
      * @return string $name name of the element
      */
-    public function addRoleIdElement() {
+    public function addRoleIdElement($class = '') {
         $this->addElement(new Auth_Form_Element_RoleId(array(
-            'multiOptions' => $this->_roles
+            'multiOptions' => $this->_roles,
+            'class' => $class
         )));
         return 'role_id';
     }
@@ -240,9 +256,10 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
      * Creates a form element for the status id and adds it to the form.
      * @return string $name name of the element
      */
-    public function addStatusIdElement() {
+    public function addStatusIdElement($class = '') {
         $this->addElement(new Auth_Form_Element_StatusId(array(
-            'multiOptions' => $this->_status
+            'multiOptions' => $this->_status,
+            'class' => $class
         )));
         return 'status_id';
     }

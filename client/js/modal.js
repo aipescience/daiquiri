@@ -30,21 +30,23 @@ angular.module('modal', ['ngSanitize'])
                     // parse html to a fake dom
                     var dom = angular.element(ModalService.modal.html);
 
+                    // add errors to form
+                    angular.element('#fieldset-actiongroup', dom).before('<ul class="unstyled text-error align-form-horizontal" ng-show="errors.form"><li ng-repeat="error in errors.form">{{error}}</li></ul>');
+
                     // add ng-model to INPUT fields and set model to values
                     angular.forEach(angular.element('input',dom), function(node, key) {
                         var id = angular.element(node).attr('id');
                         var type = angular.element(node).attr('type');
 
                         // fo different things for different types
-                        if (type === 'text') {
+                        if (type === 'text' || type == 'password') {
                             var element = angular.element('#' + id, dom);
                             element.attr('ng-model','values.' + id)
-                            element.after('<ul class="unstyled text-error help-inline angular" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
+                            element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
 
                             scope.values[id] = angular.element(node).attr('value');
                         } else if (type === 'checkbox') {
                             m = id.match(/(.*)\-(\d+)/);
-                            angular.element('#' + id, dom).attr('ng-model','values.' + m[1] + '[' + m[2] + ']');
 
                             // prepare values array
                             if (angular.isUndefined(scope.values[m[1]])) {
@@ -72,7 +74,9 @@ angular.module('modal', ['ngSanitize'])
                     // add ng-model to SELECT fields and set model to values
                     angular.forEach(angular.element('select',dom), function(node, key) {
                         var id = angular.element(node).attr('id');
-                        angular.element('#' + id, dom).attr('ng-model','values.' + id);
+                        var element = angular.element('#' + id, dom);
+                        element.attr('ng-model','values.' + id);
+                        element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
 
                         if (angular.element(node).attr('multiple')) {
                             // this is a multiselect

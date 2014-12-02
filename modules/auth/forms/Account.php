@@ -30,14 +30,14 @@ class Auth_Form_Account extends Auth_Form_Abstract {
         // add elements
         $details = array();
         foreach ($this->getDetailKeys() as $detailKey) {
-            $details[] = $this->addDetailElement($detailKey);
+            $details[] = $this->addDetailElement($detailKey, 'span5');
         }
         $elements = array();
         if ($this->_changeUsername) {
-            $elements[] = $this->addUsernameElement($this->_user['id']);
+            $elements[] = $this->addUsernameElement('',$this->_user['id']);
         }
         if ($this->_changeEmail) {
-            $elements[] = $this->addEmailElement($this->_user['id']);
+            $elements[] = $this->addEmailElement('',$this->_user['id']);
         }
         $this->addSubmitButtonElement('submit', 'Update profile');
         $this->addButtonElement('cancel', 'Cancel');
