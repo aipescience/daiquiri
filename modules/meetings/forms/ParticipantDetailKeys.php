@@ -48,7 +48,7 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
             'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('validator' => new Daiquiri_Form_Validator_Json()),
             )
         ));
 

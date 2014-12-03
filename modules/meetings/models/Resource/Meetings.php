@@ -208,12 +208,13 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
         $select = $this->select();
         $select->from('Meetings_Meetings_ParticipantDetailKeys', array('participant_detail_key_id'));
         $select->where('Meetings_Meetings_ParticipantDetailKeys.meeting_id = ?', $id);
-        $select->join('Meetings_ParticipantDetailKeys', 'Meetings_Meetings_ParticipantDetailKeys.participant_detail_key_id = Meetings_ParticipantDetailKeys.id', array('key','type_id','options'));
+        $select->join('Meetings_ParticipantDetailKeys', 'Meetings_Meetings_ParticipantDetailKeys.participant_detail_key_id = Meetings_ParticipantDetailKeys.id', array('key','hint','type_id','options'));
 
         $participantDetailKeys = array();
         foreach($this->fetchAll($select) as $row) {
             $participantDetailKeys[$row['participant_detail_key_id']] = array(
                 'key' => $row['key'],
+                'hint' => $row['hint'],
                 'type_id' => $row['type_id'],
                 'options' => $row['options']
             );

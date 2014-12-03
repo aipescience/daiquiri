@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `Meetings_ParticipantDetails` (
 CREATE TABLE IF NOT EXISTS `Meetings_ParticipantDetailKeys` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `key` VARCHAR(256) NOT NULL,
+  `hint` VARCHAR(256),
   `type_id` INTEGER NOT NULL,
   `options` VARCHAR(256)
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';

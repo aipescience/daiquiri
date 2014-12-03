@@ -28,17 +28,20 @@
             <tr>
                 <th>Id</th>
                 <th>Key</th>
+                <th>Hint</th>
                 <th>Type</th>
-                <th>Options</th>
+                <th>Input options</th>
                 <th>Options</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($this->rows as $row): ?>
                 <tr>
-                    <?php foreach ($row as $element): ?>
-                    <td><?php echo $this->escape($element); ?></td>
-                    <?php endforeach; ?>
+                    <td><?php echo $this->escape($row['id']); ?></td>
+                    <td><?php echo $this->escape($row['key']); ?></td>
+                    <td><?php echo $this->escape($row['hint']); ?></td>
+                    <td><?php echo $this->escape(Meetings_Model_ParticipantDetailKeys::$types[$row['type_id']]); ?></td>
+                    <td><?php echo $this->escape($row['options']); ?></td>
                     <td>
                         <?php 
                         echo $this->internalLink(array(

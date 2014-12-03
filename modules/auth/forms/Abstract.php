@@ -117,7 +117,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
     /**
      * Creates a form element for a detail and adds it to the form.
      * @param  array  $detailKey description of the user detail
-     * @return string $name   name of the element
+     * @return string $name      name of the element
      */
     public function addDetailElement($detailKey, $class = '') {
 

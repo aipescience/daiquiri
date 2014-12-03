@@ -45,6 +45,7 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
         foreach (array('firstname','lastname','affiliation') as $key) {
             $this->addTextElement($key, array(
                 'label' => ucfirst($key),
+                'class' => 'span5',
                 'required' => true,
                 'filters' => array('StringTrim'),
                 'validators' => array(
@@ -55,53 +56,14 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
 
         // email field
         $this->addElement(new Meetings_Form_Element_Email(array(
-            'meetingId' => $this->_meeting['id']
+            'meetingId' => $this->_meeting['id'],
+            'class' => 'span5',
         )));
 
         // participant details
         $participantDetailKeysElements = array();
-        foreach ($this->_meeting['participant_detail_keys'] as $id => $detailKey) {
-            switch (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']]) {
-                case "checkbox":
-                    $this->addMultiCheckboxElement($detailKey['key'], array(
-                        'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
-                        'required' => true,
-                        'multiOptions' => explode(',',$detailKey['options'])
-                    ));
-                    break;
-                case "radio":
-                    $this->addRadioElement($detailKey['key'], array(
-                        'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
-                        'required' => true,
-                        'multiOptions' => explode(',',$detailKey['options'])
-                    ));
-                    break;
-                case "select":
-                    $this->addSelectElement($detailKey['key'], array(
-                        'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
-                        'required' => true,
-                        'multiOptions' => explode(',',$detailKey['options'])
-                    ));
-                    break;
-                case "multiselect":
-                    $this->addMultiselectElement($detailKey['key'], array(
-                        'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
-                        'required' => true,
-                        'multiOptions' => explode(',',$detailKey['options'])
-                    ));
-                    break;
-                default:
-                    $this->addTextElement($detailKey['key'], array(
-                        'label' => ucfirst(str_replace('_',' ',$detailKey['key'])),
-                        'required' => true,
-                        'filters' => array('StringTrim'),
-                        'validators' => array(
-                            array('validator' => new Daiquiri_Form_Validator_Text()),
-                        )
-                    ));
-            }
-
-            $participantDetailKeysElements[] = $detailKey['key'];
+        foreach ($this->_meeting['participant_detail_keys'] as $detailKey) {
+            $participantDetailKeysElements[] = $this->addParticipantDetailElement($detailKey,'span5');
         }
 
         // arrival and departure
@@ -124,7 +86,7 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
 
         // contributions
         $contributionElements = array();
-        foreach ($this->_meeting['contribution_types'] as $id => $contribution_type) {
+        foreach ($this->_meeting['contribution_types'] as $contribution_type) {
             $this->addCheckboxElement($contribution_type . '_bool', array(
                 'class' => 'daiquiri-toggle-control-group',
                 'label' => ucfirst($contribution_type),

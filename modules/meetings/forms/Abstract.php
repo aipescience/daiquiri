@@ -34,4 +34,59 @@ abstract class Meetings_Form_Abstract extends Daiquiri_Form_Model {
     public function setMeeting($meeting) {
         $this->_meeting = $meeting;
     }
+
+    /**
+     * Creates a form element for a participant detail and adds it to the form.
+     * @param  array  $detailKey description of the participant detail
+     * @return string $name      name of the element
+     */
+    public function addParticipantDetailElement($detailKey, $class = '') {
+
+        switch (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']]) {
+            case "checkbox":
+                $this->addMultiCheckboxElement($detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'hint' => $detailKey['hint'],
+                    'multiOptions' => Zend_Json::decode($detailKey['options'])
+                ));
+                break;
+            case "radio":
+                $this->addRadioElement($detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'hint' => $detailKey['hint'],
+                    'required' => true,
+                    'multiOptions' => Zend_Json::decode($detailKey['options'])
+                ));
+                break;
+            case "select":
+                $this->addSelectElement($detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'hint' => $detailKey['hint'],
+                    'required' => true,
+                    'multiOptions' => Zend_Json::decode($detailKey['options'])
+                ));
+                break;
+            case "multiselect":
+                $this->addMultiselectElement($detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
+                    'hint' => $detailKey['hint'],
+                    'multiOptions' => Zend_Json::decode($detailKey['options'])
+                ));
+                break;
+            default:
+                $this->addTextElement($detailKey['key'], array(
+                    'label' => ucfirst(str_replace('_',' ',$detailKey['key'])),
+                    'hint' => $detailKey['hint'],
+                    'class' => $class,
+                    'required' => true,
+                    'filters' => array('StringTrim'),
+                    'validators' => array(
+                        array('validator' => new Daiquiri_Form_Validator_Text()),
+                    )
+                ));
+        }
+
+        return $detailKey['key'];
+    }
+
 }
