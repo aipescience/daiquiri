@@ -102,31 +102,7 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         // contributions
         $contributionElements = array();
         foreach ($this->_meeting['contribution_types'] as $contribution_type) {
-            $this->addCheckboxElement($contribution_type . '_bool', array(
-                'label' => ucfirst($contribution_type),
-            ));
-            $this->addTextElement($contribution_type . '_title', array(
-                'label' => 'Title',
-                'required' => false,
-                'class' => 'span6 mono',
-                'filters' => array('StringTrim'),
-                'validators' => array(
-                    array('validator' => new Daiquiri_Form_Validator_Text()),
-                )
-            ));
-            $this->addTextareaElement($contribution_type . '_abstract', array(
-                'label' => 'Abstract',
-                'class' => 'span6 mono',
-                'rows' => 6,
-                'required' => false,
-                'filters' => array('StringTrim'),
-                'validators' => array(
-                    array('validator' => new Daiquiri_Form_Validator_Textarea()),
-                )
-            ));
-            $contributionElements[] = $contribution_type . '_bool';
-            $contributionElements[] = $contribution_type . '_title';
-            $contributionElements[] = $contribution_type . '_abstract';
+            array_merge($contributionElements, $this->addContributionElement($contribution_type));
         }
 
         // captcha and submit buttons

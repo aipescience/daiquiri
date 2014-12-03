@@ -61,9 +61,9 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
         )));
 
         // participant details
-        $participantDetailKeysElements = array();
+        $details = array();
         foreach ($this->_meeting['participant_detail_keys'] as $detailKey) {
-            $participantDetailKeysElements[] = $this->addParticipantDetailElement($detailKey,'span5');
+            $details[] = $this->addParticipantDetailElement($detailKey,'span5');
         }
 
         // arrival and departure
@@ -84,32 +84,9 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
             )
         ));
 
-        // contributions
-        $contributionElements = array();
+        $contributions = array();
         foreach ($this->_meeting['contribution_types'] as $contribution_type) {
-            $this->addCheckboxElement($contribution_type . '_bool', array(
-                'class' => 'daiquiri-toggle-control-group',
-                'label' => ucfirst($contribution_type),
-            ));
-            $this->addTextElement($contribution_type . '_title', array(
-                'label' => 'Title',
-                'class' => 'span6 daiquiri-hide-control-group',
-                'required' => false,
-                'filters' => array('StringTrim'),
-                'validators' => array(
-                    array('validator' => new Daiquiri_Form_Validator_Text()),
-                )
-            ));
-            $this->addTextareaElement($contribution_type . '_abstract', array(
-                'label' => 'Abstract',
-                'class' => 'span6 daiquiri-hide-control-group',
-                'rows' => 6,
-                'required' => false,
-                'filters' => array('StringTrim')
-            ));
-            $contributionElements[] = $contribution_type . '_bool';
-            $contributionElements[] = $contribution_type . '_title';
-            $contributionElements[] = $contribution_type . '_abstract';
+            $contributions = array_merge($contributions, $this->addContributionElement($contribution_type));
         }
 
         // captcha and submit buttons
@@ -120,15 +97,14 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addCancelButtonElement('cancel', 'Cancel');
 
-
         // add groups
-        $this->addHorizontalGroup(array_merge(array('firstname','lastname','affiliation','email'), $participantDetailKeysElements),'personal', 'Your data');
+        $this->addHorizontalGroup(array_merge(array('firstname','lastname','affiliation','email'), $details),'personal', 'Your data');
         if (!empty($this->_status)) {
             $this->addHorizontalGroup(array('status_id'),'status', 'Status');
         }
         $this->addHorizontalGroup(array('arrival','departure'),'attendance', 'Attendance');
-        if (!empty($contributionElements)) {
-            $this->addHorizontalGroup($contributionElements,'contributions', 'Contributions');
+        if (!empty($contributions)) {
+            $this->addHorizontalGroup($contributions,'contributions', 'Contributions');
         }
         if (empty($this->_user)) {
             $this->addHorizontalCaptchaGroup('captcha');

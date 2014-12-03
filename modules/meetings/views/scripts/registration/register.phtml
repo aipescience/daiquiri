@@ -44,7 +44,7 @@
             format: 'yyyy-mm-dd'
         });
 
-        $('.daiquiri-toggle-control-group').each(function () {
+        $('#fieldset-contributions input[type="checkbox"]').each(function () {
             if (!this.checked) {
                 var type = $(this).attr('id').match(/(\w+)_bool/)[1];
                 $('#' + type + '_title').parents('.control-group').hide();
@@ -52,7 +52,7 @@
             }
         })
 
-        $('.daiquiri-toggle-control-group').change(function(){
+        $('#fieldset-contributions input[type="checkbox"]').change(function(){
             var type = $(this).attr('id').match(/(\w+)_bool/)[1];
             if (this.checked) {
                 $('#' + type + '_title').parents('.control-group').show();

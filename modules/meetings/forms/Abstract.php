@@ -89,4 +89,40 @@ abstract class Meetings_Form_Abstract extends Daiquiri_Form_Model {
         return $detailKey['key'];
     }
 
+    /**
+     * Creates form elements for the contribution type and adds it to the form.
+     * @param  array  $contributionType name of the contribution type
+     * @return array  $names            names of the elements
+     */
+    public function addContributionElement($contributionType) {
+
+        $this->addCheckboxElement($contributionType . '_bool', array(
+            'label' => ucfirst($contributionType)
+        ));
+        $this->addTextElement($contributionType . '_title', array(
+            'label' => 'Title',
+            'required' => false,
+            'class' => 'span6 mono',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
+        $this->addTextareaElement($contributionType . '_abstract', array(
+            'label' => 'Abstract',
+            'class' => 'span6 mono',
+            'rows' => 6,
+            'required' => false,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Textarea()),
+            )
+        ));
+
+        return array(
+            $contributionType . '_bool',
+            $contributionType . '_title',
+            $contributionType . '_abstract'
+        );
+    }
 }
