@@ -106,7 +106,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
         } else {
             return array_merge(
                 $row,
-                $this->_fetchParticipantDetails($id),
+                array('details' => $this->_fetchParticipantDetails($id)),
                 array('contributions' => $this->_fetchContributions($id))
             );
         }

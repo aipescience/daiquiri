@@ -196,7 +196,32 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function show($id) {
-        return $this->getModelHelper('CRUD')->show($id);
+        $row = $this->getResource()->fetchRow($id);
+
+        foreach($row['details'] as $key => $value) {
+
+            Zend_Debug::dump($key);
+            Zend_Debug::dump($value);
+
+            // if (array_key_exists($detailKey['key'],$row)) {
+            //     if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('radio','select'))) {
+            //         $options = Zend_Json::decode($detailKey['options']);
+
+            //         $row[$detailKey['key']] = $options[$row[$detailKey['key']]];
+            //     } else if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
+            //         $options = Zend_Json::decode($detailKey['options']);
+
+            //         $values = array();
+            //         foreach (Zend_Json::decode($row[$detailKey['key']]) as $value_id) {
+            //             $values[] = $options[$value_id];
+            //         }
+
+            //         $row[$detailKey['key']] = implode(', ',$values);
+            //     }
+            // }
+        }
+
+        return array('status' => 'ok', 'row' => $row);
     }
 
     /**

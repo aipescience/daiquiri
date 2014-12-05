@@ -88,7 +88,9 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
                 }
             }
 
-            return array_merge($row, $details);
+            $row['details'] = $details;
+
+            return $row;
         } else {
             return false;
         }
@@ -151,18 +153,11 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         }
 
         // seperate primary credentials and details
-        $credentials = array();
-        $details = array();
-        foreach ($data as $key => $value) {
-            if (in_array($key, array('username', 'email', 'password', 'status_id', 'role_id'))) {
-                $credentials[$key] = $value;
-            } else {
-                $details[$key] = $value;
-            }
-        }
+        $details = $data['details'];
+        unset($data['details']);
 
         // insert primary credentials
-        $this->getAdapter()->insert('Auth_User', $credentials);
+        $this->getAdapter()->insert('Auth_User', $data);
 
         // get the id of the user just inserted
         $id = $this->getAdapter()->lastInsertId();
@@ -178,8 +173,8 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
 
         // create database for user
         if (Daiquiri_Config::getInstance()->query) {
-            $userDb = Daiquiri_Config::getInstance()->getUserDbName($credentials['username']);
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $credentials['username']);
+            $userDb = Daiquiri_Config::getInstance()->getUserDbName($data['username']);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $data['username']);
 
             $sql = "CREATE DATABASE `{$userDb}`";
             $adapter->query($sql)->closeCursor();

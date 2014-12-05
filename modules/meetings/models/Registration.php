@@ -103,16 +103,19 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                 // get the form values
                 $values = $form->getValues();
                 $values['meeting_id'] = $meeting['id'];
+
                 $values['details'] = array();
-                foreach ($meeting['participant_detail_keys'] as $key_id => $detailKey) {
-                    if (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']] === 'default') {
-                        $values['details'][$key_id] = $values[$detailKey['key']];
+                foreach ($meeting['participant_detail_keys'] as $keyId => $detailKey) {
+                    if (is_array($values[$detailKey['key']])) {
+                        $values['details'][$keyId] = Zend_Json::encode($values[$detailKey['key']]);
+                    } else if ($values[$detailKey['key']] === null) {
+                        $values['details'][$keyId] = Zend_Json::encode(array());
                     } else {
-                        $options = explode(',',$detailKey['options']);
-                        $values['details'][$key_id] = $options[$values[$detailKey['key']]];
+                        $values['details'][$keyId] = $values[$detailKey['key']];
                     }
                     unset($values[$detailKey['key']]);
                 }
+
                 $values['contributions'] = array();
                 foreach ($meeting['contribution_types'] as $contributionTypeId => $contributionType) {
                     if ($values[$contributionType . '_bool'] === '1') {
@@ -177,8 +180,16 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                         'arrival' => $values['arrival'],
                         'departure' => $values['departure']
                     );
-                    foreach ($meeting['participant_detail_keys'] as $key => $detailKey) {
-                        $mailValues[$detailKey['key']] = $values['details'][$key];
+                    foreach ($meeting['participant_detail_keys'] as $keyId => $detailKey) {
+                        if (isset($values['details'][$keyId])) {
+                            if (is_array($values['details'][$keyId])) {
+                                $mailValues[$detailKey['key']] = implode(',',$values['details'][$keyId]);
+                            } else {
+                                $mailValues[$detailKey['key']] = $values['details'][$keyId];
+                            }
+                        } else {
+                            $mailValues[$detailKey['key']] = '';
+                        }
                     }
                     foreach ($meeting['contribution_types'] as $key => $contribution_type) {
                         if (!empty($values['contributions'][$key])) {
@@ -234,8 +245,16 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                 'arrival' => $values['arrival'],
                 'departure' => $values['departure']
             );
-            foreach ($meeting['participant_detail_keys'] as $key => $detailKey) {
-                $mailValues[$detailKey['key']] = $values['details'][$key];
+            foreach ($meeting['participant_detail_keys'] as $keyId => $detailKey) {
+                if (isset($values['details'][$keyId])) {
+                    if (is_array($values['details'][$keyId])) {
+                        $mailValues[$detailKey['key']] = implode(',',$values['details'][$keyId]);
+                    } else {
+                        $mailValues[$detailKey['key']] = $values['details'][$keyId];
+                    }
+                } else {
+                    $mailValues[$detailKey['key']] = '';
+                }
             }
             foreach ($meeting['contribution_types'] as $key => $contribution_type) {
                 if (!empty($values['contributions'][$key])) {

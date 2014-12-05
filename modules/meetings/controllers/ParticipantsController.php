@@ -65,6 +65,8 @@ class Meetings_ParticipantsController extends Daiquiri_Controller_Abstract {
         $response = $this->_model->show($id);
         $this->view->redirect = $this->_getParam('redirect','/meetings/participants/');
         $this->view->assign($response);
+        Zend_Debug::dump($response['row']['details']);
+        Zend_Debug::dump($response['row']['contributions']); die(0);
     }
 
     public function createAction() {

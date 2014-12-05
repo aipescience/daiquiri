@@ -32,23 +32,22 @@ unset($this->row['status_id']);
 
     <dl class="dl-horizontal">
         <?php
-        foreach (array_merge(
-            array('id', 'username', 'email', 'role', 'status'),
-            Daiquiri_Auth::getInstance()->getDetailKeys()
-        ) as $key) {
-            if (array_key_exists($key,$this->row)) {
-                echo "<dt>{$this->escape(ucfirst($key))}</dt>";
-                echo "<dd>{$this->escape($this->row[$key])}</dd>";
-                unset($this->row[$key]);
-            }
+        foreach (array('id', 'username', 'email', 'role', 'status') as $key) {
+            echo "<dt>{$this->escape(ucfirst($key))}</dt>";
+            echo "<dd>{$this->escape($this->row[$key])}</dd>";
+        }
+        foreach ($this->row['details'] as $key => $value) {
+            echo "<dt>{$this->escape(ucfirst($key))}</dt>";
+            echo "<dd>{$this->escape($value)}</dd>";
+            unset($this->row['details'][$key]);
         } ?>
     </dl>
 
     <h4>Additional information</h4>
 
-    <?php if (!empty($this->row)): ?>
+    <?php if (!empty($this->row['details'])): ?>
     <dl class="dl-horizontal">
-        <?php foreach ($this->row as $key => $value): ?>
+        <?php foreach ($this->row['details'] as $key => $value): ?>
         <dt><?php echo $this->escape(ucfirst($key)); ?></dt>
         <dd>
             <?php echo $this->escape($value); ?>

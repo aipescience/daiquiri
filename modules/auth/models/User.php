@@ -183,20 +183,24 @@ class Auth_Model_User extends Daiquiri_Model_Table {
         $row = $this->getResource()->fetchRow($id);
 
         foreach($detailKeys as $detailKey) {
-            if (array_key_exists($detailKey['key'],$row)) {
-                if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('radio','select'))) {
+            if (array_key_exists($detailKey['key'],$row['details'])) {
+                $key = $detailKey['key'];
+                $value = $row['details'][$key];
+                $type = Auth_Model_DetailKeys::$types[$detailKey['type_id']];
+
+                if (in_array($type, array('radio','select'))) {
                     $options = Zend_Json::decode($detailKey['options']);
 
-                    $row[$detailKey['key']] = $options[$row[$detailKey['key']]];
-                } else if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
+                    $row['details'][$key] = $options[$value];
+                } else if (in_array($type, array('checkbox','multiselect'))) {
                     $options = Zend_Json::decode($detailKey['options']);
 
                     $values = array();
-                    foreach (Zend_Json::decode($row[$detailKey['key']]) as $value_id) {
+                    foreach (Zend_Json::decode($value) as $value_id) {
                         $values[] = $options[$value_id];
                     }
 
-                    $row[$detailKey['key']] = implode(', ',$values);
+                    $row['details'][$key] = implode(', ',$values);
                 }
             }
         }
@@ -238,8 +242,13 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 // process arrays in the details (for checkbox and multiselect)
                 foreach ($detailKeys as $detailKey) {
                     if (is_array($values[$detailKey['key']])) {
-                        $values[$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                        $values['details'][$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                    } else if ($values[$detailKey['key']] === null) {
+                        $values['details'][$detailKey['key']] = Zend_Json::encode(array());
+                    }else {
+                        $values['details'][$detailKey['key']] = $values[$detailKey['key']];
                     }
+                    unset($values[$detailKey['key']]);
                 }
 
                 // create the user
