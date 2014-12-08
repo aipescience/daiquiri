@@ -45,6 +45,13 @@ CREATE TABLE IF NOT EXISTS `Data_Columns` (
   `publication_role_id` INTEGER
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
+CREATE TABLE IF NOT EXISTS `Data_Static` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `alias` VARCHAR(256) NOT NULL,
+  `path` VARCHAR(256) NOT NULL,
+  `publication_role_id` INTEGER
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
 CREATE TABLE IF NOT EXISTS `Data_UCD` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `type` CHAR(2) NOT NULL,

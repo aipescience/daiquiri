@@ -20,5 +20,31 @@
  */
 
 class Data_Bootstrap extends Zend_Application_Module_Bootstrap {
-    
+
+    protected function _initRoute() {
+        $this->bootstrap('frontController');
+        $front = Zend_Controller_Front::getInstance();
+
+        $router = new Zend_Controller_Router_Route_Regex(
+            // regexp for the route, matches to (excluding the zend controllers we still need)
+            // data/static/:alias/:path
+            'data/((?!columns|databases|files|functions|index|static|tables|viewer)[a-z0-9A-Z\_\-]+)([a-z0-9A-Z\/\.\_\-]*)',
+            // default values when the route matches
+            array(
+                'module' => 'data',
+                'controller' => 'static',
+                'action' => 'serve'
+            ),
+            // the third argument maps regexp matches to request params
+            array(
+                1 => 'alias',
+                2 => 'path'
+            ),
+            // this is the reversed route, we need it so the error handling works
+            'data/%s/%s'
+        );
+
+        $front->getRouter()->addRoute('static', $router);
+    }
+
 }

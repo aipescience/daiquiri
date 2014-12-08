@@ -81,6 +81,14 @@
             </div>
         </div>
     </div>
+
+    <?php
+    echo $this->internalLink(array(
+        'text' => 'Manage static file aliases',
+        'href' => '/data/static',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
     <?php echo $this->adminLink(); ?>
 </div>
 

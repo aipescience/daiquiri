@@ -31,6 +31,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
             'Data_Model_Files',
             'Data_Model_Functions',
             'Data_Model_Databases',
+            'Data_Model_Static',
             'Data_Model_Tables',
             'Data_Model_Columns'
         );
@@ -44,6 +45,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
         return array(
             'guest' => array(
                 'Data_Model_Viewer' => array('rows','cols'),
+                'Data_Model_Static'=>  array('file'),
                 'Data_Model_Files' => array('index','single','singleSize','multi','multiSize','row','rowSize')
             ),
             'admin' => array(
@@ -51,6 +53,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                 'Data_Model_Tables' => array('create','show','update','delete','export'),
                 'Data_Model_Columns' => array('create','show','update','delete','export'),
                 'Data_Model_Functions' => array('index','create','show','update','delete','export'),
+                'Data_Model_Static' => array('index','create','show','update','delete','export')
             )
         );
     }
@@ -105,7 +108,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
      */
     public function init() {
         // create column entries in the data module
-        if (isset($this->_init->options['init']['data']['columns']) 
+        if (isset($this->_init->options['init']['data']['columns'])
             && is_array($this->_init->options['init']['data']['columns'])) {
             $dataColumnsModel = new Data_Model_Columns();
             if ($dataColumnsModel->getResource()->countRows() == 0) {
@@ -125,7 +128,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create table entries in the data module
-        if (isset($this->_init->options['init']['data']['tables']) 
+        if (isset($this->_init->options['init']['data']['tables'])
             && is_array($this->_init->options['init']['data']['tables'])) {
             $dataTablesModel = new Data_Model_Tables();
             if ($dataTablesModel->getResource()->countRows() == 0) {
@@ -146,7 +149,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create database entries in the data module
-        if (isset($this->_init->options['init']['data']['databases']) 
+        if (isset($this->_init->options['init']['data']['databases'])
             && is_array($this->_init->options['init']['data']['databases'])) {
             $dataDatabasesModel = new Data_Model_Databases();
             if ($dataDatabasesModel->getResource()->countRows() == 0) {
@@ -167,7 +170,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create function entries in the tables module
-        if (isset($this->_init->options['init']['data']['functions']) 
+        if (isset($this->_init->options['init']['data']['functions'])
             && is_array($this->_init->options['init']['data']['functions'])) {
             $dataFunctionsModel = new Data_Model_Functions();
             if ($dataFunctionsModel->getResource()->countRows() == 0) {
@@ -175,9 +178,29 @@ class Data_Model_Init extends Daiquiri_Model_Init {
 
                     $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
                     unset($a['publication_role']);
-                    
+
                     try {
                         $r = $dataFunctionsModel->create($a);
+                    } catch (Exception $e) {
+                        $this->_error("Error in creating function metadata:\n" . $e->getMessage());
+                    }
+                    $this->_check($r, $a);
+                }
+            }
+        }
+
+        // create function entries in the tables module
+        if (isset($this->_init->options['init']['data']['static'])
+            && is_array($this->_init->options['init']['data']['static'])) {
+            $dataStaticModel = new Data_Model_Static();
+            if ($dataStaticModel->getResource()->countRows() == 0) {
+                foreach ($this->_init->options['init']['data']['static'] as $a) {
+
+                    $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
+                    unset($a['publication_role']);
+
+                    try {
+                        $r = $dataStaticModel->create($a);
                     } catch (Exception $e) {
                         $this->_error("Error in creating function metadata:\n" . $e->getMessage());
                     }
