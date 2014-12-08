@@ -164,13 +164,20 @@ class Data_Model_Static extends Daiquiri_Model_Abstract {
             throw new Daiquiri_Exception_Unauthorized();
         }
 
-        // create absolute file path and if the file is there
-        $file = $row['path'] . $path;
+        // create absolute file path
+        $file = realpath($row['path'] . $path);
+
+        // ensure that the file is not BELOW the give path
+        if ($file === false || strpos($file,rtrim($row['path'],'/')) !== 0) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        // see if the file is there
         if (is_file($file)) {
             return array('status' => 'ok', 'file' => $file);
         } elseif (is_dir($file)) {
             // look for and index file
-            $file .= 'index.html';
+            $file .= '/index.html';
             if (is_file($file)) {
                 return array('status' => 'ok', 'file' => $file);
             } else {
