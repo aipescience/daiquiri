@@ -19,40 +19,43 @@
  */
 ?>
 
+<?php
+$id = $this->row['id'];
+unset($this->row['meeting_id']);
+unset($this->row['status_id']);
+?>
+
 <div class="main">
-    <h2>Participant: <?php echo $this->escape($this->row['firstname'] . ' ' . $this->row['lastname']); ?></h2>
+    <h2>Participant <?php echo $this->escape($this->row['firstname'] . ' ' . $this->row['lastname']); ?></h2>
+
+    <h4>Participant information</h4>
 
     <dl class="dl-horizontal">
-        <?php foreach ($this->row as $key => $value): ?>
-        <?php if (substr($key, -strlen('_id')) !== '_id'): ?>
-        <dt><?php echo ucfirst(str_replace('_',' ',$this->escape($key))); ?></dt>
-        <dd>
-            <?php if (is_array($value)): ?>
-                <ul class="unstyled">
-                <?php foreach($value as $contribution): ?>
-                    <li><p>
-                            <?php echo $this->escape(ucfirst($contribution['contribution_type'])); ?>: <?php echo $this->escape(ucfirst($contribution['title'])); ?>
-                        </p>
-                        <p>
-                            <?php echo $this->escape(ucfirst($contribution['abstract'])); ?>
-                        </p>
-                    </li>
-                <?php endforeach; ?>
-                </ul>
-            <?php else: ?>
-                <?php echo $this->escape($value); ?>
-            <?php endif; ?>
-        </dd>
-        <?php endif; ?>
-        <?php endforeach; ?>
+        <?php
+        foreach (array('id','firstname','lastname','affiliation','arrival','email') as $key) {
+            echo "<dt>{$this->escape(ucfirst($key))}</dt>";
+            echo "<dd>{$this->escape($this->row[$key])}</dd>";
+        }
+        foreach ($this->row['details'] as $key => $value) {
+            echo "<dt>{$this->escape(ucfirst($key))}</dt>";
+            echo "<dd>{$this->escape($value)}</dd>";
+        }
+        ?>
     </dl>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'class' => 'daiquiri-modal-close',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
+    <h4>Contributions</h4>
+
+    <?php if (!empty($this->row['contributions'])): ?>
+    <dl class="dl-horizontal">
+        <?php foreach ($this->row['contributions'] as $key => $contribution): ?>
+        <dt><?php echo $this->escape(ucfirst($key)); ?></dt>
+        <dd>
+            <strong><?php echo $this->escape($contribution['title']); ?></strong>
+            <?php echo $this->escape($contribution['abstract']); ?>
+        </dd>
+        <?php endforeach; ?>
+    </dl>
+    <?php else: ?>
+        <p>none</p>
+    <?php endif; ?>
 </div>

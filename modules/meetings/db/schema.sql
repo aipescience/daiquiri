@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `Meetings_ParticipantStatus` (
 CREATE TABLE IF NOT EXISTS `Meetings_ParticipantDetails` (
   `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `participant_id` INTEGER NOT NULL,
-  `key_id` VARCHAR(256) NOT NULL,
+  `key_id` INTEGER NOT NULL,
   `value` VARCHAR(256) NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 

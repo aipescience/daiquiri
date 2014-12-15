@@ -29,6 +29,17 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
     }
 
     /**
+     * Returns the colums of the joined user table.
+     * @return array $cols
+     */
+    public function fetchCols() {
+        $cols = parent::fetchCols();
+        $cols['role'] = $this->quoteIdentifier('Auth_Roles','role');
+        $cols['status'] = $this->quoteIdentifier('Auth_Status','status');
+        return $cols;
+    }
+
+    /**
      * Fetches a set of rows from the (joined) Auth tables specified by $sqloptions.
      * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows
@@ -36,21 +47,40 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
     public function fetchRows(array $sqloptions = array()) {
         $select = $this->select($sqloptions);
         $select->from('Auth_User', array('id','username','email','role_id','status_id'));
-        $select->join('Auth_Roles', '`Auth_Roles`.`id` = `Auth_User`.`role_id`', array('role'));
-        $select->join('Auth_Status', '`Auth_Status`.`id` = `Auth_User`.`status_id`', array('status'));
-
-        // add an left join for every detail key
-        foreach (Daiquiri_Auth::getInstance()->getDetailKeys() as $key) {
-            if (substr($key, 0, 8) !== 'password') {
-                $detailSelect = $this->select();
-                $detailSelect->from('Auth_Details', array('user_id', 'value'));
-                $detailSelect->where('`key` = ?', $key);
-                $select->joinLeft(array('tmp_' . $key => $detailSelect), "`Auth_User`.`id` = tmp_" . $key . '.user_id', array($key => 'value'));
-            }
-        }
+        $select->join('Auth_Roles', 'Auth_Roles.id = Auth_User.role_id', array('role'));
+        $select->join('Auth_Status', 'Auth_Status.id = Auth_User.status_id', array('status'));
 
         // get the rowset and return
         return $this->fetchAll($select);
+    }
+
+    /**
+     * Counts the number of rows in the (joined) Auth tables.
+     * @param @param array $sqloptions array of sqloptions (start,limit,order,where,from)
+     * @return int $count
+     */
+    public function countRows(array $sqloptions = array()) {
+        $select = $this->select();
+        $select->from('Auth_User', 'COUNT(*) as count');
+        $select->join('Auth_Roles', 'Auth_Roles.id = Auth_User.role_id', array('role'));
+        $select->join('Auth_Status', 'Auth_Status.id = Auth_User.status_id', array('status'));
+
+        if ($sqloptions) {
+            if (isset($sqloptions['where'])) {
+                foreach ($sqloptions['where'] as $w) {
+                    $select = $select->where($w);
+                }
+            }
+            if (isset($sqloptions['orWhere'])) {
+                foreach ($sqloptions['orWhere'] as $w) {
+                    $select = $select->orWhere($w);
+                }
+            }
+        }
+
+        // query database and return
+        $row = $this->fetchOne($select);
+        return (int) $row['count'];
     }
 
     /**
@@ -69,60 +99,35 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
             $select = $this->select();
             $select->where('Auth_User.id = ?', $input);
         }
+
         $select->from('Auth_User', array('id','username','email','role_id','status_id'));
-        $select->join('Auth_Roles', '`Auth_Roles`.`id` = `Auth_User`.`role_id`', array('role'));
-        $select->join('Auth_Status', '`Auth_Status`.`id` = `Auth_User`.`status_id`', array('status'));
+        $select->join('Auth_Roles', 'Auth_Roles.id = Auth_User.role_id', array('role'));
+        $select->join('Auth_Status', 'Auth_Status.id = Auth_User.status_id', array('status'));
 
         $row = $this->fetchOne($select);
 
-        if ($row) {
-            $select = $this->select();
-            $select->from('Auth_Details', array('key','value'));
-            $select->where('user_id = ?', $row['id']);
-            $details = $this->fetchPairs($select);
-
-            // unset passwords
-            foreach ($details as $key => $value) {
-                if (substr($key, 0, 8) === 'password') {
-                    unset($details[$key]);
-                }
-            }
-
-            $row['details'] = $details;
-
-            return $row;
-        } else {
+        if (empty($row)) {
             return false;
-        }
-    }
+        } 
 
-    /**
-     * Counts the number of rows in the (joined) Auth tables.
-     * @param @param array $sqloptions array of sqloptions (start,limit,order,where,from)
-     * @return int $count
-     */
-    public function countRows(array $sqloptions = array()) {
+        // fetch details
         $select = $this->select();
-        $select->from('Auth_User', 'COUNT(*) as count');
-        $select->join('Auth_Roles', '`Auth_Roles`.`id` = `Auth_User`.`role_id`', array('role'));
-        $select->join('Auth_Status', '`Auth_Status`.`id` = `Auth_User`.`status_id`', array('status'));
+        $select->from('Auth_Details', array('key','value'));
+        $select->joinLeft('Auth_DetailKeys','Auth_DetailKeys.key = Auth_Details.key', array('type_id','options'));
+        $select->where('user_id = ?', $row['id']);
 
-        if ($sqloptions) {
-            if (isset($sqloptions['where'])) {
-                foreach ($sqloptions['where'] as $w) {
-                    $select = $select->where($w);
-                }
-            }
-            if (isset($sqloptions['orWhere'])) {
-                foreach ($sqloptions['orWhere'] as $w) {
-                    $select = $select->orWhere($w);
-                }
+        $details = $this->fetchPairs($select);
+
+        // unset passwords
+        foreach ($details as $key => $value) {
+            if (substr($key, 0, 8) === 'password') {
+                unset($details[$key]);
             }
         }
 
-        // query database and return
-        $row = $this->fetchOne($select);
-        return (int) $row['count'];
+        $row['details'] = $details;
+
+        return $row;
     }
 
     /**
@@ -196,15 +201,15 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         }
 
         // seperate primary credentials and details and check for password
+        $details = $data['details'];
+        unset($data['details']);
+
         $credentials = array();
-        $details = array();
         foreach ($data as $key => $value) {
             if (substr($key, 0, 8) === 'password') {
                 throw new Exception('password in $data array in ' . get_class($this) . '::' . __FUNCTION__ . '()');
             } else if (in_array($key, array('username', 'email', 'status_id', 'role_id'))) {
                 $credentials[$key] = $value;
-            } else {
-                $details[$key] = $value;
             }
         }
 
@@ -231,7 +236,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
                     'value' => $value
                 ), array(
                     'user_id=?' => $id,
-                    $this->quoteIdentifier('key') .  '=?' => $key
+                    $this->quoteIdentifier('key') .  ' = ?' => $key
                 ));
             }
         }

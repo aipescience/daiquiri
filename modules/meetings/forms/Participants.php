@@ -102,40 +102,50 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         // contributions
         $contributionElements = array();
         foreach ($this->_meeting['contribution_types'] as $contribution_type) {
-            array_merge($contributionElements, $this->addContributionElement($contribution_type));
+            $contributionElements[] = $this->addContributionElement($contribution_type);
         }
 
         // captcha and submit buttons
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addCancelButtonElement('cancel', 'Cancel');
 
-        // add groups
+        // add display group for participant information
         $this->addHorizontalGroup(array_merge(array('firstname','lastname','affiliation','email'), $participantDetailKeysElements),'personal');
         if (!empty($this->_status)) {
             $this->addHorizontalGroup(array('status_id'),'status');
         }
+
+        // add display group for arrival and departure
         $this->addHorizontalGroup(array('arrival','departure'),'attendance');
+
+        // add display groups for contributions
         if (!empty($contributionElements)) {
-            $this->addHorizontalGroup($contributionElements,'contributions');
+            foreach ($contributionElements as $key => $elements) {
+                $this->addHorizontalGroup($elements,'contributions-' . $key);
+            }
         }
+
+        // add display group for submit buttons
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));
 
-        // set fields
+        // set participant information fields
         foreach (array('firstname','lastname','affiliation','email','status_id','arrival','departure') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }
         }
-        foreach ($this->_meeting['participant_detail_keys'] as $key_id => $detailKey) {
-            if (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']] === 'default') {
-                $this->setDefault($detailKey['key'], $this->_entry[$detailKey['key']]);
+
+        // set detail fields
+        foreach ($this->_meeting['participant_detail_keys'] as $detailKey) {
+            if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
+                $value = Zend_Json::decode($this->_entry['details'][$detailKey['key']]);
             } else {
-                $options = explode(',',$detailKey['options']);
-                $option_id = array_search($this->_entry[$detailKey['key']],$options);
-                $this->setDefault($detailKey['key'], $option_id);
+                $value = $this->_entry['details'][$detailKey['key']];
             }
+            $this->setDefault($detailKey['key'],$value);
         }
 
+        // set arrival and departure
         if (isset($this->_entry['arrival'])) {
             $this->setDefault('arrival', $this->_entry['arrival']);
         } else {
@@ -146,11 +156,13 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         } else {
             $this->setDefault('departure', $this->_meeting['end']);
         }
+
+        // set contribution
         if (isset($this->_entry['contributions'])) {
-            foreach ($this->_entry['contributions'] as $contribution) {
-                $this->setDefault($contribution['contribution_type'] . '_bool', 1);
-                $this->setDefault($contribution['contribution_type'] . '_title', $contribution['title']);
-                $this->setDefault($contribution['contribution_type'] . '_abstract', $contribution['abstract']);
+            foreach ($this->_entry['contributions'] as $key => $contribution) {
+                $this->setDefault($key . '_bool', 1);
+                $this->setDefault($key . '_title', $contribution['title']);
+                $this->setDefault($key . '_abstract', $contribution['abstract']);
             }
         }
     }

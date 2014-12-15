@@ -182,30 +182,22 @@ class Auth_Model_User extends Daiquiri_Model_Table {
 
         $row = $this->getResource()->fetchRow($id);
 
-        foreach($detailKeys as $detailKey) {
-            if (array_key_exists($detailKey['key'],$row['details'])) {
-                $key = $detailKey['key'];
-                $value = $row['details'][$key];
-                $type = Auth_Model_DetailKeys::$types[$detailKey['type_id']];
+        foreach($detailKeys as $d) {
+            if (in_array(Auth_Model_DetailKeys::$types[$d['type_id']], array('radio','select'))) {
+                $options = Zend_Json::decode($d['options']);
+                $row['details'][$d['key']] = $options[$row['details'][$d['key']]];
+            } else if (in_array(Auth_Model_DetailKeys::$types[$d['type_id']], array('checkbox','multiselect'))) {
+                $options = Zend_Json::decode($d['options']);
 
-                if (in_array($type, array('radio','select'))) {
-                    $options = Zend_Json::decode($detailKey['options']);
-
-                    $row['details'][$key] = $options[$value];
-                } else if (in_array($type, array('checkbox','multiselect'))) {
-                    $options = Zend_Json::decode($detailKey['options']);
-
-                    $values = array();
-                    foreach (Zend_Json::decode($value) as $value_id) {
-                        $values[] = $options[$value_id];
-                    }
-
-                    $row['details'][$key] = implode(', ',$values);
+                $values = array();
+                foreach (Zend_Json::decode($row['details'][$d['key']]) as $value_id) {
+                    $values[] = $options[$value_id];
                 }
+
+                $row['details'][$d['key']] = implode(', ',$values);
             }
         }
-
-        return array('status' => 'ok', 'row' => $row);
+        return array('status' => 'ok', 'row' => $row, 'detailKeys' => $detailKeys);
     }
 
     /**
@@ -302,13 +294,17 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 // get the form values
                 $values = $form->getValues();
 
-                // process arrays in the details (for checkbox and multiselect)
+                // process the details
+                $values['details'] = array();
                 foreach ($detailKeys as $detailKey) {
                     if (is_array($values[$detailKey['key']])) {
-                        $values[$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                        $values['details'][$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
                     } else if ($values[$detailKey['key']] === null) {
-                        $values[$detailKey['key']] = Zend_Json::encode(array());
+                        $values['details'][$detailKey['key']] = Zend_Json::encode(array());
+                    } else {
+                        $values['details'][$detailKey['key']] = $values[$detailKey['key']];
                     }
+                    unset($values[$detailKey['key']]);
                 }
 
                 // update the user and redirect

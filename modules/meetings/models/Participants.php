@@ -198,27 +198,24 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
     public function show($id) {
         $row = $this->getResource()->fetchRow($id);
 
-        foreach($row['details'] as $key => $value) {
+        // get meeting model
+        $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($row['meeting_id']);
 
-            Zend_Debug::dump($key);
-            Zend_Debug::dump($value);
+        foreach($meeting['participant_detail_keys'] as $d) {
+            if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$d['type_id']], array('radio','select'))) {
+                $options = Zend_Json::decode($d['options']);
+                $row['details'][$d['key']] = $options[$row['details'][$d['key']]];
+            } else if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$d['type_id']], array('checkbox','multiselect'))) {
+                $options = Zend_Json::decode($d['options']);
 
-            // if (array_key_exists($detailKey['key'],$row)) {
-            //     if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('radio','select'))) {
-            //         $options = Zend_Json::decode($detailKey['options']);
+                $values = array();
+                foreach (Zend_Json::decode($row['details'][$d['key']]) as $value_id) {
+                    $values[] = $options[$value_id];
+                }
 
-            //         $row[$detailKey['key']] = $options[$row[$detailKey['key']]];
-            //     } else if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
-            //         $options = Zend_Json::decode($detailKey['options']);
-
-            //         $values = array();
-            //         foreach (Zend_Json::decode($row[$detailKey['key']]) as $value_id) {
-            //             $values[] = $options[$value_id];
-            //         }
-
-            //         $row[$detailKey['key']] = implode(', ',$values);
-            //     }
-            // }
+                $row['details'][$d['key']] = implode(', ',$values);
+            }
         }
 
         return array('status' => 'ok', 'row' => $row);
@@ -257,16 +254,20 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                 // get the form values
                 $values = $form->getValues();
                 $values['meeting_id'] = $meeting['id'];
+
+                // process the details
                 $values['details'] = array();
-                foreach ($meeting['participant_detail_keys'] as $key_id => $detailKey) {
-                    if (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']] === 'default') {
-                        $values['details'][$key_id] = $values[$detailKey['key']];
+                foreach ($meeting['participant_detail_keys'] as $detailKey) {
+                    if (is_array($values[$detailKey['key']])) {
+                        $values['details'][$detailKey['id']] = Zend_Json::encode($values[$detailKey['key']]);
+                    } else if ($values[$detailKey['key']] === null) {
+                        $values['details'][$detailKey['id']] = Zend_Json::encode(array());
                     } else {
-                        $options = explode(',',$detailKey['options']);
-                        $values['details'][$key_id] = $options[$values[$detailKey['key']]];
+                        $values['details'][$detailKey['id']] = $values[$detailKey['key']];
                     }
                     unset($values[$detailKey['key']]);
                 }
+
                 $values['contributions'] = array();
                 foreach ($meeting['contribution_types'] as $contributionTypeId => $contributionType) {
                     if ($values[$contributionType . '_bool'] === '1') {
@@ -274,6 +275,8 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                             'title' => $values[$contributionType . '_title'],
                             'abstract' => $values[$contributionType . '_abstract'],
                         );    
+                    } else {
+                        $values['contributions'][$contributionTypeId] = false;
                     }
 
                     //$values['details'][$key_id] = $values[$key];
@@ -326,16 +329,20 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // process the details
                 $values['details'] = array();
-                foreach ($meeting['participant_detail_keys'] as $key_id => $detailKey) {
-                    if (Meetings_Model_ParticipantDetailKeys::$types[$detailKey['type_id']] === 'default') {
-                        $values['details'][$key_id] = $values[$detailKey['key']];
+                foreach ($meeting['participant_detail_keys'] as $detailKey) {
+                    if (is_array($values[$detailKey['key']])) {
+                        $values['details'][$detailKey['id']] = Zend_Json::encode($values[$detailKey['key']]);
+                    } else if ($values[$detailKey['key']] === null) {
+                        $values['details'][$detailKey['id']] = Zend_Json::encode(array());
                     } else {
-                        $options = explode(',',$detailKey['options']);
-                        $values['details'][$key_id] = $options[$values[$detailKey['key']]];
+                        $values['details'][$detailKey['id']] = $values[$detailKey['key']];
                     }
                     unset($values[$detailKey['key']]);
                 }
+
                 $values['contributions'] = array();
                 foreach ($meeting['contribution_types'] as $contributionTypeId => $contributionType) {
                     if ($values[$contributionType . '_bool'] === '1') {
@@ -343,6 +350,8 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                             'title' => $values[$contributionType . '_title'],
                             'abstract' => $values[$contributionType . '_abstract'],
                         );    
+                    } else {
+                        $values['contributions'][$contributionTypeId] = false;
                     }
 
                     //$values['details'][$key_id] = $values[$key];

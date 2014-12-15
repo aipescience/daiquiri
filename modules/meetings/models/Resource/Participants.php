@@ -49,6 +49,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
         $select->from($this->getTablename());
         $select->join('Meetings_Meetings','Meetings_Meetings.id = Meetings_Participants.meeting_id',array('meeting_title' => 'title'));
         $select->join('Meetings_ParticipantStatus','Meetings_ParticipantStatus.id = Meetings_Participants.status_id',array('status' => 'status'));
+
         return $this->fetchAll($select);
     }
 
@@ -99,17 +100,38 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
         $select->where('Meetings_Participants.id = ?', $id);
         $select->join('Meetings_ParticipantStatus', 'Meetings_ParticipantStatus.id = Meetings_Participants.status_id', array('status'));
 
-        // fetch the data
         $row = $this->fetchOne($select);
+
         if (empty($row)) {
-            return array();
-        } else {
-            return array_merge(
-                $row,
-                array('details' => $this->_fetchParticipantDetails($id)),
-                array('contributions' => $this->_fetchContributions($id))
+            return false;
+        }
+
+        // fetch details
+        $select = $this->select();
+        $select->from('Meetings_ParticipantDetails', array('value'));
+        $select->join('Meetings_ParticipantDetailKeys', 'Meetings_ParticipantDetailKeys.id = Meetings_ParticipantDetails.key_id', array('key'));
+        $select->where('Meetings_ParticipantDetails.participant_id = ?', $id);
+
+        $row['details'] = array();
+        foreach($this->fetchAll($select) as $r) {
+            $row['details'][$r['key']] = $r['value'];
+        }
+
+        // fetch contributions
+        $select = $this->select();
+        $select->from('Meetings_Contributions', array('title','abstract','contribution_type_id'));
+        $select->join('Meetings_ContributionTypes', 'Meetings_ContributionTypes.id = Meetings_Contributions.contribution_type_id', array('contribution_type'));
+        $select->where('Meetings_Contributions.participant_id = ?', $id);
+
+        $row['contributions'] = array();
+        foreach($this->fetchAll($select) as $r) {
+            $row['contributions'][$r['contribution_type']] = array(
+                'title' => $r['title'],
+                'abstract' => $r['abstract']
             );
         }
+
+        return $row;
     }
 
     /**
@@ -161,11 +183,27 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
         // get id
         $id = $this->getAdapter()->lastInsertId();
 
-        // create new details for this participant
-        $this->_insertParticipantDetails($id, $details);
+        // update details
+        foreach ($details as $key_id => $value) {
+            $this->getAdapter()->insert('Meetings_ParticipantDetails', array(
+                'participant_id' => $id,
+                'key_id' =>  $key_id,
+                'value' => $value
+            ));
+        }
 
-        // create new contributions for this participant
-        $this->_insertContributions($id, $contributions);
+        // update contributions
+        foreach ($contributions as $contribution_type_id => $contribution) {
+            if ($contribution !== false) {
+                $this->getAdapter()->insert('Meetings_Contributions', array(
+                    'participant_id' => $id,
+                    'contribution_type_id' =>  $contribution_type_id,
+                    'title' => $contribution['title'],
+                    'abstract' => $contribution['abstract'],
+                    'accepted' => 0
+                ));
+            }
+        }
 
         return $id;
     }
@@ -184,25 +222,77 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
         if (isset($data['details'])) {
             $details = $data['details'];
             unset($data['details']);
-
-            // delete old and create new details for this participant
-            $this->_deleteParticipantDetails($id);
-            $this->_insertParticipantDetails($id, $details);
         }
-
 
         if (isset($data['contributions'])) {
             $contributions = $data['contributions'];
             unset($data['contributions']);
-
-            // delete old and create new contributions for this participant
-            $this->_deleteContributions($id);
-            $this->_insertContributions($id, $contributions);
-
         }
 
         // update the row in the database
         $this->getAdapter()->update('Meetings_Participants', $data, array('id = ?' => $id));
+
+        // update details
+        foreach ($details as $key_id => $value) {
+            $select = $this->getAdapter()->select();
+            $select->from('Meetings_ParticipantDetails');
+            $select->where('participant_id=?',$id);
+            $select->where('key_id=?', $key_id);
+
+            $row = $this->getAdapter()->fetchRow($select);
+
+            if (empty($row)) {
+                $this->getAdapter()->insert('Meetings_ParticipantDetails', array(
+                    'participant_id' => $id,
+                    'key_id' =>  $key_id,
+                    'value' => $value
+                ));
+            } else {
+                $this->getAdapter()->update('Meetings_ParticipantDetails', array(
+                    'value' => $value
+                ), array(
+                    'participant_id=?' => $id,
+                    'key_id=?' =>  $key_id
+                ));
+            }
+        }
+
+        // update contributions
+        foreach ($contributions as $contribution_type_id => $contribution) {
+            $select = $this->getAdapter()->select();
+            $select->from('Meetings_Contributions');
+            $select->where('participant_id=?',$id);
+            $select->where('contribution_type_id=?',$contribution_type_id);
+
+            $row = $this->getAdapter()->fetchRow($select);
+
+            if (empty($row)) {
+                if ($contribution !== false) {
+                    $this->getAdapter()->insert('Meetings_Contributions', array(
+                        'participant_id' => $id,
+                        'contribution_type_id' =>  $contribution_type_id,
+                        'title' => $contribution['title'],
+                        'abstract' => $contribution['abstract'],
+                        'accepted' => 0
+                    ));
+                }
+            } else {
+                if ($contribution !== false) {
+                    $this->getAdapter()->update('Meetings_Contributions', array(
+                        'title' => $contribution['title'],
+                        'abstract' => $contribution['abstract']
+                    ), array(
+                        'participant_id=?' => $id,
+                        'contribution_type_id=?' => $contribution_type_id
+                    ));
+                } else {
+                    $this->getAdapter()->delete('Meetings_Contributions', array(
+                        'participant_id=?' => $id,
+                        'contribution_type_id=?' => $contribution_type_id
+                    ));
+                }
+            }
+        }
 
         return $id;
     }
@@ -221,99 +311,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
         $this->getAdapter()->delete('Meetings_Participants', array('id = ?' => $id));
 
         // delete all details and contributions for this participant
-        $this->_deleteParticipantDetails($id);
-        $this->_deleteContributions($id);
-    }
-
-    /**
-     * Fetches the participant details for a participant.
-     * @param int $id id of the participant
-     * @return array $participantDetails
-     */
-    private function _fetchParticipantDetails($id) {
-        $select = $this->select();
-        $select->from('Meetings_ParticipantDetails', array('value'));
-        $select->where('Meetings_ParticipantDetails.participant_id = ?', $id);
-        $select->join('Meetings_ParticipantDetailKeys', 'Meetings_ParticipantDetailKeys.id = Meetings_ParticipantDetails.key_id', array('key'));
-
-        $participantDetails = array();
-        foreach($this->fetchAll($select) as $row) {
-            $participantDetails[$row['key']] = $row['value'];
-        }
-        return $participantDetails;
-    }
-
-    /**
-     * Inserts the participant details for a participant.
-     * @param int $id id of the participant
-     * @param int $details participant details
-     */
-    private function _insertParticipantDetails($id, $details) {
-        if (!empty($details)) {
-            foreach($details as $key_id => $value) {
-                $this->getAdapter()->insert('Meetings_ParticipantDetails', array(
-                    'participant_id' => $id,
-                    'key_id' =>  $key_id,
-                    'value' => $value
-                ));
-            }
-        }
-    }
-
-    /**
-     * Deletes the participant details for a participant.
-     * @param int $id id of the participant
-     */
-    private function _deleteParticipantDetails($id) {
         $this->getAdapter()->delete('Meetings_ParticipantDetails', array('participant_id = ?' => $id));
-    }
-
-    /**
-     * Fetches the contributions for a participant.
-     * @param int $id id of the participant
-     * @return array $contributions
-     */
-    private function _fetchContributions($id) {
-        $select = $this->select();
-        $select->from('Meetings_Contributions', array('title','abstract','contribution_type_id'));
-        $select->where('Meetings_Contributions.participant_id = ?', $id);
-        $select->join('Meetings_ContributionTypes', 'Meetings_ContributionTypes.id = Meetings_Contributions.contribution_type_id', array('contribution_type'));
-
-        $contributions = array();
-        foreach($this->fetchAll($select) as $row) {
-            $contributions[$row['contribution_type_id']] = array(
-                'contribution_type' => $row['contribution_type'],
-                'title' => $row['title'],
-                'abstract' => $row['abstract']
-            );
-        }
-        return $contributions;
-    }
-
-    /**
-     * Inserts the contributions for a participant.
-     * @param int $id id of the participant
-     * @param int $contributions
-     */
-    private function _insertContributions($id, $contributions) {
-        if (!empty($contributions)) {
-            foreach($contributions as $contribution_type_id => $contribution) {
-                $this->getAdapter()->insert('Meetings_Contributions', array(
-                    'participant_id' => $id,
-                    'contribution_type_id' =>  $contribution_type_id,
-                    'title' => $contribution['title'],
-                    'abstract' => $contribution['abstract'],
-                    'accepted' => 0
-                ));
-            }
-        }
-    }
-
-    /**
-     * Deletes the contributions for a participant.
-     * @param int $id id of the participant
-     */
-    private function _deleteContributions($id) {
         $this->getAdapter()->delete('Meetings_Contributions', array('participant_id = ?' => $id));
     }
 }
