@@ -410,22 +410,14 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         // unset password
         unset($data['new_password']);
 
-        // seperate primary credentials and details and check for password
-        $credentials = array();
-        $details = array();
-        foreach ($data as $key => $value) {
-            if (in_array($key, array('username', 'email', 'password', 'code'))) {
-                $credentials[$key] = $value;
-            } else {
-                $details[$key] = $value;
-            }
-        }
+        // seperate primary credentials and details
+        $details = $data['details'];
 
         // construct details string
-        $credentials['details'] = Zend_Json::encode($details);
+        $data['details'] = Zend_Json::encode($details);
 
         // insert the new row
-        $this->getAdapter()->insert('Auth_Registration', $credentials);
+        $this->getAdapter()->insert('Auth_Registration', $data);
 
         // return the id of the user just inserted
         return $this->getAdapter()->lastInsertId();
@@ -450,18 +442,19 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
             // see if the validation atempt is valid
             if ($row['code'] === $code) {
                 // decode the details again
+                $details = array();
                 foreach (Zend_Json::decode($row['details']) as $key => $value) {
                     if (is_array($value)) {
-                        $row[$key] = Zend_Json::encode($value);
+                        $details[$key] = Zend_Json::encode($value);
                     } else {
-                        $row[$key] = $value;
+                        $details[$key] = $value;
                     }
                 }
+                $row['details'] = $details;
 
                 // get rid of the code, the id, and the details
                 unset($row['id']);
                 unset($row['code']);
-                unset($row['details']);
 
                 // get the users status and role
                 $row['status_id'] = Daiquiri_Auth::getInstance()->getStatusId('registered');

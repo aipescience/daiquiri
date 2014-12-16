@@ -53,13 +53,13 @@ class Auth_Form_Account extends Auth_Form_Abstract {
             }
         }
         foreach ($this->getDetailKeys() as $detailKey) {
-            if (isset($this->_user[$detailKey['key']])) {
-                $key = $detailKey['key'];
+            $key = $detailKey['key'];
 
+            if (isset($this->_user['details'][$key])) {
                 if (in_array(Auth_Model_DetailKeys::$types[$detailKey['type_id']], array('checkbox','multiselect'))) {
-                    $value = Zend_Json::decode($this->_user[$key]);
+                    $value = Zend_Json::decode($this->_user['details'][$key]);
                 } else {
-                    $value = $this->_user[$key];
+                    $value = $this->_user['details'][$key];
                 }
 
                 $this->setDefault($key,$value);

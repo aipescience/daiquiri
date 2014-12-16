@@ -55,7 +55,6 @@ class Auth_Form_UpdateUser extends Auth_Form_Abstract {
                 $this->setDefault($element, $this->_user[$element]);
             }
         }
-
         foreach ($this->getDetailKeys() as $detailKey) {
             $key = $detailKey['key'];
 

@@ -311,8 +311,8 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                         'to' => Daiquiri_Config::getInstance()->query->processor->mail->admin->toArray(),
                         'sql' => $sql,
                         'plan' => $planString,
-                        'firstname' => $user['firstname'],
-                        'lastname' => $user['lastname'],
+                        'firstname' => $user['details']['firstname'],
+                        'lastname' => $user['details']['lastname'],
                         'email' => $user['email'],
                         'message' => $values['message']
                     ));

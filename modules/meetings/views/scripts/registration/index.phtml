@@ -38,22 +38,16 @@
                         <?php 
                         $link = '/meetings/registration/validate/id/' . $row['id'] . '/code/' . $row['code'];
                         echo $this->internalLink(array(
-                            'text' => 'Show',
-                            'href' => '/meetings/registration/show/id/' . $row['id'],
-                            'resource' => 'Meetings_Model_Registration',
-                            'permission' => 'show',
-                            'append' => '&nbsp;',
-                            'ng-click' => 'fetchHtml($event)'));
+                            'text' => 'Validate',
+                            'href' => $link));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/meetings/registration/delete/id/' . $row['id'],
                             'resource' => 'Meetings_Model_Registration',
                             'permission' => 'delete',
-                            'append' => '&nbsp;',
+                            'prepend' => '&nbsp;',
                             'ng-click' => 'fetchHtml($event)'));
-                        echo $this->internalLink(array(
-                            'text' => 'Validate',
-                            'href' => $link));
+
                         ?>
                     </td>
                 </tr>

@@ -231,7 +231,8 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 // unset some elements
                 unset($values['confirm_password']);
 
-                // process arrays in the details (for checkbox and multiselect)
+                // process the details
+                $values['details'] = array();
                 foreach ($detailKeys as $detailKey) {
                     if (is_array($values[$detailKey['key']])) {
                         $values['details'][$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);

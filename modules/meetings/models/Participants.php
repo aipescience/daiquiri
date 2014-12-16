@@ -278,8 +278,6 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                     } else {
                         $values['contributions'][$contributionTypeId] = false;
                     }
-
-                    //$values['details'][$key_id] = $values[$key];
                     unset($values[$contributionType . '_bool']);
                     unset($values[$contributionType . '_title']);
                     unset($values[$contributionType . '_abstract']);

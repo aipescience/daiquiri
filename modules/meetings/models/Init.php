@@ -62,7 +62,7 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
                 'Meetings_Model_ParticipantStatus' => array('index','create','show','update','delete'),
                 'Meetings_Model_Contributions' => array('index','cols','rows','export','create','show','update','delete','accept','reject'),
                 'Meetings_Model_ContributionTypes' => array('index','create','show','update','delete'),
-                'Meetings_Model_Registration' => array('index','show','delete')
+                'Meetings_Model_Registration' => array('index','delete')
             )
         );
     }

@@ -38,15 +38,6 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
     }
 
     /**
-     * Returns one specific registration entry.
-     * @param int $id id of the registration entry
-     * @return array $response
-     */
-    public function show($id) {
-        return $this->getModelHelper('CRUD')->show($id);
-    }
-
-    /**
      * Deletes a registration entry.
      * @param int $id id of the registration entry
      * @param array $formParams
@@ -123,6 +114,8 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                             'title' => $values[$contributionType . '_title'],
                             'abstract' => $values[$contributionType . '_abstract'],
                         );    
+                    } else {
+                        $values['contributions'][$contributionTypeId] = false;
                     }
                     unset($values[$contributionType . '_bool']);
                     unset($values[$contributionType . '_title']);

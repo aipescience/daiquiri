@@ -66,15 +66,37 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
         }
 
         $row = $this->fetchOne($select);
+
         if (empty($row)) {
-            return array();
-        } else {
-            return array_merge(
-                $row,
-                array('contribution_types' => $this->_fetchMeetingsContributionTypes($row['id'])),
-                array('participant_detail_keys' => $this->_fetchMeetingsParticipantDetailKeys($row['id']))
+            return false;
+        } 
+
+        // fetch contribution types
+        $select = $this->select();
+        $select->from('Meetings_Meetings_ContributionTypes', array('contribution_type_id'));
+        $select->where('Meetings_Meetings_ContributionTypes.meeting_id = ?', $row['id']);
+        $select->join('Meetings_ContributionTypes', 'Meetings_Meetings_ContributionTypes.contribution_type_id = Meetings_ContributionTypes.id', array('contribution_type'));
+
+        $row['contribution_types'] = $this->getAdapter()->fetchPairs($select);
+
+        // fetch participant detail keys
+        $select = $this->select();
+        $select->from('Meetings_Meetings_ParticipantDetailKeys', array('participant_detail_key_id'));
+        $select->where('Meetings_Meetings_ParticipantDetailKeys.meeting_id = ?', $row['id']);
+        $select->join('Meetings_ParticipantDetailKeys', 'Meetings_Meetings_ParticipantDetailKeys.participant_detail_key_id = Meetings_ParticipantDetailKeys.id', array('id','key','hint','type_id','options'));
+
+        $row['participant_detail_keys'] = array();
+        foreach($this->fetchAll($select) as $r) {
+            $row['participant_detail_keys'][$r['participant_detail_key_id']] = array(
+                'id' => $r['id'],
+                'key' => $r['key'],
+                'hint' => $r['hint'],
+                'type_id' => $r['type_id'],
+                'options' => $r['options']
             );
         }
+
+        return $row;
     }
 
     /**
@@ -89,10 +111,10 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
             throw new Exception('$data not provided in ' . get_class($this) . '::insertRow()');
         }
 
-        $contribution_type_ids = $data['contribution_type_id'];
+        $contributionTypeIds = $data['contribution_type_id'];
         unset($data['contribution_type_id']);
 
-        $participant_detail_key_ids = $data['participant_detail_key_id'];
+        $participantDetailKeyIds = $data['participant_detail_key_id'];
         unset($data['participant_detail_key_id']);
 
         // insert values
@@ -102,10 +124,24 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
         $id = $this->getAdapter()->lastInsertId();
 
         // create new contribution types for this meeting
-        $this->_insertMeetingsContributionTypes($id, $contribution_type_ids);
+        if (!empty($contributionTypeIds)) {
+            foreach($contributionTypeIds as $contributionTypeId) {
+                $this->getAdapter()->insert('Meetings_Meetings_ContributionTypes', array(
+                    'meeting_id' => $id,
+                    'contribution_type_id' => $contributionTypeId
+                ));
+            }
+        }
 
         // create new participant detail keys for this meeting
-        $this->_insertMeetingsParticipantDetailKeys($id, $participant_detail_key_ids);
+        if (!empty($participantDetailKeyIds)) {
+            foreach($participantDetailKeyIds as $participantDetailKeyId) {
+                $this->getAdapter()->insert('Meetings_Meetings_ParticipantDetailKeys', array(
+                    'meeting_id' => $id,
+                    'participant_detail_key_id' => $participantDetailKeyId
+                ));
+            }
+        }
 
         return $id;
     }
@@ -121,22 +157,36 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
             throw new Exception('$id or $data not provided in ' . get_class($this) . '::insertRow()');
         }
 
-        $contribution_type_ids = $data['contribution_type_id'];
+        $contributionTypeIds = $data['contribution_type_id'];
         unset($data['contribution_type_id']);
 
-        $participant_detail_key_ids = $data['participant_detail_key_id'];
+        $participantDetailKeyIds = $data['participant_detail_key_id'];
         unset($data['participant_detail_key_id']);
 
         // update the row in the database
         $this->getAdapter()->update('Meetings_Meetings', $data, array('id = ?' => $id));
 
         // delete old and create new contribution types for this meeting
-        $this->_deleteMeetingsContributionTypes($id);
-        $this->_insertMeetingsContributionTypes($id, $contribution_type_ids);
+        $this->getAdapter()->delete('Meetings_Meetings_ContributionTypes', array('meeting_id = ?' => $id));
+        if (!empty($contributionTypeIds)) {
+            foreach($contributionTypeIds as $contributionTypeId) {
+                $this->getAdapter()->insert('Meetings_Meetings_ContributionTypes', array(
+                    'meeting_id' => $id,
+                    'contribution_type_id' => $contributionTypeId
+                ));
+            }
+        }
 
         // delete old and create new participant detail keys for this meeting
-        $this->_deleteMeetingsParticipantDetailKeys($id);
-        $this->_insertMeetingsParticipantDetailKeys($id, $participant_detail_key_ids);
+        $this->getAdapter()->delete('Meetings_Meetings_ParticipantDetailKeys', array('meeting_id = ?' => $id));
+        if (!empty($participantDetailKeyIds)) {
+            foreach($participantDetailKeyIds as $participantDetailKeyId) {
+                $this->getAdapter()->insert('Meetings_Meetings_ParticipantDetailKeys', array(
+                    'meeting_id' => $id,
+                    'participant_detail_key_id' => $participantDetailKeyId
+                ));
+            }
+        }
     }
 
     /**
@@ -153,97 +203,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
         $this->getAdapter()->delete('Meetings_Meetings', array('id = ?' => $id));
 
         // delete the contribution types and participant detail keys for this meeting
-        $this->_deleteMeetingsContributionTypes($id);
-        $this->_deleteMeetingsParticipantDetailKeys($id);
-    }
-
-    /**
-     * Fetches the contribution types for a meeting.
-     * @param int $id id of the meeting
-     * @return array $contributionTypes
-     */
-    private function _fetchMeetingsContributionTypes($id) {
-        $select = $this->select();
-        $select->from('Meetings_Meetings_ContributionTypes', array('contribution_type_id'));
-        $select->where('Meetings_Meetings_ContributionTypes.meeting_id = ?', $id);
-        $select->join('Meetings_ContributionTypes', 'Meetings_Meetings_ContributionTypes.contribution_type_id = Meetings_ContributionTypes.id', array('contribution_type'));
-
-        $contributionTypes = array();
-        foreach($this->fetchAll($select) as $row) {
-            $contributionTypes[$row['contribution_type_id']] = $row['contribution_type'];
-        }
-        return $contributionTypes;
-    }
-
-    /**
-     * Inserts the contribution types for a meeting.
-     * @param int $id id of the meeting
-     * @param int $contributionTypeIds ids of the contribution types
-     */
-    private function _insertMeetingsContributionTypes($id, $contributionTypeIds) {
-        if (!empty($contributionTypeIds)) {
-            foreach($contributionTypeIds as $contributionTypeId) {
-                $this->getAdapter()->insert('Meetings_Meetings_ContributionTypes', array(
-                    'meeting_id' => $id,
-                    'contribution_type_id' => $contributionTypeId
-                ));
-            }
-        }
-    }
-
-    /**
-     * Deletes the contribution types for a meeting.
-     * @param int $id id of the meeting
-     */
-    private function _deleteMeetingsContributionTypes($id) {
         $this->getAdapter()->delete('Meetings_Meetings_ContributionTypes', array('meeting_id = ?' => $id));
-    }
-
-    /**
-     * Fetches the participant detail keys for a meeting.
-     * @param int $id id of the meeting
-     * @return array $participantDetailKeys
-     */
-    private function _fetchMeetingsParticipantDetailKeys($id) {
-        $select = $this->select();
-        $select->from('Meetings_Meetings_ParticipantDetailKeys', array('participant_detail_key_id'));
-        $select->where('Meetings_Meetings_ParticipantDetailKeys.meeting_id = ?', $id);
-        $select->join('Meetings_ParticipantDetailKeys', 'Meetings_Meetings_ParticipantDetailKeys.participant_detail_key_id = Meetings_ParticipantDetailKeys.id', array('id','key','hint','type_id','options'));
-
-        $participantDetailKeys = array();
-        foreach($this->fetchAll($select) as $row) {
-            $participantDetailKeys[$row['participant_detail_key_id']] = array(
-                'id' => $row['id'],
-                'key' => $row['key'],
-                'hint' => $row['hint'],
-                'type_id' => $row['type_id'],
-                'options' => $row['options']
-            );
-        }
-        return $participantDetailKeys;
-    }
-
-    /**
-     * Inserts the participant detail keys for a meeting.
-     * @param int $id id of the meeting
-     * @param int $participantDetailKeyIds ids of the participant detail keys
-     */
-    private function _insertMeetingsParticipantDetailKeys($id, $participantDetailKeyIds) {
-        if (!empty($participantDetailKeyIds)) {
-            foreach($participantDetailKeyIds as $participantDetailKeyId) {
-                $this->getAdapter()->insert('Meetings_Meetings_ParticipantDetailKeys', array(
-                    'meeting_id' => $id,
-                    'participant_detail_key_id' => $participantDetailKeyId
-                ));
-            }
-        }
-    }
-
-    /**
-     * Deletes the participant detail keys for a meeting.
-     * @param int $id id of the meeting
-     */
-    private function _deleteMeetingsParticipantDetailKeys($id) {
         $this->getAdapter()->delete('Meetings_Meetings_ParticipantDetailKeys', array('meeting_id = ?' => $id));
     }
 }

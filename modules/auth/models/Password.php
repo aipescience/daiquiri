@@ -78,8 +78,8 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                     $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/password/reset/id/' . $user['id'] . '/code/' . $code;
                     $this->getModelHelper('mail')->send('auth.forgotPassword', array(
                         'to' => $values['email'],
-                        'firstname' => $user['firstname'],
-                        'lastname' => $user['lastname'],
+                        'firstname' => $user['details']['firstname'],
+                        'lastname' => $user['details']['lastname'],
                         'link' => $link
                     ));
                 }
@@ -131,8 +131,8 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                         if (Daiquiri_Config::getInstance()->auth->mailOnChangePassword &&  $user['status'] !== 'admin') {
                             $this->getModelHelper('mail')->send('auth.changePassword', array(
                                 'to' => $this->getResource()->fetchEmailByRole('admin'),
-                                'firstname' => $user['firstname'],
-                                'lastname' => $user['lastname'],
+                                'firstname' => $user['details']['firstname'],
+                                'lastname' => $user['details']['lastname'],
                                 'username' => $user['username']
                             ));
                         }
@@ -223,8 +223,8 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                     if (Daiquiri_Config::getInstance()->auth->mailOnChangePassword &&  $user['status'] !== 'admin') {
                         $this->getModelHelper('mail')->send('auth.changePassword', array(
                             'to' => $this->getResource()->fetchEmailByRole('admin'),
-                            'firstname' => $user['firstname'],
-                            'lastname' => $user['lastname'],
+                            'firstname' => $user['details']['firstname'],
+                            'lastname' => $user['details']['lastname'],
                             'username' => $user['username']
                         ));
                     }

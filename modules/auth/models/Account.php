@@ -69,11 +69,17 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
                 // get the form values
                 $values = $form->getValues();
 
-                // process arrays in the details (for checkbox and multiselect)
+                // process the details
+                $values['details'] = array();
                 foreach ($detailKeys as $detailKey) {
                     if (is_array($values[$detailKey['key']])) {
-                        $values[$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                        $values['details'][$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                    } else if ($values[$detailKey['key']] === null) {
+                        $values['details'][$detailKey['key']] = Zend_Json::encode(array());
+                    } else {
+                        $values['details'][$detailKey['key']] = $values[$detailKey['key']];
                     }
+                    unset($values[$detailKey['key']]);
                 }
 
                 // update the user and redirect
@@ -86,8 +92,8 @@ class Auth_Model_Account extends Daiquiri_Model_Abstract {
                 if (Daiquiri_Config::getInstance()->auth->mailOnUpdateUser &&  $user['status'] !== 'admin') {
                     $this->getModelHelper('mail')->send('auth.updateUser', array(
                         'to' => $this->getResource()->fetchEmailByRole('admin'),
-                        'firstname' => $user['firstname'],
-                        'lastname' => $user['lastname'],
+                        'firstname' => $user['details']['firstname'],
+                        'lastname' => $user['details']['lastname'],
                         'username' => $user['username']
                     ));
                 }

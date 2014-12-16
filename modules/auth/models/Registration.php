@@ -77,10 +77,11 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
     public function register(array $formParams = array()) {
         // get user detail keys model
         $detailKeyModel = new Auth_Model_DetailKeys();
+        $detailKeys = $detailKeyModel->getResource()->fetchRows();
 
         // create the form object
         $form = new Auth_Form_Registration(array(
-            'detailKeys' => $detailKeyModel->getResource()->fetchRows(),
+            'detailKeys' => $detailKeys,
         ));
 
         // check if request is POST
@@ -88,7 +89,22 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // unset some elements
                 unset($values['confirm_password']);
+
+                // process the details
+                $values['details'] = array();
+                foreach ($detailKeys as $detailKey) {
+                    if (is_array($values[$detailKey['key']])) {
+                        $values['details'][$detailKey['key']] = Zend_Json::encode($values[$detailKey['key']]);
+                    } else if ($values[$detailKey['key']] === null) {
+                        $values['details'][$detailKey['key']] = Zend_Json::encode(array());
+                    }else {
+                        $values['details'][$detailKey['key']] = $values[$detailKey['key']];
+                    }
+                    unset($values[$detailKey['key']]);
+                }
 
                 // produce random validation link
                 $values['code'] = $this->createRandomString(32);
@@ -103,8 +119,8 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                 $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/registration/validate/id/' . $userId . '/code/' . $values['code'];
                 $this->getModelHelper('mail')->send('auth.register', array(
                     'to' => $values['email'],
-                    'firstname' => $values['firstname'],
-                    'lastname' => $values['lastname'],
+                    'firstname' => $values['details']['firstname'],
+                    'lastname' => $values['details']['lastname'],
                     'link' => $link
                 ));
 
@@ -140,8 +156,8 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                 );
                 $this->getModelHelper('mail')->send('auth.validate', array(
                     'to' => $manager,
-                    'firstname' => $user['firstname'],
-                    'lastname' => $user['lastname'],
+                    'firstname' => $user['details']['firstname'],
+                    'lastname' => $user['details']['lastname'],
                     'link' => $link
                 ));
 
@@ -202,8 +218,8 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     // send mail
                     $this->getModelHelper('mail')->send('auth.confirm', array(
                         'to' => $this->getResource()->fetchEmailByRole('admin'),
-                        'firstname' => $user['firstname'],
-                        'lastname' => $user['lastname'],
+                        'firstname' => $user['details']['firstname'],
+                        'lastname' => $user['details']['lastname'],
                         'username' => $user['username'],
                         'manager' => Daiquiri_Auth::getInstance()->getCurrentUsername()
                     ));
@@ -258,8 +274,8 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     );
                     $this->getModelHelper('mail')->send('auth.reject', array(
                         'to' => $manager,
-                        'firstname' => $user['firstname'],
-                        'lastname' => $user['lastname'],
+                        'firstname' => $user['details']['firstname'],
+                        'lastname' => $user['details']['lastname'],
                         'username' => $user['username'],
                         'manager' => Daiquiri_Auth::getInstance()->getCurrentUsername()
                     ));
@@ -314,8 +330,8 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     $this->getModelHelper('mail')->send('auth.activate', array(
                         'to' => $user['email'],
                         'bcc' => $manager,
-                        'firstname' => $user['firstname'],
-                        'lastname' => $user['lastname'],
+                        'firstname' => $user['details']['firstname'],
+                        'lastname' => $user['details']['lastname'],
                         'username' => $user['username']
                     ));
 
