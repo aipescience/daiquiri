@@ -111,13 +111,13 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
         // get the message
         $message = $this->getResource()->fetchRow($id);
 
-        // get the mail template
-        $template = $this->getModelHelper('mail')->template('contact.respond');
+        $subject = 'Re: ' . $message['subject'];
+        $body = 'Dear _firstname_ _lastname_,\n\n';
 
         // create the form object
         $form = new Contact_Form_Respond(array(
-            'subject' => $template['subject'],
-            'body' => $template['body']
+            'subject' => "Re: {$message['subject']}",
+            'body' => "Dear {$message['firstname']} {$message['lastname']},\n\n\n\nBest Regards"
         ));
 
         if (!empty($formParams)) {
@@ -129,10 +129,6 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
                 // send mail to user who used the contact form
                 $this->getModelHelper('mail')->send('contact.respond', array(
                     'to' => $message['email'],
-                    'firstname' => $message['firstname'],
-                    'lastname' => $message['lastname'],
-                    'subject' => $message['subject']
-                ), array(
                     'subject' => $values['subject'],
                     'body' => $values['body']
                 ));

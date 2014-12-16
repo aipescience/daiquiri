@@ -46,7 +46,7 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
             'contact.submit_user' => array('firstname', 'lastname', 'username'),
             'contact.submit_support' => array('firstname', 'lastname', 'username', 'email',
                 'category', 'subject', 'message', 'link'),
-            'contact.respond' => array('firstname', 'lastname', 'username', 'subject'),
+            'contact.respond' => array('subject', 'body'),
             'query.plan' => array('firstname', 'lastname', 'email', 'sql', 'plan', 'message'),
             'meetings.validate' => array('meeting', 'firstname', 'lastname', 'link'),
         );
@@ -78,13 +78,11 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
      * @param string $template template name
      * @return array $response
      */
-    public function show($template,  array $values = array(), array $data = array()) {
+    public function show($template,  array $values = array()) {
         // get the template data from the database
-        if (empty($data)) {
-            $data = $this->getResource()->fetchRow(array(
-                'where' => array('`template` = ?' => $template)
-            ));
-        }
+        $data = $this->getResource()->fetchRow(array(
+            'where' => array('`template` = ?' => $template)
+        ));
 
         // search replace the placeholders
         if (!empty($values)) {

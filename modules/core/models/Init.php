@@ -232,12 +232,8 @@ _link_
 Best Regards'
             ),
             'contact.respond' => array(
-                'subject' => '[Daiquiri] Re: _subject_',
-                'body' => 'Dear _firstname_ _lastname_,
-
-
-
-Best Regards'
+                'subject' => '[Daiquiri] _subject_',
+                'body' => '_body_'
             ),
             'query.plan' => array(
                 'subject' => '[Daiquiri] Query Plan Inquery',

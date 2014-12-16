@@ -27,13 +27,13 @@ class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
         return $templateModel->show($template);
     }
 
-    public function send($template, array $values = array(), array $templateData = array()) {
+    public function send($template, array $values = array()) {
         // create a new mail
         $mail = new Zend_Mail('UTF-8');
 
         // get the template
         $templateModel = new Core_Model_Templates();
-        $data = $templateModel->show($template, $values, $templateData);
+        $data = $templateModel->show($template, $values);
 
         if (isset($values['to'])) {
             if (is_array($values['to'])) {
