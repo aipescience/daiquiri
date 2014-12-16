@@ -255,7 +255,7 @@ angular.module('table', ['ngSanitize'])
     };
 
     $scope.search = function() {
-        TableService.search();
+        TableService.search($scope.searchString);
     };
 
     $scope.sort = function(col) {
