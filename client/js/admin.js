@@ -44,17 +44,22 @@ app.factory('AdminService', ['$http','$window','TableService','ModalService',fun
         values: values,
         errors: errors,
         fetchHtml: function (url) {
-            $http.get(url,{'headers': {'Accept': 'application/html'}}).success(function(html) {
-                for (var value in values) delete values[value];
-                for (var error in errors) delete errors[error];
+            $http.get(url,{'headers': {'Accept': 'application/html'}})
+                .success(function(html) {
+                    for (var value in values) delete values[value];
+                    for (var error in errors) delete errors[error];
 
-                if (ModalService.modal.html != html) {
-                    ModalService.modal.html = html;
-                }
+                    if (ModalService.modal.html != html) {
+                        ModalService.modal.html = html;
+                    }
 
-                activeUrl = url;
-                ModalService.modal.enabled = true;
-            });
+                    activeUrl = url;
+                    ModalService.modal.enabled = true;
+                })
+                .error(function() {
+                    ModalService.modal.html = '<div><h2>Error</h2><p style="margin-bottom: 15px">Please reload the page.</p></div>';
+                    ModalService.modal.enabled = true;
+                });
         },
         submitForm: function(submit) {
             if (submit) {
