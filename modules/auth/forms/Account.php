@@ -40,7 +40,7 @@ class Auth_Form_Account extends Auth_Form_Abstract {
             $elements[] = $this->addEmailElement('',$this->_user['id']);
         }
         $this->addSubmitButtonElement('submit', 'Update profile');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array_merge($details,$elements));

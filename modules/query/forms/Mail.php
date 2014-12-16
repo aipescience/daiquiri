@@ -131,7 +131,7 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
             $this->addCaptchaElement();
         }
         $this->addSubmitButtonElement('submit', 'Send message');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('sql', 'plan'), 'query-group', 'Query');

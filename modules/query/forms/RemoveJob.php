@@ -29,7 +29,7 @@ class Query_Form_RemoveJob extends Daiquiri_Form_Abstract {
 
         // add fields
         $this->addDangerButtonElement('submit', 'Remove job');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalButtonGroup(array('submit', 'cancel'));

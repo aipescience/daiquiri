@@ -37,7 +37,7 @@ class Auth_Form_ForgotPassword extends Auth_Form_Abstract {
             )
         ));
         $this->addSubmitButtonElement('submit', 'Request password reset');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
         $this->addCaptchaElement();
 
         // set decorators

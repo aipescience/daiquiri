@@ -38,7 +38,7 @@ class Auth_Form_Roles extends Daiquiri_Form_Abstract {
             )
         ));
         $this->addSubmitButtonElement('submit', 'Create user role');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('role'));

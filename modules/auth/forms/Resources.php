@@ -38,7 +38,7 @@ class Auth_Form_Resources extends Daiquiri_Form_Abstract {
             )
         ));
         $this->addSubmitButtonElement('submit', 'Create Resource');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('resource'));

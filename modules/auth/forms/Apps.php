@@ -34,7 +34,7 @@ class Auth_Form_Apps extends Auth_Form_Abstract {
             $this->addConfirmPasswordElement(),
         );
         $this->addSubmitButtonElement('submit', 'Create user status');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup($elements);

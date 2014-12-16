@@ -49,7 +49,7 @@ class Query_Form_RenameJob extends Daiquiri_Form_Abstract {
         )));
 
         $this->addSubmitButtonElement('submit', 'Rename table');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('tablename'), 'tablerename-group');

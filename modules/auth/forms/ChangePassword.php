@@ -32,7 +32,7 @@ class Auth_Form_ChangePassword extends Auth_Form_Abstract {
         $this->addNewPasswordElement();
         $this->addConfirmPasswordElement();
         $this->addSubmitButtonElement('submit', 'Change Password');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('old_password', 'new_password', 'confirm_password'));

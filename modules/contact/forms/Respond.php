@@ -77,7 +77,7 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
         ));
 
         $this->addSubmitButtonElement('submit', 'Respond to contact message');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // create groups
         $this->addHorizontalGroup(array('subject', 'body'));

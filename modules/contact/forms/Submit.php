@@ -115,7 +115,7 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
             $this->addCaptchaElement();
         }
         $this->addSubmitButtonElement('submit', 'Send message');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('firstname', 'lastname', 'email'), 'name-group');

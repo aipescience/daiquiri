@@ -38,7 +38,7 @@ class Contact_Form_Category extends Daiquiri_Form_Abstract {
         ));
 
         $this->addSubmitButtonElement('submit', 'Create user status');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('category'));

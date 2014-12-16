@@ -31,7 +31,7 @@ class Auth_Form_SetPassword extends Auth_Form_Abstract {
         $this->addNewPasswordElement('span6');
         $this->addConfirmPasswordElement('span6');
         $this->addSubmitButtonElement('submit', 'Set new password');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // set decorators
         $this->addHorizontalGroup(array('new_password', 'confirm_password'));

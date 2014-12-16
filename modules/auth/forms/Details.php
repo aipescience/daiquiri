@@ -80,7 +80,7 @@ class Auth_Form_Details extends Auth_Form_Abstract {
         ));
         $this->addDetailElement('value');
         $this->addSubmitButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // set decorators
         $this->addHorizontalGroup(array('key', 'value'));

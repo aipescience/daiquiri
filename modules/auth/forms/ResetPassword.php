@@ -35,7 +35,7 @@ class Auth_Form_ResetPassword extends Auth_Form_Abstract {
         $this->addNewPasswordElement();
         $this->addConfirmPasswordElement();
         $this->addSubmitButtonElement('submit', 'Set new password');
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // set decorators
         $this->addHorizontalGroup(array('username', 'new_password', 'confirm_password'));
