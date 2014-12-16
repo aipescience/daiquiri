@@ -42,7 +42,7 @@ class Contact_Form_Category extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('category'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

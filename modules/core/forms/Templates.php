@@ -61,7 +61,7 @@ class Core_Form_Templates extends Daiquiri_Form_Model {
 
         // add groups
         $this->addHorizontalGroup(array('template','subject', 'body'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_entry['template'])) {

@@ -43,7 +43,7 @@ class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Model {
 
         // add groups
         $this->addHorizontalGroup(array('status'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('status') as $element) {

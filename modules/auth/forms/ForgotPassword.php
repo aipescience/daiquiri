@@ -41,9 +41,9 @@ class Auth_Form_ForgotPassword extends Auth_Form_Abstract {
         $this->addCaptchaElement();
 
         // set decorators
-        $this->addHorizontalGroup(array('email'));
-        $this->addHorizontalCaptchaGroup('captcha');
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addHorizontalGroup(array('email'),'email-group');
+        $this->addHorizontalGroup(array('captcha'),'captcha-group');
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

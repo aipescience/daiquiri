@@ -266,60 +266,30 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
-     * Adds a form group using an inlined div for every element and adiv for the group.
+     * Adds a form group.
+     * @param array $elements array of form element names
+     * @param string $name    name of the group
+     * @param string $legend  legend for the formgroup
+     * @param bool $label     show labels of the form elements 
+     */
+    public function addDisplayGroup(array $elements, $name = 'simple-group', $legend = Null, $label = False) {
+        parent::addDisplayGroup($elements, $name, array(
+            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup',
+            'legend' => $legend,
+            'label' => $label
+        ));
+    }
+
+    /**
+     * Adds a form group where the elements are inlined.
      * @param array $elements array of form element names
      * @param string $name    name of the group
      * @param string $legend  legend for the formgroup
      * @param bool $label     show labels of the form elements 
      */
     public function addInlineGroup(array $elements, $name = 'inline-group', $legend = Null, $label = False) {
-        $this->addDisplayGroup($elements, $name, array(
+        parent::addDisplayGroup($elements, $name, array(
             'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Inline',
-            'legend' => $legend,
-            'label' => $label
-        ));
-    }
-
-    /**
-     * Adds a form group using an inlined div for every element and right-floating div for the group.
-     * @param array $elements array of form element names
-     * @param string $name    name of the group
-     * @param string $legend  legend for the formgroup
-     * @param bool $label     show labels of the form elements 
-     */
-    public function addInlineRightGroup(array $elements, $name = 'inline-group', $legend = Null, $label = False) {
-        $this->addDisplayGroup($elements, $name, array(
-            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_InlineRight',
-            'legend' => $legend,
-            'label' => $label
-        ));
-    }
-
-    /**
-     * Adds a form group using a div for every element.
-     * @param array $elements array of form element names
-     * @param string $name    name of the group
-     * @param string $legend  legend for the formgroup
-     * @param bool $label     show labels of the form elements 
-     */
-    public function addDivGroup(array $elements, $name = 'div-group', $legend = Null, $label = False) {
-        $this->addDisplayGroup($elements, $name, array(
-            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Div',
-            'legend' => $legend,
-            'label' => $label
-        ));
-    }
-
-    /**
-     * Adds a form group using a p for every element.
-     * @param array $elements array of form element names
-     * @param string $name    name of the group
-     * @param string $legend  legend for the formgroup
-     * @param bool $label     show labels of the form elements 
-     */
-    public function addParagraphGroup(array $elements, $name = 'paragraph-group', $legend = Null, $label = False) {
-        $this->addDisplayGroup($elements, $name, array(
-            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Paragraph',
             'legend' => $legend,
             'label' => $label
         ));
@@ -332,7 +302,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * @param string $legend   legend for the fieldset
      */
     public function addHorizontalGroup(array $elements, $name = 'horizontal-group', $legend = Null) {
-        $this->addDisplayGroup($elements, $name, array(
+        parent::addDisplayGroup($elements, $name, array(
             'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Horizontal',
             'legend' => $legend
         ));
@@ -344,68 +314,11 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * @param string $name     name of the group
      * @param string $legend   legend for the fieldset
      */
-    public function addHorizontalButtonGroup(array $elements, $name = 'action-group', $legend = Null) {
-        $this->addDisplayGroup($elements, $name, array(
-            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_HorizontalButton',
+    public function addActionGroup(array $elements, $name = 'action-group', $legend = Null) {
+        parent::addDisplayGroup($elements, $name, array(
+            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Action',
             'legend' => $legend
         ));
-    }
-
-    /**
-     * Adds a form group, putting the captcha in a div.
-     * @param string $element captcha element name
-     * @param string $name    name of the group
-     * @param string $legend  legend for the fieldset
-     */
-    public function addHorizontalCaptchaGroup($element, $name = 'captcha-group', $legend = Null) {
-        $this->addDisplayGroup(array($element), $name, array(
-            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_HorizontalCaptcha',
-            'legend' => $legend
-        ));
-    }
-
-    /**
-     * Adds a form group using a view script.
-     * @param array  $elements   array of form element names
-     * @param string $viewscript viewscrit to use with this group
-     * @param string $name       name of the group
-     * @param string $legend     legend for the fieldset
-     */
-    public function addViewScriptGroup(array $elements, $viewscript, $name = 'view-script-group', $legend = Null) {
-        $this->addDisplayGroup($elements, $name, array(
-            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_ViewScript',
-            'viewScript' => $viewscript,
-            'legend' => $legend
-        ));
-    }
-
-    /**
-     * Adds a form group for a set of toogle buttons.
-     * @param array  $elements   array of form element names
-     * @param string $name       name of the group
-     */
-    public function addToggleButtonsGroup(array $elements, $name = 'toogle-button-group', $prefix = 'toogle_buttons_') {
-        $this->addDisplayGroup($elements, $name, array(
-            'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_ToggleButtons',
-            'prefix' => $prefix
-        ));
-    }
-
-    /**
-     * Adds a toggle-button bar. Automagically decides whether to use a drop down instead.
-     * @param string $prefix  prefix string for the identifiers of the buttons
-     * @param array  $buttons array of buttons with key as name and array stating label and tooltip
-     */
-    public function addToggleButtonElements(array $buttons, $prefix) {
-        // add a hidden field to the button group to get the selected value
-        $this->addElement('hidden', $prefix . 'value', array(
-            'decorators' => array('ViewHelper')
-        ));
-
-        // add buttons
-        foreach ($buttons as $button) {
-            $this->addToggleButtonElement($button['name'], $button['label'], $button['tooltip']);
-        }
     }
 
     /**

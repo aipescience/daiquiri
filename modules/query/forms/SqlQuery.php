@@ -79,8 +79,8 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         $this->addQueuesElement('sql_queue');
 
         // add display groups
-        $this->addDivGroup(array('sql_query'), 'sql-input-group');
-        $this->addDivGroup(array('sql_tablename'), 'sql-table-group', false, true);
+        $this->addDisplayGroup(array('sql_query'), 'sql-input-group');
+        $this->addDisplayGroup(array('sql_tablename'), 'sql-table-group', false, true);
         $this->addInlineGroup(array('sql_submit','sql_clear','sql_queue'), 'sql-button-group');
 
         // override angular directives

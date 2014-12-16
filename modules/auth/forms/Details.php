@@ -84,7 +84,7 @@ class Auth_Form_Details extends Auth_Form_Abstract {
 
         // set decorators
         $this->addHorizontalGroup(array('key', 'value'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_key)) {

@@ -44,7 +44,7 @@ class Auth_Form_Account extends Auth_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array_merge($details,$elements));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         foreach ($elements as $element) {

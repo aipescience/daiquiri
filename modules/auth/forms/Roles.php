@@ -42,7 +42,7 @@ class Auth_Form_Roles extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('role'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

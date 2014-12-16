@@ -26,7 +26,7 @@ class Daiquiri_Form_DisplayGroup_Horizontal extends Zend_Form_DisplayGroup {
      */
     function init() {
         // set css class for html element
-        $this->setAttrib('class', 'daiquiri-form-horizontal-group form-horizontal');
+        $this->setAttrib('class', 'form-horizontal');
 
         // set decorators for DisplayGroup
         $this->setDecorators(array('FormElements','Fieldset'));

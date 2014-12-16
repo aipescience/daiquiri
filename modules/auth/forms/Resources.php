@@ -42,7 +42,7 @@ class Auth_Form_Resources extends Daiquiri_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('resource'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

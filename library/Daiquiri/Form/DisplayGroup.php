@@ -19,42 +19,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Form_DisplayGroup_ViewScript extends Zend_Form_DisplayGroup {
-
-    /**
-     * The viewscript to use with this group.
-     * @var string
-     */
-    protected $_viewScript;
-
-    /**
-     * Sets the viewscript.
-     * @param string $viewScript viewscript to use with this group
-     */
-    public function setViewScript($viewScript) {
-        $this->_viewScript = $viewScript;
-    }
+class Daiquiri_Form_DisplayGroup extends Zend_Form_DisplayGroup {
 
     /**
      * Initializes the DisplayGroup
      */
-    public function init() {
+    function init() {
         // set decorators for DisplayGroup
-        $this->setDecorators(array(
-            array(
-                'ViewScript',
-                array(
-                    'viewScript' => $this->_viewScript,
-                    'group' => $this
-                )
-            )
-        ));
-
-        // loop over elements and set decorators
-        foreach ($this->getElements() as $element) {
-            $element->setDecorators(array(
-                'ViewHelper'
-            ));
-        }
+        $this->setDecorators(array('FormElements','Fieldset'));
     }
 }

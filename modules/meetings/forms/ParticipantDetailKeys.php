@@ -57,7 +57,7 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
 
         // add groups
         $this->addHorizontalGroup(array('key','type_id','options'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('key','type_id','options') as $element) {

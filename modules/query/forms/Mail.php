@@ -139,9 +139,9 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
         $this->addHorizontalGroup(array('firstname', 'lastname', 'email'), 'name-group', 'Sender (not required)');
 
         if (empty($this->_user)) {
-            $this->addHorizontalCaptchaGroup('captcha');
+            $this->addHorizontalGroup(array('captcha'),'captcha-group');
         }
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields if user is logged in.
         foreach (array('firstname', 'lastname', 'email') as $key) {

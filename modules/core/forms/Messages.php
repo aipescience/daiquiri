@@ -52,7 +52,7 @@ class Core_Form_Messages extends Daiquiri_Form_Model {
 
         // add groups
         $this->addHorizontalGroup(array('key', 'value'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_entry['key'])) {

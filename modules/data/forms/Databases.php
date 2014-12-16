@@ -95,7 +95,7 @@ class Data_Form_Databases extends Data_Form_Abstract {
             $inputelements[] = 'autofill';
         }
         $this->addHorizontalGroup($inputelements);
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('order', 'name', 'description', 'adapter', 'publication_role_id', 'publication_select',

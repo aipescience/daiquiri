@@ -39,6 +39,6 @@ class Auth_Form_ResetPassword extends Auth_Form_Abstract {
 
         // set decorators
         $this->addHorizontalGroup(array('username', 'new_password', 'confirm_password'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 }

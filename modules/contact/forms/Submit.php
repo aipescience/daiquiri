@@ -121,9 +121,9 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
         $this->addHorizontalGroup(array('firstname', 'lastname', 'email'), 'name-group');
         $this->addHorizontalGroup(array('category_id', 'subject', 'message'), 'detail-group');
         if (empty($this->_user)) {
-            $this->addHorizontalCaptchaGroup('captcha');
+            $this->addHorizontalGroup(array('captcha'),'captcha-group');
         }
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields if user is logged in.
         foreach (array('firstname', 'lastname', 'email') as $key) {

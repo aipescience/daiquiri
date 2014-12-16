@@ -81,7 +81,7 @@ class Contact_Form_Respond extends Daiquiri_Form_Abstract {
 
         // create groups
         $this->addHorizontalGroup(array('subject', 'body'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set default values for fields.
         $this->setDefault('subject', $this->_subject);

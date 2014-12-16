@@ -19,32 +19,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Daiquiri_Form_DisplayGroup_HorizontalButton extends Zend_Form_DisplayGroup {
+class Daiquiri_Form_DisplayGroup_Action extends Zend_Form_DisplayGroup {
 
     /**
      * Initializes the DisplayGroup
      */
     function init() {
         // set css class for html element
-        $this->setAttrib('class', 'daiquiri-form-horizontal-button-group form-horizontal');
+        $this->setAttrib('class', 'form-action');
 
         // set decorators for DisplayGroup
-        $this->setDecorators(array(
-            'FormElements',
-            array(
-                array('control-group' => 'HtmlTag'),
-                array('tag' => 'div', 'class' => 'controls')),
-            array(
-                array('controls' => 'HtmlTag'),
-                array('tag' => 'div', 'class' => 'control-group')),
-            'Fieldset'
-        ));
-
-        // loop over elements and set decorators
-        foreach ($this->getElements() as $element) {
-            $element->setDecorators(array(
-                'ViewHelper'
-            ));
-        }
+        $this->setDecorators(array('FormElements','Fieldset'));
     }
 }

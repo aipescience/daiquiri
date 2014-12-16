@@ -45,7 +45,7 @@ class Auth_Form_Login extends Auth_Form_Abstract {
 
         // set decorators
         $this->addHorizontalGroup(array('username', 'password', 'remember'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

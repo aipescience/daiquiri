@@ -107,9 +107,9 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
             $this->addHorizontalGroup($contributions,'contributions', 'Contributions');
         }
         if (empty($this->_user)) {
-            $this->addHorizontalCaptchaGroup('captcha');
+            $this->addHorizontalGroup(array('captcha'),'captcha');
         }
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_user['details']['firstname'])) {

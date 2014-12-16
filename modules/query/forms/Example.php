@@ -81,7 +81,7 @@ class Query_Form_Example extends Daiquiri_Form_Model {
 
         // add groups
         $this->addHorizontalGroup(array('name', 'query', 'description', 'publication_role_id'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_entry)) {

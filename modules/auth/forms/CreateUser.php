@@ -46,7 +46,7 @@ class Auth_Form_CreateUser extends Auth_Form_Abstract {
         // add groups
         $this->addHorizontalGroup($details, 'detail-group');
         $this->addHorizontalGroup($elements, 'user-group');
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

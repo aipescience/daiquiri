@@ -22,63 +22,13 @@
 class Daiquiri_Form_DisplayGroup_Inline extends Zend_Form_DisplayGroup {
 
     /**
-     * Show labels or not.
-     * @var bool
-     */
-    protected $_label = false;
-
-    /**
-     * Sets the label variable.
-     * @param bool $label show labels or not
-     */
-    public function setLabel($label) {
-        $this->_label = $label;
-    }
-
-    /**
      * Initializes the DisplayGroup
      */
     function init() {
         // set css class for html element
-        $this->setAttrib('class', 'daiquiri-form-inline-group inline');
+        $this->setAttrib('class', 'form-inline');
 
         // set decorators for DisplayGroup
         $this->setDecorators(array('FormElements','Fieldset'));
-
-        // loop over elements and set decorators
-        foreach ($this->getElements() as $element) {
-            if (!$this->_label) {
-                $element->setDecorators(array(
-                    'ViewHelper',
-                    'Errors',
-                    array(
-                        'HtmlTag',
-                        array('tag' => 'div',),
-                    ),
-                    array(
-                        'Description',
-                        array('tag' => 'div', 'placement' => 'append', 'escape' => true)),
-                ));
-            } else {
-                $element->setDecorators(array(
-                    'ViewHelper',
-                    'Errors',
-                    array(
-                        'HtmlTag',
-                        array('tag' => 'div')
-                    ),
-                    array(
-                        'Description',
-                        array('tag' => 'div', 'placement' => 'append', 'escape' => true)),
-                    array(
-                        'Label',
-                        array('tag' => 'div', 'escape' => false)),
-                ));
-            }
-            // modify Error decorators retroactively
-            $element->getDecorator('Errors')->setOptions(array(
-                'class' => 'daiquiri-form-error unstyled'
-            ));
-        }
     }
 }

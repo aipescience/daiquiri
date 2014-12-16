@@ -46,7 +46,7 @@ class Auth_Form_Registration extends Auth_Form_Abstract {
         $this->addHorizontalGroup($details, 'detail-group');
         $this->addHorizontalGroup($elements, 'user-group');
         $this->addHorizontalGroup(array('captcha'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

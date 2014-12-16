@@ -126,7 +126,7 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         }
 
         // add display group for submit buttons
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set participant information fields
         foreach (array('firstname','lastname','affiliation','email','status_id','arrival','departure') as $element) {

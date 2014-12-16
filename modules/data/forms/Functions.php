@@ -65,7 +65,7 @@ class Data_Form_Functions extends Data_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup(array('name','description','order','publication_role_id'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('order', 'name', 'description', 'publication_role_id') as $element) {

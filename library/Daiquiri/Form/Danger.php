@@ -46,7 +46,7 @@ class Daiquiri_Form_Danger extends Daiquiri_Form_Abstract {
         $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

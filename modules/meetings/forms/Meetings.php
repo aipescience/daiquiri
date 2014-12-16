@@ -166,7 +166,7 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
 
         // add groups
         $this->addHorizontalGroup(array('title','slug','description','begin','end','registration_message','participants_message','contributions_message','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id','contribution_type_id','participant_detail_key_id'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('title','slug','description','begin','end','registration_publication_role_id','participants_publication_role_id','contributions_publication_role_id') as $element) {

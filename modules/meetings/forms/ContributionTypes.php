@@ -43,7 +43,7 @@ class Meetings_Form_ContributionTypes extends Daiquiri_Form_Model {
 
         // add groups
         $this->addHorizontalGroup(array('contribution_type'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         foreach (array('contribution_type') as $element) {

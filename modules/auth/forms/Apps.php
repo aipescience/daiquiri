@@ -38,7 +38,7 @@ class Auth_Form_Apps extends Auth_Form_Abstract {
 
         // add groups
         $this->addHorizontalGroup($elements);
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
     }
 
 }

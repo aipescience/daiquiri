@@ -53,8 +53,8 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
             'label' => 'Download table'
         ));
 
-        $this->addParagraphGroup(array('download_tablename'),'download-table-group', false, true);
-        $this->addDivGroup(array('download_format'),'download-format-group');
+        $this->addDisplayGroup(array('download_tablename'),'download-table-group', false, true);
+        $this->addDisplayGroup(array('download_format'),'download-format-group');
         $this->addInlineGroup(array('download_submit'));
 
         // add angular directives
