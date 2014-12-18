@@ -29,15 +29,12 @@ class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
 
     public function indexAction() {
         $slug = $this->_getParam('slug');
-        $redirect = $this->_getParam('redirect','/meetings/meetings/');
         if ($slug !== null) {
             $model = Daiquiri_Proxy::factory('Meetings_Model_Meetings');
             $response = $model->show(array('slug' => $slug));
             $this->view->meeting = $response['row'];
         }
-
         $this->view->slug = $slug;
-        $this->view->redirect = $redirect;
     }
 
     public function colsAction() {
@@ -64,7 +61,6 @@ class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         $id = $this->getParam('id');
         $response = $this->_model->show($id);
-        $this->view->redirect = $this->_getParam('redirect','/meetings/contributions/');
         $this->view->assign($response);
     }
 

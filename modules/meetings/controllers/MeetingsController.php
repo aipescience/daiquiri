@@ -35,7 +35,6 @@ class Meetings_MeetingsController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         $id = (int) $this->getParam('id');
         $response = $this->_model->show($id);
-        $this->view->redirect = $this->_getParam('redirect','/meetings/meetings/');
         $this->view->assign($response);
     }
 

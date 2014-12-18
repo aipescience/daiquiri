@@ -46,7 +46,6 @@ class Auth_UserController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         $id = $this->_getParam('id');
         $response = $this->_model->show($id);
-        $this->view->redirect = $this->_getParam('redirect','/auth/user/');
         $this->view->assign($response);
     }
 

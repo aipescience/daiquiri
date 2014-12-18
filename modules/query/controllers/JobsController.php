@@ -46,7 +46,6 @@ class Query_JobsController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         $id = $this->_getParam('id');
         $response = $this->_model->show($id);
-        $this->view->redirect = $this->_getParam('redirect','/query/jobs/');
         $this->view->assign($response);
     }
 

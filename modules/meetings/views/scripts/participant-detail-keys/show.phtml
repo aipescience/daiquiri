@@ -28,12 +28,4 @@
         <dd><?php echo $this->escape($this->row[$key]); ?></dd>
         <?php endforeach; ?>
     </dl>
-
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Back',
-        'href' => $this->redirect,
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    ?>
 </div>

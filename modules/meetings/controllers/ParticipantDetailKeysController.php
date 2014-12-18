@@ -35,7 +35,6 @@ class Meetings_ParticipantDetailKeysController extends Daiquiri_Controller_Abstr
     public function showAction() {
         $id = $this->getParam('id');
         $response = $this->_model->show($id);
-        $this->view->redirect = $this->_getParam('redirect','/meetings/participant-detail-keys/');
         $this->view->assign($response);
     }
 

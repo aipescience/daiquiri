@@ -35,7 +35,6 @@ class Auth_DetailKeysController extends Daiquiri_Controller_Abstract {
     public function showAction() {
         $id = $this->getParam('id');
         $response = $this->_model->show($id);
-        $this->view->redirect = $this->_getParam('redirect','/auth/detail-keys/');
         $this->view->assign($response);
     }
 
