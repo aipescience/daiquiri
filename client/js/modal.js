@@ -21,7 +21,7 @@ angular.module('modal', ['ngSanitize'])
 
 .directive('daiquiriModal', ['$compile','ModalService',function($compile,ModalService) {
     return {
-        templateUrl: '/daiquiri/html/modal.html',
+        templateUrl: angular.element('base').attr('href') + '/daiquiri/html/modal.html',
         link: function(scope, element) {
             scope.$watch(function () {
                 return ModalService.modal.enabled;

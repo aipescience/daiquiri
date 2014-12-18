@@ -27,17 +27,17 @@ angular.module('table', ['ngSanitize'])
 
 .directive('daiquiriTable', ['TableService',function(TableService) {
     return {
-        templateUrl: '/daiquiri/html/table.html',
+        templateUrl: angular.element('base').attr('href') + '/daiquiri/html/table.html',
         link: {
             pre: function (scope, element, attrs) {
                 // look for the cols url in the attributes
                 if (!angular.isUndefined(attrs.cols)) {
-                    TableService.url.cols = attrs.cols;
+                    TableService.url.cols = angular.element('base').attr('href') + attrs.cols;
                 }
 
                 // look for the rows url in the attributes
                 if (!angular.isUndefined(attrs.rows)) {
-                    TableService.url.rows = attrs.rows;
+                    TableService.url.rows = angular.element('base').attr('href') + attrs.rows;
                 }
 
                 // watch the cols for a change, and perform callback

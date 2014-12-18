@@ -21,7 +21,7 @@ angular.module('browser',[])
 
 .directive('daiquiriBrowser', ['BrowserService',function(BrowserService) {
     return {
-        templateUrl: '/daiquiri/html/browser.html',
+        templateUrl: angular.element('base').attr('href') + '/daiquiri/html/browser.html',
         scope: {
             browser: '='
         }

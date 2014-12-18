@@ -65,10 +65,10 @@ class Daiquiri_View_Helper_InternalLink extends Zend_View_Helper_Abstract {
             $html .= $options['prepend'];
         }
 
-        $html .= '<a';
+        $html .= "<a href=\"{$this->view->baseUrl($options['href'])}\"";
 
         foreach($options as $key => $value) {
-            if (!in_array($key, array('resource','permission','prepend','append','text'))) {
+            if (!in_array($key, array('resource','permission','prepend','append','text','href'))) {
                 $html .= " {$key}=\"{$value}\"";
             }
         }
