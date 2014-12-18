@@ -194,10 +194,10 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                     $values[] = $options[$value_id];
                 }
 
-                $row['details'][$d['key']] = implode(', ',$values);
+                $row['details'][$d['key']] = $values;
             }
         }
-        return array('status' => 'ok', 'row' => $row, 'detailKeys' => $detailKeys);
+        return array('status' => 'ok', 'row' => $row);
     }
 
     /**

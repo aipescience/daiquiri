@@ -38,7 +38,11 @@ unset($this->row['status_id']);
         }
         foreach ($this->row['details'] as $key => $value) {
             echo "<dt>{$this->escape(ucfirst($key))}</dt>";
-            echo "<dd>{$this->escape($value)}</dd>";
+            if (is_array($value)) {
+                echo "<dd>{$this->escape(implode(', ',$value))}</dd>";
+            } else {
+                echo "<dd>{$this->escape($value)}</dd>";
+            }
         }
         ?>
     </dl>

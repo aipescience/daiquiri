@@ -214,7 +214,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                     $values[] = $options[$value_id];
                 }
 
-                $row['details'][$d['key']] = implode(', ',$values);
+                $row['details'][$d['key']] = $values;
             }
         }
 
