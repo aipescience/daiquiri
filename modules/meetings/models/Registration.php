@@ -173,6 +173,22 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                         'arrival' => $values['arrival'],
                         'departure' => $values['departure']
                     );
+
+                    foreach($meeting['participant_detail_keys'] as $d) {
+                        if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$d['type_id']], array('radio','select'))) {
+                            $options = Zend_Json::decode($d['options']);
+                            $mailValues[$d['key']] = $options[$row['details'][$d['key']]];
+                        } else if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$d['type_id']], array('checkbox','multiselect'))) {
+                            $options = Zend_Json::decode($d['options']);
+
+                            $values = array();
+                            foreach (Zend_Json::decode($row['details'][$d['key']]) as $value_id) {
+                                $values[] = $options[$value_id];
+                            }
+
+                            $mailValues[$d['key']] = $values;
+                        }
+                    }
                     foreach ($meeting['participant_detail_keys'] as $keyId => $detailKey) {
                         if (isset($values['details'][$keyId])) {
                             if (is_array($values['details'][$keyId])) {
@@ -238,15 +254,19 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                 'arrival' => $values['arrival'],
                 'departure' => $values['departure']
             );
-            foreach ($meeting['participant_detail_keys'] as $keyId => $detailKey) {
-                if (isset($values['details'][$keyId])) {
-                    if (is_array($values['details'][$keyId])) {
-                        $mailValues[$detailKey['key']] = implode(',',$values['details'][$keyId]);
-                    } else {
-                        $mailValues[$detailKey['key']] = $values['details'][$keyId];
+            foreach($meeting['participant_detail_keys'] as $d) {
+                if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$d['type_id']], array('radio','select'))) {
+                    $options = Zend_Json::decode($d['options']);
+                    $mailValues[$d['key']] = $options[$row['details'][$d['key']]];
+                } else if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$d['type_id']], array('checkbox','multiselect'))) {
+                    $options = Zend_Json::decode($d['options']);
+
+                    $values = array();
+                    foreach (Zend_Json::decode($row['details'][$d['key']]) as $value_id) {
+                        $values[] = $options[$value_id];
                     }
-                } else {
-                    $mailValues[$detailKey['key']] = '';
+
+                    $mailValues[$d['key']] = $values;
                 }
             }
             foreach ($meeting['contribution_types'] as $key => $contribution_type) {
