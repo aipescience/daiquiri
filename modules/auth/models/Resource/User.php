@@ -355,6 +355,33 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         return $rows;
     }
 
+    public function fetchEmails($status = null, $role = null) {
+        $select = $this->select();
+        $select->from('Auth_User', array('email'));
+
+        // add an left join for firstname and lastname
+        foreach (array('firstname','lastname') as $key) {
+            $detailSelect = $this->select();
+            $detailSelect->from('Auth_Details', array('user_id', 'value'));
+            $detailSelect->where('`key` = ?', $key);
+            $select->joinLeft(array('tmp_' . $key => $detailSelect), "`Auth_User`.`id` = tmp_" . $key . '.user_id', array($key => 'value'));
+        }
+
+        // filter by status
+        if (!empty($status)) {
+            $select->join('Auth_Status', '`Auth_Status`.`id` = `Auth_User`.`status_id`', array());
+            $select->where('status = ?', $status);
+        }
+
+        // filter by role
+        if (!empty($role)) {
+            $select->join('Auth_Roles', '`Auth_Roles`.`id` = `Auth_User`.`role_id`', array());
+            $select->where('role = ?', $role);
+        }
+
+        return $this->fetchAll($select);
+    }
+
     /**
      * Fetches the registrations.
      * @return array $rows

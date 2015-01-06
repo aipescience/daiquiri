@@ -20,7 +20,8 @@
 /* paragraphs */
 
 p:last-child,
-dl:last-child {
+dl:last-child,
+ul:last-child {
     margin-bottom: 0;
 }
 

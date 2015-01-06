@@ -80,7 +80,7 @@ class Meetings_Form_Contributions extends Meetings_Form_Abstract {
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('contribution_type_id','title','abstract') as $element) {
+        foreach (array('participant_id','contribution_type_id','title','abstract') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

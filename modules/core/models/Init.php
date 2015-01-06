@@ -39,6 +39,9 @@ class Core_Model_Init extends Daiquiri_Model_Init {
      */
     public function getRules() {
         $rules = array(
+            'manager' => array(
+                'Core_Model_Templates' => array('index', 'update')
+            ),
             'admin' => array(
                 'Core_Model_Config' => array('index', 'create', 'update', 'delete', 'export'),
                 'Core_Model_Messages' => array('index', 'create', 'update', 'delete', 'export'),
@@ -210,7 +213,7 @@ Best Regards'
             ),
             'contact.submit_support' => array(
                 'subject' => '[Daiquiri] New contact message',
-                'body' => 'Dear Daiquiri-Test support member,
+                'body' => 'Dear Daiquiri manager,
 
 a new message was sent via the contact form.
 

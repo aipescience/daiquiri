@@ -90,7 +90,6 @@ class Contact_Model_Submit extends Daiquiri_Model_Abstract {
                 $userResource = new Auth_Model_Resource_User();
                 $this->getModelHelper('mail')->send('contact.submit_support', array(
                     'to' => array_merge(
-                        $userResource->fetchEmailByRole('support'),
                         $userResource->fetchEmailByRole('manager'),
                         $userResource->fetchEmailByRole('admin')
                     ),

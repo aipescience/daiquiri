@@ -50,9 +50,9 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
                 'Meetings_Model_Registration' => array('register','validate')
             ),
             'manager' => array(
-                'Meetings_Model_Meetings' => array('index','create','show','update'),
-                'Meetings_Model_Participants' => array('index','cols','rows','show','update','delete','accept','reject'),
-                'Meetings_Model_Contributions' => array('index','cols','rows','show','update','delete','accept','reject'),
+                'Meetings_Model_Meetings' => array('index','show','update'),
+                'Meetings_Model_Participants' => array('index','cols','rows','show','create','update','delete','accept','reject','export'),
+                'Meetings_Model_Contributions' => array('index','cols','rows','show','create','update','delete','accept','reject','export'),
             ),
             'admin' => array(
                 'Meetings_Model_Meetings' => array('index','create','show','update','delete','mails'),

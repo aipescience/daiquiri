@@ -23,7 +23,7 @@
 <div class="main" ng-app="admin" ng-controller="AdminController">
     <?php
     if (isset($this->meeting)){
-        echo "<h2>Contributions for: {$this->escape($this->meeting['title'])}</h2>";
+        echo "<h2>Contributions for {$this->escape($this->meeting['title'])}</h2>";
         $cols = "/meetings/contributions/cols?meetingId={$this->meeting['id']}";
         $rows = "/meetings/contributions/rows?meetingId={$this->meeting['id']}";
     } else {
@@ -36,6 +36,51 @@
     <div daiquiri-table data-cols="<?php echo $cols; ?>" data-rows="<?php echo $rows; ?>"></div>
 
     <div class="row">
+        <div class="span6">
+            <div class="daiquiri-widget">
+                <ul class="unstyled">
+                    <li>Export as plain text:
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'all',
+                        'href' => '/meetings/' . $this->slug . '/contributions/export/',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Contributions',
+                        'permission' => 'export',
+                        'append' => ',&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'accepted',
+                        'href' => '/meetings/' . $this->slug . '/contributions/export/status/accepted',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Contributions',
+                        'permission' => 'export'
+                    ));
+                    ?>
+                    </li>
+
+                    <li>Export as latex template:
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'all',
+                        'href' => '/meetings/' . $this->slug . '/contributions/export/mode/latex',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Contributions',
+                        'permission' => 'export',
+                        'append' => ',&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'accepted',
+                        'href' => '/meetings/' . $this->slug . '/contributions/export/mode/latex/status/accepted',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Contributions',
+                        'permission' => 'export'
+                    ));
+                    ?>
+                    </li>
+                </ul>
+            </div>
+        </div>
         <div class="span3">
             <div class="daiquiri-widget">
             <?php

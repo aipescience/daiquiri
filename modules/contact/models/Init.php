@@ -41,7 +41,7 @@ class Contact_Model_Init extends Daiquiri_Model_Init {
             'guest' => array(
                 'Contact_Model_Submit' => array('contact')
             ),
-            'support' => array(
+            'manager' => array(
                 'Contact_Model_Messages' => array('rows','cols','show','respond')
             )
         );

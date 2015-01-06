@@ -44,7 +44,11 @@
                 ?>
                 </ul>
             <?php else: ?>
+                <?php if (strpos($value,'http') === 0): ?>
+                <a href="<?php echo $this->escape($value); ?>"><?php echo $this->escape($value); ?></a>
+                <?php else: ?>
                 <?php echo $this->escape($value); ?>
+                <?php endif; ?>
             <?php endif; ?>
         </dd>
         <?php endif; ?>

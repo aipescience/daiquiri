@@ -62,10 +62,16 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         );
 
         // manager
+
         if ($this->_init->options['config']['auth']['confirmation']) {
             $rules['manager'] = array(
-                'Auth_Model_User' => array('rows','cols','show'),
-                'Auth_Model_Registration' => array('confirm','reject')
+                'Auth_Model_User' => array('rows','cols','show','export'),
+                'Auth_Model_Registration' => array('activate','confirm','reject','disable','reenable')
+            );
+        } else {
+            $rules['manager'] = array(
+                'Auth_Model_User' => array('rows','cols','show','export'),
+                'Auth_Model_Registration' => array('activate','confirm','reject','disable','reenable')
             );
         }
 
@@ -162,18 +168,12 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $output['roles'] = array('guest', 'user');
         if (isset($input['roles'])) {
             foreach ($input['roles'] as $role) {
-                if (! in_array($role, array('guest','user','support','manager','admin'))) {
+                if (! in_array($role, array('guest','user','manager','admin'))) {
                     $output['roles'][] = $role;
                 }
             }
         }
-        if (in_array('contact',$this->_init->options['modules'])) {
-            $output['roles'][] = 'support';
-        }
-        if ($this->_init->options['config']['auth']['confirmation'] 
-            || in_array('meetings',$this->_init->options['modules'])) {
-            $output['roles'][] = 'manager';
-        }
+        $output['roles'][] = 'manager';
         $output['roles'][] = 'admin';
 
         // construct detail keys array

@@ -26,56 +26,44 @@ class Auth_Model_User extends Daiquiri_Model_Table {
      * @var array $_options
      */
     private $_options = array(
-        'Show' => array(
-            'url' => '/auth/user/show',
-            'permission' => 'show',
-            'resource' => 'Auth_Model_User'
-        ),
-        'Update' => array(
-            'url' => '/auth/user/update',
-            'permission' => 'update',
-            'resource' => 'Auth_Model_User'
-        ),
-        'Delete' => array(
-            'url' => '/auth/user/delete',
-            'permission' => 'delete',
-            'resource' => 'Auth_Model_User'
-        ),
+
         'Confirm' => array(
             'url' => '/auth/registration/confirm',
             'permission' => 'confirm',
             'resource' => 'Auth_Model_Registration',
-            'prerequisites' => array('registered')
+            'status' => array('registered')
         ),
         'Reject' => array(
             'url' => '/auth/registration/reject',
             'permission' => 'reject',
             'resource' => 'Auth_Model_Registration',
-            'prerequisites' => array('registered')
+            'status' => array('registered')
         ),
         'Activate' => array(
             'url' => '/auth/registration/activate',
             'permission' => 'activate',
             'resource' => 'Auth_Model_Registration',
-            'prerequisites' => array('registered', 'confirmed')
+            'status' => array('registered', 'confirmed')
         ),
         'Disable' => array(
             'url' => '/auth/registration/disable',
             'permission' => 'disable',
             'resource' => 'Auth_Model_Registration',
-            'prerequisites' => array('active')
+            'status' => array('active'),
+            'role' => array('user')
         ),
         'Reenable' => array(
             'url' => '/auth/registration/reenable',
             'permission' => 'reenable',
             'resource' => 'Auth_Model_Registration',
-            'prerequisites' => array('disabled')
+            'status' => array('disabled')
         ),
+
         'Password' => array(
             'url' => '/auth/password/set',
             'permission' => 'set',
             'resource' => 'Auth_Model_Password'
-         )
+        )
     );
 
     /**
@@ -144,24 +132,94 @@ class Auth_Model_User extends Daiquiri_Model_Table {
 
             $status = $dbRow['status'];
         
+            // add options
             $options = array();
-            foreach ($this->_options as $key => $value) {
-                if ($status !== null &&
-                    isset($value['prerequisites']) &&
-                    !in_array($status, $value['prerequisites'])) {
-                    // pass
-                } else {
-                    $option = $this->internalLink(array(
+            foreach (array(
+                'Show' => array(
+                    'url' => '/auth/user/show',
+                    'permission' => 'show',
+                    'resource' => 'Auth_Model_User'
+                ),
+                'Update' => array(
+                    'url' => '/auth/user/update',
+                    'permission' => 'update',
+                    'resource' => 'Auth_Model_User'
+                ),
+                'Delete' => array(
+                    'url' => '/auth/user/delete',
+                    'permission' => 'delete',
+                    'resource' => 'Auth_Model_User'
+                )) as $key => $value) {
+                $option = $this->internalLink(array(
                         'text' => $key,
                         'href' => $value['url'] . '/id/' . $dbRow['id'],
                         'resource' => $value['resource'],
                         'permission' => $value['permission'],
                         'class' => 'daiquiri-admin-option'));
-                    if (!empty($option)) {
-                       $options[] = $option;
+                if (!empty($option)) {
+                   $options[] = $option;
+                }
+            }
+
+            // add options for registration workflow
+            if (!in_array($dbRow['role'],array('manager','admin'))) {
+                foreach (array(
+                    'Confirm' => array(
+                        'url' => '/auth/registration/confirm',
+                        'permission' => 'confirm',
+                        'resource' => 'Auth_Model_Registration',
+                        'prerequisites' => array('registered')
+                    ),
+                    'Reject' => array(
+                        'url' => '/auth/registration/reject',
+                        'permission' => 'reject',
+                        'resource' => 'Auth_Model_Registration',
+                        'prerequisites' => array('registered')
+                    ),
+                    'Activate' => array(
+                        'url' => '/auth/registration/activate',
+                        'permission' => 'activate',
+                        'resource' => 'Auth_Model_Registration',
+                        'prerequisites' => array('registered', 'confirmed')
+                    ),
+                    'Disable' => array(
+                        'url' => '/auth/registration/disable',
+                        'permission' => 'disable',
+                        'resource' => 'Auth_Model_Registration',
+                        'prerequisites' => array('active')
+                    ),
+                    'Reenable' => array(
+                        'url' => '/auth/registration/reenable',
+                        'permission' => 'reenable',
+                        'resource' => 'Auth_Model_Registration',
+                        'prerequisites' => array('disabled')
+                    )) as $key => $value) {
+                    if (in_array($status, $value['prerequisites'])) {
+                        $option = $this->internalLink(array(
+                                'text' => $key,
+                                'href' => $value['url'] . '/id/' . $dbRow['id'],
+                                'resource' => $value['resource'],
+                                'permission' => $value['permission'],
+                                'class' => 'daiquiri-admin-option'));
+                        if (!empty($option)) {
+                           $options[] = $option;
+                        }
                     }
                 }
             }
+
+            // add option for set password
+            $option = $this->internalLink(array(
+                    'text' => 'Password',
+                    'href' => '/auth/password/set/id/' . $dbRow['id'],
+                    'resource' => 'Auth_Model_Password',
+                    'permission' => set,
+                    'class' => 'daiquiri-admin-option'));
+            if (!empty($option)) {
+               $options[] = $option;
+            }
+
+            // add options to row
             $row[] = implode('&nbsp;',$options);
 
             $rows[] = $row;
@@ -366,21 +424,9 @@ class Auth_Model_User extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function export($status = false) {
-        if (!empty($status)) {
-            $sqloptions = array(
-                'where' => array(
-                    'status = ?' => $status
-                )
-            );
-        } else {
-            $sqloptions = array();
-        }
-
         return array(
             'status' => 'ok',
-            'rows' => $this->getResource()->fetchRows($sqloptions)
+            'rows' => $this->getResource()->fetchEmails($status)
         );
-        
-    } 
-
+    }
 }

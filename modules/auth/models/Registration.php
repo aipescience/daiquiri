@@ -367,6 +367,9 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                 if ($user['status'] === 'disabled') {
                     $form->setDescription('User status is already "disabled"');
                     return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+                } else if (in_array($user['role'],array('manager','admin'))) {
+                    $form->setDescription('Admins and managers can not be disabled.');
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form);
                 } else {
                     // get the new status id
                     $statusId = Daiquiri_Auth::getInstance()->getStatusId('disabled');

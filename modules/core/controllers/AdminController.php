@@ -90,7 +90,7 @@ class Core_AdminController extends Daiquiri_Controller_Abstract {
                 'icon' => 'fa-gears')
         );
         if (Daiquiri_Config::getInstance()->core->cms->enabled
-            && Daiquiri_Auth::getInstance()->getCurrentRole() === 'admin') {
+            && in_array(Daiquiri_Auth::getInstance()->getCurrentRole(),array('manager','admin'))) {
             $this->_items['cms'] = array(
                 'text' => 'CMS Admin',
                 'href' => rtrim(Daiquiri_Config::getInstance()->core->cms->url,'/') . '/wp-admin/',

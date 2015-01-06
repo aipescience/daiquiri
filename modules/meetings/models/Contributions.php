@@ -285,7 +285,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
         // create the form object
         $form = new Meetings_Form_Contributions(array(
-            'submit'=> 'Update participant',
+            'submit'=> 'Update contribution',
             'meeting' => $meetingsModel->getResource()->fetchRow($entry['meeting_id']),
             'participants' => $participantsModel->getResource()->fetchValues('email', $entry['meeting_id']),
             'entry' => $entry

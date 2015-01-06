@@ -56,65 +56,18 @@
             <p>from <?php echo $this->escape($row['begin']); ?> to <?php echo $this->escape($row['end']); ?></p>
             <p><?php echo $this->escape($row['description']); ?></p>
 
-            <ul class="unstyled pull-right">
-                <li>
-                    Export participants:
-                <?php
-                echo $this->internalLink(array(
-                    'text' => 'names',
-                    'href' => '/meetings/' . $this->escape($row['slug']) . '/participants/export',
-                    'resource' => 'Meetings_Model_Participants',
-                    'permission' => 'export',
-                    'append' => ', '));
-                echo $this->internalLink(array(
-                    'text' => 'names and email',
-                    'href' => '/meetings/' . $this->escape($row['slug']) . '/participants/export/mode/mail',
-                    'resource' => 'Meetings_Model_Participants',
-                    'permission' => 'export',
-                    'append' => ', '));
-                echo $this->internalLink(array(
-                    'text' => 'names and affiliation',
-                    'href' => '/meetings/' . $this->escape($row['slug']) . '/participants/export/mode/affiliation',
-                    'resource' => 'Meetings_Model_Participants',
-                    'permission' => 'export'));
-                ?>
-                </li>
-                <li>
-                    Export contributions:
-                <?php
-                echo $this->internalLink(array(
-                    'text' => 'plain text',
-                    'href' => '/meetings/' . $this->escape($row['slug']) . '/contributions/export',
-                    'resource' => 'Meetings_Model_Contributions',
-                    'permission' => 'index',
-                    'append' => ', '));
-                echo $this->internalLink(array(
-                    'text' => 'latex sourcecode',
-                    'href' => '/meetings/' . $this->escape($row['slug']) . '/contributions/export/mode/latex',
-                    'resource' => 'Meetings_Model_Contributions',
-                    'permission' => 'index'));
-                ?>
-                </li>
-            </ul>
 
             <ul class="unstyled">
                 <?php
                 echo $this->internalLink(array(
-                    'text' => 'Show registration page',
-                    'href' => '/meetings/' . $this->escape($row['slug']) . '/registration/',
-                    'resource' => 'Meetings_Model_Registration',
-                    'permission' => 'register',
-                    'prepend' => '<li>',
-                    'append' => '</li>'));
-                echo $this->internalLink(array(
-                    'text' => 'Show participants',
+                    'text' => 'Manage participants',
                     'href' => '/meetings/' . $this->escape($row['slug']) . '/participants/',
                     'resource' => 'Meetings_Model_Participants',
                     'permission' => 'index',
                     'prepend' => '<li>',
                     'append' => '</li>'));
                 echo $this->internalLink(array(
-                    'text' => 'Show contributions',
+                    'text' => 'Manage contributions',
                     'href' => '/meetings/' . $this->escape($row['slug']) . '/contributions/',
                     'resource' => 'Meetings_Model_Contributions',
                     'permission' => 'index',
@@ -126,54 +79,52 @@
     <?php endforeach; ?>
         </div>
         <div class="span3">
-            <div class="daiquiri-widget">
-                <?php
-                echo $this->internalLink(array(
-                    'text' => 'Create new meeting',
-                    'href' => '/meetings/meetings/create',
-                    'resource' => 'Meetings_Model_Meetings',
-                    'permission' => 'create',
-                    'prepend' => '<p>',
-                    'append' => '</p>',
-                    'ng-click' => 'fetchHtml($event)'));
-                ?>
-            </div>
-            <div class="daiquiri-widget">
-                <?php
-                echo $this->internalLink(array(
-                    'text' => 'Show all registrations',
-                    'href' => '/meetings/registration',
-                    'resource' => 'Meetings_Model_Registration',
-                    'permission' => 'index', 
-                    'prepend' => '<p>',
-                    'append' => '</p>'));
-                ?>
-            </div>
-            <div class="daiquiri-widget">
-                <?php
-                echo $this->internalLink(array(
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create new meeting',
+                'href' => '/meetings/meetings/create',
+                'resource' => 'Meetings_Model_Meetings',
+                'permission' => 'create',
+                'prepend' => '<div class="daiquiri-widget"><p>',
+                'append' => '</p></div>',
+                'ng-click' => 'fetchHtml($event)'));
+            echo $this->internalLink(array(
+                'text' => 'Show all registrations',
+                'href' => '/meetings/registration',
+                'resource' => 'Meetings_Model_Registration',
+                'permission' => 'index',
+                'prepend' => '<div class="daiquiri-widget"><p>',
+                'append' => '</p></div>'));
+            ?>
+            <?php
+            $items = $this->internalLink(array(
                     'text' => 'Manage participant detail keys',
                     'href' => '/meetings/participant-detail-keys',
                     'resource' => 'Meetings_Model_ParticipantDetailKeys',
                     'permission' => 'index',
                     'prepend' => '<p>',
-                    'append' => '</p>'));
-                echo $this->internalLink(array(
+                    'append' => '</p>'))
+            . $this->internalLink(array(
                     'text' => 'Manage participant status',
                     'href' => '/meetings/participant-status',
                     'resource' => 'Meetings_Model_ParticipantStatus',
                     'permission' => 'index',
                     'prepend' => '<p>',
-                    'append' => '</p>'));
-                echo $this->internalLink(array(
+                    'append' => '</p>'))
+            . $this->internalLink(array(
                     'text' => 'Manage contribution types',
                     'href' => '/meetings/contribution-types',
                     'resource' => 'Meetings_Model_ContributionTypes',
                     'permission' => 'index',
                     'prepend' => '<p>',
                     'append' => '</p>'));
-                ?>
+            ?>
+            <?php if (!empty($items)): ?>
+            <div class="daiquiri-widget">
+                <?php echo $items ?>
             </div>
+            <?php endif; ?>
+
             <div class="daiquiri-widget">
                 <?php echo $this->adminLink(); ?>
             </div>

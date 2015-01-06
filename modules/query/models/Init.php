@@ -78,9 +78,11 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             }
         }
 
-        //$rules['user']['Query_Model_Uws'] = array('getJobList', 'getJob', 'getError', 'createPendingJob', 'getQuote','createJobId', 'getPendingJob', 'getQuote', 'setDestructTime','setDestructTimeImpl', 'setExecutionDuration', 'setParameters','deleteJob', 'abortJob', 'runJob');
-
         $rules['user']['Query_Model_Uws'] = array('index','get','post','put','delete','head','options');
+
+        $rules['manager'] = array(
+            'Query_Model_Examples' => array('index','create','update','delete')
+        );
 
         $rules['admin'] = array(
             'Query_Model_Jobs' => array('rows','cols','show','kill','remove','rename'),

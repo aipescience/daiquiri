@@ -59,29 +59,23 @@
 
     <div class="row">
         <div class="span3">
-            <div class="daiquiri-widget">
             <?php
             echo $this->internalLink(array(
                 'text' => 'Create new mail template',
                 'href' => '/core/templates/create',
                 'resource' => 'Core_Model_Templates',
                 'permission' => 'create',
-                'prepend' => '<p>',
-                'append' => '</p>',
+                'prepend' => '<div class="daiquiri-widget"><p>',
+                'append' => '</p></div>',
                 'ng-click' => 'fetchHtml($event)'));
-            ?>
-            </div>
-            <div class="daiquiri-widget">
-            <?php
             echo $this->internalLink(array(
                 'text' => 'Export to init.php syntax',
                 'href' => '/core/templates/export',
                 'resource' => 'Core_Model_Templates',
                 'permission' => 'export',
-                'prepend' => '<p>',
-                'append' => '</p>'));
+                'prepend' => '<div class="daiquiri-widget"><p>',
+                'append' => '</p></div>'));
             ?>
-            </div>
         </div>
 
         <div class="span3 pull-right">
