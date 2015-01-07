@@ -78,7 +78,14 @@ class Auth_Form_Details extends Auth_Form_Abstract {
                 array('stringLength', false, array(0, 256))
             )
         ));
-        $this->addDetailElement('value');
+        $this->addTextElement('value', array(
+            'label' => 'Value',
+            'required' => true,
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('stringLength', false, array(0, 256))
+            )
+        ));
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addCancelButtonElement('cancel', 'Cancel');
 
