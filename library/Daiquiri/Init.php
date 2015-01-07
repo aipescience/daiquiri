@@ -485,6 +485,7 @@ class Daiquiri_Init {
         mkdir('public/min',0755,true);
         mkdir('public/min/js',0755,true);
         mkdir('public/min/css',0755,true);
+        mkdir('public/min/fonts',0755,true);
 
         echo "minifing js and css files.";
 

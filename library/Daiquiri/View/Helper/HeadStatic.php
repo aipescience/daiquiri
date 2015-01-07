@@ -99,6 +99,11 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
     public static $links = array(
         'img/glyphicons-halflings.png' => 'daiquiri/lib/bootstrap/img/glyphicons-halflings.png',
         'img/glyphicons-halflings-white.png' => 'daiquiri/lib/bootstrap/img/glyphicons-halflings-white.png',
+        'img/glyphicons-halflings.png' => 'daiquiri/lib/bootstrap/img/glyphicons-halflings.png',
+        'fonts/fontawesome-webfont.woff' => 'daiquiri/lib/font-awesome/fonts/fontawesome-webfont.woff',
+        'fonts/fontawesome-webfont.ttf' => 'daiquiri/lib/font-awesome/fonts/fontawesome-webfont.ttf',
+        'fonts/fontawesome-webfont.svg' => 'daiquiri/lib/font-awesome/fonts/fontawesome-webfont.svg',
+        'fonts/fontawesome-webfont.eot' => 'daiquiri/lib/font-awesome/fonts/fontawesome-webfont.eot'
     );
 
     /**
