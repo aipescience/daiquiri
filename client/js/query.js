@@ -226,11 +226,12 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
     };
 }]);
 
-app.controller('QueryController',['$scope','QueryService',function($scope,QueryService) {
+app.controller('QueryController',['$scope','$timeout','QueryService',function($scope,$timeout,QueryService) {
 
     $scope.account = QueryService.account;
 
     $scope.activateForm = function(formName) {
+        console.log(formName);
         QueryService.account.active.form = formName;
         QueryService.account.active.job = false;
 
@@ -254,7 +255,21 @@ app.controller('QueryController',['$scope','QueryService',function($scope,QueryS
     };
 
     QueryService.fetchAccount();
-    $scope.activateForm(QueryService.account.active.form);
+
+    $timeout(function() {
+        angular.element('.codemirror').each(function(key,element) {
+            CodeMirror.fromTextArea(element, {
+                mode: 'text/x-mysql',
+                indentWithTabs: false,
+                smartIndent: true,
+                matchBrackets : true,
+                lineNumbers: true,
+                lineWrapping: true,
+                autofocus: true
+            }).setSize(angular.element(element).width(),null);
+        });
+    }, 0);
+
 }]);
 
 app.controller('FormController',['$scope','QueryService','FormService',function($scope,QueryService,FormService) {

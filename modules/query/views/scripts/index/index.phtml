@@ -26,6 +26,9 @@
     <h2>Query interface</h2>
 
     <div class="row">
+
+        <!-- sidebar  -->
+
         <div class="span3">
 
             <!-- database status -->
@@ -60,7 +63,7 @@
                 </div>
             </div>
 
-            <!-- new query status -->
+            <!-- new query menu -->
 
             <ul id="database-status" class="daiquiri-widget nav nav-pills nav-stacked">
                 <li class="nav-header">New Query</li>
@@ -94,9 +97,15 @@
             </ul>
 
         </div>
+
+        <!-- main content  -->
+
         <div class="span9">
             <div id="query" class=""> 
                 <div class="tabbable">
+
+                    <!-- tab header -->
+
                     <ul class="nav nav-tabs">
                         <li id="form-tab-header" ng-show="account.active.form" ng-class="{active: account.active.form}">
                             <a href="#form-tab" data-toggle="tab">New Query</a>
@@ -114,6 +123,9 @@
                             <a href="#download-tab" data-toggle="tab">Download</a>
                         </li>
                     </ul>
+
+                    <!-- tabs -->
+
                     <div class="tab-content">
 
                         <!-- query form tab -->

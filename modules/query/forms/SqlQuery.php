@@ -69,7 +69,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         $this->addTextareaElement('sql_query', array(
             'filters' => array('StringTrim'),
             'required' => true,
-            'class' => 'span9',
+            'class' => 'span9 codemirror',
             'style' => "resize: none;",
             'rows' => 8
         ));

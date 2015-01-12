@@ -17,6 +17,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+.tab-content {
+    overflow: visible;
+}
+
 .tab-content form {
     margin-top: 0;
 }
@@ -39,3 +43,4 @@
     border-radius: 5px;
     padding: 12px;
 }
+
