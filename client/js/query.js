@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table']);
+var app = angular.module('query',['table','codemirror']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -231,7 +231,6 @@ app.controller('QueryController',['$scope','$timeout','QueryService',function($s
     $scope.account = QueryService.account;
 
     $scope.activateForm = function(formName) {
-        console.log(formName);
         QueryService.account.active.form = formName;
         QueryService.account.active.job = false;
 
@@ -256,28 +255,15 @@ app.controller('QueryController',['$scope','$timeout','QueryService',function($s
 
     QueryService.fetchAccount();
 
-    $timeout(function() {
-        angular.element('.codemirror').each(function(key,element) {
-            CodeMirror.fromTextArea(element, {
-                mode: 'text/x-mysql',
-                indentWithTabs: false,
-                smartIndent: true,
-                matchBrackets : true,
-                lineNumbers: true,
-                lineWrapping: true,
-                autofocus: true
-            }).setSize(angular.element(element).width(),null);
-        });
-    }, 0);
-
 }]);
 
-app.controller('FormController',['$scope','QueryService','FormService',function($scope,QueryService,FormService) {
+app.controller('FormController',['$scope','QueryService','FormService','CodemirrorService',function($scope,QueryService,FormService,CodemirrorService) {
 
     $scope.values = FormService.values;
     $scope.errors = FormService.errors;
 
     $scope.submitQuery = function(formName) {
+        CodemirrorService.save();
         FormService.submitQuery(formName);
     };
 

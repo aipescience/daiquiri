@@ -89,6 +89,8 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         'daiquiri_modal.js' => '/daiquiri/js/modal.js',
         'daiquiri_browser.css' => '/daiquiri/css/browser.css',
         'daiquiri_browser.js' => '/daiquiri/js/browser.js',
+        'daiquiri_codemirror.css' => '/daiquiri/css/codemirror.css',
+        'daiquiri_codemirror.js' => '/daiquiri/js/codemirror.js',
         'daiquiri_admin.js' => '/daiquiri/js/admin.js'
     );
 
