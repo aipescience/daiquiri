@@ -83,9 +83,8 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         $this->addDisplayGroup(array('sql_tablename'), 'sql-table-group', false, true);
         $this->addInlineGroup(array('sql_submit','sql_clear','sql_queue'), 'sql-button-group');
 
-        // override angular directives
-        $this->setAttrib('name',"sql");
-        $this->setAttrib('ng-submit',"submitQuery('sql')");
+        // angularify form
+        $this->addAngularDecorators('sql',array('sql_query','sql_tablename'));
     }
 
 }

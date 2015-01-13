@@ -44,3 +44,17 @@
     padding: 12px;
 }
 
+.daiquiri-download-format {
+    display: block;
+    width: 20px;
+    float: left;
+}
+
+.daiquiri-download-format-name {
+    width: 200px;
+    margin-left: 10px;
+    float: left;
+}
+.daiquiri-download-format-description {
+    margin-left: 225px;
+}

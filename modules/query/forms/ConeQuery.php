@@ -87,9 +87,8 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         $this->setDefault('cone_dec', $this->_formOptions['decDefault']);
         $this->setDefault('cone_radius', $this->_formOptions['radiusDefault']);
 
-        // override angular directives
-        $this->setAttrib('name','cone');
-        $this->setAttrib('ng-submit',"submitQuery('cone')");
+        // angularify form
+        $this->addAngularDecorators('cone',array('cone_ra','cone_dec','cone_radius','cone_tablename'));
     }
 
 }

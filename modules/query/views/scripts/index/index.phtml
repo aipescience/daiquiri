@@ -107,8 +107,8 @@
                     <!-- tab header -->
 
                     <ul class="nav nav-tabs">
-                        <li id="form-tab-header" ng-show="account.active.form" ng-class="{active: account.active.form}">
-                            <a href="#form-tab" data-toggle="tab">New Query</a>
+                        <li id="submit-tab-header" ng-show="account.active.form" ng-class="{active: account.active.form}">
+                            <a href="#submit-tab" data-toggle="tab">New Query</a>
                         </li>
                         <li id="overview-tab-header" ng-show="account.active.job">
                             <a href="#overview-tab" data-toggle="tab">Job Overview</a>
@@ -128,9 +128,9 @@
 
                     <div class="tab-content">
 
-                        <!-- query form tab -->
+                        <!-- submit tab -->
 
-                        <div class="tab-pane" id="form-tab" ng-show="account.active.form" ng-controller="FormController">
+                        <div class="tab-pane" id="submit-tab" ng-show="account.active.form" ng-controller="SubmitController">
                             <?php foreach ($this->forms as $key => $form): ?>
                             <div ng-show="account.active.form == '<?php echo $key; ?>'">
                                 <?php echo $this->action('index', 'form', 'query', array('form' => $key)); ?>

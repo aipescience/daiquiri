@@ -82,6 +82,7 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         // 'daiquiri_samp.js' => 'daiquiri/js/daiquiri_samp.js'
         // 
         'daiquiri_common.css' => 'daiquiri/css/common.css',
+        'daiquiri_form.css' => 'daiquiri/css/form.css',
         'daiquiri_wordpress.css' => 'daiquiri/css/wordpress.css',
         'daiquiri_table.css' => '/daiquiri/css/table.css',
         'daiquiri_table.js' => '/daiquiri/js/table.js',

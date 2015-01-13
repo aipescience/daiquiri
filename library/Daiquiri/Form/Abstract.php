@@ -64,7 +64,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
             $this->addDecorator('Description', array(
                 'tag' => 'div',
                 'placement' => 'append',
-                'class' => 'unstyled form-error text-error align-form-horizontal',
+                'class' => 'form-description',
                 'escape' => false
             ));
             $this->addDecorator('Form');

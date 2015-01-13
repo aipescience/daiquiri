@@ -36,104 +36,6 @@ pre {
     margin-bottom: 20px;
 }
 
-/* forms */
-
-form .mono {
-    font-size: small;
-}
-form .captcha img {
-    display: block;
-    border: 1px solid silver;
-    margin-bottom: 10px;
-}
-form fieldset {
-    margin-bottom: 20px;
-}
-form .control-group .controls > label {
-    padding-top: 5px;
-    margin-bottom: 5px;
-}
-form .control-group .controls > label > input[type="checkbox"]{
-    margin-top: 0;
-    margin-right: 10px;
-}
-form .control-group .controls > input[type="checkbox"]{
-    margin-top: 9px;
-}
-form .form-inline select,
-form .form-inline textarea,
-form .form-inline input[type="text"],
-form .form-inline input[type="password"],
-form .form-inline input[type="datetime"],
-form .form-inline input[type="datetime-local"],
-form .form-inline input[type="date"],
-form .form-inline input[type="month"],
-form .form-inline input[type="time"],
-form .form-inline input[type="week"],
-form .form-inline input[type="number"],
-form .form-inline input[type="email"],
-form .form-inline input[type="url"],
-form .form-inline input[type="search"],
-form .form-inline input[type="tel"],
-form .form-inline input[type="color"],
-form .form-inline .uneditable-input {
-    /* remove bottom margin, if the form element is inside a paragraph or inline */
-    margin-bottom: 0px;
-}
-form .form-inline {
-    margin-bottom: 10px;
-}
-form .form-action {
-    margin-left: 180px;
-}
-
-.form-inline label {
-    display: inline;
-}
-.form-inline { 
-    float: right;
-}
-.form-horizontal input[type="radio"] {
-    margin: 0 10px 0 0;
-}
-.form-horizontal .controls br {
-    display: none;
-}
-.form-horizontal .control-group:last-child {
-    margin-bottom: 0;
-}
-.form-horizontal:last-child {
-    margin-bottom: 0;
-}
-
-button::-moz-focus-inner {
-    /* Remove extra space inside buttons in Firefox */
-    border: none;
-    padding: 0em;
-}
-form[novalidate] input:focus:invalid,
-form[novalidate] textarea:focus:invalid,
-form[novalidate] select:focus:invalid {
-    color: inherit;
-    border-color: inherit;
-    -webkit-box-shadow: inherit;
-    -moz-box-shadow: inherit;
-    box-shadow: inherit;
-}
-#add_ucd {
-    margin-left: 20px;
-}
-form .controls ul.text-error,
-form .controls div.form-hint {
-    margin: 5px 0 0 0;
-    padding: 0;
-}
-.help-block,
-.help-inline,
-.form-hint {
-    color: #888;
-}
-
 /* 
 a button that looks like a link, see
 http://stackoverflow.com/questions/1367409/how-to-make-button-look-like-a-link
@@ -186,20 +88,6 @@ ol.align-form-horizontal,
     line-height: 30px;
 }
 
-
-/*.table .accordion:last-child {
-    margin-bottom: 0;
-}
-.table .table {
-    margin-bottom: 10px;
-}
-.table .table:last-child {
-    margin-bottom: 0;
-}
-.accordion-inner :last-child {
-    margin-bottom: 0;
-}*/
-
 /* definitions */
 
 dl.dl-horizontal dt {
@@ -243,6 +131,7 @@ dl.dl-horizontal dd {
 }
 
 /* nav widget */
+
 .daiquiri-widget.nav {
     padding: 0;
 }
@@ -295,8 +184,6 @@ dl.dl-horizontal dd {
     padding-left: 10px;
     color: #b94a48;
 }
-
-
 
 /* dropdown */
 
@@ -370,6 +257,7 @@ li.dropdown ul ul {
 }
 
 /* login */
+
 .login:first-child {
     margin-top: 60px;
 }

@@ -1,0 +1,97 @@
+/*  
+ *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+form .mono {
+    font-size: small;
+}
+form .captcha img {
+    display: block;
+    border: 1px solid silver;
+    margin-bottom: 10px;
+}
+form .control-group .controls > label {
+    padding-top: 5px;
+    margin-bottom: 5px;
+}
+form .control-group .controls > label > input[type="checkbox"]{
+    margin-top: 0;
+    margin-right: 10px;
+}
+form .control-group .controls > input[type="checkbox"]{
+    margin-top: 9px;
+}
+form .controls ul.text-error,
+form .controls div.form-hint {
+    margin: 5px 0 0 0;
+    padding: 0;
+}
+form .form-inline {
+    margin-bottom: 10px;
+}
+form .form-action {
+    margin-left: 180px;
+}
+form .form-error {
+    margin-bottom: 20px;
+}
+
+.form-inline label {
+    display: inline;
+}
+.form-horizontal input[type="radio"] {
+    margin: 0 10px 0 0;
+}
+.form-horizontal .controls br {
+    display: none;
+}
+.form-horizontal:last-child {
+    margin-bottom: 0;
+}
+.form-horizontal .text-error {
+    margin-left: 180px;
+    margin-top: 10px;
+}
+.form-horizontal .text-error {
+    margin-left: 180px;
+    margin-top: 10px;
+}
+
+.help-block,
+.help-inline,
+.form-hint {
+    color: #888;
+}
+
+button::-moz-focus-inner {
+    /* Remove extra space inside buttons in Firefox */
+    border: none;
+    padding: 0em;
+}
+/*form[novalidate] input:focus:invalid,
+form[novalidate] textarea:focus:invalid,
+form[novalidate] select:focus:invalid {
+    color: inherit;
+    border-color: inherit;
+    -webkit-box-shadow: inherit;
+    -moz-box-shadow: inherit;
+    box-shadow: inherit;
+}*/
+#add_ucd {
+    margin-left: 20px;
+}

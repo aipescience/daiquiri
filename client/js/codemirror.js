@@ -46,7 +46,6 @@ angular.module('codemirror', [])
         elements: elements,
         save: function() {
             angular.forEach(elements,function(object, key) {
-                console.log(object);
                 object.save();
             });
         }

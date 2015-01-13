@@ -22,19 +22,8 @@
 abstract class Daiquiri_Form_Element_Abstract {
 
     /**
-     * Constructor. Sets the angular model attribute.
-     */
-    static public function addAngularOptions($name,$options) {
-        // if (empty($options['ng-model'])) {
-        //     $options['ng-model'] = "values.{$name}";
-        // }
-        return $options;
-    }
-
-    /**
      * Sets the default decorators needed for angular.
      */
-
     public function loadDaiquiriDecorators($element) {
 
         if ($element->loadDefaultDecoratorsIsDisabled()) {

@@ -56,7 +56,7 @@ app.factory('QueryService', ['$http','$timeout','$q',function($http,$timeout,$q)
     };
 }]);
 
-app.factory('FormService', ['$http','QueryService',function($http,QueryService) {
+app.factory('SubmitService', ['$http','QueryService',function($http,QueryService) {
     var values = {};
     var errors = {};
 
@@ -81,7 +81,6 @@ app.factory('FormService', ['$http','QueryService',function($http,QueryService) 
                 if (response.status == 'ok') {
                     QueryService.fetchAccount();
                 } else if (response.status == 'error') {
-                    console.log(response.errors);
                     angular.forEach(response.errors, function(error, key) {
                         errors[key] = error;
                     });
@@ -234,7 +233,7 @@ app.controller('QueryController',['$scope','$timeout','QueryService',function($s
         QueryService.account.active.form = formName;
         QueryService.account.active.job = false;
 
-        $('#form-tab-header a').tab('show');
+        $('#submit-tab-header a').tab('show');
     };
 
     $scope.activateJob = function(jobId) {
@@ -257,14 +256,19 @@ app.controller('QueryController',['$scope','$timeout','QueryService',function($s
 
 }]);
 
-app.controller('FormController',['$scope','QueryService','FormService','CodemirrorService',function($scope,QueryService,FormService,CodemirrorService) {
+app.controller('SubmitController',['$scope','QueryService','SubmitService','CodemirrorService',function($scope,QueryService,SubmitService,CodemirrorService) {
 
-    $scope.values = FormService.values;
-    $scope.errors = FormService.errors;
+    $scope.values = SubmitService.values;
+    $scope.errors = SubmitService.errors;
 
-    $scope.submitQuery = function(formName) {
-        CodemirrorService.save();
-        FormService.submitQuery(formName);
+    $scope.submitQuery = function(formName,event) {
+        console.log();
+        if (formName == 'sql') {
+            CodemirrorService.save();
+            $scope.values[angular.element('.codemirror').attr('id')] = angular.element('.codemirror').val();
+        }
+        SubmitService.submitQuery(formName);
+        event.preventDefault()
     };
 
 }]);

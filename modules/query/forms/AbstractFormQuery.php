@@ -156,6 +156,39 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
     }
 
     /**
+     * Adds the angular decorators to the form and the elements.
+     * @param array $elements form elements
+     */
+    public function addAngularDecorators($name, $elements) {
+        // set aangular attributes to form
+        $this->setAttrib('name',$name);
+        $this->setAttrib('ng-submit',"submitQuery('{$name}',\$event)");
+
+        // add angular model and error model decorators to elements
+        foreach ($elements as $name) {
+            $element = $this->getElement($name);
+            $element->setAttrib('ng-model',"values.{$name}");
+
+            // inject new decorator in penultimate position
+            $decorators = $element->getDecorators();
+            $last = array_pop($decorators);
+
+            $element->setDecorators($decorators);
+            $element->addDecorator(array('field' => 'Callback'), array(
+                'callback' => function($content, $element, $options) {
+                    $errorModel = "errors.{$element->getName()}";
+                    return "<ul class=\"text-error unstyled\"><li ng-repeat=\"error in {$errorModel}\">{{error}}</li></ul>";
+                },
+                'placement' => 'append'
+            ));
+            $element->addDecorator($last);
+        }
+
+        // add form error to the description
+        $this->setDescription("<ul class=\"text-error form-error unstyled\"><li ng-repeat=\"error in errors.form\">{{error}}</li></ul>");
+    }
+
+    /**
      * Quotes a given string using the database adapter.
      * @param  string $string quote string including database field
      * @param  $value $value  value to quote
