@@ -445,10 +445,26 @@ ublication_role_id']);
     }
 
     /**
-     * Returns all functions which the user has access to.
+     * Returns a set of keywords with description.
      * @return array $response
      */
-    public function functions() {
+    public function keywords() {
+        return array('keywords' => Query_Model_Resource_AbstractQuery::$keywords, 'status' => 'ok');
+    }
+
+    /**
+     * Returns a set of functions with description.
+     * @return array $response
+     */
+    public function nativeFunctions() {
+        return array('native_functions' => Query_Model_Resource_AbstractQuery::$functions, 'status' => 'ok');
+    }
+
+    /**
+     * Returns all the custom functions which the user has access to.
+     * @return array $response
+     */
+    public function customFunctions() {
         $resource = new Data_Model_Resource_Functions();
         $rows = array();
         foreach ($resource->fetchRows() as $row) {
@@ -457,11 +473,11 @@ ublication_role_id']);
                 $rows[] = $row;
             }
         }
-        return array('functions' => $rows, 'status' => 'ok');
+        return array('custom_functions' => $rows, 'status' => 'ok');
     }
 
     /**
-     * Returns all examles which the user has access to.
+     * Returns all examples which the user has access to.
      * @return array $response
      */
     public function examples() {

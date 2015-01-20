@@ -58,3 +58,54 @@
 .daiquiri-download-format-description {
     margin-left: 225px;
 }
+
+#fieldset-sqlbargroup {
+    margin-bottom: 0;
+}
+#fieldset-sqlbargroup .daiquiri-browser {
+    margin-bottom: 10px;
+}
+#fieldset-sqlbargroup .span3:first-child {
+    margin-left: 0;
+}
+.daiquiri-query-bar {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 24px;
+    margin-bottom: 10px;
+}
+.daiquiri-query-bar ul {
+    margin: 0;
+}
+.daiquiri-query-bar ul > li {
+    list-style: none;
+    display: inline-block;
+    float: none;
+}
+.daiquiri-query-bar ul > li > a {
+    margin: 0;
+    padding: 5px 12px;
+    display: inline-block;
+}
+.daiquiri-query-bar ul > li > a {
+    padding: 5px 12px;
+    display: inline-block;
+    border-radius: 0;
+}
+.daiquiri-query-bar ul.pull-left > li:first-child > a {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.daiquiri-query-bar ul.pull-right > li:last-child > a {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.daiquiri-query-bar ul > li > a:hover {
+    text-decoration: none;
+    background-color: #efefef;
+}
+.daiquiri-query-bar-hint {
+    margin-bottom: 10px;
+    font-size: small;
+    color: #666;
+}

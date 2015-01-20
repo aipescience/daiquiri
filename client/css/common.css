@@ -102,11 +102,11 @@ dl.dl-horizontal dd {
 /* navigation */
 
 .daiquiri-nav .nav {
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 5px;
 }
 .daiquiri-nav .nav .nav-header {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ccc;
 }
 .daiquiri-nav li.nav-item > a {
     margin-top: 0;
@@ -124,7 +124,7 @@ dl.dl-horizontal dd {
 /* widget */
 
 .daiquiri-widget {
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 20px;
     padding: 5px 8px;
@@ -136,7 +136,7 @@ dl.dl-horizontal dd {
     padding: 0;
 }
 .daiquiri-widget.nav .nav-header {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ccc;
 }
 .daiquiri-widget.nav li.nav-item a,
 .daiquiri-widget.nav li.nav-item p {
@@ -158,7 +158,7 @@ dl.dl-horizontal dd {
 .daiquiri-widget.nav div.nav-item {
     padding: 5px 12px 0 12px;
     font-size: small;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ccc;
 }
 .daiquiri-widget.nav div.nav-item:last-child {
     border-bottom: none;

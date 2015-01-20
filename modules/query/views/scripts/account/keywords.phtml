@@ -20,11 +20,11 @@
 ?>
 
 <div class="main">
-    <h2>Functions</h2>
+    <h2>Database keywords</h2>
 
-    <?php foreach ($this->functions as $function): ?>
+    <?php foreach ($this->keywords as $row): ?>
         <table class='table table-bordered'>
-            <?php foreach($function as $key => $value): ?>
+            <?php foreach($row as $key => $value): ?>
                 <tr>
                     <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
                     <td>

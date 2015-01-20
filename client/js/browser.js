@@ -75,7 +75,12 @@ angular.module('browser',[])
 
     function initBrowser(name) {
         // with of one column of the browser
-        var width = Math.floor(220 + (1 - 1 / browser[name].colnames.length) * 20 - 1);
+        var width;
+        if (browser[name].colnames.length == 1) {
+            width = '100%';
+        } else {
+            width = Math.floor(220 + (1 - 1 / browser[name].colnames.length) * 20 - 1);
+        }
 
         var selected0;
         if (angular.isUndefined(browser[name].cols) || angular.isUndefined(browser[name].cols[0])) {
@@ -109,7 +114,7 @@ angular.module('browser',[])
                     if (!angular.isUndefined(colname)) {
                         browser[name].cols.push({
                             'id': i,
-                            'name': colname,
+                            'name': colname.replace('_',' '),
                             'height': height,
                             'width': width,
                             'items': []

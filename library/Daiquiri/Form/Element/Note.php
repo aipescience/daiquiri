@@ -43,4 +43,21 @@ class Daiquiri_Form_Element_Note extends Zend_Form_Element_Xhtml {
      */
     public $helper = 'formNote';
 
+    /**
+     * Sets the default decorators.
+     */
+    public function loadDefaultDecorators() {
+        if ($this->loadDefaultDecoratorsIsDisabled()) {
+            return $this;
+        }
+
+        $decorators = $this->getDecorators();
+        if (empty($decorators)) {
+            // the element itself
+            $this->addDecorator('ViewHelper');
+        }
+
+        return $this;
+    }
+
 }

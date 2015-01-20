@@ -228,6 +228,17 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
+     * Adds a note element containing only text.
+     * @param  string $name  name of the element
+     * @param  string $text  content of the element
+     * @return string $name  name of the element
+     */
+    public function addNoteElement($name, $text) {
+        $this->addElement(new Daiquiri_Form_Element_Note($name, array('value' => $text)));
+        return $name;
+    }
+
+    /**
      * Adds a singe toggle-button element. Needs additional grouping by 
      * Daiquiri_Form_DisplayGroup_ToggleButtons using addToggleButtonsGroup. 
      * @param string $name    name of the element

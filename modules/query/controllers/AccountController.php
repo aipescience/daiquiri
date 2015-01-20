@@ -58,14 +58,23 @@ class Query_AccountController extends Daiquiri_Controller_Abstract {
         $this->view->assign($response);
     }
 
+    public function keywordsAction() {
+        $response = $this->_model->keywords();
+        $this->view->assign($response);
+    }
+
+    public function nativeFunctionsAction() {
+        $response = $this->_model->nativeFunctions();
+        $this->view->assign($response);
+    }
+
+    public function customFunctionsAction() {
+        $response = $this->_model->customFunctions();
+        $this->view->assign($response);
+    }
+
     public function examplesAction() {
         $response = $this->_model->examples();
         $this->view->assign($response);
     }
-
-    public function functionsAction() {
-        $response = $this->_model->functions();
-        $this->view->assign($response);
-    }
-
 }

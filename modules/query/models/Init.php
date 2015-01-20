@@ -48,7 +48,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             $rules['guest'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
-                    'index','showJob','killJob','removeJob','renameJob','databases','functions','examples'
+                    'index','showJob','killJob','removeJob','renameJob','databases','functions','reference','examples'
                 ),
                 'Query_Model_Database' => array('download','regenerate','file','stream'),
                 'Query_Model_Examples' => array('index', 'show')
@@ -64,7 +64,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             $rules['user'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
-                    'index','showJob','killJob','removeJob','renameJob','databases','functions','examples'
+                    'index','showJob','killJob','removeJob','renameJob','databases','keywords','nativeFunctions','customFunctions','examples'
                 ),
                 'Query_Model_Database' => array('download','regenerate','file','stream'),
                 'Query_Model_Examples' => array('index', 'show')

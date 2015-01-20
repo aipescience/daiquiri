@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','codemirror']);
+var app = angular.module('query',['table','browser','codemirror']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -56,9 +56,21 @@ app.factory('QueryService', ['$http','$timeout','$q',function($http,$timeout,$q)
     };
 }]);
 
-app.factory('SubmitService', ['$http','QueryService',function($http,QueryService) {
+app.factory('SubmitService', ['$http','QueryService','BrowserService',function($http,QueryService,BrowserService) {
     var values = {};
     var errors = {};
+
+    BrowserService.browser.databases = {
+        'url': '/data/databases/',
+        'colnames': ['databases','tables','columns']
+    };
+    BrowserService.initBrowser('databases');
+
+    // BrowserService.browser.functions = {
+    //     'url': '/data/functions/',
+    //     'colnames': ['functions']
+    // };
+    // BrowserService.initBrowser('functions');
 
     return {
         values: values,
@@ -94,7 +106,49 @@ app.factory('SubmitService', ['$http','QueryService',function($http,QueryService
                     'form': ['Could not connect to server.']
                 };
             });
-        }
+        },
+        databases: BrowserService.browser.databases,
+        functions: BrowserService.browser.functions
+    };
+}]);
+
+app.factory('BarService', ['$http','BrowserService',function($http,BrowserService) {
+    BrowserService.browser.databases = {
+        'url': '/query/account/databases/',
+        'colnames': ['databases','tables','columns']
+    };
+    BrowserService.initBrowser('databases');
+
+    BrowserService.browser.keywords = {
+        'url': '/query/account/keywords/',
+        'colnames': ['keywords']
+    };
+    BrowserService.initBrowser('keywords');
+
+    BrowserService.browser.nativeFunctions = {
+        'url': '/query/account/native-functions/',
+        'colnames': ['native_functions']
+    };
+    BrowserService.initBrowser('nativeFunctions');
+
+    BrowserService.browser.customFunctions = {
+        'url': '/query/account/custom-functions/',
+        'colnames': ['custom_functions']
+    };
+    BrowserService.initBrowser('customFunctions');
+
+    BrowserService.browser.examples = {
+        'url': '/query/account/examples/',
+        'colnames': ['examples']
+    };
+    BrowserService.initBrowser('examples');
+
+    return {
+        databases: BrowserService.browser.databases,
+        keywords: BrowserService.browser.keywords,
+        nativeFunctions: BrowserService.browser.nativeFunctions,
+        customFunctions: BrowserService.browser.customFunctions,
+        examples: BrowserService.browser.examples
     };
 }]);
 
@@ -258,6 +312,8 @@ app.controller('QueryController',['$scope','$timeout','QueryService',function($s
 
 app.controller('SubmitController',['$scope','QueryService','SubmitService','CodemirrorService',function($scope,QueryService,SubmitService,CodemirrorService) {
 
+    /* form submission */
+
     $scope.values = SubmitService.values;
     $scope.errors = SubmitService.errors;
 
@@ -270,7 +326,39 @@ app.controller('SubmitController',['$scope','QueryService','SubmitService','Code
         SubmitService.submitQuery(formName);
         event.preventDefault()
     };
+}]);
 
+app.controller('BarController',['$scope','BarService',function($scope,BarService) {
+
+    $scope.databases = BarService.databases;
+    $scope.keywords = BarService.keywords;
+    $scope.nativeFunctions = BarService.nativeFunctions;
+    $scope.customFunctions = BarService.customFunctions;
+    $scope.examples = BarService.examples;
+
+    $scope.visible = false;
+
+    $scope.toogleDatabases = function() {
+        if ($scope.visible === 'databases') {
+            $scope.visible = false;
+        } else {
+            $scope.visible = 'databases';
+        }
+    };
+    $scope.toogleFunctions = function() {
+        if ($scope.visible === 'functions') {
+            $scope.visible = false;
+        } else {
+            $scope.visible = 'functions';
+        }
+    };
+    $scope.toogleExamples = function() {
+        if ($scope.visible === 'examples') {
+            $scope.visible = false;
+        } else {
+            $scope.visible = 'examples';
+        }
+    };
 }]);
 
 app.controller('ResultsController',['$scope','QueryService','TableService',function($scope,QueryService,TableService) {

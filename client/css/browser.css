@@ -18,21 +18,21 @@
  */
 
 .daiquiri-browser {
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 5px;
     padding: 0px;
     margin-bottom: 20px;
     white-space: nowrap;
 }
 .daiquiri-browser > div {
-    border-right: 1px solid #ddd;
+    border-right: 1px solid #ccc;
     display: inline-block;
 }
 .daiquiri-browser > div:last-child {
     border-right: 0px;
 }
 .daiquiri-browser-head {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ccc;
     margin: 0;
 }
 .daiquiri-browser-body {

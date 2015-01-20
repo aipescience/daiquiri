@@ -47,6 +47,12 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
     };
     BrowserService.initBrowser('functions');
 
+    BrowserService.browser.functions = {
+        'url': '/data/functions/',
+        'colnames': ['functions']
+    };
+    BrowserService.initBrowser('functions');
+
     function fetchView(model,id) {
         var url = '/data/' + model + '/show/id/' + id;
 

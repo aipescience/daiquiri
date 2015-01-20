@@ -66,6 +66,53 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
     public function init() {
         // add form elements
         $this->addCsrfElement('sql_csrf');
+
+        $this->addNoteElement('sql_bar', '<div ng-controller="BarController">
+            <div class="daiquiri-query-bar">
+                <ul class="nav-pills pull-left">
+                    <li ng-class="{\'active\': visible === \'databases\'}">
+                        <a href="" ng-click="toogleDatabases()">Show databases, tables and columns</a>
+                    </li>
+                    <li ng-class="{\'active\': visible === \'functions\'}">
+                        <a href="" ng-click="toogleFunctions()">Show keywords and functions</a>
+                    </li>
+                </ul>
+                <ul class="nav-pills pull-right">
+                    <li ng-class="{\'active\': visible === \'examples\'}">
+                        <a href="" ng-click="toogleExamples()">Show query examples</a>
+                    </li>
+                </ul>
+            </div>
+            <div ng-show="visible === \'databases\'">
+                <div daiquiri-browser data-browser="databases"></div>
+                <div class="daiquiri-query-bar-hint">
+                    A double click will paste the database/table/column identifier into the query field.
+                </div>
+            </div>
+            <div ng-show="visible === \'functions\'">
+                <div class="span3">
+                    <div daiquiri-browser data-browser="keywords"></div>
+                </div>
+                <div class="span3">
+                    <div daiquiri-browser data-browser="nativeFunctions"></div>
+                </div>
+                <div class="span3">
+                    <div daiquiri-browser data-browser="customFunctions"></div>
+                </div>
+                <div class="daiquiri-query-bar-hint">
+                    A double click will paste the function into the query field.
+                </div>
+            </div>
+            <div ng-show="visible === \'examples\'">
+                <div>
+                    <div daiquiri-browser data-browser="examples"></div>
+                </div>
+                <div class="daiquiri-query-bar-hint">
+                    A double click replace the content of the query field with the example query.
+                </div>
+            </div>
+        </div>');
+
         $this->addTextareaElement('sql_query', array(
             'filters' => array('StringTrim'),
             'required' => true,
@@ -73,15 +120,19 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             'style' => "resize: none;",
             'rows' => 8
         ));
+
         $this->addTablenameElement('sql_tablename');
         $this->addSubmitButtonElement('sql_submit', 'Submit new SQL Query');
         $this->addDumbButtonElement('sql_clear', 'Clear input window');
         $this->addQueuesElement('sql_queue');
 
         // add display groups
+        $this->addInlineGroup(array('sql_bar'), 'sql-bar-group');
         $this->addDisplayGroup(array('sql_query'), 'sql-input-group');
+
         $this->addDisplayGroup(array('sql_tablename'), 'sql-table-group', false, true);
-        $this->addInlineGroup(array('sql_submit','sql_clear','sql_queue'), 'sql-button-group');
+
+        $this->addInlineGroup(array('sql_submit','sql_clear' /*,'sql_queue'*/), 'sql-button-group');
 
         // angularify form
         $this->addAngularDecorators('sql',array('sql_query','sql_tablename'));
