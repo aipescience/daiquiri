@@ -71,15 +71,15 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             <div class="daiquiri-query-bar">
                 <ul class="nav-pills pull-left">
                     <li ng-class="{\'active\': visible === \'databases\'}">
-                        <a href="" ng-click="toogleDatabases()">Show databases, tables and columns</a>
+                        <a href="" ng-click="toogleDatabases()">Database browser</a>
                     </li>
                     <li ng-class="{\'active\': visible === \'functions\'}">
-                        <a href="" ng-click="toogleFunctions()">Show keywords and functions</a>
+                        <a href="" ng-click="toogleFunctions()">Function browser</a>
                     </li>
                 </ul>
                 <ul class="nav-pills pull-right">
                     <li ng-class="{\'active\': visible === \'examples\'}">
-                        <a href="" ng-click="toogleExamples()">Show query examples</a>
+                        <a href="" ng-click="toogleExamples()">Examples</a>
                     </li>
                 </ul>
             </div>

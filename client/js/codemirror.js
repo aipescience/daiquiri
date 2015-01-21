@@ -44,10 +44,29 @@ angular.module('codemirror', [])
 
     return {
         elements: elements,
+        insert: function (string, key) {
+            if (angular.isUndefined(key)) key = 0;
+
+            var pos = elements[key].getCursor();
+            pos['ch'] += string.length;
+            elements[key].replaceSelection(string);
+            elements[key].setCursor(pos);
+            elements[key].focus();
+        },
+        clear: function(key) {
+            if (angular.isUndefined(key)) key = 0;
+
+            elements[key].setValue('');
+        },
+        refresh: function(key) {
+            if (angular.isUndefined(key)) key = 0;
+
+            elements[key].refresh();
+        },
         save: function() {
             angular.forEach(elements,function(object, key) {
                 object.save();
             });
         }
     };
-}])
+}]);

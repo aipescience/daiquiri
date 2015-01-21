@@ -60,18 +60,6 @@ app.factory('SubmitService', ['$http','QueryService','BrowserService',function($
     var values = {};
     var errors = {};
 
-    BrowserService.browser.databases = {
-        'url': '/data/databases/',
-        'colnames': ['databases','tables','columns']
-    };
-    BrowserService.initBrowser('databases');
-
-    // BrowserService.browser.functions = {
-    //     'url': '/data/functions/',
-    //     'colnames': ['functions']
-    // };
-    // BrowserService.initBrowser('functions');
-
     return {
         values: values,
         errors: errors,
@@ -106,9 +94,7 @@ app.factory('SubmitService', ['$http','QueryService','BrowserService',function($
                     'form': ['Could not connect to server.']
                 };
             });
-        },
-        databases: BrowserService.browser.databases,
-        functions: BrowserService.browser.functions
+        }
     };
 }]);
 
@@ -328,7 +314,7 @@ app.controller('SubmitController',['$scope','QueryService','SubmitService','Code
     };
 }]);
 
-app.controller('BarController',['$scope','BarService',function($scope,BarService) {
+app.controller('BarController',['$scope','BarService','CodemirrorService',function($scope,BarService,CodemirrorService) {
 
     $scope.databases = BarService.databases;
     $scope.keywords = BarService.keywords;
@@ -359,6 +345,16 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
             $scope.visible = 'examples';
         }
     };
+
+    $scope.$on('browserItemDblClicked', function(event,browsername,value) {
+        if (browsername == 'examples') {
+            // empty the query input textarea
+            CodemirrorService.clear();
+        }
+
+        // insert the sting into the codemirror textarea
+        CodemirrorService.insert(value + ' ');
+    });
 }]);
 
 app.controller('ResultsController',['$scope','QueryService','TableService',function($scope,QueryService,TableService) {

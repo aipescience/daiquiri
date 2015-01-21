@@ -38,7 +38,7 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
         foreach($this->getResource()->fetchRows() as $row) {
             $function = $this->getResource()->fetchRow($row['id']);
             $function['publication_role'] = Daiquiri_Auth::getInstance()->getRole($function['publication_role_id']);
-
+            $function['value'] = '/data/functions/show/id/' . $function['id'];
             $functions[] = $function;
         }
         return array('functions' => $functions, 'status' => 'ok');

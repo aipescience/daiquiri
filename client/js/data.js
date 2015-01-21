@@ -53,14 +53,13 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
     };
     BrowserService.initBrowser('functions');
 
-    function fetchView(model,id) {
-        var url = '/data/' + model + '/show/id/' + id;
-
+    function fetchView(url) {
         $http.get(url).success(function(data) {
-            view.showUrl = '/data/' + model + '/show/id/' + id;
-            view.updateUrl = '/data/' + model + '/update/id/' + id;
-            view.deleteUrl = '/data/' + model + '/delete/id/' + id;
+            view.showUrl   = url.substring(1);
+            view.updateUrl = url.substring(1).replace('/show/','/update/');
+            view.deleteUrl = url.substring(1).replace('/show/','/delete/');
 
+            var model = url.match(/^\/data\/(.*?)\/show\//)[1];
             view.model = model.substring(0,1).toUpperCase() + model.substring(1,model.length-1);
 
             view.name = '';
@@ -216,8 +215,8 @@ app.controller('DataController', ['$scope','DataService',function($scope,DataSer
         DataService.submitForm($scope.submit);
     };
 
-    $scope.$on('browserItemClicked', function(event,browsername,colname,id) {
-        DataService.fetchView(colname,id);
+    $scope.$on('browserItemClicked', function(event,browsername,url) {
+        DataService.fetchView(url);
     });
 
 }]);

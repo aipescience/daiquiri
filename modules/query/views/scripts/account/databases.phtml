@@ -20,70 +20,46 @@
 ?>
 
 <div class="main">
-    <h2>Table management</h2>
+    <h2>Database tables</h2>
 
     <?php foreach ($this->databases as $database): ?>
-        <table class='table table-bordered'>
-            <?php foreach ($database as $dbKey => $dbValue): ?>
-                <tr>
-                    <td class="onehundredtwenty"><?php echo ucfirst($this->escape($dbKey)); ?></td>
-                    <td>
-                        <?php if (is_array($dbValue)): ?>
-                            <?php foreach ($dbValue as $table): ?>
-                                <div class="accordion" id="accordion-table-<?php echo $this->escape($table['id']); ?>">
-                                    <div class="accordion-group">
-                                        <div class="accordion-heading">
-                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse-table-<?php echo $this->escape($table['id']); ?>">
-                                                <?php echo $this->escape($table['name']); ?>
-                                            </a>
-                                        </div>
-                                        <div id="collapse-table-<?php echo $this->escape($table['id']); ?>" class="accordion-body collapse">
-                                            <div class="accordion-inner">
-                                                <table class='table table-bordered'>
-                                                    <?php foreach ($table as $tableKey => $tableValue): ?>
-                                                        <tr>
-                                                            <td class="onehundredtwenty"><?php echo ucfirst($this->escape($tableKey)); ?></td>
-                                                            <td>
-                                                                <?php if (is_array($tableValue)): ?>
-                                                                    <?php foreach ($tableValue as $col): ?>
-                                                                        <div class="accordion" id="accordion-col-<?php echo $this->escape($col['id']); ?>">
-                                                                            <div class="accordion-group">
-                                                                                <div class="accordion-heading">
-                                                                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse-col-<?php echo $col['id'] ?>">
-                                                                                        <?php echo $this->escape($col['name']); ?>
-                                                                                    </a>
-                                                                                </div>
-                                                                                <div id="collapse-col-<?php echo $this->escape($col['id']); ?>" class="accordion-body collapse">
-                                                                                    <div class="accordion-inner">
-                                                                                        <table class='table table-bordered'>
-                                                                                            <?php foreach ($col as $colKey => $colValue): ?>
-                                                                                                <tr>
-                                                                                                    <td class="onehundredtwenty"><?php echo $this->escape($colKey); ?></td>
-                                                                                                    <td><?php echo $this->escape($colValue); ?></td>
-                                                                                                </tr>
-                                                                                            <?php endforeach; ?>
-                                                                                        </table>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        <?php endforeach; ?>
-                                                                    <?php else: ?>
-                                                                        <?php echo $this->escape($tableValue); ?>
-                                                                    <?php endif; ?>
-                                                            </td>
-                                                        </tr>   
-                                                    <?php endforeach; ?>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <?php echo $this->escape($dbValue); ?>
-                            <?php endif; ?>
-                    </td>
-                </tr>   
-            <?php endforeach; ?>
-        </table>
+
+    <h6><?php echo $this->escape($database['name']); ?></h6>
+
+    <dl class="dl-horizontal">
+        <?php foreach ($database as $dbKey => $dbValue): ?>
+        <?php if ($dbKey !== 'tables'): ?>
+        <dt><?php echo $this->escape(ucfirst($dbKey)); ?></dt>
+        <dd><?php echo (empty($dbValue) ? '&nbsp' : $this->escape($dbValue)) ?></dd>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </dl>
+
+    <?php foreach ($database['tables'] as $table): ?>
+
+    <h6><?php echo $this->escape($database['name'] . '.' . $table['name']); ?></h6>
+
+    <dl class="dl-horizontal">
+        <?php foreach ($table as $tableKey => $tableValue): ?>
+        <?php if ($tableKey !== 'columns'): ?>
+        <dt><?php echo $this->escape(ucfirst($tableKey)); ?></dt>
+        <dd><?php echo (empty($tableValue) ? '&nbsp' : $this->escape($tableValue)) ?></dd>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </dl>
+
+    <?php foreach ($table['columns'] as $column): ?>
+
+    <h6><?php echo $this->escape($database['name'] . '.' . $table['name'] . '.' . $column['name']); ?></h6>
+
+    <dl class="dl-horizontal">
+        <?php foreach ($column as $columnKey => $columnValue): ?>
+        <dt><?php echo $this->escape(ucfirst($columnKey)); ?></dt>
+        <dd><?php echo (empty($columnValue) ? '&nbsp' : $this->escape($columnValue)) ?></dd>
+        <?php endforeach; ?>
+    </dl>
+
+    <?php endforeach; ?>
+    <?php endforeach; ?>
     <?php endforeach; ?>
 </div>

@@ -38,8 +38,13 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
             $database = $this->getResource()->fetchRow($row['id'], true, true);
 
             $database['publication_role'] = Daiquiri_Auth::getInstance()->getRole($database['publication_role_id']);
-            foreach ($database['tables'] as $key => $table) {
-                $database['tables'][$key]['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
+            $database['value'] = '/data/databases/show/id/' . $database['id'];
+            foreach ($database['tables'] as $tableKey => $table) {
+                $database['tables'][$tableKey]['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
+                $database['tables'][$tableKey]['value'] = '/data/tables/show/id/' . $table['id'];
+                foreach ($table['columns'] as $columnKey => $column) {
+                    $database['tables'][$tableKey]['columns'][$columnKey]['value'] = '/data/columns/show/id/' . $column['id'];
+                }
             }
 
             $databases[] = $database;

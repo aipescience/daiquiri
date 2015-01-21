@@ -20,13 +20,18 @@
 ?>
 
 <div class="main">
-    <?php if (is_array($this->examples)): ?>
-        <?php foreach ($this->examples as $example): ?>
-            <p>
-                <a href='#' class="daiquiri-query-example" data-toggle="<?php echo $this->escape($example['query']) ?>">
-                    <?php echo $this->escape($example['name']); ?>
-                </a>
-            </p>
+    <h2>Examples</h2>
+
+    <?php foreach ($this->examples as $row): ?>
+
+    <h6><?php echo $this->escape($row['name']); ?></h6>
+
+    <dl class="dl-horizontal">
+        <?php foreach ($row as $key => $value): ?>
+        <dt><?php echo $this->escape(ucfirst($key)); ?></dt>
+        <dd><?php echo (empty($value) ? '&nbsp' : $this->escape($value)) ?></dd>
         <?php endforeach; ?>
-    <?php endif; ?>
+    </dl>
+
+    <?php endforeach; ?>
 </div>

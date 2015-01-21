@@ -38,6 +38,7 @@ angular.module('browser',[])
             items.push({
                 'id': item.id,
                 'name': item.name,
+                'value': item.value,
                 'order': item.order
             })
         });
@@ -176,19 +177,23 @@ angular.module('browser',[])
 
 .controller('BrowserController', ['$scope','BrowserService',function($scope,BrowserService) {
 
-    $scope.browserItemClicked = function(browsername,colname,id,i) {
+    $scope.browserItemClicked = function(browsername,item,colname,i) {
         BrowserService.updateBrowser(browsername,colname,i);
 
         var active = {
             'browsername': browsername,
             'colname': colname,
-            'id': id
+            'id': item.id
         };
         angular.forEach(BrowserService.browser, function(browser, key) {
             browser.active = active;
-        })
+        });
 
-        $scope.$emit('browserItemClicked',browsername,colname,id);
+        $scope.$emit('browserItemClicked',browsername,item.value);
+    };
+
+    $scope.browserItemDblClicked = function(browsername,item) {
+        $scope.$emit('browserItemDblClicked',browsername,item.value);
     };
 
 }]);

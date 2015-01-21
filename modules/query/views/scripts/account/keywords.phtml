@@ -23,15 +23,15 @@
     <h2>Database keywords</h2>
 
     <?php foreach ($this->keywords as $row): ?>
-        <table class='table table-bordered'>
-            <?php foreach($row as $key => $value): ?>
-                <tr>
-                    <td class="onehundredtwenty"><?php echo $this->escape($key); ?></td>
-                    <td>
-                        <?php echo $this->escape($value); ?>
-                    </td>
-                </tr>
-            <?php endforeach ?>
-        </table>
+
+    <h6><?php echo $this->escape($row['name']); ?></h6>
+
+    <dl class="dl-horizontal">
+        <?php foreach ($row as $key => $value): ?>
+        <dt><?php echo $this->escape(ucfirst($key)); ?></dt>
+        <dd><?php echo (empty($value) ? '&nbsp' : $this->escape($value)) ?></dd>
+        <?php endforeach; ?>
+    </dl>
+
     <?php endforeach; ?>
 </div>

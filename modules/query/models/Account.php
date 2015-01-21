@@ -340,8 +340,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
             $database['publication_role'] = Daiquiri_Auth::getInstance()->getRole($database['publication_role_id']);
             foreach ($database['tables'] as $key => $table) {
-                $database['tables'][$key]['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['p\
-ublication_role_id']);
+                $database['tables'][$key]['publication_role'] = Daiquiri_Auth::getInstance()->getRole($table['publication_role_id']);
             }
 
             $rows[] = $database;
@@ -355,6 +354,7 @@ ublication_role_id']);
                 $db = array(
                     'id' => $database['id'],
                     'name' => $database['name'],
+                    'value' => $databasesModel->getResource()->quoteIdentifier($database['name']),
                     'description' => $database['description'],
                     'tables' => array()
                 );
@@ -364,6 +364,7 @@ ublication_role_id']);
                         $t = array(
                             'id' => $table['id'],
                             'name' => $table['name'],
+                            'value' => $databasesModel->getResource()->quoteIdentifier($database['name'],$table['name']),
                             'description' => $table['description'],
                             'columns' => array(),
                         );
@@ -372,6 +373,7 @@ ublication_role_id']);
                             $t['columns'][] = array(
                                 'id' => $column['id'],
                                 'name' => $column['name'],
+                                'value' => $databasesModel->getResource()->quoteIdentifier($column['name']),
                                 'description' => $column['description'],
                             );
                         }
@@ -394,6 +396,7 @@ ublication_role_id']);
         $userdb = array(
             'id' => 'userdb',
             'name' => $userDbName,
+            'value' => $databasesModel->getResource()->quoteIdentifier($userDbName),
             'description' => 'Your personal database',
             'tables' => array()
         );
@@ -418,6 +421,7 @@ ublication_role_id']);
             $table = array(
                 'id' => 'userdb-table-' . $table_id++,
                 'name' => $usertable,
+                'value' => $databasesModel->getResource()->quoteIdentifier($userDbName,$usertable),
                 'description' => '',
                 'columns' => array()
             );
@@ -433,6 +437,7 @@ ublication_role_id']);
                 $table['columns'][] = array(
                     'id' => 'userdb-column-' . $column_id++,
                     'name' => $usercolumn,
+                    'value' => $databasesModel->getResource()->quoteIdentifier($usercolumn),
                     'description' => ''
                 );
             }
@@ -449,7 +454,12 @@ ublication_role_id']);
      * @return array $response
      */
     public function keywords() {
-        return array('keywords' => Query_Model_Resource_AbstractQuery::$keywords, 'status' => 'ok');
+        $rows = Query_Model_Resource_AbstractQuery::$keywords;
+        foreach ($rows as $key => &$row) {
+            $row['id'] = $key + 1;
+            $row['value'] = $row['name'];
+        }
+        return array('keywords' => $rows, 'status' => 'ok');
     }
 
     /**
@@ -457,7 +467,12 @@ ublication_role_id']);
      * @return array $response
      */
     public function nativeFunctions() {
-        return array('native_functions' => Query_Model_Resource_AbstractQuery::$functions, 'status' => 'ok');
+        $rows =Query_Model_Resource_AbstractQuery::$functions;
+        foreach ($rows as $key => &$row) {
+            $row['id'] = $key + 1;
+            $row['value'] = $row['name'] . '()';
+        }
+        return array('native_functions' => $rows, 'status' => 'ok');
     }
 
     /**
@@ -470,6 +485,7 @@ ublication_role_id']);
         foreach ($resource->fetchRows() as $row) {
             if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id'])) {
                 $row['publication_role'] = Daiquiri_Auth::getInstance()->getRole($row['publication_role_id']);
+                $row['value'] = $row['name'] . '()';
                 $rows[] = $row;
             }
         }
@@ -486,6 +502,8 @@ ublication_role_id']);
         foreach ($model->getResource()->fetchRows() as $row) {
             if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id'])) {
                 $row['publication_role'] = Daiquiri_Auth::getInstance()->getRole($row['publication_role_id']);
+                $row['value'] = $row['query'];
+                unset($row['query']);
                 $rows[] = $row;
             }
         }

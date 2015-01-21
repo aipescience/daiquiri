@@ -27,77 +27,62 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
      */
     public static $keywords = array(
         array(
-            'id' => '1',
             'name' => 'SELECT',
             'description' => ''
         ),
         array(
-            'id' => '2',
             'name' => 'SELECT DISTINCT',
             'description' => ''
         ),
         array(
-            'id' => '3',
             'name' => 'FROM',
             'description' => ''
         ),
         array(
-            'id' => '4',
             'name' => 'WHERE',
             'description' => ''
         ),
         array(
-            'id' => '5',
             'name' => 'AND',
             'description' => ''
         ),
         array(
-            'id' => '6',
             'name' => 'OR',
             'description' => ''
         ),
         array(
-            'id' => '7',
             'name' => 'BETWEEN',
             'description' => ''
         ),
         array(
-            'id' => '8',
             'name' => 'LIKE',
             'description' => ''
         ),
         array(
-            'id' => '9',
             'name' => 'HAVING',
             'description' => ''
         ),
         array(
-            'id' => '10',
             'name' => 'GROUP BY',
             'description' => ''
         ),
         array(
-            'id' => '11',
             'name' => 'LIMIT',
             'description' => ''
         ),
         array(
-            'id' => '12',
             'name' => 'INNER JOIN',
             'description' => ''
         ),
         array(
-            'id' => '13',
             'name' => 'LEFT JOIN',
             'description' => ''
         ),
         array(
-            'id' => '14',
             'name' => 'RIGHT JOIN',
             'description' => ''
         ),
         array(
-            'id' => '15',
             'name' => 'FULL JOIN',
             'description' => ''
         )
