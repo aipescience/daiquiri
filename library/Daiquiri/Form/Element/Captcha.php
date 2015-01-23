@@ -46,7 +46,7 @@ class Daiquiri_Form_Element_Captcha extends Zend_Form_Element_Captcha {
             $this->addDecorator(array('controls' => 'HtmlTag'), array('tag' => 'div', 'class' => 'controls captcha'));
 
             // the label.control-label
-            $this->addDecorator('Label', array('class' => 'control-label'));
+            $this->addDecorator('Label', array('class' => 'control-label', 'escape' => false));
 
             // wrap in div.control-group
             $this->addDecorator(array('control-group' => 'HtmlTag'), array('tag' => 'div', 'class' => 'control-group'));

@@ -108,7 +108,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                     <div daiquiri-browser data-browser="examples"></div>
                 </div>
                 <div class="daiquiri-query-bar-hint">
-                    A double click replace the content of the query field with the example query.
+                    A double click will replace the content of the query field with the example query.
                 </div>
             </div>
         </div>');
