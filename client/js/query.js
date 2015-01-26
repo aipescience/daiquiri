@@ -265,7 +265,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
     };
 }]);
 
-app.controller('QueryController',['$scope','$timeout','QueryService',function($scope,$timeout,QueryService) {
+app.controller('QueryController',['$scope','$timeout','QueryService','CodemirrorService',function($scope,$timeout,QueryService,CodemirrorService) {
 
     $scope.account = QueryService.account;
 
@@ -292,7 +292,28 @@ app.controller('QueryController',['$scope','$timeout','QueryService',function($s
         QueryService.account.active.job = jobId;
     };
 
+    $scope.pasteQuery = function() {
+        var query = angular.element('#overview-query')[0].innerText;
+
+        CodemirrorService.clear();
+        CodemirrorService.insert(query);
+        $scope.activateForm('sql');
+        $timeout(function() {
+            CodemirrorService.refresh();
+        }, 100);
+    };
+
     QueryService.fetchAccount();
+
+    $scope.$on('browserItemDblClicked', function(event,browsername,value) {
+        if (browsername == 'examples') {
+            // empty the query input textarea
+            CodemirrorService.clear();
+        }
+
+        // insert the sting into the codemirror textarea
+        CodemirrorService.insert(value + ' ');
+    });
 
 }]);
 
@@ -314,7 +335,7 @@ app.controller('SubmitController',['$scope','QueryService','SubmitService','Code
     };
 }]);
 
-app.controller('BarController',['$scope','BarService','CodemirrorService',function($scope,BarService,CodemirrorService) {
+app.controller('BarController',['$scope','BarService',function($scope,BarService) {
 
     $scope.databases = BarService.databases;
     $scope.keywords = BarService.keywords;
@@ -345,16 +366,6 @@ app.controller('BarController',['$scope','BarService','CodemirrorService',functi
             $scope.visible = 'examples';
         }
     };
-
-    $scope.$on('browserItemDblClicked', function(event,browsername,value) {
-        if (browsername == 'examples') {
-            // empty the query input textarea
-            CodemirrorService.clear();
-        }
-
-        // insert the sting into the codemirror textarea
-        CodemirrorService.insert(value + ' ');
-    });
 }]);
 
 app.controller('ResultsController',['$scope','QueryService','TableService',function($scope,QueryService,TableService) {
