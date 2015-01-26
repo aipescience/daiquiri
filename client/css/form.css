@@ -1,6 +1,6 @@
-/*  
+/*
  *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -49,6 +49,9 @@ form .form-action {
 }
 form .form-error {
     margin-bottom: 20px;
+}
+form .form-description {
+    margin: 20px 0 0 180px;
 }
 
 .form-inline label {

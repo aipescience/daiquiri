@@ -2,7 +2,7 @@
 
 /*
  *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,10 @@
 /**
  * @class   Daiquiri_Form_Abstract Abstract.php
  * @brief   Abstract class for daiquiri form handling.
- * 
+ *
  * Abstract class for daiquiri form handling. This function provides a variety
  * of convenience functions when dealing with forms.
- * 
+ *
  */
 abstract class Daiquiri_Form_Abstract extends Zend_Form {
 
@@ -64,7 +64,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
             $this->addDecorator('Description', array(
                 'tag' => 'div',
                 'placement' => 'append',
-                'class' => 'form-description',
+                'class' => 'form-description text-error',
                 'escape' => false
             ));
             $this->addDecorator('Form');

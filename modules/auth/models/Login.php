@@ -62,7 +62,7 @@ class Auth_Model_Login extends Daiquiri_Model_Abstract {
      */
     public function logout($cms = true) {
         $cookies = array();
-        
+
         // get the auth singleton, clear the identity and redirect.
         Zend_Auth::getInstance()->clearIdentity();
         Zend_Session::forgetMe();
