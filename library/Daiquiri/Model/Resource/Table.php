@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,7 +21,7 @@
 class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
 
     /**
-     * Name of the database table used for the generic functions in this class. 
+     * Name of the database table used for the generic functions in this class.
      * @var string
      */
     private $_tablename = null;
@@ -109,7 +108,7 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
         // get select object
         $select = $this->select($sqloptions);
         $select->from($this->getTablename());
-        
+
         // query database
         $row = $this->fetchOne($select);
         if (empty($row)) {

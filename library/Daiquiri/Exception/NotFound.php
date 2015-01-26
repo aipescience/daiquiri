@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,7 +19,7 @@
  */
 
 class Daiquiri_Exception_NotFound extends Zend_Exception {
-    
+
     public function __construct($message = null) {
         if (empty($message)) {
             parent::__construct('This page does not exist. (404)', 404);

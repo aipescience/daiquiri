@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,7 +20,7 @@
 
 /**
  * This form element renders a plain html string, but has
- * no input field. It can be used to display further information or 
+ * no input field. It can be used to display further information or
  * images in a form.
  */
 
