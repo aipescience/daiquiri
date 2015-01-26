@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -26,7 +25,7 @@ class Meetings_Form_ParticipantStatus extends Daiquiri_Form_Model {
      */
     public function init() {
         $this->addCsrfElement();
-        
+
         // add elements
         $this->addTextElement('status', array(
             'label' => 'Participant status',

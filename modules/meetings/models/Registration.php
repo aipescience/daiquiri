@@ -1,8 +1,7 @@
 <?php
-
-/*  
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+/*
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -113,7 +112,7 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                         $values['contributions'][$contributionTypeId] = array(
                             'title' => $values[$contributionType . '_title'],
                             'abstract' => $values[$contributionType . '_abstract'],
-                        );    
+                        );
                     } else {
                         $values['contributions'][$contributionTypeId] = false;
                     }
@@ -133,7 +132,7 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                         'where' => array('`status` = "accepted"')
                     ));
                 }
-                    
+
                 if (Daiquiri_Config::getInstance()->meetings->validation) {
                     $code = $this->createRandomString(32);
 
@@ -148,7 +147,7 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                     // prepare and send mail
                     $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/meetings/registration/validate/id/' . $id . '/code/' . $code;
 
-                    $this->getModelHelper('mail')->send('meetings.validate', 
+                    $this->getModelHelper('mail')->send('meetings.validate',
                         array(
                             'to' => $values['email'],
                             'meeting' => $meeting['title'],

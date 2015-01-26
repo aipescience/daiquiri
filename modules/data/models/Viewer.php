@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -31,9 +30,9 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
     }
 
     /**
-     * Returns the columns of a given table and database. 
+     * Returns the columns of a given table and database.
      * @param array $params get params of the request
-     * @return array 
+     * @return array
      */
     public function cols(array $params = array()) {
         // get db and table from params
@@ -75,7 +74,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
             $descResource = new Data_Model_Resource_Description();
             $descResource->init($params['db']);
             $tableMeta = $descResource->describeTable($params['table']);
-        } 
+        }
 
         // construct metadata array
         $meta = array();

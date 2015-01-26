@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -50,7 +49,7 @@ class Core_ConfigController extends Daiquiri_Controller_Abstract {
         $response = $this->_model->export();
         $this->view->data = $response['data'];
         $this->view->status = $response['status'];
-        
+
         // disable layout
         $this->_helper->layout->disableLayout();
         $this->getResponse()->setHeader('Content-Type', 'text/plain');

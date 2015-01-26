@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -18,7 +17,6 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 class Data_Form_Tables extends Data_Form_Abstract {
 
     /**
@@ -29,7 +27,7 @@ class Data_Form_Tables extends Data_Form_Abstract {
 
     /**
      * The preselected database.
-     * @var int 
+     * @var int
      */
     protected $_database_id;
 
@@ -54,7 +52,7 @@ class Data_Form_Tables extends Data_Form_Abstract {
      */
     public function init() {
         $this->addCsrfElement();
-    
+
         // add elements
         $this->addSelectElement('database_id', array(
             'label' => 'Database:',

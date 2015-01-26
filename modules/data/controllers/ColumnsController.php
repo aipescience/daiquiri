@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,7 +21,7 @@
 class Data_ColumnsController extends Daiquiri_Controller_Abstract {
 
     protected $_model;
-    
+
     public function init() {
         $this->_model = Daiquiri_Proxy::factory('Data_Model_Columns');
     }
@@ -82,5 +81,5 @@ class Data_ColumnsController extends Daiquiri_Controller_Abstract {
         $this->_helper->layout->disableLayout();
         $this->getResponse()->setHeader('Content-Type', 'text/plain');
     }
-    
+
 }

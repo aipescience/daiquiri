@@ -1,8 +1,7 @@
 <?php
-
-/*  
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+/*
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -115,11 +114,11 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
             'status' => 'ok',
             'rows' => $rows
         );
-        
-    }   
+
+    }
 
     /**
-     * Returns the columns of the contributions table specified by some parameters. 
+     * Returns the columns of the contributions table specified by some parameters.
      * @param array $params get params of the request
      * @return array $response
      */
@@ -148,7 +147,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
     }
 
     /**
-     * Returns the rows of the contributions table specified by some parameters. 
+     * Returns the rows of the contributions table specified by some parameters.
      * @param array $params get params of the request
      * @return array $response
      */
@@ -296,7 +295,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
-                
+
                 // store the values in the database
                 $this->getResource()->updateRow($id, $values);
 
@@ -308,7 +307,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
         return array('form' => $form, 'status' => 'form');
     }
-    
+
     /**
      * Deletes a contribution.
      * @param int $id id of the contribution

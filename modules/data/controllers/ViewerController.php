@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -31,7 +30,7 @@ class Data_ViewerController extends Daiquiri_Controller_Abstract {
 
     public function indexAction() {
         if (empty($this->_db) || empty($this->_table)) {
-            $this->view->status = 'error';           
+            $this->view->status = 'error';
         } else {
             $this->view->status = 'ok';
             $this->view->db = $this->_db;

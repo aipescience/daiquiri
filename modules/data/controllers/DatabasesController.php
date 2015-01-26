@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -47,7 +46,7 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
         }
         $this->view->assign($response);
     }
-    
+
     public function updateAction() {
         if ($this->_hasParam('id')) {
             $id = (int) $this->_getParam('id');
@@ -77,5 +76,5 @@ class Data_DatabasesController extends Daiquiri_Controller_Abstract {
         $this->_helper->layout->disableLayout();
         $this->getResponse()->setHeader('Content-Type', 'text/plain');
     }
-    
+
 }

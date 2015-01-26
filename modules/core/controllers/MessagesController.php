@@ -1,8 +1,7 @@
 <?php
-
 /*
- *  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
- *                           Adrian M. Partl <apartl@aip.de>, 
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -18,7 +17,6 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 class Core_MessagesController extends Daiquiri_Controller_Abstract {
 
     protected $_model;
@@ -50,7 +48,7 @@ class Core_MessagesController extends Daiquiri_Controller_Abstract {
         $response = $this->_model->export();
         $this->view->data = $response['data'];
         $this->view->status = $response['status'];
-        
+
         // disable layout
         $this->_helper->layout->disableLayout();
         $this->getResponse()->setHeader('Content-Type', 'text/plain');

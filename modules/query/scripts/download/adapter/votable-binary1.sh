@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#  
-#  Copyright (c) 2012-2014 Jochen S. Klar <jklar@aip.de>,
-#                           Adrian M. Partl <apartl@aip.de>, 
+#
+#  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+#                           Adrian M. Partl <apartl@aip.de>,
 #                           AIP E-Science (www.aip.de)
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
