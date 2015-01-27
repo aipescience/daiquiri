@@ -31,6 +31,9 @@ angular.module('modal', ['ngSanitize'])
                     // parse html to a fake dom
                     var dom = angular.element(ModalService.modal.html);
 
+                    // remove the action attribute from the form
+                    angular.element('form', dom).removeAttr('action');
+
                     // add errors to form
                     angular.element('#fieldset-actiongroup', dom).before('<ul class="unstyled text-error align-form-horizontal" ng-show="errors.form"><li ng-repeat="error in errors.form">{{error}}</li></ul>');
 
