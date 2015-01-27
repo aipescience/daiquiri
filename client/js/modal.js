@@ -21,6 +21,7 @@ angular.module('modal', ['ngSanitize'])
 
 .directive('daiquiriModal', ['$compile','ModalService',function($compile,ModalService) {
     return {
+        restrict: 'A',
         templateUrl: angular.element('base').attr('href') + '/daiquiri/html/modal.html',
         link: function(scope, element) {
             scope.$watch(function () {
@@ -165,7 +166,7 @@ angular.module('modal', ['ngSanitize'])
     $scope.modal = ModalService.modal;
 
     $scope.closeModal = function($event) {
-        if ($event.target === angular.element('.daiquiri-modal')[0]) {
+        if (angular.isUndefined($event) || angular.element($event.target).attr('class') == 'daiquiri-modal') {
             $scope.modal.enabled = false;
         };
     }

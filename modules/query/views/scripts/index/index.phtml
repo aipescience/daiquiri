@@ -180,12 +180,17 @@
                                 </div>
                                 <div class="nav-item">
                                     <div>
-                                        <button class="linkbutton" ng-click="renameJob()">
+                                        <button class="linkbutton" ng-click="showModal('rename')">
                                             Rename the job's database table
                                         </button>
                                     </div>
                                     <div>
-                                        <button class="linkbutton" ng-click="renameJob()">
+                                        <button class="linkbutton" ng-click="showModal('kill')">
+                                            Kill the job
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button class="linkbutton" ng-click="showModal('remove')">
                                             Remove the job
                                         </button>
                                     </div>
@@ -225,7 +230,7 @@
                                 <form id="plot" name="plot" ng-submit="createPlot(plot.$valid)" novalidate>
                                     <div class="control-group" ng-class="{'error': plot.plot_x.$invalid && plot.$submitted}">
                                         <label for="plot_x">Column for X axis:</label>
-                                        <select id="plot_x" name="plot_x" 
+                                        <select id="plot_x" name="plot_x"
                                                 ng-options="col.name for col in account.job.cols"
                                                 ng-model="values.plot_x"
                                                 required>
@@ -279,4 +284,75 @@
             </div>
         </div>
     </div>
+
+    <!-- modals -->
+
+    <div ng-controller="ModalController">
+
+        <!-- rename job modal -->
+
+        <div class="daiquiri-modal" ng-show="modal.enabled == 'rename'" ng-click="closeModal($event)">
+            <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
+                <button class="linkbutton daiquiri-modal-close" href="" ng-click="modals.rename = false">&times;</button>
+                <div class="daiquiri-modal-body">
+                    <div class="main">
+                        <h2>Rename table</h2>
+                        <form name="rename">
+                            <fieldset id="fieldset-tablerenamegroup" class="form-horizontal">
+                                <div class="control-group">
+                                    <label for="tablename" class="control-label required">New name of the table</label>
+                                    <div class="controls">
+                                        <input type="text" name="tablename" id="tablename" />
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset id="fieldset-actiongroup" class="form-action">
+                                <input type="submit" name="submit" value="Rename table" class="btn btn-primary" ng-click="renameJob()" />
+                                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="closeModal()" />
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- kill job modal -->
+
+        <div class="daiquiri-modal" ng-show="modal.enabled == 'kill'" ng-click="closeModal($event)">
+            <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
+                <button class="linkbutton daiquiri-modal-close" href="" ng-click="modals.kill = false">&times;</button>
+                <div class="daiquiri-modal-body">
+                    <div class="main">
+                        <h2>Kill job</h2>
+                        <form name="kill" class="daiquiri-form-danger">
+                            <fieldset id="fieldset-actiongroup" class="form-action">
+                                <input type="submit" name="submit" value="Kill job" class="btn btn-danger" ng-click="killJob()" />
+                                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="closeModal()" />
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- remove job modal -->
+
+        <div class="daiquiri-modal" ng-show="modal.enabled == 'remove'" ng-click="closeModal($event)">
+            <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
+                <button class="linkbutton daiquiri-modal-close" href="" ng-click="modals.remove = false">&times;</button>
+                <div class="daiquiri-modal-body">
+                    <div class="main">
+                        <h2>Remove Job</h2>
+                        <form name="kill" class="daiquiri-form-danger">
+                            <fieldset id="fieldset-actiongroup" class="form-action">
+                                <input type="submit" name="submit" value="Remove job" class="btn btn-danger" ng-click="removeJob()" />
+                                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="closeModal()" />
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

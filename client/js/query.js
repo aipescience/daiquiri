@@ -17,14 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','browser','codemirror']);
+var app = angular.module('query',['table','modal','browser','codemirror']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.factory('QueryService', ['$http','$timeout','$q',function($http,$timeout,$q) {
+app.factory('QueryService', ['$http','$timeout','$q','ModalService',function($http,$timeout,$q,ModalService) {
     var account = {
         active: {
             form: false,
@@ -52,7 +52,16 @@ app.factory('QueryService', ['$http','$timeout','$q',function($http,$timeout,$q)
             });
 
             return deferred.promise;
-        }
+        },
+        renameJob: function() {
+            console.log('renameJob');
+        },
+        killJob: function() {
+            console.log('killJob');
+        },
+        removeJob: function() {
+            console.log('removeJob');
+        },
     };
 }]);
 
@@ -265,7 +274,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
     };
 }]);
 
-app.controller('QueryController',['$scope','$timeout','QueryService','CodemirrorService',function($scope,$timeout,QueryService,CodemirrorService) {
+app.controller('QueryController',['$scope','$timeout','QueryService','CodemirrorService','ModalService',function($scope,$timeout,QueryService,CodemirrorService,ModalService) {
 
     $scope.account = QueryService.account;
 
@@ -291,6 +300,22 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
         QueryService.account.active.form = false;
         QueryService.account.active.job = jobId;
     };
+
+    $scope.showModal = function(key) {
+        ModalService.modal.enabled = key;
+    }
+
+    $scope.renameJob = function() {
+        QueryService.renameJob();
+    }
+
+    $scope.killJob = function() {
+        QueryService.killJob();
+    }
+
+    $scope.removeJob = function() {
+        QueryService.removeJob();
+    }
 
     $scope.pasteQuery = function() {
         var query = angular.element('#overview-query')[0].innerText;
