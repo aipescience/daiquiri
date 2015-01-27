@@ -216,8 +216,8 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         // get job and check permissions
         $row = $this->getResource()->fetchRow($id);
-        if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
-            throw new Daiquiri_Exception_Forbidden();
+        if (empty($row) || $row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // create the form object
@@ -262,8 +262,8 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         // get job and check permissions
         $row = $this->getResource()->fetchRow($id);
-        if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
-            throw new Daiquiri_Exception_Forbidden();
+        if (empty($row) || $row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // create the form object
@@ -274,11 +274,11 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // valiadate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
-                    try {
-                        $this->getResource()->killJob($id);
-                        return array('status' => 'ok');
-                    } catch (Exception $e) {
-                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$e->getMessage());
+                try {
+                    $this->getResource()->killJob($id);
+                    return array('status' => 'ok');
+                } catch (Exception $e) {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form,$e->getMessage());
                     }
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
@@ -300,8 +300,8 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         // get job and check permissions
         $row = $this->getResource()->fetchRow($id);
-        if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
-            throw new Daiquiri_Exception_Forbidden();
+        if (empty($row) || $row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_NotFound();
         }
 
         // create the form object

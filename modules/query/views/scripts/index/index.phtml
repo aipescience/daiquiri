@@ -179,24 +179,24 @@
                                     </dl>
                                 </div>
                                 <div class="nav-item">
-                                    <div>
-                                        <button class="linkbutton" ng-click="showModal('rename')">
+                                    <div ng-show="account.job.status == 'success'">
+                                        <button class="linkbutton" ng-click="showDialog('rename')">
                                             Rename the job's database table
                                         </button>
                                     </div>
-                                    <div>
-                                        <button class="linkbutton" ng-click="showModal('kill')">
+                                    <div ng-show="account.job.status == 'running' || account.job.status == 'pending'">
+                                        <button class="linkbutton" ng-click="showDialog('kill')">
                                             Kill the job
                                         </button>
                                     </div>
-                                    <div>
-                                        <button class="linkbutton" ng-click="showModal('remove')">
+                                    <div ng-show="account.job.status != 'running' && account.job.status != 'pending'">
+                                        <button class="linkbutton" ng-click="showDialog('remove')">
                                             Remove the job
                                         </button>
                                     </div>
                                 </div>
                             </div>
-
+                            {{account.job.status}}
                             <div class="daiquiri-widget nav">
                                 <div class="nav-header">Additional infomation</div>
                                 <div class="nav-item">
@@ -285,11 +285,11 @@
         </div>
     </div>
 
-    <!-- modals -->
+    <!-- dialogs -->
 
     <div ng-controller="ModalController">
 
-        <!-- rename job modal -->
+        <!-- rename job dialog -->
 
         <div class="daiquiri-modal" ng-show="modal.enabled == 'rename'" ng-click="closeModal($event)">
             <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
@@ -302,10 +302,14 @@
                                 <div class="control-group">
                                     <label for="tablename" class="control-label required">New name of the table</label>
                                     <div class="controls">
-                                        <input type="text" name="tablename" id="tablename" />
+                                        <input type="text" name="tablename" id="tablename" ng-model="dialog.values.tablename" />
+                                        <ul class="unstyled text-error" ng-show="dialog.errors.tablename">
+                                            <li ng-repeat="error in dialog.errors.tablename">{{error}}</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </fieldset>
+                            <p class="text-error" ng-show="dialog.errors">{{dialog.errors.form}}</p>
                             <fieldset id="fieldset-actiongroup" class="form-action">
                                 <input type="submit" name="submit" value="Rename table" class="btn btn-primary" ng-click="renameJob()" />
                                 <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="closeModal()" />
@@ -316,7 +320,7 @@
             </div>
         </div>
 
-        <!-- kill job modal -->
+        <!-- kill job dialog -->
 
         <div class="daiquiri-modal" ng-show="modal.enabled == 'kill'" ng-click="closeModal($event)">
             <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
@@ -324,6 +328,7 @@
                 <div class="daiquiri-modal-body">
                     <div class="main">
                         <h2>Kill job</h2>
+                        <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
                         <form name="kill" class="daiquiri-form-danger">
                             <fieldset id="fieldset-actiongroup" class="form-action">
                                 <input type="submit" name="submit" value="Kill job" class="btn btn-danger" ng-click="killJob()" />
@@ -335,7 +340,7 @@
             </div>
         </div>
 
-        <!-- remove job modal -->
+        <!-- remove job dialog -->
 
         <div class="daiquiri-modal" ng-show="modal.enabled == 'remove'" ng-click="closeModal($event)">
             <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
@@ -343,6 +348,7 @@
                 <div class="daiquiri-modal-body">
                     <div class="main">
                         <h2>Remove Job</h2>
+                        <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
                         <form name="kill" class="daiquiri-form-danger">
                             <fieldset id="fieldset-actiongroup" class="form-action">
                                 <input type="submit" name="submit" value="Remove job" class="btn btn-danger" ng-click="removeJob()" />

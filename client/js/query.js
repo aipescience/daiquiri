@@ -6,7 +6,7 @@
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
  *  published by the Free Software Foundation, either version 3 of the
- *  License, or (at your option) any later version.
+ *  License, or (at your option) any later version.'ngCookies'
  *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,14 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','modal','browser','codemirror']);
+var app = angular.module('query',['table','modal','browser','codemirror','ngCookies']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.factory('QueryService', ['$http','$timeout','$q','ModalService',function($http,$timeout,$q,ModalService) {
+app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',function($http,$timeout,$q,$cookies,ModalService) {
     var account = {
         active: {
             form: false,
@@ -35,33 +35,95 @@ app.factory('QueryService', ['$http','$timeout','$q','ModalService',function($ht
         jobs: []
     };
 
-    return {
-        account: account,
-        fetchAccount: function() {
-            $http.get('query/account/').success(function(response) {
-                account.jobs = response.jobs;
-                account.database = response.database;
-            });
-        },
-        fetchJob: function(id) {
-            var deferred = $q.defer();
+    var dialog = {
+        values: {},
+        error: false
+    };
 
-            $http.get('query/account/show-job/id/' + id).success(function(response) {
+    function fetchAccount() {
+        $http.get('query/account/').success(function(response) {
+            account.jobs = response.jobs;
+            account.database = response.database;
+        });
+    }
+
+    function fetchJob(id) {
+        var deferred = $q.defer();
+
+        $http.get('query/account/show-job/id/' + id)
+            .success(function(response) {
                 account.job = response.job;
                 deferred.resolve();
+            })
+            .error(function(response, status) {
+                if (status === 404) {
+                    fetchAccount();
+                    // TODO load another job
+                } else if (status === 403) {
+                    // TODO show a modal to reload
+                    console.log(status);
+                } else {
+                    // show a modal
+                    console.log(status);
+                }
             });
 
-            return deferred.promise;
-        },
-        renameJob: function() {
-            console.log('renameJob');
-        },
-        killJob: function() {
-            console.log('killJob');
-        },
-        removeJob: function() {
-            console.log('removeJob');
-        },
+        return deferred.promise;
+    }
+
+    function renameJob () {
+        var data = {
+            'csrf': $cookies['XSRF-TOKEN'],
+            'tablename': dialog.values.tablename
+        };
+
+        $http.post('query/account/rename-job/id/' + account.job.id,$.param(data))
+            .success(function(response) { httpSuccess(response) })
+            .error(function (response,status) { httpError(response,status) });
+    }
+
+    function killJob () {
+        $http.post('query/account/kill-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
+            .success(function(response) { httpSuccess(response) })
+            .error(function (response,status) { httpError(response,status) });
+    }
+
+    function removeJob() {
+        $http.post('query/account/remove-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
+            .success(function(response) { httpSuccess(response) })
+            .error(function (response,status) { httpError(response,status) });
+    }
+
+    function httpSuccess(response) {
+        if (response.status == 'ok') {
+            fetchAccount();
+            ModalService.modal.enabled = false;
+            // TODO load another job
+        } else if (response.status == 'error') {
+            angular.forEach(response.errors, function(error, key) {
+                dialog.errors[key] = error;
+            });
+        } else {
+            dialog.errors.form = 'An error occured (' + response.status + ').';
+        }
+    }
+
+    function httpError(response,status) {
+        if (status === 404) {
+            dialog.errors.form = 'The selected job can not be found. Please reload the page to update the job list.';
+        } else {
+            dialog.errors.form = 'An error occured (' + status + '). Please reload the page.';
+        }
+    };
+
+    return {
+        account: account,
+        dialog: dialog,
+        fetchAccount: fetchAccount,
+        fetchJob: fetchJob,
+        renameJob: renameJob,
+        killJob: killJob,
+        removeJob: removeJob
     };
 }]);
 
@@ -277,6 +339,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
 app.controller('QueryController',['$scope','$timeout','QueryService','CodemirrorService','ModalService',function($scope,$timeout,QueryService,CodemirrorService,ModalService) {
 
     $scope.account = QueryService.account;
+    $scope.dialog  = QueryService.dialog;
 
     $scope.activateForm = function(formName) {
         QueryService.account.active.form = formName;
@@ -301,7 +364,9 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
         QueryService.account.active.job = jobId;
     };
 
-    $scope.showModal = function(key) {
+    $scope.showDialog = function(key) {
+        $scope.dialog.errors = {};
+        $scope.dialog.values.tablename = QueryService.account.job.table;
         ModalService.modal.enabled = key;
     }
 
