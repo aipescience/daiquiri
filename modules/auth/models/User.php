@@ -74,7 +74,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
     }
 
     /**
-     * Returns the columns of the user table specified by some parameters. 
+     * Returns the columns of the user table specified by some parameters.
      * @param array $params get params of the request
      * @return array $response
      */
@@ -105,12 +105,12 @@ class Auth_Model_User extends Daiquiri_Model_Table {
             'width' => '200px',
             'sortable' => 'false'
         );
-        
+
         return array('cols' => $cols, 'status' => 'ok');
     }
 
     /**
-     * Returns the rows of the user table specified by some parameters. 
+     * Returns the rows of the user table specified by some parameters.
      * @param array $params get params of the request
      * @return array $response
      */
@@ -130,7 +130,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
             }
 
             $status = $dbRow['status'];
-        
+
             // add options
             $options = array();
             foreach (array(
@@ -405,7 +405,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 foreach ($resource->fetchAuthSessionsByUserId($id) as $session) {
                     $resource->deleteRow($session);
                 };
-                
+
                 // log the event and return
                 Daiquiri_Log::getInstance()->notice("user deleted by admin (user_id: {$id})");
                 return array('status' => 'ok');
