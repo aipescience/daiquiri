@@ -414,6 +414,10 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
         }, 100);
     };
 
+    $scope.clearInput = function() {
+        CodemirrorService.clear();
+    }
+
     QueryService.fetchAccount();
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {

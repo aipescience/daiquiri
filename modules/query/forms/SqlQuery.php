@@ -121,8 +121,8 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         ));
 
         $this->addTablenameElement('sql_tablename');
-        $this->addSubmitButtonElement('sql_submit', 'Submit new SQL Query');
-        $this->addDumbButtonElement('sql_clear', 'Clear input window');
+        $this->addSubmitButtonElement('sql_submit','Submit new SQL Query');
+        $this->addClearInputButtonElement('sql_clear','Clear input window');
         $this->addQueuesElement('sql_queue');
 
         // add display groups

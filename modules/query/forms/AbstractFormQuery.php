@@ -127,6 +127,16 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
     }
 
     /**
+     * Adds the button to clear the input field to the form.
+     * @param string $name name of the form element
+     */
+    public function addClearInputButtonElement($name, $label) {
+        $this->addElement(new Query_Form_Element_ClearInput($name, array(
+            'label' => $label
+        )));
+    }
+
+    /**
      * Adds the queue selection select field to the form.
      * @param string $name name of the form element
      */
