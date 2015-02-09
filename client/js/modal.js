@@ -22,114 +22,117 @@ angular.module('modal', ['ngSanitize'])
 .directive('daiquiriModal', ['$compile','ModalService',function($compile,ModalService) {
     return {
         restrict: 'A',
+        transclude: true,
         templateUrl: angular.element('base').attr('href') + '/daiquiri/html/modal.html',
         link: function(scope, element) {
-            scope.$watch(function () {
-                return ModalService.modal.enabled;
-            }, function(newValue, oldValue) {
-                if (newValue === true) {
-                    // parse html to a fake dom
-                    var dom = angular.element(ModalService.modal.html);
+            if (angular.isUndefined(element.attr('transclude'))) {
+                scope.$watch(function () {
+                    return ModalService.modal.enabled;
+                }, function(newValue, oldValue) {
+                    if (newValue === true) {
+                        // parse html to a fake dom
+                        var dom = angular.element(ModalService.modal.html);
 
-                    // remove the action attribute from the form
-                    angular.element('form', dom).removeAttr('action');
+                        // remove the action attribute from the form
+                        angular.element('form', dom).removeAttr('action');
 
-                    // add errors to form
-                    angular.element('#fieldset-actiongroup', dom).before('<ul class="unstyled text-error align-form-horizontal" ng-show="errors.form"><li ng-repeat="error in errors.form">{{error}}</li></ul>');
+                        // add errors to form
+                        angular.element('#fieldset-actiongroup', dom).before('<ul class="unstyled text-error align-form-horizontal" ng-show="errors.form"><li ng-repeat="error in errors.form">{{error}}</li></ul>');
 
-                    // add ng-model to INPUT fields and set model to values
-                    angular.forEach(angular.element('input',dom), function(node, key) {
-                        var id = angular.element(node).attr('id');
-                        var type = angular.element(node).attr('type');
+                        // add ng-model to INPUT fields and set model to values
+                        angular.forEach(angular.element('input',dom), function(node, key) {
+                            var id = angular.element(node).attr('id');
+                            var type = angular.element(node).attr('type');
 
-                        // fo different things for different types
-                        if (type === 'text' || type == 'password') {
-                            var element = angular.element('#' + id, dom);
-                            element.attr('ng-model','values.' + id)
-                            element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
-
-                            scope.values[id] = angular.element(node).attr('value');
-                        } else if (type === 'checkbox') {
-                            m = id.match(/(.*)\-(\d+)/);
-
-                            if (m === null) {
-                                // this is a regular single with a hidden field checkbox
+                            // fo different things for different types
+                            if (type === 'text' || type == 'password') {
                                 var element = angular.element('#' + id, dom);
                                 element.attr('ng-model','values.' + id)
-                                element.attr('ng-true-value','1');
-                                element.attr('ng-false-value','0');
+                                element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
 
-                                if (element.attr('checked') == 'checked') {
-                                    scope.values[id] = 1;
+                                scope.values[id] = angular.element(node).attr('value');
+                            } else if (type === 'checkbox') {
+                                m = id.match(/(.*)\-(\d+)/);
+
+                                if (m === null) {
+                                    // this is a regular single with a hidden field checkbox
+                                    var element = angular.element('#' + id, dom);
+                                    element.attr('ng-model','values.' + id)
+                                    element.attr('ng-true-value','1');
+                                    element.attr('ng-false-value','0');
+
+                                    if (element.attr('checked') == 'checked') {
+                                        scope.values[id] = 1;
+                                    } else {
+                                        scope.values[id] = 0;
+                                    }
+
                                 } else {
-                                    scope.values[id] = 0;
+                                    // this belongs to a multible checkbox
+                                    var element = angular.element('#' + id, dom);
+                                    element.attr('ng-model','values.' + m[1] + '[' + m[2] + ']');
+
+                                    // prepare values array
+                                    if (angular.isUndefined(scope.values[m[1]])) {
+                                        scope.values[m[1]] = {};
+                                    }
+
+                                    // set values based on checked argument
+                                    if (angular.element(node).attr('checked') == 'checked') {
+                                        scope.values[m[1]][m[2]] = true;
+                                    } else {
+                                        scope.values[m[1]][m[2]] = false;
+                                    }
                                 }
 
-                            } else {
-                                // this belongs to a multible checkbox
-                                var element = angular.element('#' + id, dom);
-                                element.attr('ng-model','values.' + m[1] + '[' + m[2] + ']');
+                            } else if (type === 'radio') {
+                                m = id.match(/(.*)\-\d+/);
+                                angular.element('#' + id, dom).attr('ng-model','values.' + m[1]);
 
-                                // prepare values array
-                                if (angular.isUndefined(scope.values[m[1]])) {
-                                    scope.values[m[1]] = {};
-                                }
-
-                                // set values based on checked argument
                                 if (angular.element(node).attr('checked') == 'checked') {
-                                    scope.values[m[1]][m[2]] = true;
-                                } else {
-                                    scope.values[m[1]][m[2]] = false;
+                                    scope.values[m[1]] = parseInt(angular.element(node).attr('value'));
                                 }
                             }
 
-                        } else if (type === 'radio') {
-                            m = id.match(/(.*)\-\d+/);
-                            angular.element('#' + id, dom).attr('ng-model','values.' + m[1]);
+                        });
 
-                            if (angular.element(node).attr('checked') == 'checked') {
-                                scope.values[m[1]] = parseInt(angular.element(node).attr('value'));
+                        // add ng-model to SELECT fields and set model to values
+                        angular.forEach(angular.element('select',dom), function(node, key) {
+                            var id = angular.element(node).attr('id');
+                            var element = angular.element('#' + id, dom);
+                            element.attr('ng-model','values.' + id);
+                            element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
+
+                            if (angular.element(node).attr('multiple')) {
+                                // this is a multiselect
+                                scope.values[id] = [];
+                                angular.element('option[selected="selected"]',node).each(function (key, element) {
+                                    var value = angular.element(element).attr('value');
+                                    scope.values[id].push(value);
+                                });
+                            } else {
+                                // this is a regular select
+                                scope.values[id] = angular.element('option[selected="selected"]',node).attr('value');
                             }
-                        }
+                        });
 
-                    });
+                        // add ng-model to TEXTAREA fields and set model to values
+                        angular.forEach(angular.element('textarea',dom), function(node, key) {
+                            var id = angular.element(node).attr('id');
+                            var element = angular.element('#' + id, dom);
+                            element.attr('ng-model','values.' + id);
+                            element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
 
-                    // add ng-model to SELECT fields and set model to values
-                    angular.forEach(angular.element('select',dom), function(node, key) {
-                        var id = angular.element(node).attr('id');
-                        var element = angular.element('#' + id, dom);
-                        element.attr('ng-model','values.' + id);
-                        element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
+                            scope.values[id] = angular.element(node).text();
+                        });
 
-                        if (angular.element(node).attr('multiple')) {
-                            // this is a multiselect
-                            scope.values[id] = [];
-                            angular.element('option[selected="selected"]',node).each(function (key, element) {
-                                var value = angular.element(element).attr('value');
-                                scope.values[id].push(value);
-                            });
-                        } else {
-                            // this is a regular select
-                            scope.values[id] = angular.element('option[selected="selected"]',node).attr('value');
-                        }
-                    });
-
-                    // add ng-model to TEXTAREA fields and set model to values
-                    angular.forEach(angular.element('textarea',dom), function(node, key) {
-                        var id = angular.element(node).attr('id');
-                        var element = angular.element('#' + id, dom);
-                        element.attr('ng-model','values.' + id);
-                        element.after('<ul class="unstyled text-error" ng-show="errors.' + id + '"><li ng-repeat="error in errors.' + id + '">{{error}}</li></ul>');
-
-                        scope.values[id] = angular.element(node).text();
-                    });
-
-                    // compile to an angular element and add to actual modal
-                    var element = $compile(dom)(scope);
-                    angular.element('.daiquiri-modal-body').children().remove();
-                    angular.element('.daiquiri-modal-body').append(element);
-                }
-            }, true);
+                        // compile to an angular element and add to actual modal
+                        var element = $compile(dom)(scope);
+                        angular.element('.daiquiri-modal-body').children().remove();
+                        angular.element('.daiquiri-modal-body').append(element);
+                    }
+                }, true);
+            }
         }
     };
 }])
@@ -169,7 +172,10 @@ angular.module('modal', ['ngSanitize'])
     $scope.modal = ModalService.modal;
 
     $scope.closeModal = function($event) {
-        if (angular.isUndefined($event) || angular.element($event.target).attr('class') == 'daiquiri-modal') {
+        if (angular.isUndefined($event)) {
+            $scope.modal.enabled = false;
+        };
+        if (angular.element($event.target).hasClass('daiquiri-modal')) {
             $scope.modal.enabled = false;
         };
     }

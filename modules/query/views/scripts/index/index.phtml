@@ -196,7 +196,7 @@
                                     </div>
                                 </div>
                             </div>
-                            {{account.job.status}}
+
                             <div class="daiquiri-widget nav">
                                 <div class="nav-header">Additional infomation</div>
                                 <div class="nav-item">
@@ -285,80 +285,54 @@
         </div>
     </div>
 
-    <!-- dialogs -->
+    <!-- rename job dialog -->
 
-    <div ng-controller="ModalController">
-
-        <!-- rename job dialog -->
-
-        <div class="daiquiri-modal" ng-show="modal.enabled == 'rename'" ng-click="closeModal($event)">
-            <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
-                <button class="linkbutton daiquiri-modal-close" href="" ng-click="modals.rename = false">&times;</button>
-                <div class="daiquiri-modal-body">
-                    <div class="main">
-                        <h2>Rename table</h2>
-                        <form name="rename">
-                            <fieldset id="fieldset-tablerenamegroup" class="form-horizontal">
-                                <div class="control-group">
-                                    <label for="tablename" class="control-label required">New name of the table</label>
-                                    <div class="controls">
-                                        <input type="text" name="tablename" id="tablename" ng-model="dialog.values.tablename" />
-                                        <ul class="unstyled text-error" ng-show="dialog.errors.tablename">
-                                            <li ng-repeat="error in dialog.errors.tablename">{{error}}</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </fieldset>
-                            <p class="text-error" ng-show="dialog.errors">{{dialog.errors.form}}</p>
-                            <fieldset id="fieldset-actiongroup" class="form-action">
-                                <input type="submit" name="submit" value="Rename table" class="btn btn-primary" ng-click="renameJob()" />
-                                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="closeModal()" />
-                            </fieldset>
-                        </form>
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='rename'">
+        <h2>Rename table</h2>
+        <p class="text-error" ng-show="dialog.errors">{{dialog.errors.form}}</p>
+        <form name="rename">
+            <fieldset id="fieldset-tablerenamegroup" class="form-horizontal">
+                <div class="control-group">
+                    <label for="tablename" class="control-label required">New name of the table</label>
+                    <div class="controls">
+                        <input type="text" name="tablename" id="tablename" ng-model="dialog.values.tablename" />
+                        <ul class="unstyled text-error" ng-show="dialog.errors.tablename">
+                            <li ng-repeat="error in dialog.errors.tablename">{{error}}</li>
+                        </ul>
                     </div>
                 </div>
-            </div>
-        </div>
+            </fieldset>
+            <fieldset id="fieldset-actiongroup" class="form-action">
+                <input type="submit" name="submit" value="Rename table" class="btn btn-primary" ng-click="renameJob()" />
+                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
+            </fieldset>
+        </form>
+    </div>
 
-        <!-- kill job dialog -->
+    <!-- kill job dialog -->
 
-        <div class="daiquiri-modal" ng-show="modal.enabled == 'kill'" ng-click="closeModal($event)">
-            <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
-                <button class="linkbutton daiquiri-modal-close" href="" ng-click="modals.kill = false">&times;</button>
-                <div class="daiquiri-modal-body">
-                    <div class="main">
-                        <h2>Kill job</h2>
-                        <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
-                        <form name="kill" class="daiquiri-form-danger">
-                            <fieldset id="fieldset-actiongroup" class="form-action">
-                                <input type="submit" name="submit" value="Kill job" class="btn btn-danger" ng-click="killJob()" />
-                                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="closeModal()" />
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='kill'">
+        <h2>Kill job</h2>
+        <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
+        <form name="kill" class="daiquiri-form-danger">
+            <fieldset id="fieldset-actiongroup" class="form-action">
+                <input type="submit" name="submit" value="Kill job" class="btn btn-danger" ng-click="killJob()" />
+                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
+            </fieldset>
+        </form>
+    </div>
 
-        <!-- remove job dialog -->
+    <!-- remove job dialog -->
 
-        <div class="daiquiri-modal" ng-show="modal.enabled == 'remove'" ng-click="closeModal($event)">
-            <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
-                <button class="linkbutton daiquiri-modal-close" href="" ng-click="modals.remove = false">&times;</button>
-                <div class="daiquiri-modal-body">
-                    <div class="main">
-                        <h2>Remove Job</h2>
-                        <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
-                        <form name="kill" class="daiquiri-form-danger">
-                            <fieldset id="fieldset-actiongroup" class="form-action">
-                                <input type="submit" name="submit" value="Remove job" class="btn btn-danger" ng-click="removeJob()" />
-                                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="closeModal()" />
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='remove'">
+        <h2>Remove Job</h2>
+        <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
+        <form name="kill" class="daiquiri-form-danger">
+            <fieldset id="fieldset-actiongroup" class="form-action">
+                <input type="submit" name="submit" value="Remove job" class="btn btn-danger" ng-click="removeJob()" />
+                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
+            </fieldset>
+        </form>
     </div>
 
 </div>

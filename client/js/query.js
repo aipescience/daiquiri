@@ -37,7 +37,8 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
 
     var dialog = {
         values: {},
-        error: false
+        error: false,
+        enabled: false
     };
 
     function fetchAccount() {
@@ -94,6 +95,16 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
             .error(function (response,status) { httpError(response,status) });
     }
 
+    function showDialog(key) {
+        dialog.enabled = key;
+        ModalService.modal.enabled = true;
+    }
+
+    function hideDialog() {
+        dialog.enabled = false;
+        ModalService.modal.enabled = false;
+    }
+
     function httpSuccess(response) {
         if (response.status == 'ok') {
             fetchAccount();
@@ -123,7 +134,9 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
         fetchJob: fetchJob,
         renameJob: renameJob,
         killJob: killJob,
-        removeJob: removeJob
+        removeJob: removeJob,
+        showDialog: showDialog,
+        hideDialog: hideDialog
     };
 }]);
 
@@ -365,9 +378,12 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
     };
 
     $scope.showDialog = function(key) {
-        $scope.dialog.errors = {};
-        $scope.dialog.values.tablename = QueryService.account.job.table;
-        ModalService.modal.enabled = key;
+        QueryService.showDialog(key);
+    }
+
+    $scope.hideDialog = function() {
+        console.log('foo');
+        QueryService.hideDialog();
     }
 
     $scope.renameJob = function() {

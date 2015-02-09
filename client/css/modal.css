@@ -77,6 +77,10 @@ button.daiquiri-modal-close:hover {
     padding-left: 15px;
     padding-right: 15px;
 }
+.daiquiri-modal-body > form:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
 .daiquiri-modal-body .main > :nth-child(2) {
     border-top: 1px solid #eee;
     margin-top: 0;
@@ -86,13 +90,12 @@ button.daiquiri-modal-close:hover {
     padding-bottom: 20px;
     margin-bottom: 0;
 }
-.daiquiri-modal-body .main > form:nth-child(2) {
-    padding-top: 20px;
-}
 .daiquiri-modal-body .main > form:last-child {
     padding-bottom: 0;
 }
-
+.daiquiri-modal-body .main > form:nth-child(2) {
+    padding-top: 20px;
+}
 .daiquiri-modal-body .main > form.daiquiri-form-confirm,
 .daiquiri-modal-body .main > form.daiquiri-form-danger {
     border-top: none;

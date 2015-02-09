@@ -41,7 +41,8 @@
 #fieldset-downloadformatgroup {
     border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 12px;
+    padding-right: 10px;
+    margin-bottom: 10px;
 }
 .daiquiri-download-format {
     display: block;
