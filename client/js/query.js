@@ -24,7 +24,11 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',function($http,$timeout,$q,$cookies,ModalService) {
+app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService',function($http,$timeout,$cookies,filterFilter,ModalService) {
+    // query options, will be set inside the template via ng-init
+    var options = {};
+
+    // account information, will be fetched via ajax
     var account = {
         active: {
             form: false,
@@ -35,6 +39,7 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
         jobs: []
     };
 
+    // dialog state, use for the different modal which will be displayed to the user
     var dialog = {
         values: {},
         errors: {},
@@ -48,13 +53,36 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
         });
     }
 
-    function fetchJob(id) {
-        var deferred = $q.defer();
+    function activateForm(formName) {
+        if (angular.isUndefined(formName)) {
+            if (options.defaultForm == null) {
+                formName = options.forms[0].key;
+            } else {
+                formName = options.defaultForm;
+            }
+        }
 
+        account.active.form = formName;
+        account.active.job = false;
+
+        $('#submit-tab-header a').tab('show');
+    }
+
+    function activateJob(id) {
         $http.get('query/account/show-job/id/' + id)
             .success(function(response) {
                 account.job = response.job;
-                deferred.resolve();
+
+                // codemirrorfy the query
+                CodeMirror.runMode(account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
+
+                // if a form was active, switch to job overview tab
+                if (account.active.form != false) {
+                    $('#overview-tab-header a').tab('show');
+                }
+
+                account.active.form = false;
+                account.active.job = id;
             })
             .error(function(response, status) {
                 if (status === 404) {
@@ -68,8 +96,6 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
                     console.log(status);
                 }
             });
-
-        return deferred.promise;
     }
 
     function renameJob () {
@@ -79,27 +105,70 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
         };
 
         $http.post('query/account/rename-job/id/' + account.job.id,$.param(data))
-            .success(function(response) { httpSuccess(response) })
-            .error(function (response,status) { httpError(response,status) });
+            .success(function(response) {
+                dialogSuccess(response, function() {
+                    account.job.table = data.tablename;
+                    fetchAccount();
+                });
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
     }
 
     function killJob () {
         $http.post('query/account/kill-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
-            .success(function(response) { httpSuccess(response) })
-            .error(function (response,status) { httpError(response,status) });
+            .success(function(response) {
+                dialogSuccess(response, function() {
+                    // get the index of the job in the jobs array (by magic)
+                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': account.job.id})[0]);
+
+                    if (account.jobs.length == 1) {
+                        // no jobs left, jump to form
+                        activateForm();
+                    } else if (i == account.jobs.length - 1) {
+                        // this was the last job, jump to the previous job
+                        activateJob(account.jobs[i-1].id)
+                    } else {
+                        // jump to the next job in array
+                        activateJob(account.jobs[i+1].id)
+                    }
+                });
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
     }
 
     function removeJob() {
         $http.post('query/account/remove-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
-            .success(function(response) { httpSuccess(response) })
-            .error(function (response,status) { httpError(response,status) });
+            .success(function(response) {
+                dialogSuccess(response, function() {
+                    // get the index of the job in the jobs array (by magic)
+                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': account.job.id})[0]);
+
+                    if (account.jobs.length == 1) {
+                        // no jobs left, jump to form
+                        activateForm();
+                    } else if (i == account.jobs.length - 1) {
+                        // this was the last job, jump to the previous job
+                        activateJob(account.jobs[i-1].id)
+                    } else {
+                        // jump to the next job in array
+                        activateJob(account.jobs[i+1].id)
+                    }
+                });
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
     }
 
-    function httpSuccess(response) {
+    function dialogSuccess(response, callback) {
         if (response.status == 'ok') {
+            if (angular.isFunction(callback)) callback(response);
             fetchAccount();
             ModalService.modal.enabled = false;
-            // TODO load another job
         } else if (response.status == 'error') {
             angular.forEach(response.errors, function(error, key) {
                 dialog.errors[key] = error;
@@ -109,7 +178,7 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
         }
     }
 
-    function httpError(response,status) {
+    function dialogError(response,status) {
         if (status === 404) {
             dialog.errors.form = 'The selected job can not be found. Please reload the page to update the job list.';
         } else {
@@ -134,10 +203,12 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
     }
 
     return {
+        options: options,
         account: account,
         dialog: dialog,
         fetchAccount: fetchAccount,
-        fetchJob: fetchJob,
+        activateForm: activateForm,
+        activateJob: activateJob,
         renameJob: renameJob,
         killJob: killJob,
         removeJob: removeJob,
@@ -361,26 +432,11 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
     $scope.dialog  = QueryService.dialog;
 
     $scope.activateForm = function(formName) {
-        QueryService.account.active.form = formName;
-        QueryService.account.active.job = false;
-
-        $('#submit-tab-header a').tab('show');
+        QueryService.activateForm(formName);
     };
 
     $scope.activateJob = function(jobId) {
-
-        QueryService.fetchJob(jobId).then(function() {
-            // codemirrorfy the query
-            CodeMirror.runMode(QueryService.account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
-        });
-
-        // if a form was active, switch to job overview tab
-        if (QueryService.account.active.form != false) {
-            $('#overview-tab-header a').tab('show');
-        }
-
-        QueryService.account.active.form = false;
-        QueryService.account.active.job = jobId;
+        QueryService.activateJob(jobId);
     };
 
     $scope.showDialog = function(key) {
@@ -419,6 +475,11 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
     }
 
     QueryService.fetchAccount();
+
+    $timeout(function() {
+        for (var option in $scope.options) QueryService.options[option] = $scope.options[option];
+        QueryService.activateForm();
+    }, 0);
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
         if (browsername == 'examples') {

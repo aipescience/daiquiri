@@ -52,10 +52,17 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
         // ));
 
         // get the forms to display
-        if (Daiquiri_Config::getInstance()->query->forms) {
-            $this->view->forms = Daiquiri_Config::getInstance()->query->forms->toArray();
-        } else {
-            $this->view->forms = array();
+        $this->view->options = array(
+            'defaultForm' => Null,
+            'forms' => array()
+        );
+
+        foreach(Daiquiri_Config::getInstance()->query->forms as $key => $form) {
+            if ($form->default) $this->view->options['defaultForm'] = $key;
+            $this->view->options['forms'][] = array(
+                'key' => $key,
+                'title' => $form->title
+            );
         }
 
         // check if samp is enabled
