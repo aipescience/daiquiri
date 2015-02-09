@@ -378,8 +378,9 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                         'format': response.format
                     }
                 } else if (response.status == 'error') {
-                    errors[formName] = {};
-                    angular.forEach(response.status, function(object, key) {
+                    for (var error in errors) delete errors[error];
+
+                    angular.forEach(response.errors, function(object, key) {
                         errors[key] = object;
                     });
                 } else {
@@ -578,8 +579,9 @@ app.controller('DownloadController',['$scope','DownloadService',function($scope,
     $scope.values = DownloadService.values;
     $scope.errors = DownloadService.errors;
 
-    $scope.downloadTable = function() {
+    $scope.downloadTable = function(event) {
         DownloadService.downloadTable();
+        event.preventDefault();
     };
 
     $scope.regenerateTable = function() {

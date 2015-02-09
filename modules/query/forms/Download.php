@@ -41,7 +41,7 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
         // add elements
         $this->addCsrfElement('download_csrf');
         $this->addElement(new Daiquiri_Form_Element_Tablename('download_tablename', array(
-            'label' => 'Name of the new table (optional)',
+            'label' => 'Name of the table',
             'class' => 'span9',
             'required' => true
         )));
@@ -58,30 +58,29 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
 
         // add angular directives
         $this->setAttrib('name',"download");
-        $this->setAttrib('ng-submit',"downloadTable()");
-        $this->setDecorators(array(
-            'FormElements',
-            array('Callback', array(
-                'callback' => function($content, $element, $options) {
-                    $ngErrorModel = 'errors.form';
+        $this->setAttrib('ng-submit',"downloadTable(\$event)");
 
-                    return '<ul class="unstyled text-error angular-hidden" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">Error: {{error}}</li></ul>';
-                },
-                'placement' => 'append'
-            )),
-            'Form'
-        ));
+        // add angular model and error model decorators to elements
         foreach (array('download_csrf','download_tablename','download_format') as $name) {
             $element = $this->getElement($name);
-            $element->setAttrib('ng-model','values.' . $name);
-            $element->addDecorators(array(array('Callback', array(
-                'callback' => function($content, $element, $options) {
-                    $ngErrorModel = 'errors.' . $element->getName();
+            $element->setAttrib('ng-model',"values.{$name}");
 
-                    return '<ul class="unstyled text-error angular-hidden" ng-show="' . $ngErrorModel . '"><li ng-repeat="error in ' . $ngErrorModel . '">Error: {{error}}</li></ul>';
+            // inject new decorator in penultimate position
+            $decorators = $element->getDecorators();
+            $last = array_pop($decorators);
+
+            $element->setDecorators($decorators);
+            $element->addDecorator(array('field' => 'Callback'), array(
+                'callback' => function($content, $element, $options) {
+                    $errorModel = "errors.{$element->getName()}";
+                    return "<ul class=\"text-error unstyled\"><li ng-repeat=\"error in {$errorModel}\">{{error}}</li></ul>";
                 },
                 'placement' => 'append'
-            ))));
+            ));
+            $element->addDecorator($last);
         }
+
+        // add form error to the description
+        $this->setDescription("<ul class=\"text-error form-error unstyled\"><li ng-repeat=\"error in errors.form\">{{error}}</li></ul>");
     }
 }

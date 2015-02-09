@@ -44,6 +44,9 @@
     padding-right: 10px;
     margin-bottom: 10px;
 }
+#fieldset-downloadformatgroup ul.text-error {
+    margin: 10px;
+}
 .daiquiri-download-format {
     display: block;
     width: 20px;
