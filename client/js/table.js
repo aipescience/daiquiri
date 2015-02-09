@@ -70,7 +70,7 @@ angular.module('table', ['ngSanitize'])
 }])
 
 .factory('TableService', ['$http',function($http) {
-    
+
     var url = {
         cols: null,
         rows: null

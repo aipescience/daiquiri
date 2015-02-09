@@ -37,7 +37,7 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
 
     var dialog = {
         values: {},
-        error: false,
+        errors: {},
         enabled: false
     };
 
@@ -95,16 +95,6 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
             .error(function (response,status) { httpError(response,status) });
     }
 
-    function showDialog(key) {
-        dialog.enabled = key;
-        ModalService.modal.enabled = true;
-    }
-
-    function hideDialog() {
-        dialog.enabled = false;
-        ModalService.modal.enabled = false;
-    }
-
     function httpSuccess(response) {
         if (response.status == 'ok') {
             fetchAccount();
@@ -126,6 +116,22 @@ app.factory('QueryService', ['$http','$timeout','$q','$cookies','ModalService',f
             dialog.errors.form = 'An error occured (' + status + '). Please reload the page.';
         }
     };
+
+    function showDialog(key) {
+        for (var value in dialog.values) delete dialog.values[value];
+        for (var error in dialog.errors) delete dialog.errors[error];
+
+        if (key === 'rename') {
+            dialog.values.tablename = account.job.table;
+        }
+        dialog.enabled = key;
+        ModalService.modal.enabled = true;
+    }
+
+    function hideDialog() {
+        dialog.enabled = false;
+        ModalService.modal.enabled = false;
+    }
 
     return {
         account: account,
@@ -382,7 +388,6 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
     }
 
     $scope.hideDialog = function() {
-        console.log('foo');
         QueryService.hideDialog();
     }
 
