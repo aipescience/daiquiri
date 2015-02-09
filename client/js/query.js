@@ -462,12 +462,12 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
     $scope.pasteQuery = function() {
         var query = angular.element('#overview-query')[0].innerText;
 
-        CodemirrorService.clear();
-        CodemirrorService.insert(query);
         $scope.activateForm('sql');
         $timeout(function() {
+            CodemirrorService.clear();
+            CodemirrorService.insert(query);
             CodemirrorService.refresh();
-        }, 100);
+        }, 0);
     };
 
     $scope.clearInput = function() {
