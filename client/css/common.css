@@ -21,7 +21,8 @@
 
 p:last-child,
 dl:last-child,
-ul:last-child {
+ul:last-child,
+table:last-child {
     margin-bottom: 0;
 }
 

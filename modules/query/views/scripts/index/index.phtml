@@ -209,6 +209,30 @@
                                     <dl>
                                 </div>
                             </div>
+
+                            <div class="daiquiri-widget nav">
+                                <div class="nav-header">Database columns</div>
+                                <div class="nav-item">
+                                    <table class="table table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Unit</th>
+                                                <th>UCD</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="element in account.job.cols">
+                                                <td>{{element.name}}</td>
+                                                <td>{{element.type}}</td>
+                                                <td>{{element.unit}}</td>
+                                                <td>{{element.ucd}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- results table tab -->

@@ -85,11 +85,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
                 account.active.job = id;
 
                 // init plot
-                PlotService.values.db = account.job.database;
-                PlotService.values.table = account.job.table;
-                PlotService.values.plot_x = account.job.cols[1];
-                PlotService.values.plot_y = account.job.cols[2];
-                $('#plot-canvas').children().remove();
+                PlotService.init(account);
             })
             .error(function(response, status) {
                 if (status === 404) {
@@ -331,6 +327,15 @@ app.factory('PlotService', ['$http',function($http) {
         values: values,
         errors: errors,
         labels: labels,
+        init: function(account) {
+            values.db = account.job.database;
+            values.table = account.job.table;
+            values.plot_x = account.job.cols[1];
+            values.plot_y = account.job.cols[2];
+
+            $('#plot-canvas').children().remove();
+            for (var label in labels) delete labels[label];
+        },
         createPlot: function() {
             for (var error in errors) delete errors[error];
 
