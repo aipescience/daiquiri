@@ -219,40 +219,84 @@
 
                         <!-- plot tab -->
 
-                        <div class="tab-pane row" id="plot-tab" ng-show="account.active.job" ng-controller="PlotController">
-                            <div class="span6">
-                                <div id="plot-container">
-                                    <div id="plot-canvas"></div>
+                        <div class="tab-pane" id="plot-tab" ng-show="account.active.job" ng-controller="PlotController">
+                            <div id="plot-area" class="daiquiri-widget">
+                                <div id="plot-canvas"></div>
+                                <div id="plot-xlabel">{{labels.x}}</div>
+                                <div id="plot-ylabel">{{labels.y}}</div>
+                            </div>
+                            <form id="plot-form" name="plot" ng-submit="createPlot(plot.$valid)">
+                                <div class="daiquiri-widget">
+                                    <fieldset>
+                                        <div class="control-group">
+                                            <label for="plot_x" class="span1">X axis</label>
+                                            <select id="plot_x" name="plot_x" class="span3"
+                                                    ng-options="col.name for col in account.job.cols"
+                                                    ng-model="values.plot_x">
+                                                    <option value="" class="muted">Select a column</option>
+                                            </select>
+                                            <ul class="unstyled text-error" ng-show="errors.plot_x">
+                                                <li ng-repeat="error in errors.plot_x">{{error}}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="control-group">
+                                            <label for="plot_x_min" class="span1">X range</label>
+                                            <input type="text" name="plot_x_min" id="plot_x_min" class="span1" ng-model="values.plot_x_min" />
+                                            <input type="text" name="plot_x_max" id="plot_x_max" class="span1" ng-model="values.plot_x_max" />
+                                            <select id="plot_x_scale" name="plot_x_scale" class="span2" ng-model="values.plot_x_scale">
+                                                <option value="lin">Linear</option>
+                                                <option value="log">Logarithmic</option>
+                                            </select>
+                                            <ul class="unstyled text-error" ng-show="errors.plot_x_range">
+                                                <li ng-repeat="error in errors.plot_x_range">{{error}}</li>
+                                            </ul>
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset>
+                                        <div class="control-group">
+                                            <label for="plot_y" class="span1">Y axis</label>
+                                            <select id="plot_y" name="plot_y" class="span3"
+                                                    ng-options="col.name for col in account.job.cols"
+                                                    ng-model="values.plot_y">
+                                                    <option value="" class="muted">Select a column</option>
+                                            </select>
+                                            <ul class="unstyled text-error" ng-show="errors.plot_y">
+                                                <li ng-repeat="error in errors.plot_y">{{error}}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="control-group">
+                                            <label for="plot_y_min" class="span1">Y range</label>
+                                            <input type="text" name="plot_y_min" id="plot_y_min" class="span1" ng-model="values.plot_y_min" />
+                                            <input type="text" name="plot_y_max" id="plot_y_max" class="span1" ng-model="values.plot_y_max" />
+                                            <select id="plot_y_scale" name="plot_y_scale" class="span2" ng-model="values.plot_y_scale">
+                                                <option value="lin">Linear</option>
+                                                <option value="log">Logarithmic</option>
+                                            </select>
+                                            <ul class="unstyled text-error" ng-show="errors.plot_y_range">
+                                                <li ng-repeat="error in errors.plot_y_range">{{error}}</li>
+                                            </ul>
+                                        </div>
+                                    </fieldset>
                                 </div>
-                            </div>
 
-                            <div id="plot-form" class="span3">
-                                <h4>Select Colums for plot</h4><p>
-                                <form id="plot" name="plot" ng-submit="createPlot(plot.$valid)" novalidate>
-                                    <div class="control-group" ng-class="{'error': plot.plot_x.$invalid && plot.$submitted}">
-                                        <label for="plot_x">Column for X axis:</label>
-                                        <select id="plot_x" name="plot_x"
-                                                ng-options="col.name for col in account.job.cols"
-                                                ng-model="values.plot_x"
-                                                required>
-                                                <option value="" class="muted">Select a column</option>
-                                        </select>
-                                    </div>
-                                    <div class="control-group" ng-class="{'error': plot.plot_y.$invalid && plot.$submitted}">
-                                        <label for="plot_y">Column for X axis:</label>
-                                        <select id="plot_y" name="plot_y"
-                                                ng-options="col.name for col in account.job.cols"
-                                                ng-model="values.plot_y"
-                                                required>
-                                                <option value="" class="muted">Select a column</option>
-                                        </select>
-                                    </div>
-                                    <label for="number">Number of rows to plot:</label>
-                                    <input type="text" name="number" id="number" ng-model="values.plot_nrows" />
+                                <fieldset class="pull-right">
+                                    <select id="plot_nrows" name="plot_nrows" class="span3" ng-model="values.plot_nrows">
+                                        <option value="100">Limit to 100 rows</option>
+                                        <option value="1000">Limit to 1000 rows</option>
+                                        <option value="10000">Limit to 10000 rows</option>
+                                    </select>
+                                </fieldset>
 
-                                    <input type="submit" name="plot_submit" id="plot_submit" value="Create plot" class="btn btn-primary" />
-                                </form>
-                            </div>
+                                <fieldset class="form-inline">
+                                    <input type="submit" name="plot_submit" id="plot_submit" value="Create plot" class="btn btn-primary">
+                                    <button name="plot_reset" id="plot_reset" type="button" class="btn" ng-click="resetPlot()">Reset</button>
+                                </fieldset>
+                            </form>
+
+                            <ul class="unstyled text-error" ng-show="errors.form">
+                                <li ng-repeat="error in errors.form">{{error}}</li>
+                            </ul>
                         </div>
 
                         <!-- download tab -->

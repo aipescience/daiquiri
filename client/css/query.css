@@ -114,3 +114,44 @@
     font-size: small;
     color: #666;
 }
+
+/* plot */
+
+#plot-area {
+    padding: 20px 0 0 0;
+}
+#plot-canvas {
+    height: 400px;
+    margin-left: 30px;
+}
+#plot-xlabel,
+#plot-ylabel {
+    height: 20px;
+    text-align: center;
+}
+#plot-ylabel {
+    width: 440px;
+    float: left;
+
+    transform: rotate(-90deg);
+    transform-origin: left top 0;
+}
+#plot-form .control-group:first-child {
+    float: left;
+}
+#plot-form .control-group:last-child {
+    float: right;
+}
+#plot-form .control-group label {
+    line-height: 30px;
+    margin-bottom: 0;
+}
+#plot-form .daiquiri-widget fieldset:first-child {
+    margin-top: 10px;
+}
+#plot-form .daiquiri-widget fieldset:last-child .control-group {
+    margin-bottom: 0;
+}
+#plot-form .control-group ul.text-error {
+    margin-left: 80px;
+}

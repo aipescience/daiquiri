@@ -24,7 +24,7 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
-app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService',function($http,$timeout,$cookies,filterFilter,ModalService) {
+app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService','PlotService',function($http,$timeout,$cookies,filterFilter,ModalService,PlotService) {
     // query options, will be set inside the template via ng-init
     var options = {};
 
@@ -83,6 +83,13 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
 
                 account.active.form = false;
                 account.active.job = id;
+
+                // init plot
+                PlotService.values.db = account.job.database;
+                PlotService.values.table = account.job.table;
+                PlotService.values.plot_x = account.job.cols[1];
+                PlotService.values.plot_y = account.job.cols[2];
+                $('#plot-canvas').children().remove();
             })
             .error(function(response, status) {
                 if (status === 404) {
@@ -299,56 +306,142 @@ app.factory('BarService', ['$http','BrowserService',function($http,BrowserServic
     };
 }]);
 
-app.factory('PlotService', ['$http','QueryService',function($http,QueryService) {
+app.factory('PlotService', ['$http',function($http) {
     var values = {};
     var errors = {};
+    var labels = {};
+
+    // initial values
+    values.plot_nrows = 100;
+    values.plot_x_scale = 'lin';
+    values.plot_y_scale = 'lin';
+
+    // function to format the tics
+    function tickFormatter(val, axis) {
+        if (val > 1000) {
+            var exp = Math.floor(Math.log(val) / Math.LN10);
+            var man = val / Math.pow(10,exp);
+            return (man).toFixed(3) + "E" + exp;
+        } else {
+            return val.toFixed(axis.tickDecimals);
+        }
+    };
 
     return {
         values: values,
         errors: errors,
+        labels: labels,
         createPlot: function() {
+            for (var error in errors) delete errors[error];
+
             // manual validation
-            // var valid = true;
-            // if (angular.isUndefined(values.plot_x)) {
-            //     errors.plot_x = true;
-            //     valid = false;
-            // }
-            // if (angular.isUndefined(values.plot_y)) {
-            //     errors.plot_y = true;
-            //     valid = false;
-            // }
-            // if (!angular.isNumber(values.plot_nrows)) {
-            //     errors.plot_nrows = true;
-            //     valid = false;
-            // }
+            var valid = true;
+            if (angular.isUndefined(values.plot_x)) {
+                errors.plot_x = ['Please select a column'];
+                valid = false;
+            }
+            if (angular.isUndefined(values.plot_y)) {
+                errors.plot_y = ['Please select a column'];
+                valid = false;
+            }
 
-            // if (errors !== {}) {
-            //     return;
-            // }
+            // parse ranges
+            angular.forEach(['plot_x_min','plot_x_max'], function(key) {
+                if (values[key] === '') delete values[key];
 
+                if (!angular.isUndefined(values[key])) {
+                    var f = parseFloat(values[key]);
+                    if (isNaN(f)) {
+                        errors.plot_x_range = ['Please give a numerial value'];
+                        valid = false;
+                    } else {
+                        values[key] = f;
+                    }
+                }
+            });
+            angular.forEach(['plot_y_min','plot_y_max'], function(key) {
+                if (values[key] === '') delete values[key];
+
+                if (!angular.isUndefined(values[key])) {
+                    var f = parseFloat(values[key]);
+                    if (isNaN(f)) {
+                        errors.plot_y_range = ['Please give a numerial value'];
+                        valid = false;
+                    } else {
+                        values[key] = f;
+                    }
+                }
+            });
+
+            // return if validation fails
+            if (valid === false) return;
+
+            // obtain the data from the server
             $http.get('data/viewer/rows/',{
                 'params': {
-                    'db': QueryService.account.job.database,
-                    'table': QueryService.account.job.table,
+                    'db': values.db,
+                    'table': values.table,
                     'cols': values.plot_x.name + ',' + values.plot_y.name,
                     'nrows': values.plot_nrows
                 }
             }).success(function(response) {
                 if (response.status == 'ok') {
-                    var plot = {'x': [],'y': []};
-
+                    var data = [];
                     for (var i=0; i<response.nrows; i++) {
-                        plot.x.push(response.rows[i].cell[0]);
-                        plot.y.push(response.rows[i].cell[1]);
+                        data.push([response.rows[i].cell[0],response.rows[i].cell[1]]);
                     }
 
-                    QueryService.account.job.plot = plot;
+                    // create plot
+                    var options = {
+                        lines: {
+                            show: false
+                        },
+                        points: {
+                            radius: 1,
+                            show: true,
+                            fill: true
+                        },
+                        shadowSize: 0,
+                        xaxis: {
+                            tickFormatter: tickFormatter,
+                            label: 'fff'
+                        },
+                        yaxis: {
+                            tickFormatter: tickFormatter
+                        },
+                        zoom: {
+                            interactive: true
+                        },
+                        pan: {
+                            interactive: true
+                        }
+                    };
+
+                    if (!angular.isUndefined(values.plot_x_min)) options.xaxis.min = values.plot_x_min;
+                    if (!angular.isUndefined(values.plot_x_max)) options.xaxis.max = values.plot_x_max;
+                    if (!angular.isUndefined(values.plot_y_min)) options.yaxis.min = values.plot_y_min;
+                    if (!angular.isUndefined(values.plot_y_max)) options.yaxis.max = values.plot_y_max;
+
+                    if (values.plot_x_scale === 'log') options.xaxis.transform = function(v) {return Math.log(v+0.0001)};
+                    if (values.plot_y_scale === 'log') options.yaxis.transform = function(v) {return Math.log(v+0.0001)};
+
+                    $.plot('#plot-canvas', [{
+                        color: "#08c",
+                        data: data
+                    }],options);
+
+                    // set axes label
+                    labels.x = values.plot_x.name;
+                    if (values.plot_x.unit.length > 0) labels.x += ' [' + values.plot_x.unit + ']';
+
+                    labels.y = values.plot_y.name;
+                    if (values.plot_y.unit.length > 0) labels.y += ' [' + values.plot_y.unit + ']';
 
                 } else {
-                    console.log('Error: Unknown response.');
+                    errors.form = ['There was a problem receiving the data.']
                 }
             }).error(function () {
-                console.log('Error: Could not connect to server.');
+                errors.form = ['Could not connect to server.']
             });
         }
     };
@@ -563,13 +656,10 @@ app.controller('PlotController',['$scope','PlotService',function($scope,PlotServ
 
     $scope.values = PlotService.values;
     $scope.errors = PlotService.errors;
-    $scope.values.plot_nrows = 100;
-    $scope.values.plot_y = 2;
+    $scope.labels = PlotService.labels;
 
-    $scope.createPlot = function(isValid) {
-        if (isValid) {
-            PlotService.createPlot();
-        }
+    $scope.createPlot = function() {
+        PlotService.createPlot();
     };
 
 }]);
