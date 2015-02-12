@@ -47,8 +47,7 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         'bootstrap-datepicker.css' => 'daiquiri/lib/bootstrap-datepicker/css/datepicker.css',
         'bootstrap-datepicker.js' => 'daiquiri/lib/bootstrap-datepicker/js/bootstrap-datepicker.js',
         // other libs
-        // 'insert_at_caret.js' => 'daiquiri/lib/insert_at_caret.js',
-        // 'samp.js' => 'daiquiri/lib/sampjs/samp.js',
+        'samp.js' => 'daiquiri/lib/sampjs/samp.js',
         //daiquiri common
         // 'daiquiri_common.js' => 'daiquiri/js/daiquiri_common.js',
         // daiquiri browser
@@ -80,7 +79,7 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         // 'daiquiri_plot.js' => 'daiquiri/js/daiquiri_plot.js',
         // 'daiquiri_query_buttons.js' => 'daiquiri/js/daiquiri_query_buttons.js',
         // 'daiquiri_samp.js' => 'daiquiri/js/daiquiri_samp.js'
-        // 
+        //
         'daiquiri_common.css' => 'daiquiri/css/common.css',
         'daiquiri_form.css' => 'daiquiri/css/form.css',
         'daiquiri_wordpress.css' => 'daiquiri/css/wordpress.css',
@@ -90,6 +89,8 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         'daiquiri_modal.js' => '/daiquiri/js/modal.js',
         'daiquiri_browser.css' => '/daiquiri/css/browser.css',
         'daiquiri_browser.js' => '/daiquiri/js/browser.js',
+        'daiquiri_samp.css' => '/daiquiri/css/samp.css',
+        'daiquiri_samp.js' => '/daiquiri/js/samp.js',
         'daiquiri_codemirror.css' => '/daiquiri/css/codemirror.css',
         'daiquiri_codemirror.js' => '/daiquiri/js/codemirror.js',
         'daiquiri_admin.js' => '/daiquiri/js/admin.js'

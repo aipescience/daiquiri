@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','modal','browser','codemirror','ngCookies']);
+var app = angular.module('query',['table','modal','browser','codemirror','samp','ngCookies']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -413,12 +413,6 @@ app.factory('PlotService', ['$http',function($http) {
                         },
                         yaxis: {
                             tickFormatter: tickFormatter
-                        },
-                        zoom: {
-                            interactive: true
-                        },
-                        pan: {
-                            interactive: true
                         }
                     };
 
@@ -566,7 +560,7 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
             CodemirrorService.clear();
             CodemirrorService.insert(query);
             CodemirrorService.refresh();
-        }, 0);
+        });
     };
 
     $scope.clearInput = function() {
@@ -577,8 +571,11 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
 
     $timeout(function() {
         for (var option in $scope.options) QueryService.options[option] = $scope.options[option];
-        QueryService.activateForm();
-    }, 0);
+        // QueryService.activateForm();
+
+        QueryService.activateJob(1);
+        $('#results-tab-header a').tab('show');
+    });
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
         if (browsername == 'examples') {
@@ -643,7 +640,7 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
     };
 }]);
 
-app.controller('ResultsController',['$scope','QueryService','TableService',function($scope,QueryService,TableService) {
+app.controller('ResultsController',['$scope','QueryService','TableService','SampService',function($scope,QueryService,TableService,SampService) {
 
     $scope.$watch(function() {
         return QueryService.account.job;
@@ -654,6 +651,31 @@ app.controller('ResultsController',['$scope','QueryService','TableService',funct
             TableService.init();
         }
     });
+
+    $scope.clients  = SampService.clients;
+    $scope.errors  = SampService.errors;
+
+    $scope.$watch(function() {
+        return SampService.isConnected();
+    }, function (connected) {
+        $scope.connected = connected;
+    });
+
+    $scope.register = function() {
+        SampService.register();
+    };
+
+    $scope.unregister  = function() {
+        SampService.unregister();
+    };
+
+    $scope.ping = function(id) {
+        SampService.ping(id);
+    };
+
+    $scope.send  = function(id) {
+        SampService.send(id);
+    };
 
 }]);
 
