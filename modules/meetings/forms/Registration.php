@@ -106,7 +106,7 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
             $this->addHorizontalGroup($contributions,'contributions', 'Contributions');
         }
         if (empty($this->_user)) {
-            $this->addHorizontalGroup(array('captcha'),'captcha');
+            $this->addHorizontalGroup(array('captcha'),'captcha-group');
         }
         $this->addActionGroup(array('submit', 'cancel'));
 
