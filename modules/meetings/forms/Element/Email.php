@@ -62,6 +62,9 @@ class Meetings_Form_Element_Email extends Daiquiri_Form_Element_Text {
     function init() {
         $this->setLabel('Email');
 
+        // set required
+        $this->setRequired(true);
+
         // set filter
         $this->addFilter('StringTrim');
 

@@ -58,16 +58,19 @@ class Auth_Form_DetailKeys extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Json()),
             )
         ));
+        $this->addCheckboxElement('required', array(
+            'label' => 'Required'
+        ));
 
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('key','hint','type_id','options'));
+        $this->addHorizontalGroup(array('key','hint','type_id','options','required'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('key','hint','type_id','options') as $element) {
+        foreach (array('key','hint','type_id','options','required') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

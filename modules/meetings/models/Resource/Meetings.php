@@ -68,7 +68,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
 
         if (empty($row)) {
             return false;
-        } 
+        }
 
         // fetch contribution types
         $select = $this->select();
@@ -82,7 +82,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
         $select = $this->select();
         $select->from('Meetings_Meetings_ParticipantDetailKeys', array('participant_detail_key_id'));
         $select->where('Meetings_Meetings_ParticipantDetailKeys.meeting_id = ?', $row['id']);
-        $select->join('Meetings_ParticipantDetailKeys', 'Meetings_Meetings_ParticipantDetailKeys.participant_detail_key_id = Meetings_ParticipantDetailKeys.id', array('id','key','hint','type_id','options'));
+        $select->join('Meetings_ParticipantDetailKeys', 'Meetings_Meetings_ParticipantDetailKeys.participant_detail_key_id = Meetings_ParticipantDetailKeys.id', array('id','key','hint','type_id','options','required'));
 
         $row['participant_detail_keys'] = array();
         foreach($this->fetchAll($select) as $r) {
@@ -91,7 +91,8 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
                 'key' => $r['key'],
                 'hint' => $r['hint'],
                 'type_id' => $r['type_id'],
-                'options' => $r['options']
+                'options' => $r['options'],
+                'required' => $r['required']
             );
         }
 
@@ -190,7 +191,7 @@ class Meetings_Model_Resource_Meetings extends Daiquiri_Model_Resource_Table {
 
     /**
      * Deletes a meeting.
-     * @param int $id 
+     * @param int $id
      * @throws Exception
      */
     public function deleteRow($id) {

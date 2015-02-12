@@ -132,7 +132,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
                 $this->addRadioElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                     'hint' => $detailKey['hint'],
-                    'required' => true,
+                    'required' => $detailKey['required'],
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
@@ -140,7 +140,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
                 $this->addSelectElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                     'hint' => $detailKey['hint'],
-                    'required' => true,
+                    'required' => $detailKey['required'],
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
@@ -156,7 +156,7 @@ abstract class Auth_Form_Abstract extends Daiquiri_Form_Abstract {
                     'label' => ucfirst(str_replace('_',' ',$detailKey['key'])),
                     'hint' => $detailKey['hint'],
                     'class' => $class,
-                    'required' => true,
+                    'required' => $detailKey['required'],
                     'filters' => array('StringTrim'),
                     'validators' => array(
                         array('validator' => new Daiquiri_Form_Validator_Text()),

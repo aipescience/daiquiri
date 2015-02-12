@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS `Auth_DetailKeys` (
   `key` VARCHAR(256) NOT NULL,
   `hint` VARCHAR(256),
   `type_id` INTEGER NOT NULL,
-  `options` VARCHAR(256)
+  `options` VARCHAR(256),
+  `required` BOOL NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Auth_Roles` (

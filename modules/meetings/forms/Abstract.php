@@ -53,7 +53,7 @@ abstract class Meetings_Form_Abstract extends Daiquiri_Form_Model {
                 $this->addRadioElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                     'hint' => $detailKey['hint'],
-                    'required' => true,
+                    'required' => $detailKey['required'],
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
@@ -61,7 +61,7 @@ abstract class Meetings_Form_Abstract extends Daiquiri_Form_Model {
                 $this->addSelectElement($detailKey['key'], array(
                     'label' => ucfirst(str_replace('_',' ', $detailKey['key'])),
                     'hint' => $detailKey['hint'],
-                    'required' => true,
+                    'required' => $detailKey['required'],
                     'multiOptions' => Zend_Json::decode($detailKey['options'])
                 ));
                 break;
@@ -77,7 +77,7 @@ abstract class Meetings_Form_Abstract extends Daiquiri_Form_Model {
                     'label' => ucfirst(str_replace('_',' ',$detailKey['key'])),
                     'hint' => $detailKey['hint'],
                     'class' => $class,
-                    'required' => true,
+                    'required' => $detailKey['required'],
                     'filters' => array('StringTrim'),
                     'validators' => array(
                         array('validator' => new Daiquiri_Form_Validator_Text()),
