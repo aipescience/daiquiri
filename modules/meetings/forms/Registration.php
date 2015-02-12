@@ -91,7 +91,7 @@ class Meetings_Form_Registration extends Meetings_Form_Abstract {
         // captcha and submit buttons
         if (empty($this->_user)) {
             // display captcha if no user is logged in
-            $this->addCaptchaElement('captcha');
+            $this->addCaptchaElement();
         }
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addCancelButtonElement('cancel', 'Cancel');
