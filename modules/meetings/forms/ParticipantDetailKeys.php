@@ -36,6 +36,14 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
+        $this->addTextElement('hint', array(
+            'label' => 'Hint for form',
+            'class' => 'span6',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => new Daiquiri_Form_Validator_Text()),
+            )
+        ));
         $this->addSelectElement('type_id', array(
             'label' => 'Type',
             'required' => true,
@@ -58,11 +66,11 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
         $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('key','type_id','options','required'));
+        $this->addHorizontalGroup(array('key','hint','type_id','options','required'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('key','type_id','options','required') as $element) {
+        foreach (array('key','hint','type_id','options','required') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }
