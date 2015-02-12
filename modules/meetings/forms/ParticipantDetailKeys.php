@@ -32,8 +32,9 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
             'class' => 'span6 mono',
             'required' => true,
             'filters' => array('StringTrim'),
+            'hint' => 'Underscores will be displayed as spaces to the user.',
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
             )
         ));
         $this->addTextElement('hint', array(
