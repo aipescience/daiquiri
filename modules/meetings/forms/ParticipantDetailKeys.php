@@ -31,8 +31,10 @@ class Meetings_Form_ParticipantDetailKeys extends Daiquiri_Form_Model {
             'label' => 'Participant detail key',
             'class' => 'span6 mono',
             'required' => true,
-            'filters' => array('StringTrim'),
-            'hint' => 'Underscores will be displayed as spaces to the user.',
+            'filters' => array(
+                'StringTrim',
+                array('PregReplace', array('match' => '/ /', 'replace' => '_'))
+            ),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
             )

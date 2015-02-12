@@ -31,8 +31,10 @@ class Auth_Form_DetailKeys extends Daiquiri_Form_Model {
             'label' => 'Detail key',
             'class' => 'span6',
             'required' => true,
-            'filters' => array('StringTrim'),
-            'hint' => 'Underscores will be displayed as spaces to the user.',
+            'filters' => array(
+                'StringTrim',
+                array('PregReplace', array('match' => '/ /', 'replace' => '_'))
+            ),
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_AlnumUnderscore()),
             )
