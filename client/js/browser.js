@@ -32,6 +32,8 @@ angular.module('browser',[])
     var height = 200;
     var browser = {};
 
+    var base = angular.element('base').attr('href');
+
     function getItems(data) {
         var items = [];
         angular.forEach(data, function(item, key) {
@@ -69,7 +71,7 @@ angular.module('browser',[])
             var active0 = browser[name].cols[0].selected;
             browser[name].cols[1].selected = i;
 
-            // update THIRD column            
+            // update THIRD column
             browser[name].cols[2].items = getItems(browser[name].data[colname0][active0][colname1][i][colname2]);
         }
     };
@@ -103,7 +105,7 @@ angular.module('browser',[])
         var colname1 = browser[name].colnames[1];
         var colname2 = browser[name].colnames[2];
 
-        $http.get(browser[name].url).success(function(response) {
+        $http.get(base + browser[name].url).success(function(response) {
             if (response.status == 'ok') {
                 browser[name].data = response;
 

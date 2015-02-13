@@ -19,10 +19,10 @@
 
 angular.module('samp', [])
 
-.factory('SampService', ['$timeout','$window',function($timeout,$window) {
+.factory('SampService', ['$timeout','$window','$location','$http','$cookies',function($timeout,$window,$location,$http,$cookies) {
 
-    clients = {};
-    errors = {};
+    var clients = {};
+    var errors = {};
 
     var options = {
         client: "Daiquiri-SAMP",
@@ -33,14 +33,15 @@ angular.module('samp', [])
         }
     }
 
+    var info = false;
+
     var sampClientTracker;
     var subscriptions;
     var sampConnector;
 
-    /**
-     * Determines the url of the favicon.
-     * @return string icon
-     */
+    var base = angular.element('base').attr('href');
+    var absBase = $location.absUrl().split('/query')[0];
+
     function getIcon() {
         // try to get favicon
         var icon = $('link[rel="icon"]');
@@ -61,12 +62,9 @@ angular.module('samp', [])
         return iconUrl;
     }
 
-    /**
-     * Registers with the SAMP hub.
-     */
     function register() {
         // clean up errors
-        for (var error in samp.errors) delete samp.errors[error];
+        for (var error in errors) delete errors[error];
 
         // init client tracker
         sampClientTracker = new samp.ClientTracker();
@@ -105,9 +103,6 @@ angular.module('samp', [])
         });
     };
 
-    /**
-     * Unregisters from the SAMP hub.
-     */
     function unregister() {
         $timeout(function() {
             sampConnector.unregister();
@@ -115,17 +110,63 @@ angular.module('samp', [])
     }
 
     function ping(id) {
-        console.log('ping ' + id);
+        var message = new samp.Message('samp.app.ping',{});
+        var tag = Math.random().toString(36).substring(7);
+        var callback = function(responderId, msgTag, response) {
+            $timeout(function () {
+                if (response['samp.status'] == "samp.ok") {
+                    info = {'tag': tag, 'text': clients[id].name + ' was successfully pinged.'};
+                } else {
+                    info = {'tag': tag, 'text': 'An error occured.'};
+                    console.log(response);
+                }
+            });
+
+            delete sampClientTracker.replyHandler[tag];
+        }
+        sampClientTracker.replyHandler[tag] = callback;
+        sampConnector.connection.call([id, tag, message], null, callback);
     }
 
-    function send(id) {
-        console.log('send ' + id);
+    function send(id, table, username, password) {
+        // get path
+        var path = '/query/download/stream/format/votable/table/' + encodeURIComponent(table);
+
+        var data = {
+            'csrf': $cookies['XSRF-TOKEN'],
+            'path': path
+        };
+
+        // get an auth token
+        $http.post(base + '/auth/token/create', $.param(data))
+            .success(function(response) {
+                // // construct url
+                var s = absBase.split('//');
+                var url = s[0] + '//' + username + ":" + response.token + "@" + s[1] + path;
+
+                var message = new samp.Message('table.load.votable',{'url': url, 'name' : table});
+                var tag = Math.random().toString(36).substring(7);
+                var callback = function(responderId, msgTag, response) {
+                    $timeout(function () {
+                        if (response['samp.status'] == "samp.ok") {
+                            info = {'tag': tag, 'text': 'The table was successfully transfered to ' + clients[id].name + '.'};
+                        } else {
+                            info = {'tag': tag, 'text': 'An error occured.'};
+                            console.log(response);
+                        }
+                    });
+
+                    delete sampClientTracker.replyHandler[tag];
+                }
+                sampClientTracker.replyHandler[tag] = callback;
+                sampConnector.connection.call([id, tag, message], null, callback);
+
+            })
+            .error(function (response,status) {
+
+            });
     }
 
-    /**
-     * Updates the clients object.
-     * @param  id  the id of the SAMP client
-     */
     function updateClients(id) {
         $timeout(function() {
 
@@ -133,39 +174,27 @@ angular.module('samp', [])
             var meta = sampClientTracker.metas[id];
 
             var subs = {};
-            angular.forEach(sampClientTracker.subs[id], function(sub, key) {
-                if (key === 'samp.app.ping') {
-                    subs.ping = true;
-                } else if (key === 'table.load.votable') {
-                    subs.send = true;
-                }
-            });
 
-            clients[id] = {
-                id: id,
-                icon: meta ? meta["samp.icon.url"] : null,
-                name: name,
-                subs: subs
-            };
+            if (angular.isUndefined(meta)) {
+                delete clients[id];
+            } else {
+                angular.forEach(sampClientTracker.subs[id], function(sub, key) {
+                    if (key === 'samp.app.ping') {
+                        subs.ping = true;
+                    } else if (key === 'table.load.votable') {
+                        subs.send = true;
+                    }
+                });
+                clients[id] = {
+                    id: id,
+                    icon: meta ? meta["samp.icon.url"] : null,
+                    name: name,
+                    subs: subs
+                };
+            }
         });
     }
 
-    /**
-     * Creates a SAMP message (json) object by the given args.
-     * @param  mtype  the SAMP message type (mtype) to create the (SAMP) actions (links) for
-     * @param  param  the SAMP parameter for the given mtype,
-     */
-    function createSampMessage(mtype, params) {
-        if(mtype == null || params == null) return null;
-
-        var p2 = eval("(" + params + ")");
-        var result = new samp.Message(mtype, p2);
-        return result;
-    };
-
-    /**
-     * Returns whether there is a connection to a SAMP hub established.
-     */
     function isConnected() {
         if (angular.isUndefined(sampConnector)) {
             return false;
@@ -174,6 +203,10 @@ angular.module('samp', [])
         }
     };
 
+    function getInfo() {
+        return info;
+    }
+
     return {
         errors: errors,
         clients: clients,
@@ -181,7 +214,8 @@ angular.module('samp', [])
         unregister: unregister,
         ping: ping,
         send: send,
-        isConnected: isConnected
+        isConnected: isConnected,
+        getInfo: getInfo
     };
 }])
 

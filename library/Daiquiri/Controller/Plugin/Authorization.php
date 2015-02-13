@@ -64,18 +64,24 @@ class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Ab
             $result = Daiquiri_Auth::getInstance()->authenticateUser($username, $password);
 
             if (!$result) {
-                // try to authenticate as app
-                $result = Daiquiri_Auth::getInstance()->authenticateApp($username, $password);
+                // try to authenticate with the samp token
+                $result = Daiquiri_Auth::getInstance()->authenticateToken($username, $password, $request->getPathInfo());
 
                 if (!$result) {
-                    $this->getResponse()
-                            ->clearHeaders()
-                            ->setHttpResponseCode(401)
-                            ->sendResponse();
-                    die(0);
+                    // try to authenticate as app
+                    $result = Daiquiri_Auth::getInstance()->authenticateApp($username, $password);
+
+                    if (!$result) {
+                        $this->getResponse()
+                                ->clearHeaders()
+                                ->setHttpResponseCode(401)
+                                ->sendResponse();
+                        die(0);
+                    }
                 }
+
             }
-            
+
             Daiquiri_Auth::getInstance()->unsetCsrf();
             $this->_active = true;
         }

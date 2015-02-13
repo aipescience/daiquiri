@@ -172,7 +172,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'additional' => array()
         );
 
-        foreach(array('id','database','table','query','status','error') as $key) {
+        foreach(array('id','database','table','query','status','error','username') as $key) {
             if (!empty($dbRow[$key])) {
                 $job[$key] = $dbRow[$key];
             }

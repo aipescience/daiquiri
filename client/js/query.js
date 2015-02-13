@@ -46,8 +46,10 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
         enabled: false
     };
 
+    var base = angular.element('base').attr('href');
+
     function fetchAccount() {
-        $http.get('query/account/').success(function(response) {
+        $http.get(base + '/query/account/').success(function(response) {
             account.jobs = response.jobs;
             account.database = response.database;
         });
@@ -69,7 +71,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     }
 
     function activateJob(id) {
-        $http.get('query/account/show-job/id/' + id)
+        $http.get(base + '/query/account/show-job/id/' + id)
             .success(function(response) {
                 account.job = response.job;
 
@@ -107,7 +109,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
             'tablename': dialog.values.tablename
         };
 
-        $http.post('query/account/rename-job/id/' + account.job.id,$.param(data))
+        $http.post(base + '/query/account/rename-job/id/' + account.job.id,$.param(data))
             .success(function(response) {
                 dialogSuccess(response, function() {
                     account.job.table = data.tablename;
@@ -120,7 +122,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     }
 
     function killJob () {
-        $http.post('query/account/kill-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
+        $http.post(base + '/query/account/kill-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
             .success(function(response) {
                 dialogSuccess(response, function() {
                     // get the index of the job in the jobs array (by magic)
@@ -144,7 +146,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     }
 
     function removeJob() {
-        $http.post('query/account/remove-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
+        $http.post(base + '/query/account/remove-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
             .success(function(response) {
                 dialogSuccess(response, function() {
                     // get the index of the job in the jobs array (by magic)
@@ -224,6 +226,8 @@ app.factory('SubmitService', ['$http','QueryService','BrowserService',function($
     var values = {};
     var errors = {};
 
+    var base = angular.element('base').attr('href');
+
     return {
         values: values,
         errors: errors,
@@ -241,7 +245,7 @@ app.factory('SubmitService', ['$http','QueryService','BrowserService',function($
             // reset errors for all forms
             for (var error in errors) delete errors[error];
 
-            $http.post('query/form/?form=' + formName,$.param(data)).success(function(response) {
+            $http.post(base + '/query/form/?form=' + formName,$.param(data)).success(function(response) {
                 if (response.status == 'ok') {
                     QueryService.fetchAccount();
                 } else if (response.status == 'error') {
@@ -262,7 +266,7 @@ app.factory('SubmitService', ['$http','QueryService','BrowserService',function($
     };
 }]);
 
-app.factory('BarService', ['$http','BrowserService',function($http,BrowserService) {
+app.factory('BarService', ['BrowserService',function(BrowserService) {
     BrowserService.browser.databases = {
         'url': '/query/account/databases/',
         'colnames': ['databases','tables','columns']
@@ -306,6 +310,8 @@ app.factory('PlotService', ['$http',function($http) {
     var values = {};
     var errors = {};
     var labels = {};
+
+    var base = angular.element('base').attr('href');
 
     // initial values
     values.plot_nrows = 100;
@@ -382,7 +388,7 @@ app.factory('PlotService', ['$http',function($http) {
             if (valid === false) return;
 
             // obtain the data from the server
-            $http.get('data/viewer/rows/',{
+            $http.get(base + '/data/viewer/rows/',{
                 'params': {
                     'db': values.db,
                     'table': values.table,
@@ -450,6 +456,8 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
     var values = {};
     var errors = {};
 
+    var base = angular.element('base').attr('href');
+
     return {
         values: values,
         errors: errors,
@@ -463,7 +471,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
             // merge with form values
             angular.extend(data,values);
 
-            $http.post('query/download/',$.param(data)).success(function(response) {
+            $http.post(base + '/query/download/',$.param(data)).success(function(response) {
                 if (response.status == 'ok') {
                     QueryService.account.job.download = {
                         'link': response.link,
@@ -494,7 +502,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                 'download_format': QueryService.account.job.download.format
             };
 
-            $http.post('query/download/regenerate/',$.param(data)).success(function(response) {
+            $http.post(base + '/query/download/regenerate/',$.param(data)).success(function(response) {
                 if (response.status == 'ok') {
                     QueryService.account.job.download = {
                         'link': response.link,
@@ -571,10 +579,7 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
 
     $timeout(function() {
         for (var option in $scope.options) QueryService.options[option] = $scope.options[option];
-        // QueryService.activateForm();
-
-        QueryService.activateJob(1);
-        $('#results-tab-header a').tab('show');
+        QueryService.activateForm();
     });
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
@@ -646,19 +651,30 @@ app.controller('ResultsController',['$scope','QueryService','TableService','Samp
         return QueryService.account.job;
     }, function (job) {
         if (!angular.isUndefined(job.cols)) {
-            TableService.url.cols = '/data/viewer/cols?db=' + job.database + '&table=' + job.table;
-            TableService.url.rows = '/data/viewer/rows?db=' + job.database + '&table=' + job.table;
+            var base = angular.element('base').attr('href');
+
+            TableService.url.cols = base + '/data/viewer/cols?db=' + job.database + '&table=' + job.table;
+            TableService.url.rows = base + '/data/viewer/rows?db=' + job.database + '&table=' + job.table;
             TableService.init();
         }
     });
 
-    $scope.clients  = SampService.clients;
-    $scope.errors  = SampService.errors;
+    $scope.clients = SampService.clients;
+    $scope.errors = SampService.errors;
 
     $scope.$watch(function() {
         return SampService.isConnected();
     }, function (connected) {
         $scope.connected = connected;
+    });
+
+    $scope.$watch(function() {
+        return SampService.getInfo();
+    }, function (info) {
+        if (info !== false) {
+            QueryService.showDialog('info');
+            QueryService.dialog.info = info.text;
+        }
     });
 
     $scope.register = function() {
@@ -673,10 +689,9 @@ app.controller('ResultsController',['$scope','QueryService','TableService','Samp
         SampService.ping(id);
     };
 
-    $scope.send  = function(id) {
-        SampService.send(id);
+    $scope.send = function(id) {
+        SampService.send(id, QueryService.account.job.table, QueryService.account.job.username);
     };
-
 }]);
 
 app.controller('PlotController',['$scope','PlotService',function($scope,PlotService) {

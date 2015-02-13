@@ -154,6 +154,54 @@ class Daiquiri_Auth extends Daiquiri_Model_Singleton {
         }
     }
 
+    public function authenticateToken($username, $token, $path) {
+        // first check if username, password or path are missing
+        if (!$username) {
+            throw new Exception('Username not given.');
+        } else if (!$token) {
+            throw new Exception('Token not given.');
+        } else if (!$path) {
+            throw new Exception('Path not given.');
+        }
+
+        $tokenResource = new Auth_Model_Resource_Token();
+        $tokenResource->cleanup();
+        $result = $tokenResource->check($username,$token,$path);
+
+        if ($result === true) {
+            $userResource = new Auth_Model_Resource_User();
+            $user = $userResource->fetchRow(array(
+                'where' => array(
+                    'username = ?' => $username
+                )
+            ));
+
+            // store user table row in auth object, but suppress password
+            $row = new stdClass();
+            $row->id = $user['id'];
+            $row->username = $username;
+            $row->email = $user['email'];
+            $row->status_id = $user['status_id'];
+            $row->role_id = $user['role_id'];
+
+            // get ip and user agent
+            $row->ip = $this->getRemoteAddr();
+            $row->userAgent = $this->getUserAgent();
+
+            // get role and status
+            $row->status = $this->getStatus($row->status_id);
+            $row->role = $this->getRole($row->role_id);
+
+            // get the auth singleton and its storage and store the row
+            $storage = Zend_Auth::getInstance()->getStorage();
+            $storage->write($row);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * @brief   authenticateApp method - authenticates an API access with a given API key
      * @param   string $apikey: API key

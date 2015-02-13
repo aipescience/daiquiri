@@ -53,7 +53,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         'time' => 'Job submission time',
         'query' => 'Original query',
         'actualQuery' => 'Actual query',
-        'status_id' => 'Job status',
+        'status_id' => 'Internal job status id',
         'status' => 'Job status',
         'tbl_size' => 'Total disk usage (in MB)',
         'tbl_idx_size' => 'Index disk usage (in MB)',

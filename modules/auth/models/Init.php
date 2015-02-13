@@ -32,6 +32,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'Auth_Model_User',
             'Auth_Model_Account',
             'Auth_Model_Sessions',
+            'Auth_Model_Token',
             'Auth_Model_Details',
             'Auth_Model_DetailKeys'
         );
@@ -57,11 +58,11 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $rules['user'] = array(
             'Auth_Model_User' => array('edit'),
             'Auth_Model_Password' => array('change'),
+            'Auth_Model_Token' => array('create'),
             'Auth_Model_Account' => array('show','update')
         );
 
         // manager
-
         if ($this->_init->options['config']['auth']['confirmation']) {
             $rules['manager'] = array(
                 'Auth_Model_User' => array('rows','cols','show','export'),

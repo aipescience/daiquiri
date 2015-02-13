@@ -19,8 +19,8 @@
  */
 ?>
 
-<link href="/daiquiri/css/query.css" media="screen" rel="stylesheet" type="text/css" >
-<script type="text/javascript" src="/daiquiri/js/query.js"></script>
+<link href="<?php echo $this->baseUrl('/daiquiri/css/query.css'); ?>" media="screen" rel="stylesheet" type="text/css" >
+<script type="text/javascript" src="<?php echo $this->baseUrl('/daiquiri/js/query.js'); ?>"></script>
 
 <div class="main" ng-app="query" ng-controller="QueryController"
     ng-init='options = <?php echo Zend_Json::encode($this->options); ?>'>
@@ -249,7 +249,6 @@
                                         <thead>
                                             <tr>
                                                 <th></th>
-                                                <th>Id</th>
                                                 <th>Client</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -257,7 +256,6 @@
                                         <tbody>
                                             <tr ng-repeat="client in clients">
                                                 <td><img ng-show="client.icon" src="{{client.icon}}"></img></td>
-                                                <td>{{client.id}}</td>
                                                 <td>{{client.name}}</td>
                                                 <td>
                                                     <a href="" ng-show="client.subs.ping" ng-click="ping(client.id)">Ping {{client.name}}</a>
@@ -437,6 +435,18 @@
             <fieldset id="fieldset-actiongroup" class="form-action">
                 <input type="submit" name="submit" value="Remove job" class="btn btn-danger" ng-click="removeJob()" />
                 <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
+            </fieldset>
+        </form>
+    </div>
+
+    <!-- SAMP password modal -->
+
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='info'">
+        <h2>SAMP</h2>
+        <p>{{dialog.info}}</p>
+        <form name="info" class="daiquiri-form">
+            <fieldset id="fieldset-passwordgroup" class="form-action">
+                <input type="submit" name="submit" value="Ok" class="btn btn-primary" ng-click="hideDialog()" />
             </fieldset>
         </form>
     </div>

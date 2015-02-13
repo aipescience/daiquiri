@@ -67,3 +67,11 @@ CREATE TABLE IF NOT EXISTS `Auth_Sessions` (
   `lifetime` int(11) DEFAULT NULL,
   `data` text
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Auth_Token` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(256) NOT NULL,
+  `token` VARCHAR(32) NOT NULL,
+  `path` VARCHAR(256) NOT NULL,
+  `expires` DATETIME
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';

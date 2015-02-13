@@ -34,6 +34,8 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
         url: null
     };
 
+    var base = angular.element('base').attr('href');
+
     // init databases browser
     BrowserService.browser.databases = {
         'url': '/data/databases/',
@@ -54,7 +56,7 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
     BrowserService.initBrowser('functions');
 
     function fetchView(url) {
-        $http.get(url).success(function(data) {
+        $http.get(base + url).success(function(data) {
             view.showUrl   = url.substring(1);
             view.updateUrl = url.substring(1).replace('/show/','/update/');
             view.deleteUrl = url.substring(1).replace('/show/','/delete/');

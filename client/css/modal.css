@@ -81,6 +81,7 @@ button.daiquiri-modal-close:hover {
     margin-bottom: 0;
     padding-bottom: 0;
 }
+.daiquiri-modal-body > :nth-child(2),
 .daiquiri-modal-body .main > :nth-child(2) {
     border-top: 1px solid #eee;
     margin-top: 0;
