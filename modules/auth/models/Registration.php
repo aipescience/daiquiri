@@ -224,7 +224,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     ));
 
                     return array('status' => 'ok');
-                }        
+                }
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }

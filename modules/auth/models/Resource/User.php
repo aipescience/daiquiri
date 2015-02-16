@@ -200,8 +200,12 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         }
 
         // seperate primary credentials and details and check for password
-        $details = $data['details'];
-        unset($data['details']);
+        if (isset($data['details'])) {
+            $details = $data['details'];
+            unset($data['details']);
+        } else {
+            $details = array();
+        }
 
         $credentials = array();
         foreach ($data as $key => $value) {

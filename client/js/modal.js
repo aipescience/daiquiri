@@ -52,9 +52,10 @@ angular.module('modal', ['ngSanitize'])
 
                                 scope.values[id] = angular.element(node).attr('value');
                             } else if (type === 'checkbox') {
-                                m = id.match(/(.*)\-(\d+)/);
+                                var element = angular.element('#' + id, dom);
+                                var hidden = angular.element("[name='" + id + "']",dom);
 
-                                if (m === null) {
+                                if (hidden.length >= 2) {
                                     // this is a regular single with a hidden field checkbox
                                     var element = angular.element('#' + id, dom);
                                     element.attr('ng-model','values.' + id)
@@ -68,20 +69,22 @@ angular.module('modal', ['ngSanitize'])
                                     }
 
                                 } else {
-                                    // this belongs to a multible checkbox
-                                    var element = angular.element('#' + id, dom);
-                                    element.attr('ng-model','values.' + m[1] + '[' + m[2] + ']');
+                                    // this belongs to a multiple checkbox
+                                    var group = id.match(/^([a-zA-Z0-9]*)/)[0];
+                                    var value = element.attr('value');
+
+                                    element.attr('ng-model','values.' + group + "['" + value + "']");
 
                                     // prepare values array
-                                    if (angular.isUndefined(scope.values[m[1]])) {
-                                        scope.values[m[1]] = {};
+                                    if (angular.isUndefined(scope.values[group])) {
+                                        scope.values[group] = {};
                                     }
 
                                     // set values based on checked argument
                                     if (angular.element(node).attr('checked') == 'checked') {
-                                        scope.values[m[1]][m[2]] = true;
+                                        scope.values[group][value] = true;
                                     } else {
-                                        scope.values[m[1]][m[2]] = false;
+                                        scope.values[group][value] = false;
                                     }
                                 }
 
