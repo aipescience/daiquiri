@@ -212,7 +212,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                     'text' => 'Password',
                     'href' => '/auth/password/set/id/' . $dbRow['id'],
                     'resource' => 'Auth_Model_Password',
-                    'permission' => set,
+                    'permission' => 'set',
                     'class' => 'daiquiri-admin-option'));
             if (!empty($option)) {
                $options[] = $option;
