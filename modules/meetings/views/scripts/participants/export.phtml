@@ -51,7 +51,7 @@ foreach ($this->rows as $row) {
                 } else if (empty($value)) {
                     $values[] = '""';
                 } else {
-                    echo '"' . $this->escape($value) . '"';
+                    $values[] = '"' . $this->escape($value) . '"';
                 }
             }
             echo implode(',',$values) . "\n";
@@ -67,7 +67,7 @@ foreach ($this->rows as $row) {
                 } else if (empty($value)) {
                     $values[] = '""';
                 } else {
-                    echo '"' . $this->escape($value);
+                    $values[] = '"' . $this->escape($value) . '"';
                 }
             }
             echo implode(';',$values) . "\n";
