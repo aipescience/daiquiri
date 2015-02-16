@@ -49,7 +49,7 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
             'query.plan' => array('firstname', 'lastname', 'email', 'sql', 'plan', 'message'),
             'meetings.validate' => array('meeting', 'firstname', 'lastname', 'link'),
         );
-        
+
         if (in_array('meetings',Daiquiri_Config::getInstance()->getApplication()->resources->modules->toArray())) {
             $participantDetailKeysModel = new Meetings_Model_ParticipantDetailKeys();
             $contributionTypesModel = new Meetings_Model_ContributionTypes();
