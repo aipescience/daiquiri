@@ -47,13 +47,21 @@ class Meetings_ParticipantsController extends Daiquiri_Controller_Abstract {
     public function exportAction() {
         $slug = $this->_getParam('slug');
         $status = $this->_getParam('status');
+        $mode = $this->_getParam('mode');
+
         $response = $this->_model->export($slug, $status);
-        $this->view->mode = $this->_getParam('mode');
+
+        $this->view->mode = $mode;
         $this->view->assign($response);
 
         // disable layout
-        $this->_helper->layout->disableLayout();
-        $this->getResponse()->setHeader('Content-Type', 'text/plain');
+        $this->_helper->layout()->disableLayout();
+        if (in_array($mode, array('csv','excel'))) {
+            $this->getResponse()->setHeader('Content-Type', 'text/csv');
+            $this->getResponse()->setHeader('Content-Disposition', 'attachement; filename=participants.csv');
+        } else {
+            $this->getResponse()->setHeader('Content-Type', 'text/plain');
+        }
     }
 
     public function showAction() {
