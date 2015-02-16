@@ -34,14 +34,10 @@ unset($this->row['status_id']);
         <?php
         foreach (array('id','firstname','lastname','affiliation','arrival','email') as $key) {
             echo "<dt>{$this->escape(ucfirst($key))}</dt>";
-            echo "<dd>{$this->escape($this->row[$key])}</dd>";
-        }
-        foreach ($this->row['details'] as $key => $value) {
-            echo "<dt>{$this->escape(ucfirst($key))}</dt>";
-            if (is_array($value)) {
-                echo "<dd>{$this->escape(implode(', ',$value))}</dd>";
+            if (!empty($this->row[$key])) {
+                echo "<dd>{$this->escape($this->row[$key])}</dd>";
             } else {
-                echo "<dd>{$this->escape($value)}</dd>";
+                echo "<dd>&nbsp;</dd>";
             }
         }
         ?>
