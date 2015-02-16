@@ -31,7 +31,7 @@ if (in_array($this->mode, array('csv','excel'))) {
         echo implode(';',$values) . "\n";
     }
 }
-
+Zend_Debug::dump(); // die(0);
 foreach ($this->rows as $row) {
     switch ($this->mode) {
         case 'mail':
@@ -51,7 +51,7 @@ foreach ($this->rows as $row) {
                 } else if (empty($value)) {
                     $values[] = '""';
                 } else {
-                    echo '"' . $this->escape($value);
+                    echo '"' . $this->escape($value) . '"';
                 }
             }
             echo implode(',',$values) . "\n";
