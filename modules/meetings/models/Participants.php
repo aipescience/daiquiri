@@ -58,7 +58,7 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
                         'where' => array(
                             '`meeting_id` = ?' => $meeting['id'],
                             '(`status` = "accepted") OR (`status` = "organizer") OR (`status` = "invited")'
-                        ), 
+                        ),
                         'order' => 'lastname ASC'
                     )
                 )
@@ -92,11 +92,42 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
             $where['`status` = ?'] = $status;
         }
 
-        $rows = $this->getResource()->fetchRows(array('where' => $where, 'order' => 'lastname ASC'));
+        $dbRows = $this->getResource()->fetchRows(array('where' => $where, 'order' => 'lastname ASC'));
+
+        $rows = array();
+        foreach ($dbRows as $dbRow) {
+            $row = $this->getResource()->fetchRow($dbRow['id']);
+
+            foreach($meeting['participant_detail_keys'] as $d) {
+                if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$d['type_id']], array('radio','select'))) {
+                    $options = Zend_Json::decode($d['options']);
+                    $row['details'][$d['key']] = $options[$row['details'][$d['key']]];
+                } else if (in_array(Meetings_Model_ParticipantDetailKeys::$types[$d['type_id']], array('checkbox','multiselect'))) {
+                    $options = Zend_Json::decode($d['options']);
+
+                    $values = array();
+                    foreach (Zend_Json::decode($row['details'][$d['key']]) as $value_id) {
+                        $values[] = $options[$value_id];
+                    }
+
+                    $row['details'][$d['key']] = $values;
+                }
+            }
+
+            $rows[] = $row;
+        }
+
+        $keys = array('firstname','lastname','affiliation','email','arrival','departure','status');
+        $detailKeys = array();
+        foreach($meeting['participant_detail_keys'] as $d) {
+            $detailKeys[] = $d['key'];
+        }
 
         return array(
             'status' => 'ok',
-            'rows' => $rows
+            'rows' => $rows,
+            'keys' => $keys,
+            'detailKeys' => $detailKeys
         );
 
     }

@@ -18,16 +18,62 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-<?php if ($this->mode == 'mail'): ?>
-<?php foreach ($this->rows as $row): ?>
-<?php echo $row['firstname'] . ' ' . $row['lastname'] . ' <' . $row['email'] . ">\n"; ?>
-<?php endforeach; ?>
-<?php elseif ($this->mode == 'affiliation'): ?>
-<?php foreach ($this->rows as $row): ?>
-<?php echo $row['lastname'] . ', ' . $row['firstname'] . ' (' . $row['affiliation'] . ")\n"; ?>
-<?php endforeach; ?>
-<?php else: ?>
-<?php foreach ($this->rows as $row): ?>
-<?php echo $row['lastname'] . ', ' . $row['firstname'] . "\n";  ?>
-<?php endforeach; ?>
-<?php endif; ?>
+<?php
+if (in_array($this->mode, array('csv','excel'))) {
+    $values = array();
+    foreach (array_merge($this->keys, $this->detailKeys) as $key) {
+        $values[] = '"' . ucfirst($this->escape($key)) . '"';
+    }
+
+    if ($this->mode == 'csv') {
+        echo implode(',',$values) . "\n";
+    } else {
+        echo implode(';',$values) . "\n";
+    }
+}
+
+foreach ($this->rows as $row) {
+    switch ($this->mode) {
+        case 'mail':
+            echo $row['firstname'] . ' ' . $row['lastname'] . ' <' . $row['email'] . ">\n";
+            break;
+        case 'affiliation':
+            echo $row['lastname'] . ', ' . $row['firstname'] . ' (' . $row['affiliation'] . ")\n";
+            break;
+        case 'csv':
+            $values = array();
+            foreach ($this->keys as $key) {
+                $values[] = '"' . $this->escape($row[$key]) . '"';
+            }
+            foreach ($row['details'] as $key => $value) {
+                if (is_array($value)) {
+                    $values[] = '"' . $this->escape(implode(', ',$value)) . '"';
+                } else if (empty($value)) {
+                    $values[] = '""';
+                } else {
+                    echo '"' . $this->escape($value);
+                }
+            }
+            echo implode(',',$values) . "\n";
+            break;
+        case 'excel':
+            $values = array();
+            foreach ($this->keys as $key) {
+                $values[] = '"' . $this->escape($row[$key]) . '"';
+            }
+            foreach ($row['details'] as $key => $value) {
+                if (is_array($value)) {
+                    $values[] = '"' . $this->escape(implode(', ',$value)) . '"';
+                } else if (empty($value)) {
+                    $values[] = '""';
+                } else {
+                    echo '"' . $this->escape($value);
+                }
+            }
+            echo implode(';',$values) . "\n";
+            break;
+        default:
+            echo $row['lastname'] . ', ' . $row['firstname'] . "\n";
+    }
+}
+?>

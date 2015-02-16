@@ -121,6 +121,62 @@
                     ));
                     ?>
                     </li>
+
+                    <li>Export everything as csv:
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'all',
+                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/csv',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export',
+                        'append' => ',&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'accepted',
+                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/csv/status/accepted',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export',
+                        'append' => ',&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'rejected',
+                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/csv/status/rejected',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export'
+                    ));
+                    ?>
+                    </li>
+
+                    <li>Export everything as Excel compatible text file:
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'all',
+                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/excel',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export',
+                        'append' => ',&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'accepted',
+                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/excel/status/accepted',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export',
+                        'append' => ',&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'rejected',
+                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/excel/status/rejected',
+                        'target' => 'blank',
+                        'resource' => 'Meetings_Model_Participants',
+                        'permission' => 'export'
+                    ));
+                    ?>
+                    </li>
                 </ul>
             </div>
         </div>
