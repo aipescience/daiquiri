@@ -587,11 +587,15 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
         CodemirrorService.clear();
     }
 
+    // init query interface
     $timeout(function() {
         for (var option in $scope.options) QueryService.options[option] = $scope.options[option];
         QueryService.startPolling();
         QueryService.activateForm();
-    }, 200);
+        $timeout(function() {
+            CodemirrorService.refresh();
+        });
+    });
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
         if (browsername == 'examples') {
