@@ -144,7 +144,7 @@ angular.module('modal', ['ngSanitize'])
     var modal = {
         'enabled': false,
         'top': 100,
-        'width': 660,
+        'width': 800,
         'maxHeight': $window.innerHeight - 100 - 100,
         'html': ''
     };
