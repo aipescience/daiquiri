@@ -34,37 +34,22 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     public function indexAction() {
         $this->view->status = 'ok';
 
-        // get the different download formats
-        // $formats = array();
-        // $this->view->adapter = array();
-        // foreach (Daiquiri_Config::getInstance()->getQueryDownloadAdapter() as $adapter) {
-        //     $formats[$adapter['format']] = $adapter['name'];
-
-        //     if (isset($adapter['description'])) {
-        //         $this->view->adapter[] = array(
-        //             'name' => $adapter['name'],
-        //             'description' => $adapter['description']
-        //         );
-        //     }
-        // }
-        // $this->view->downloadForm = new Query_Form_Download(array(
-        //     'formats' => $formats
-        // ));
-
         // get the forms to display
-        $this->view->options = array(
+        $options = array(
             'defaultForm' => Null,
             'polling' => Daiquiri_Config::getInstance()->query->polling->toArray(),
             'forms' => array()
         );
 
         foreach(Daiquiri_Config::getInstance()->query->forms as $key => $form) {
-            if ($form->default) $this->view->options['defaultForm'] = $key;
-            $this->view->options['forms'][] = array(
+            if ($form->default) $options['defaultForm'] = $key;
+            $options['forms'][] = array(
                 'key' => $key,
                 'title' => $form->title
             );
         }
+
+        $this->view->options = $options;
 
         // check if samp is enabled
         if (Daiquiri_Config::getInstance()->query->samp && Daiquiri_Auth::getInstance()->getCurrentUsername() !== 'guest') {

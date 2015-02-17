@@ -41,6 +41,9 @@ class Query_Form_Element_Queues extends Zend_Form_Element_Select {
         // set decorators
         $this->setDecorators(array('ViewHelper', 'Label'));
 
+        // set label
+        $this->setLabel('Queue');
+
         // set multioptions and attributes
         $entries = array();
         $attribs = array();

@@ -55,8 +55,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
      * @return string $queue
      */
     public function getQueue() {
-        $value = str_replace('sql_queue_', '', $this->getValue('sql_queue_value'));
-        return $value;
+        return $this->getValue('sql_queues');
     }
 
     /**
@@ -123,7 +122,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         $this->addTablenameElement('sql_tablename');
         $this->addSubmitButtonElement('sql_submit','Submit new SQL Query');
         $this->addClearInputButtonElement('sql_clear','Clear input window');
-        $this->addQueuesElement('sql_queue');
+        $this->addQueuesElement('sql_queues');
 
         // add display groups
         $this->addInlineGroup(array('sql_bar'), 'sql-bar-group');
@@ -131,10 +130,11 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
 
         $this->addDisplayGroup(array('sql_tablename'), 'sql-table-group', false, true);
 
-        $this->addInlineGroup(array('sql_submit','sql_clear' /*,'sql_queue'*/), 'sql-button-group');
+        $this->addQueuesGroup(array('sql_queues'), 'sql-queues-group');
+        $this->addInlineGroup(array('sql_submit','sql_clear'), 'sql-button-group');
 
         // angularify form
-        $this->addAngularDecorators('sql',array('sql_query','sql_tablename'));
+        $this->addAngularDecorators('sql',array('sql_query','sql_tablename','sql_queues'));
     }
 
 }

@@ -60,7 +60,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
      * @return string $queue
      */
     public function getQueue() {
-        return $this->getValue('cone_queue');
+        return $this->getValue('cone_queues');
     }
 
     /**
@@ -77,9 +77,11 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         $this->addQueuesElement('cone_queues');
 
         // add display groups
-        $this->addHorizontalGroup(array('cone_ra','cone_dec','cone_radius'), 'cone_values-group');
-        $this->addDisplayGroup(array('cone_tablename'), 'cone_table-group', false, true);
-        $this->addInlineGroup(array('cone_submit','cone_queues'), 'cone_button-group');
+        $this->addHorizontalGroup(array('cone_ra','cone_dec','cone_radius'), 'cone-values-group');
+        $this->addDisplayGroup(array('cone_tablename'), 'cone-table-group', false, true);
+
+        $this->addQueuesGroup(array('cone_queues'), 'cone-queues-group');
+        $this->addInlineGroup(array('cone_submit'), 'cone-button-group');
 
         // fill elements with default values
         $this->setDefault('cone_ra', $this->_formOptions['raDefault']);
@@ -87,7 +89,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
         $this->setDefault('cone_radius', $this->_formOptions['radiusDefault']);
 
         // angularify form
-        $this->addAngularDecorators('cone',array('cone_ra','cone_dec','cone_radius','cone_tablename'));
+        $this->addAngularDecorators('cone',array('cone_ra','cone_dec','cone_radius','cone_tablename','cone_queues'));
     }
 
 }

@@ -141,27 +141,24 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
      * @param string $name name of the form element
      */
     public function addQueuesElement($name) {
-
-        // $this->_queues = array(
-        //     array(
-        //         'id' => 1,
-        //         'name' => 'foo',
-        //         'timeout' => 23,
-        //         'priority' => 42
-        //     ),
-        //     array(
-        //         'id' => 2,
-        //         'name' => 'bar',
-        //         'timeout' => 23,
-        //         'priority' => 42
-        //     )
-        // );
-
         if (!empty($this->_queues)) {
             $this->addElement(new Query_Form_Element_Queues($name, array(
-                'queues' => $this->_queues
+                'queues' => $this->_queues,
+                'class' => 'daiquiri-query-queues',
+                'value' => $this->_defaultQueue['id']
             )));
         }
+    }
+
+    /**
+     * Adds a form group for the queues element
+     * @param array $elements array of form element names
+     * @param string $name    name of the group
+     */
+    public function addQueuesGroup(array $elements, $name = 'queues-group') {
+        $this->addInlineGroup($elements, $name);
+        $group = $this->getDisplayGroup($name);
+        $group->setAttrib('class','form-inline daiquiri-query-queues-group');
     }
 
     /**

@@ -234,11 +234,20 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     };
 }]);
 
-app.factory('SubmitService', ['$http','QueryService','BrowserService',function($http,QueryService,BrowserService) {
+app.factory('SubmitService', ['$http','$timeout','QueryService','BrowserService',function($http,$timeout,QueryService,BrowserService) {
     var values = {};
     var errors = {};
 
     var base = angular.element('base').attr('href');
+
+    // init queues field
+    $timeout(function() {
+        angular.element('.daiquiri-query-queues').each(function(key,element) {
+            var id = angular.element(element).attr('id');
+            var value = angular.element('[selected="selected"]',element).attr('value');
+            values[id] = value;
+        });
+    });
 
     return {
         values: values,
@@ -610,8 +619,6 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
 }]);
 
 app.controller('SubmitController',['$scope','QueryService','SubmitService','CodemirrorService',function($scope,QueryService,SubmitService,CodemirrorService) {
-
-    /* form submission */
 
     $scope.values = SubmitService.values;
     $scope.errors = SubmitService.errors;
