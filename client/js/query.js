@@ -50,7 +50,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
 
     function poll() {
         fetchAccount();
-        if (options.polling.enabled) {
+        if (options.polling.enabled == true) {
             $timeout(poll, options.polling.timeout);
         }
     }
