@@ -54,6 +54,7 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
         // get the forms to display
         $this->view->options = array(
             'defaultForm' => Null,
+            'polling' => Daiquiri_Config::getInstance()->query->polling->toArray(),
             'forms' => array()
         );
 

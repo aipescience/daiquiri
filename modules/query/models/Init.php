@@ -147,6 +147,10 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'user' => '500 MB',
                 'admin' => '1.5 GB',
             ),
+            'polling' => array(
+                'enabled' => true,
+                'timeout' => 2000
+            ),
             'download' => array(
                 'type' => 'direct', // or gearman
                 'dir' => "/var/lib/daiquiri/download",

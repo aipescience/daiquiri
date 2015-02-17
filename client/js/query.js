@@ -48,6 +48,17 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
 
     var base = angular.element('base').attr('href');
 
+    function poll() {
+        fetchAccount();
+        if (options.polling.enabled) {
+            $timeout(poll, options.polling.timeout);
+        }
+    }
+
+    function startPolling() {
+        poll();
+    }
+
     function fetchAccount() {
         $http.get(base + '/query/account/').success(function(response) {
             account.jobs = response.jobs;
@@ -211,6 +222,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
         options: options,
         account: account,
         dialog: dialog,
+        startPolling: startPolling,
         fetchAccount: fetchAccount,
         activateForm: activateForm,
         activateJob: activateJob,
@@ -575,12 +587,11 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
         CodemirrorService.clear();
     }
 
-    QueryService.fetchAccount();
-
     $timeout(function() {
         for (var option in $scope.options) QueryService.options[option] = $scope.options[option];
+        QueryService.startPolling();
         QueryService.activateForm();
-    });
+    }, 200);
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
         if (browsername == 'examples') {
