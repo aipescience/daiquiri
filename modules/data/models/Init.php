@@ -70,7 +70,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
         }
 
         // create default entries
-        $defaults = array(                
+        $defaults = array(
             'writeToDB' => 0,
             'viewer' => array(
                 'removeNewline' => false,
@@ -106,47 +106,6 @@ class Data_Model_Init extends Daiquiri_Model_Init {
      * Initializes the database with the init data for the data module.
      */
     public function init() {
-        // create column entries in the data module
-        if (isset($this->_init->options['init']['data']['columns'])
-            && is_array($this->_init->options['init']['data']['columns'])) {
-            $dataColumnsModel = new Data_Model_Columns();
-            if ($dataColumnsModel->getResource()->countRows() == 0) {
-                foreach ($this->_init->options['init']['data']['columns'] as $a) {
-
-                    $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
-                    unset($a['publication_role']);
-
-                    try {
-                        $r = $dataColumnsModel->create(null, $a);
-                    } catch (Exception $e) {
-                        $this->_error("Error in creating columns metadata:\n" . $e->getMessage());
-                    }
-                    $this->_check($r, $a);
-                }
-            }
-        }
-
-        // create table entries in the data module
-        if (isset($this->_init->options['init']['data']['tables'])
-            && is_array($this->_init->options['init']['data']['tables'])) {
-            $dataTablesModel = new Data_Model_Tables();
-            if ($dataTablesModel->getResource()->countRows() == 0) {
-                foreach ($this->_init->options['init']['data']['tables'] as $a) {
-                    echo '    Generating metadata for table: ' . $a['name'] . PHP_EOL;
-
-                    $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
-                    unset($a['publication_role']);
-
-                    try {
-                        $r = $dataTablesModel->create(null, $a);
-                    } catch (Exception $e) {
-                        $this->_error("Error in creating tables metadata:\n" . $e->getMessage());
-                    }
-                    $this->_check($r, $a);
-                }
-            }
-        }
-
         // create database entries in the data module
         if (isset($this->_init->options['init']['data']['databases'])
             && is_array($this->_init->options['init']['data']['databases'])) {
@@ -166,9 +125,63 @@ class Data_Model_Init extends Daiquiri_Model_Init {
                     $this->_check($r, $a);
                 }
             }
+
+
+            // create table entries in the data module
+            if (isset($this->_init->options['init']['data']['tables'])
+                && is_array($this->_init->options['init']['data']['tables'])) {
+                // get the ids of the databases
+                $database_ids = array_flip($dataDatabasesModel->getResource()->fetchValues('name'));
+
+                $dataTablesModel = new Data_Model_Tables();
+                if ($dataTablesModel->getResource()->countRows() == 0) {
+                    foreach ($this->_init->options['init']['data']['tables'] as $a) {
+                        echo '    Generating metadata for table: ' . $a['name'] . PHP_EOL;
+
+                        $a['database_id'] = $database_ids[$a['database']];
+                        unset($a['database']);
+
+                        $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
+                        unset($a['publication_role']);
+
+                        try {
+                            $r = $dataTablesModel->create(null, $a);
+                        } catch (Exception $e) {
+                            $this->_error("Error in creating tables metadata:\n" . $e->getMessage());
+                        }
+                        $this->_check($r, $a);
+                    }
+                }
+
+                // create column entries in the data module
+                if (isset($this->_init->options['init']['data']['columns'])
+                    && is_array($this->_init->options['init']['data']['columns'])) {
+                    // get the ids of the databases
+                    $table_ids = array_flip($dataTablesModel->getResource()->fetchValues('name'));
+
+                    $dataColumnsModel = new Data_Model_Columns();
+                    if ($dataColumnsModel->getResource()->countRows() == 0) {
+                        foreach ($this->_init->options['init']['data']['columns'] as $a) {
+
+                            $a['table_id'] = $table_ids[$a['table']];
+                            unset($a['table']);
+
+                            // $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
+                            // unset($a['publication_role']);
+
+                            try {
+                                $r = $dataColumnsModel->create(null, $a);
+                            } catch (Exception $e) {
+                                $this->_error("Error in creating columns metadata:\n" . $e->getMessage());
+                            }
+                            $this->_check($r, $a);
+                        }
+                    }
+                }
+            }
         }
 
-        // create function entries in the tables module
+        // // create function entries in the tables module
         if (isset($this->_init->options['init']['data']['functions'])
             && is_array($this->_init->options['init']['data']['functions'])) {
             $dataFunctionsModel = new Data_Model_Functions();

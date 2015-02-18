@@ -126,7 +126,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Volatile()),
             )
         ));
-        $this->addSelectElement('publication_role_id', array(
+        /* $this->addSelectElement('publication_role_id', array(
             'label' => 'Published for',
             'required' => true,
             'multiOptions' => $this->_roles,
@@ -144,7 +144,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
         $this->addCheckboxElement('publication_insert', array(
             'label' => 'Allow INSERT',
             'class' => 'checkbox'
-        ));
+        )); */
 
         // obtain UCD data and provide a usable form (but only if called from a non scriptable context)
         $ucdStrings = array(

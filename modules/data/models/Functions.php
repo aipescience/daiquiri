@@ -194,8 +194,18 @@ class Data_Model_Functions extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function export() {
+        $rows = array();
+        foreach($this->getResource()->fetchRows() as $dbRow) {
+            $rows[] = array(
+                'name' => $dbRow['name'],
+                'order' => $dbRow['order'],
+                'description' => $dbRow['description'],
+                'publication_role' => Daiquiri_Auth::getInstance()->getRole($dbRow['publication_role_id'])
+            );
+        }
+
         return array(
-            'data' => array('functions' => $this->getResource()->fetchRows()),
+            'data' => array('functions' => $rows),
             'status' => 'ok'
         );
     }

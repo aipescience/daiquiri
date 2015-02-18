@@ -206,8 +206,22 @@ class Data_Model_Databases extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function export() {
+        $rows = array();
+        foreach($this->getResource()->fetchRows() as $dbRow) {
+            $rows[] = array(
+                'name' => $dbRow['name'],
+                'order' => $dbRow['order'],
+                'description' => $dbRow['description'],
+                'publication_select' => $dbRow['publication_select'],
+                'publication_update' => $dbRow['publication_update'],
+                'publication_insert' => $dbRow['publication_insert'],
+                'publication_show' => $dbRow['publication_show'],
+                'publication_role' => Daiquiri_Auth::getInstance()->getRole($dbRow['publication_role_id'])
+            );
+        }
+
         return array(
-            'data' => array('databases' => $this->getResource()->fetchRows()),
+            'data' => array('databases' => $rows),
             'status' => 'ok'
         );
     }

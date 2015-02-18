@@ -42,8 +42,11 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
         // get roles
         $roles = array_merge(array(0 => 'not published'), Daiquiri_Auth::getInstance()->getRoles());
 
+        // get list of tables
+        $tables = $tablesResource->fetchValues('name');
+
         $form = new Data_Form_Columns(array(
-            'tables' => $tablesResource->fetchValues('name'),
+            'tables' => $tables,
             'tableId' => $tableId,
             'roles' => $roles,
             'ucds' => $ucdsResource->fetchRows(),
@@ -208,8 +211,25 @@ class Data_Model_Columns extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function export() {
+        // get databases
+        $tablesModel = new Data_Model_Tables();
+        $tables = $tablesModel->getResource()->fetchValues('name');
+
+        $rows = array();
+        foreach($this->getResource()->fetchRows() as $dbRow) {
+            $rows[] = array(
+                'table' => $tables[$dbRow['table_id']],
+                'name' => $dbRow['name'],
+                'order' => $dbRow['order'],
+                'description' => $dbRow['description'],
+                'type' => $dbRow['type'],
+                'unit' => $dbRow['unit'],
+                'ucd' => $dbRow['ucd'],
+            );
+        }
+
         return array(
-            'data' => array('columns' => $this->getResource()->fetchRows()),
+            'data' => array('columns' => $rows),
             'status' => 'ok'
         );
     }
