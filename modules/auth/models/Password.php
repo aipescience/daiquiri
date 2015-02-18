@@ -103,7 +103,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
         $user = $this->getResource()->fetchRow($userId);
 
         // check if the code is ok
-        if ($user !== false && !empty($user['code']) && $code === $user['details']['code']) {
+        if ($user !== false && !empty($user['details']['code']) && $code === $user['details']['code']) {
             // create the form object
             $form = new Auth_Form_ResetPassword();
 
