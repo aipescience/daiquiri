@@ -32,11 +32,14 @@ class Auth_Model_Resource_Token extends Daiquiri_Model_Resource_Table {
      * @return  string  $token  the new token
      */
     public function insertRow($path) {
+        // get lifetime for token
+        $lifetime = Daiquiri_Config::getInstance()->auth->tokenLifetime;
+
         // randomly create the new token
         $token = md5(mt_rand(1,1000000));
 
         // set expiration date to tomorrow
-        $expires = date("Y-m-d\TH:i:s", time() + 60);
+        $expires = date("Y-m-d\TH:i:s", time() + $lifetime);
 
         // insert into database credentials
         $this->getAdapter()->insert('Auth_Token', array(

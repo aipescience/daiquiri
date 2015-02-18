@@ -18,31 +18,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @class   Daiquiri_Controller_Plugin_Authorization Authorization.php
- * @brief   Daiquiri API front controller plugin.
- * 
- * Class for the daiquiri front controller plugin handling the treatment of
- * the API functionality.
- * 
- */
 class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Abstract {
 
-    private $_active; //!< bool encoding if API key has been set or not
-
     /**
-     * @brief   preDispatch method - called by Front Controller before dispatch
-     * @param   Zend_Controller_Request_Abstract $request: request object
-     * 
-     * preDispatch plugin checking for the basic authorization in the http header 
-     * of the request. If the basic authorization header is given the user is 
-     * authenticated for this request only. If the authetication is not successful
-     * a HTML 401 is returned.
-     * 
-     * <b>Side effects:</b> Throws HTML 401 if API key does not match defined
-     *                      one.
-     * 
+     * Boolian if username and password have been set for this request or not
+     * @var bool
      */
+    private $_active;
 
     public function preDispatch(Zend_Controller_Request_Abstract $request) {
         parent::preDispatch($request);
@@ -50,12 +32,18 @@ class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Ab
         $username = null;
         $password = null;
 
-        if(isset($_SERVER['PHP_AUTH_USER'])) {
+        if (isset($_SERVER['PHP_AUTH_USER'])) {
             $username = $_SERVER['PHP_AUTH_USER'];
+        } else if ($request->getParam('username') !== null) {
+            $username = $request->getParam('username');
+            $request->getParam('username',null);
         }
 
-        if(isset($_SERVER['PHP_AUTH_PW'])) {
+        if (isset($_SERVER['PHP_AUTH_PW'])) {
             $password = $_SERVER['PHP_AUTH_PW'];
+        } else if ($request->getParam('password')) {
+            $password = $request->getParam('password');
+            $request->getParam('password',null);
         }
 
         // get the authorisation headers
@@ -87,14 +75,6 @@ class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Ab
         }
     }
 
-    /**
-     * @brief   postDispatch method - called by Front Controller after dispatch
-     * @param   Zend_Controller_Request_Abstract $request: request object
-     * 
-     * postDispatch plugin for destroying the session if a user was authenticated
-     * by the http authorization header.
-     * 
-     */
     public function postDispatch(Zend_Controller_Request_Abstract $request) {
         parent::postDispatch($request);
 

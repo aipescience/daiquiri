@@ -40,7 +40,6 @@ angular.module('samp', [])
     var sampConnector;
 
     var base = angular.element('base').attr('href');
-    var absBase = $location.absUrl().split('/query')[0];
 
     function getIcon() {
         // try to get favicon
@@ -130,7 +129,7 @@ angular.module('samp', [])
 
     function send(id, table, username, password) {
         // get path
-        var path = '/query/download/stream/format/votable/table/' + encodeURIComponent(table);
+        var path = '/query/download/stream/format/votable/table/' + table;
 
         var data = {
             'csrf': $cookies['XSRF-TOKEN'],
@@ -140,9 +139,15 @@ angular.module('samp', [])
         // get an auth token
         $http.post(base + '/auth/token/create', $.param(data))
             .success(function(response) {
-                // // construct url
-                var s = absBase.split('//');
-                var url = s[0] + '//' + username + ":" + response.token + "@" + s[1] + path;
+                // get credentials
+                var credentials = $.param({
+                    'username': username,
+                    'password': response.token
+                });
+
+                // construct url
+                var url = $location.protocol() + '://' + $location.host() + ':' + $location.port() + base + path + '?' + credentials;
+                console.log(url);
 
                 var message = new samp.Message('table.load.votable',{'url': url, 'name' : table});
                 var tag = Math.random().toString(36).substring(7);

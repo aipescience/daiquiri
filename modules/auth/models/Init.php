@@ -117,7 +117,8 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
             'changeEmail' => true,
             'lowerCaseUsernames' => false,
             'usernameMinLength' => 4,
-            'passwordMinLength' => 4
+            'passwordMinLength' => 4,
+            'tokenLifetime' => 60
         );
 
         // create config array
