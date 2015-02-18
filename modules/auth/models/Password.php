@@ -103,7 +103,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
         $user = $this->getResource()->fetchRow($userId);
 
         // check if the code is ok
-        if ($user !== false && !empty($user['code']) && $code === $user['code']) {
+        if ($user !== false && !empty($user['code']) && $code === $user['details']['code']) {
             // create the form object
             $form = new Auth_Form_ResetPassword();
 
@@ -125,7 +125,7 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
 
                         // log the event
                         Daiquiri_Log::getInstance()->notice("password reset by user '{$user['username']}'");
-                        
+
                         // send a notification mail to the admins
                         if (Daiquiri_Config::getInstance()->auth->mailOnChangePassword &&  $user['status'] !== 'admin') {
                             $this->getModelHelper('mail')->send('auth.changePassword', array(
