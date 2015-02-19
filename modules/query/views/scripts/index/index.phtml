@@ -255,7 +255,7 @@
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="client in clients">
-                                                <td><img ng-show="client.icon" src="{{client.icon}}"></img></td>
+                                                <td><img ng-show="client.icon" ng-src="{{client.icon}}"></img></td>
                                                 <td>{{client.name}}</td>
                                                 <td>
                                                     <a href="" ng-show="client.subs.ping" ng-click="ping(client.id)">Ping {{client.name}}</a>
