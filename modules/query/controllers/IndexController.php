@@ -51,6 +51,14 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
 
         $this->view->options = $options;
 
+        // get options for the query plan
+        $queryModel = new Query_Model_Query();
+        $this->view->plan = array(
+            'enabled' => $queryModel->canShowPlan(),
+            'editable' => $queryModel->canAlterPlan(),
+            'mail' => Daiquiri_Config::getInstance()->query->processor->mail->enabled,
+        );
+
         // check if samp is enabled
         if (Daiquiri_Config::getInstance()->query->samp && Daiquiri_Auth::getInstance()->getCurrentUsername() !== 'guest') {
             $this->view->samp = true;

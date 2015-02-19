@@ -137,6 +137,39 @@
                                 <?php echo $this->action('index', 'form', 'query', array('form' => $form['key'])); ?>
                             </div>
                             <?php endforeach; ?>
+
+                            <?php if (!empty($this->plan['enabled'])): ?>
+                            <div daiquiri-modal transclude>
+                                <h2>Query plan</h2>
+                                <form id="plan" name="plan" class="daiquiri-form">
+                                    <fieldset class="daiquiri-form-group">
+                                        <div class="control-group">
+                                            <div class="controls">
+                                                <?php if (empty($this->plan['editable'])): ?>
+                                                <textarea id="plan_query" class="daiquiri-query-plan" readonly>{{dialog.values.plan}}</textarea>
+                                                <?php else: ?>
+                                                <textarea id="plan_query" class="daiquiri-query-plan codemirror"></textarea>
+                                                <?php endif; ?>
+                                                <ul class="unstyled text-error" ng-show="errors.plan_query">
+                                                    <li ng-repeat="error in errors.plan_query">{{error}}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    <?php if (!empty($this->plan['mail'])): ?>
+                                    <fieldset class="daiquiri-form-inline-group inline">
+                                        <button type="button" class="linkbutton daiquiri-query-plan-mail-button">
+                                            Send this plan as a bug report to the Daiquiri developers (opens a new window/tab).
+                                        </button>
+                                    </fieldset>
+                                    <?php endif; ?>
+                                    <fieldset id="fieldset-actiongroup" class="form-action">
+                                        <input type="submit" name="submit" value="Submit this plan" class="btn btn-primary" ng-click="submitPlan()" />
+                                        <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
+                                    </fieldset>
+                                </form>
+                            </div>
+                            <?php endif; ?>
                         </div>
 
                         <!-- job overview tab -->
@@ -450,5 +483,4 @@
             </fieldset>
         </form>
     </div>
-
 </div>

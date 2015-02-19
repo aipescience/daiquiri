@@ -111,30 +111,30 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
                 // take a detour to the query plan
                 if ($model->canShowPlan()) {
-                    // // store query, tablename and queue in session
-                    // Zend_Session::namespaceUnset('query_plan');
-                    // $ns = new Zend_Session_Namespace('query_plan');
-                    // $ns->sql = $sql;
-                    // $ns->tablename = $tablename;
+                    // store query, tablename and queue in session
+                    Zend_Session::namespaceUnset('query_plan');
+                    $ns = new Zend_Session_Namespace('query_plan');
+                    $ns->sql = $sql;
+                    $ns->tablename = $tablename;
 
-                    // if (isset($options['queue'])) {
-                    //     $ns->queue = $options['queue'];
-                    // } else {
-                    //     $ns->queue = null;
-                    // }
+                    if (isset($options['queue'])) {
+                        $ns->queue = $options['queue'];
+                    } else {
+                        $ns->queue = null;
+                    }
 
-                    // $ns->plan = $model->plan($sql, $errors);
+                    $ns->plan = $model->plan($sql, $errors);
 
-                    // if (!empty($errors)) {
-                    //     return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
-                    // }
+                    if (!empty($errors)) {
+                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
+                    }
 
-                    // // construct response with redirect to plan
-                    // $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
-                    // return array(
-                    //     'status' => 'plan',
-                    //     'redirect' => $baseurl . '/query/form/plan?form=' . $formstring,
-                    // );
+                    // construct response with redirect to plan
+                    $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
+                    return array(
+                        'status' => 'plan',
+                        'redirect' => $baseurl . '/query/form/plan?form=' . $formstring,
+                    );
                 } else {
                     // submit query
                     $response = $model->query($sql, false, $tablename, $options);
@@ -210,7 +210,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
         // validate form
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
-                // get values 
+                // get values
                 $values = $form->getValues();
 
                 if ($model->canAlterPlan()) {
@@ -258,7 +258,8 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
         return array(
             'form' => $form,
-            'status' => 'form'
+            'status' => 'form',
+            'query' => $outString
         );
     }
 

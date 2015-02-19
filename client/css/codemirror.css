@@ -27,8 +27,7 @@
     overflow: hidden;
     background-color: white;
     width: 700px;
-
-    height: 240px;
+    height: auto;
 
     /* Copied from Bootstrap's textarea */
     display: inline-block;

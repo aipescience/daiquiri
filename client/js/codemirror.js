@@ -24,7 +24,9 @@ angular.module('codemirror', [])
         restrict: 'C', // only for the .codemirror class
         link: function(scope, elements) {
             elements.each(function(key,element) {
-                CodemirrorService.elements[key] = CodeMirror.fromTextArea(element, {
+                var id = angular.element(element).attr('id');
+
+                CodemirrorService.elements[id] = CodeMirror.fromTextArea(element, {
                     mode: 'text/x-mysql',
                     indentWithTabs: false,
                     smartIndent: true,
@@ -33,7 +35,7 @@ angular.module('codemirror', [])
                     lineWrapping: true,
                     autofocus: true
                 });
-                CodemirrorService.elements[key].setSize(angular.element(element).width(),null);
+                CodemirrorService.elements[id].setSize(angular.element(element).width(),null);
             });
         }
     };
@@ -44,9 +46,7 @@ angular.module('codemirror', [])
 
     return {
         elements: elements,
-        insert: function (string, key) {
-            if (angular.isUndefined(key)) key = 0;
-
+        insert: function (key, string) {
             var pos = elements[key].getCursor();
             pos['ch'] += string.length;
             elements[key].replaceSelection(string);
@@ -54,19 +54,16 @@ angular.module('codemirror', [])
             elements[key].focus();
         },
         clear: function(key) {
-            if (angular.isUndefined(key)) key = 0;
-
             elements[key].setValue('');
         },
         refresh: function(key) {
-            if (angular.isUndefined(key)) key = 0;
-
             elements[key].refresh();
         },
-        save: function() {
-            angular.forEach(elements,function(object, key) {
-                object.save();
-            });
+        save: function(key) {
+            elements[key].save();
+        },
+        setReadOnly: function(key) {
+            elements[key].readOnly = true;
         }
     };
 }]);

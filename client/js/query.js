@@ -234,7 +234,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     };
 }]);
 
-app.factory('SubmitService', ['$http','$timeout','QueryService','BrowserService',function($http,$timeout,QueryService,BrowserService) {
+app.factory('SubmitService', ['$http','$timeout','$cookies','QueryService','BrowserService','CodemirrorService',function($http,$timeout,$cookies,QueryService,BrowserService,CodemirrorService) {
     var values = {};
     var errors = {};
 
@@ -247,6 +247,7 @@ app.factory('SubmitService', ['$http','$timeout','QueryService','BrowserService'
             var value = angular.element('[selected="selected"]',element).attr('value');
             values[id] = value;
         });
+
     });
 
     return {
@@ -255,6 +256,11 @@ app.factory('SubmitService', ['$http','$timeout','QueryService','BrowserService'
         submitQuery: function(formName) {
             var data = {};
             data[formName + '_csrf'] = $('#' + formName + '_csrf').attr('value');
+
+            if (formName == 'sql') {
+                CodemirrorService.save('sql_query');
+                values[angular.element('.codemirror').attr('id')] = angular.element('.codemirror').val();
+            }
 
             // merge with form values of THIS form
             angular.forEach(values, function (value, key) {
@@ -269,19 +275,56 @@ app.factory('SubmitService', ['$http','$timeout','QueryService','BrowserService'
             $http.post(base + '/query/form/?form=' + formName,$.param(data)).success(function(response) {
                 if (response.status == 'ok') {
                     QueryService.fetchAccount();
+                } else if (response.status == 'plan') {
+                    $http.get(response.redirect).success(function(res) {
+                        QueryService.showDialog('plan');
+                        if (res.editable) {
+                            CodemirrorService.clear('plan_query');
+                            $timeout(function() {
+                                CodemirrorService.insert('plan_query', res.query);
+                                CodemirrorService.refresh('plan_query');
+                            }, 100);
+                        } else {
+                            QueryService.dialog.values.plan = res.query;
+                        }
+                    }).error(function () {
+                        errors = {'form': ['Could not connect to server.']};
+                    });
                 } else if (response.status == 'error') {
                     angular.forEach(response.errors, function(error, key) {
                         errors[key] = error;
                     });
                 } else {
-                    errors = {
-                        'form': ['Unknown response.']
-                    };
+                    console.log(respnse);
+                    errors = {'form': ['Unknown response.']};
                 }
             }).error(function () {
-                errors = {
-                    'form': ['Could not connect to server.']
-                };
+                errors = {'form': ['Could not connect to server.']};
+            });
+        },
+        submitPlan: function() {
+            if (angular.element('#plan_query.codemirror').length !== 0) {
+                CodemirrorService.save('plan_query');
+            }
+
+            $http.post(base + '/query/form/plan',$.param({
+                'plan_csrf': $cookies['XSRF-TOKEN'],
+                'plan_query': angular.element('#plan_query').val()
+            })).success(function(response) {
+                if (response.status == 'ok') {
+                    QueryService.fetchAccount();
+                    QueryService.hideDialog();
+                } else if (response.status == 'error') {
+                    console.log(response);
+                    angular.forEach(response.errors, function(error, key) {
+                        errors[key] = error;
+                    });
+                } else {
+                    console.log(response);
+                    errors = {'form': ['Unknown response.']};
+                }
+            }).error(function () {
+                errors = {'form': ['Could not connect to server.']};
             });
         }
     };
@@ -548,7 +591,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
     };
 }]);
 
-app.controller('QueryController',['$scope','$timeout','QueryService','CodemirrorService','ModalService',function($scope,$timeout,QueryService,CodemirrorService,ModalService) {
+app.controller('QueryController',['$scope','$timeout','QueryService','SubmitService','CodemirrorService','ModalService',function($scope,$timeout,QueryService,SubmitService,CodemirrorService,ModalService) {
 
     $scope.account = QueryService.account;
     $scope.dialog  = QueryService.dialog;
@@ -586,14 +629,14 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
 
         $scope.activateForm('sql');
         $timeout(function() {
-            CodemirrorService.clear();
-            CodemirrorService.insert(query);
-            CodemirrorService.refresh();
+            CodemirrorService.clear('sql_query');
+            CodemirrorService.insert('sql_query',query);
+            CodemirrorService.refresh('sql_query');
         });
     };
 
     $scope.clearInput = function() {
-        CodemirrorService.clear();
+        CodemirrorService.clear('sql_query');
     }
 
     // init query interface
@@ -602,36 +645,35 @@ app.controller('QueryController',['$scope','$timeout','QueryService','Codemirror
         QueryService.startPolling();
         QueryService.activateForm();
         $timeout(function() {
-            CodemirrorService.refresh();
+            CodemirrorService.refresh('sql_query');
         });
     });
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
         if (browsername == 'examples') {
             // empty the query input textarea
-            CodemirrorService.clear();
+            CodemirrorService.clear('sql_query');
         }
 
         // insert the sting into the codemirror textarea
-        CodemirrorService.insert(value + ' ');
+        CodemirrorService.insert('sql_query', value + ' ');
     });
 
 }]);
 
-app.controller('SubmitController',['$scope','QueryService','SubmitService','CodemirrorService',function($scope,QueryService,SubmitService,CodemirrorService) {
+app.controller('SubmitController',['$scope','QueryService','SubmitService',function($scope,QueryService,SubmitService) {
 
     $scope.values = SubmitService.values;
     $scope.errors = SubmitService.errors;
 
     $scope.submitQuery = function(formName,event) {
-        console.log();
-        if (formName == 'sql') {
-            CodemirrorService.save();
-            $scope.values[angular.element('.codemirror').attr('id')] = angular.element('.codemirror').val();
-        }
         SubmitService.submitQuery(formName);
         event.preventDefault()
     };
+
+    $scope.submitPlan = function() {
+        SubmitService.submitPlan();
+    }
 }]);
 
 app.controller('BarController',['$scope','BarService',function($scope,BarService) {

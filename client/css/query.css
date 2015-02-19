@@ -34,6 +34,11 @@
 }
 
 /* forms */
+
+form#sql .CodeMirror {
+    height: 240px;
+}
+
 .daiquiri-query-queues-group {
     float: right;
 }
@@ -42,6 +47,21 @@
 }
 .daiquiri-query-queues-group label {
     margin-right: 10px;
+}
+
+/* plan */
+
+form#plan .CodeMirror {
+    height: 400px;
+}
+
+.daiquiri-query-plan {
+    width: 756px;
+    height: 400px;
+    resize: none;
+}
+.daiquiri-query-plan-mail-button {
+    margin-bottom: 10px;
 }
 
 /* download tab */

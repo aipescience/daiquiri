@@ -22,7 +22,7 @@
 <div class="main">
     <?php if ($this->status === 'ok'): ?>
         <p>Query successfully submitted.</p>
-    <?php elseif ($this->status === 'redirect'): ?>
+    <?php elseif ($this->status === 'plan'): ?>
         <?php $this->redirector($this->redirect); ?>
     <?php else: ?>
         <h4><?php echo $this->formOptions['title']; ?></h4>
