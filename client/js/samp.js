@@ -139,32 +139,39 @@ angular.module('samp', [])
         // get an auth token
         $http.post(base + '/auth/token/create', $.param(data))
             .success(function(response) {
-                // get credentials
-                var credentials = $.param({
-                    'username': username,
-                    'password': response.token
-                });
-
-                // construct url
-                var url = $location.protocol() + '://' + $location.host() + ':' + $location.port() + base + path + '?' + credentials;
-                console.log(url);
-
-                var message = new samp.Message('table.load.votable',{'url': url, 'name' : table});
-                var tag = Math.random().toString(36).substring(7);
-                var callback = function(responderId, msgTag, response) {
-                    $timeout(function () {
-                        if (response['samp.status'] == "samp.ok") {
-                            info = {'tag': tag, 'text': 'The table was successfully transfered to ' + clients[id].name + '.'};
-                        } else {
-                            info = {'tag': tag, 'text': 'An error occured.'};
-                            console.log(response);
-                        }
+                if (response.status == 'ok') {
+                    // get credentials
+                    var credentials = $.param({
+                        'username': username,
+                        'password': response.token
                     });
+                    console.log(response);
+                    // construct url
+                    var url = $location.protocol() + '://' + $location.host() + ':' + $location.port() + base + path + '?' + credentials;
+                    console.log(url);
 
-                    delete sampClientTracker.replyHandler[tag];
+                    var message = new samp.Message('table.load.votable',{'url': url, 'name' : table});
+                    var tag = Math.random().toString(36).substring(7);
+                    var callback = function(responderId, msgTag, response) {
+                        $timeout(function () {
+                            if (response['samp.status'] == "samp.ok") {
+                                info = {'tag': tag, 'text': 'The table was successfully transfered to ' + clients[id].name + '.'};
+                            } else {
+                                info = {'tag': tag, 'text': 'An error occured when tranfering the table to ' + clients[id].name + '.'};
+                                console.log(response);
+                            }
+                        });
+
+                        delete sampClientTracker.replyHandler[tag];
+                    }
+                    sampClientTracker.replyHandler[tag] = callback;
+                    sampConnector.connection.call([id, tag, message], null, callback);
+                } else {
+                    $timeout(function () {
+                        console.log(response);
+                        info = {'tag': null, 'text': 'An error occured when obtaining the token from the server.'};
+                    });
                 }
-                sampClientTracker.replyHandler[tag] = callback;
-                sampConnector.connection.call([id, tag, message], null, callback);
 
             })
             .error(function (response,status) {

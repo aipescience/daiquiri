@@ -156,9 +156,11 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
      * @param string $name    name of the group
      */
     public function addQueuesGroup(array $elements, $name = 'queues-group') {
-        $this->addInlineGroup($elements, $name);
-        $group = $this->getDisplayGroup($name);
-        $group->setAttrib('class','form-inline daiquiri-query-queues-group');
+        if (!empty($this->_queues)) {
+            $this->addInlineGroup($elements, $name);
+            $group = $this->getDisplayGroup($name);
+            $group->setAttrib('class','form-inline daiquiri-query-queues-group');
+        }
     }
 
     /**
@@ -169,6 +171,10 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
         // set aangular attributes to form
         $this->setAttrib('name',$name);
         $this->setAttrib('ng-submit',"submitQuery('{$name}',\$event)");
+
+        if (empty($this->_queues)) {
+            array_pop($elements);
+        }
 
         // add angular model and error model decorators to elements
         foreach ($elements as $name) {

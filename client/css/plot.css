@@ -1,0 +1,57 @@
+/*
+ *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
+ *                           Adrian M. Partl <apartl@aip.de>,
+ *                           AIP E-Science (www.aip.de)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#plot-area {
+    padding: 20px 0 0 0;
+}
+#plot-canvas {
+    height: 400px;
+    margin-left: 30px;
+}
+#plot-xlabel,
+#plot-ylabel {
+    height: 20px;
+    text-align: center;
+}
+#plot-ylabel {
+    width: 440px;
+    float: left;
+
+    transform: rotate(-90deg);
+    transform-origin: left top 0;
+}
+#plot-form .control-group:first-child {
+    float: left;
+}
+#plot-form .control-group:last-child {
+    float: right;
+}
+#plot-form .control-group label {
+    line-height: 30px;
+    margin-bottom: 0;
+}
+#plot-form .daiquiri-widget fieldset:first-child {
+    margin-top: 10px;
+}
+#plot-form .daiquiri-widget fieldset:last-child .control-group {
+    margin-bottom: 0;
+}
+#plot-form .control-group ul.text-error {
+    margin-left: 80px;
+}

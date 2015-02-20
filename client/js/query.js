@@ -17,12 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','modal','browser','codemirror','samp','ngCookies']);
+var app = angular.module('query',['table','modal','browser','plot','codemirror','samp','ngCookies']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
+
+/* services */
 
 app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService','PlotService',function($http,$timeout,$cookies,filterFilter,ModalService,PlotService) {
     // query options, will be set inside the template via ng-init
@@ -47,6 +49,11 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     };
 
     var base = angular.element('base').attr('href');
+
+    function init() {
+        startPolling();
+        activateForm();
+    }
 
     function poll() {
         fetchAccount();
@@ -222,7 +229,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
         options: options,
         account: account,
         dialog: dialog,
-        startPolling: startPolling,
+        init: init,
         fetchAccount: fetchAccount,
         activateForm: activateForm,
         activateJob: activateJob,
@@ -234,99 +241,155 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     };
 }]);
 
-app.factory('SubmitService', ['$http','$timeout','$cookies','QueryService','BrowserService','CodemirrorService',function($http,$timeout,$cookies,QueryService,BrowserService,CodemirrorService) {
+app.factory('SubmitService', ['$http','$timeout','$cookies','QueryService','CodemirrorService',function($http,$timeout,$cookies,QueryService,CodemirrorService) {
     var values = {};
     var errors = {};
 
     var base = angular.element('base').attr('href');
 
-    // init queues field
-    $timeout(function() {
-        angular.element('.daiquiri-query-queues').each(function(key,element) {
-            var id = angular.element(element).attr('id');
-            var value = angular.element('[selected="selected"]',element).attr('value');
-            values[id] = value;
-        });
+    function init() {
+        $timeout(function() {
+            // refresh codemirror
+            CodemirrorService.refresh('sql_query');
 
-    });
+            // init queues field
+            angular.element('.daiquiri-query-queues').each(function(key,element) {
+                var id = angular.element(element).attr('id');
+                var value = angular.element('[selected="selected"]',element).attr('value');
+                values[id] = value;
+            });
+        });
+    }
+
+    function submitted(response) {
+        console.log(response);
+        if (response.job.status == 'success') {
+            QueryService.activateJob(response.job.id);
+        } else {
+            QueryService.showDialog('submitted');
+            QueryService.dialog.values.table = response.job.table;
+        }
+        QueryService.fetchAccount();
+    }
+
+    function plan(response) {
+        // get the plan from the server
+        $http.get(response.redirect).success(function(res) {
+            // show the plan dialog
+            QueryService.showDialog('plan');
+
+            // codemirrorfy when the plan is editable
+            if (angular.element('#plan_query.codemirror').length !== 0) {
+                CodemirrorService.clear('plan_query');
+                $timeout(function() {
+                    CodemirrorService.insert('plan_query', res.query);
+                    CodemirrorService.refresh('plan_query');
+                }, 100);
+            } else {
+                QueryService.dialog.values.plan = res.query;
+            }
+        }).error(function () {
+            errors = {'form': ['Could not connect to server.']};
+        });
+    }
+
+    function submitQuery(formName) {
+        var data = {};
+        data[formName + '_csrf'] = $('#' + formName + '_csrf').attr('value');
+
+        if (formName == 'sql') {
+            CodemirrorService.save('sql_query');
+            values[angular.element('.codemirror').attr('id')] = angular.element('.codemirror').val();
+        }
+
+        // merge with form values of THIS form
+        angular.forEach(values, function (value, key) {
+            if (key.indexOf(formName + '_') === 0) {
+                data[key] = value;
+            }
+        })
+
+        // reset errors for all forms
+        for (var error in errors) delete errors[error];
+
+        $http.post(base + '/query/form/?form=' + formName,$.param(data)).success(function(response) {
+            if (response.status == 'ok') {
+                submitted(response);
+            } else if (response.status == 'plan') {
+                plan(response);
+            } else if (response.status == 'error') {
+                console.log(response);
+                angular.forEach(response.errors, function(error, key) {
+                    errors[key] = error;
+                });
+            } else {
+                console.log(response);
+                errors = {'form': ['Unknown response.']};
+            }
+        }).error(function () {
+            errors = {'form': ['Could not connect to server.']};
+        });
+    }
+
+    function submitPlan() {
+        if (angular.element('#plan_query.codemirror').length !== 0) {
+            CodemirrorService.save('plan_query');
+        }
+
+        $http.post(base + '/query/form/plan',$.param({
+            'plan_csrf': $cookies['XSRF-TOKEN'],
+            'plan_query': angular.element('#plan_query').val()
+        })).success(function(response) {
+            if (response.status == 'ok') {
+                submitted(response);
+            } else if (response.status == 'error') {
+                console.log(response);
+                angular.forEach(response.errors, function(error, key) {
+                    errors[key] = error;
+                });
+            } else {
+                console.log(response);
+                errors = {'form': ['Unknown response.']};
+            }
+        }).error(function () {
+            errors = {'form': ['Could not connect to server.']};
+        });
+    }
+
+    function pasteQuery() {
+        QueryService.activateForm('sql');
+
+        var query = angular.element('#overview-query')[0].innerText;
+        $timeout(function() {
+            CodemirrorService.clear('sql_query');
+            CodemirrorService.insert('sql_query',query);
+            CodemirrorService.refresh('sql_query');
+        });
+    }
+
+    function clearInput() {
+        CodemirrorService.clear('sql_query');
+    }
+
+    function insertIntoQuery(browsername,value) {
+        if (browsername == 'examples') {
+            // empty the query input textarea
+            CodemirrorService.clear('sql_query');
+        }
+
+        // insert the sting into the codemirror textarea
+        CodemirrorService.insert('sql_query', value + ' ');
+    }
 
     return {
         values: values,
         errors: errors,
-        submitQuery: function(formName) {
-            var data = {};
-            data[formName + '_csrf'] = $('#' + formName + '_csrf').attr('value');
-
-            if (formName == 'sql') {
-                CodemirrorService.save('sql_query');
-                values[angular.element('.codemirror').attr('id')] = angular.element('.codemirror').val();
-            }
-
-            // merge with form values of THIS form
-            angular.forEach(values, function (value, key) {
-                if (key.indexOf(formName + '_') === 0) {
-                    data[key] = value;
-                }
-            })
-
-            // reset errors for all forms
-            for (var error in errors) delete errors[error];
-
-            $http.post(base + '/query/form/?form=' + formName,$.param(data)).success(function(response) {
-                if (response.status == 'ok') {
-                    QueryService.fetchAccount();
-                } else if (response.status == 'plan') {
-                    $http.get(response.redirect).success(function(res) {
-                        QueryService.showDialog('plan');
-                        if (res.editable) {
-                            CodemirrorService.clear('plan_query');
-                            $timeout(function() {
-                                CodemirrorService.insert('plan_query', res.query);
-                                CodemirrorService.refresh('plan_query');
-                            }, 100);
-                        } else {
-                            QueryService.dialog.values.plan = res.query;
-                        }
-                    }).error(function () {
-                        errors = {'form': ['Could not connect to server.']};
-                    });
-                } else if (response.status == 'error') {
-                    angular.forEach(response.errors, function(error, key) {
-                        errors[key] = error;
-                    });
-                } else {
-                    console.log(respnse);
-                    errors = {'form': ['Unknown response.']};
-                }
-            }).error(function () {
-                errors = {'form': ['Could not connect to server.']};
-            });
-        },
-        submitPlan: function() {
-            if (angular.element('#plan_query.codemirror').length !== 0) {
-                CodemirrorService.save('plan_query');
-            }
-
-            $http.post(base + '/query/form/plan',$.param({
-                'plan_csrf': $cookies['XSRF-TOKEN'],
-                'plan_query': angular.element('#plan_query').val()
-            })).success(function(response) {
-                if (response.status == 'ok') {
-                    QueryService.fetchAccount();
-                    QueryService.hideDialog();
-                } else if (response.status == 'error') {
-                    console.log(response);
-                    angular.forEach(response.errors, function(error, key) {
-                        errors[key] = error;
-                    });
-                } else {
-                    console.log(response);
-                    errors = {'form': ['Unknown response.']};
-                }
-            }).error(function () {
-                errors = {'form': ['Could not connect to server.']};
-            });
-        }
+        init: init,
+        submitQuery: submitQuery,
+        submitPlan: submitPlan,
+        pasteQuery: pasteQuery,
+        clearInput: clearInput,
+        insertIntoQuery: insertIntoQuery
     };
 }]);
 
@@ -370,152 +433,6 @@ app.factory('BarService', ['BrowserService',function(BrowserService) {
     };
 }]);
 
-app.factory('PlotService', ['$http',function($http) {
-    var values = {};
-    var errors = {};
-    var labels = {};
-
-    var base = angular.element('base').attr('href');
-
-    // initial values
-    values.plot_nrows = 100;
-    values.plot_x_scale = 'lin';
-    values.plot_y_scale = 'lin';
-
-    // function to format the tics
-    function tickFormatter(val, axis) {
-        if (val > 1000) {
-            var exp = Math.floor(Math.log(val) / Math.LN10);
-            var man = val / Math.pow(10,exp);
-            return (man).toFixed(3) + "E" + exp;
-        } else {
-            return val.toFixed(axis.tickDecimals);
-        }
-    };
-
-    return {
-        values: values,
-        errors: errors,
-        labels: labels,
-        init: function(account) {
-            values.db = account.job.database;
-            values.table = account.job.table;
-            values.plot_x = account.job.cols[1];
-            values.plot_y = account.job.cols[2];
-
-            $('#plot-canvas').children().remove();
-            for (var label in labels) delete labels[label];
-        },
-        createPlot: function() {
-            for (var error in errors) delete errors[error];
-
-            // manual validation
-            var valid = true;
-            if (angular.isUndefined(values.plot_x)) {
-                errors.plot_x = ['Please select a column'];
-                valid = false;
-            }
-            if (angular.isUndefined(values.plot_y)) {
-                errors.plot_y = ['Please select a column'];
-                valid = false;
-            }
-
-            // parse ranges
-            angular.forEach(['plot_x_min','plot_x_max'], function(key) {
-                if (values[key] === '') delete values[key];
-
-                if (!angular.isUndefined(values[key])) {
-                    var f = parseFloat(values[key]);
-                    if (isNaN(f)) {
-                        errors.plot_x_range = ['Please give a numerial value'];
-                        valid = false;
-                    } else {
-                        values[key] = f;
-                    }
-                }
-            });
-            angular.forEach(['plot_y_min','plot_y_max'], function(key) {
-                if (values[key] === '') delete values[key];
-
-                if (!angular.isUndefined(values[key])) {
-                    var f = parseFloat(values[key]);
-                    if (isNaN(f)) {
-                        errors.plot_y_range = ['Please give a numerial value'];
-                        valid = false;
-                    } else {
-                        values[key] = f;
-                    }
-                }
-            });
-
-            // return if validation fails
-            if (valid === false) return;
-
-            // obtain the data from the server
-            $http.get(base + '/data/viewer/rows/',{
-                'params': {
-                    'db': values.db,
-                    'table': values.table,
-                    'cols': values.plot_x.name + ',' + values.plot_y.name,
-                    'nrows': values.plot_nrows
-                }
-            }).success(function(response) {
-                if (response.status == 'ok') {
-                    var data = [];
-                    for (var i=0; i<response.nrows; i++) {
-                        data.push([response.rows[i].cell[0],response.rows[i].cell[1]]);
-                    }
-
-                    // create plot
-                    var options = {
-                        lines: {
-                            show: false
-                        },
-                        points: {
-                            radius: 1,
-                            show: true,
-                            fill: true
-                        },
-                        shadowSize: 0,
-                        xaxis: {
-                            tickFormatter: tickFormatter,
-                            label: 'fff'
-                        },
-                        yaxis: {
-                            tickFormatter: tickFormatter
-                        }
-                    };
-
-                    if (!angular.isUndefined(values.plot_x_min)) options.xaxis.min = values.plot_x_min;
-                    if (!angular.isUndefined(values.plot_x_max)) options.xaxis.max = values.plot_x_max;
-                    if (!angular.isUndefined(values.plot_y_min)) options.yaxis.min = values.plot_y_min;
-                    if (!angular.isUndefined(values.plot_y_max)) options.yaxis.max = values.plot_y_max;
-
-                    if (values.plot_x_scale === 'log') options.xaxis.transform = function(v) {return Math.log(v+0.0001)};
-                    if (values.plot_y_scale === 'log') options.yaxis.transform = function(v) {return Math.log(v+0.0001)};
-
-                    $.plot('#plot-canvas', [{
-                        color: "#08c",
-                        data: data
-                    }],options);
-
-                    // set axes label
-                    labels.x = values.plot_x.name;
-                    if (values.plot_x.unit.length > 0) labels.x += ' [' + values.plot_x.unit + ']';
-
-                    labels.y = values.plot_y.name;
-                    if (values.plot_y.unit.length > 0) labels.y += ' [' + values.plot_y.unit + ']';
-
-                } else {
-                    errors.form = ['There was a problem receiving the data.']
-                }
-            }).error(function () {
-                errors.form = ['Could not connect to server.']
-            });
-        }
-    };
-}]);
-
 app.factory('DownloadService', ['$http','QueryService',function($http,QueryService) {
     var values = {};
     var errors = {};
@@ -543,19 +460,16 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                     }
                 } else if (response.status == 'error') {
                     for (var error in errors) delete errors[error];
-
+                    console.log(response);
                     angular.forEach(response.errors, function(object, key) {
                         errors[key] = object;
                     });
                 } else {
-                    errors[formName] = {
-                        'form': ['Unknown response.']
-                    };
+                    console.log(response);
+                    errors[formName] = {'form': ['Unknown response.']};
                 }
             }).error(function () {
-                errors[formName] = {
-                    'form': ['Could not connect to server.']
-                };
+                errors[formName] = {'form': ['Could not connect to server.']};
             });
         },
         regenerateTable: function() {
@@ -574,24 +488,24 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                     }
                 } else if (response.status == 'error') {
                     errors[formName] = {};
+                    console.log(response);
                     angular.forEach(response.status, function(object, key) {
                         errors[key] = object;
                     });
                 } else {
-                    errors[formName] = {
-                        'form': ['Unknown response.']
-                    };
+                    console.log(response);
+                    errors[formName] = {'form': ['Unknown response.']};
                 }
             }).error(function () {
-                errors[formName] = {
-                    'form': ['Could not connect to server.']
-                };
+                errors[formName] = {'form': ['Could not connect to server.']};
             });
         }
     };
 }]);
 
-app.controller('QueryController',['$scope','$timeout','QueryService','SubmitService','CodemirrorService','ModalService',function($scope,$timeout,QueryService,SubmitService,CodemirrorService,ModalService) {
+/* controllers */
+
+app.controller('QueryController',['$scope','$timeout','QueryService','SubmitService',function($scope,$timeout,QueryService,SubmitService) {
 
     $scope.account = QueryService.account;
     $scope.dialog  = QueryService.dialog;
@@ -625,43 +539,28 @@ app.controller('QueryController',['$scope','$timeout','QueryService','SubmitServ
     }
 
     $scope.pasteQuery = function() {
-        var query = angular.element('#overview-query')[0].innerText;
-
-        $scope.activateForm('sql');
-        $timeout(function() {
-            CodemirrorService.clear('sql_query');
-            CodemirrorService.insert('sql_query',query);
-            CodemirrorService.refresh('sql_query');
-        });
+        SubmitService.pasteQuery();
     };
 
     $scope.clearInput = function() {
-        CodemirrorService.clear('sql_query');
+        SubmitService.clearInput();
     }
 
     // init query interface
     $timeout(function() {
         for (var option in $scope.options) QueryService.options[option] = $scope.options[option];
-        QueryService.startPolling();
-        QueryService.activateForm();
-        $timeout(function() {
-            CodemirrorService.refresh('sql_query');
-        });
+
+        QueryService.init();
+        SubmitService.init();
     });
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
-        if (browsername == 'examples') {
-            // empty the query input textarea
-            CodemirrorService.clear('sql_query');
-        }
-
-        // insert the sting into the codemirror textarea
-        CodemirrorService.insert('sql_query', value + ' ');
+        SubmitService.insertIntoQuery(browsername,value);
     });
 
 }]);
 
-app.controller('SubmitController',['$scope','QueryService','SubmitService',function($scope,QueryService,SubmitService) {
+app.controller('SubmitController',['$scope','SubmitService',function($scope,SubmitService) {
 
     $scope.values = SubmitService.values;
     $scope.errors = SubmitService.errors;
@@ -709,7 +608,7 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
     };
 }]);
 
-app.controller('ResultsController',['$scope','QueryService','TableService','SampService',function($scope,QueryService,TableService,SampService) {
+app.controller('ResultsController',['$scope','QueryService','TableService',function($scope,QueryService,TableService) {
 
     $scope.$watch(function() {
         return QueryService.account.job;
@@ -722,6 +621,9 @@ app.controller('ResultsController',['$scope','QueryService','TableService','Samp
             TableService.init();
         }
     });
+}]);
+
+app.controller('SampController',['$scope','SampService','QueryService',function($scope,SampService,QueryService) {
 
     $scope.clients = SampService.clients;
     $scope.errors = SampService.errors;
@@ -736,8 +638,8 @@ app.controller('ResultsController',['$scope','QueryService','TableService','Samp
         return SampService.getInfo();
     }, function (info) {
         if (info !== false) {
-            QueryService.showDialog('info');
-            QueryService.dialog.info = info.text;
+            QueryService.showDialog('samp');
+            QueryService.dialog.samp = info.text;
         }
     });
 

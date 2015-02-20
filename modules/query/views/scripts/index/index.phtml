@@ -139,7 +139,7 @@
                             <?php endforeach; ?>
 
                             <?php if (!empty($this->plan['enabled'])): ?>
-                            <div daiquiri-modal transclude>
+                            <div daiquiri-modal transclude ng-show="dialog.enabled == 'plan'">
                                 <h2>Query plan</h2>
                                 <form id="plan" name="plan" class="daiquiri-form">
                                     <fieldset class="daiquiri-form-group">
@@ -270,42 +270,56 @@
 
                         <!-- results table tab -->
 
-                        <div class="tab-pane" id="results-tab" ng-show="account.active.job" ng-controller="ResultsController">
-                            <div daiquiri-table></div>
+                        <div class="tab-pane" id="results-tab" ng-show="account.active.job">
+                            <div ng-controller="ResultsController">
+                                <div daiquiri-table></div>
+                            </div>
 
                             <?php if ($this->samp): ?>
-                            <div class="daiquiri-widget nav">
-                                <div class="nav-header">SAMP</div>
+                            <div ng-controller="SampController">
+                                <div class="daiquiri-widget nav">
+                                    <div class="nav-header">SAMP</div>
 
-                                <div class="nav-item" ng-show="connected">
-                                    <table class="table table-condensed daiquiri-samp-clients">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>Client</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="client in clients">
-                                                <td><img ng-show="client.icon" ng-src="{{client.icon}}"></img></td>
-                                                <td>{{client.name}}</td>
-                                                <td>
-                                                    <a href="" ng-show="client.subs.ping" ng-click="ping(client.id)">Ping {{client.name}}</a>
-                                                    <a href="" ng-show="client.subs.send" ng-click="send(client.id)">Send table to {{client.name}}</a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <div class="nav-item" ng-show="connected">
+                                        <table class="table table-condensed daiquiri-samp-clients">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Client</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="client in clients">
+                                                    <td><img ng-show="client.icon" ng-src="{{client.icon}}"></img></td>
+                                                    <td>{{client.name}}</td>
+                                                    <td>
+                                                        <a href="" ng-show="client.subs.ping" ng-click="ping(client.id)">Ping {{client.name}}</a>
+                                                        <a href="" ng-show="client.subs.send" ng-click="send(client.id)">Send table to {{client.name}}</a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="nav-item">
+                                        <button class="linkbutton" ng-click="register()" ng-hide="connected">Register with a local SAMP Hub</button>
+                                        <button class="linkbutton" ng-click="unregister()" ng-show="connected">Disconnect from SAMP Hub</button>
+                                    </div>
                                 </div>
-                                <div class="nav-item">
-                                    <button class="linkbutton" ng-click="register()" ng-hide="connected">Register with a local SAMP Hub</button>
-                                    <button class="linkbutton" ng-click="unregister()" ng-show="connected">Disconnect from SAMP Hub</button>
+                                <ul class="unstyled text-error" ng-show="errors.connection">
+                                    <li ng-repeat="error in errors.connection">{{error}}</li>
+                                </ul>
+
+                                <div daiquiri-modal transclude ng-show="dialog.enabled=='samp'">
+                                    <h2>SAMP</h2>
+                                    <p>{{dialog.samp}}</p>
+                                    <form name="samp" class="daiquiri-form">
+                                        <fieldset id="fieldset-passwordgroup" class="form-action">
+                                            <input type="submit" name="submit" value="Ok" class="btn btn-primary" ng-click="hideDialog()" />
+                                        </fieldset>
+                                    </form>
                                 </div>
                             </div>
-                            <ul class="unstyled text-error" ng-show="errors.connection">
-                                <li ng-repeat="error in errors.connection">{{error}}</li>
-                            </ul>
                             <?php endif; ?>
                         </div>
 
@@ -472,11 +486,12 @@
         </form>
     </div>
 
-    <!-- SAMP password modal -->
+    <!-- info modal -->
 
-    <div daiquiri-modal transclude ng-show="dialog.enabled=='info'">
-        <h2>SAMP</h2>
-        <p>{{dialog.info}}</p>
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='submitted'">
+        <h2>Query submitted</h2>
+        <p>Your query has been submitted as job {{dialog.table}}.</p>
+        <p>When the job is done you can obtain the results via the job browser on the left side.</p>
         <form name="info" class="daiquiri-form">
             <fieldset id="fieldset-passwordgroup" class="form-action">
                 <input type="submit" name="submit" value="Ok" class="btn btn-primary" ng-click="hideDialog()" />
