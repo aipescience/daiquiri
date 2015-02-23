@@ -70,7 +70,8 @@ class Core_Model_Init extends Daiquiri_Model_Init {
                 'url' => "/captcha",
             ),
             'minify' => array(
-                'enabled' => false
+                'enabled' => false,
+                'method' => 'yui'
             ),
             'libs' => array(
                 'phpSqlParser' => $this->_init->daiquiri_path . '/library/PHP-SQL-Parser/src/PHPSQLParser',

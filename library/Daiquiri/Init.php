@@ -486,7 +486,7 @@ class Daiquiri_Init {
         mkdir('public/min/css',0755,true);
         mkdir('public/min/fonts',0755,true);
 
-        echo "minifing js and css files.";
+        echo "minifing js and css files." . PHP_EOL;
 
         exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/js/daiquiri.js" );
         exec("echo '/* Automatically created file. Manual customization is not recommended. */' > public/min/css/daiquiri.css");
@@ -507,13 +507,34 @@ class Daiquiri_Init {
             $files = Daiquiri_View_Helper_HeadStatic::$files;
         }
 
+        // collect files
+        $js = array();
+        $css = array();
         foreach ($files as $file) {
             $ext = pathinfo($file, PATHINFO_EXTENSION);
             if ($ext === 'js') {
-                exec("yui-compressor " . $this->application_path . "/public/" . $file . " >> public/min/js/daiquiri.js");
+                $js[] = $this->application_path . "/public/" . $file;
             } else if ($ext === 'css') {
-                exec("yui-compressor " . $this->application_path . "/public/" . $file . " >> public/min/css/daiquiri.css");
+                $css[] = $this->application_path . "/public/" . $file;
             }
+        }
+
+        // minify files
+        switch ($this->options['config']['core']['minify']['method']) {
+            case 'yui':
+                foreach($js as $file) {
+                    exec("yui-compressor " . $file . " >> public/min/js/daiquiri.js");
+                }
+                foreach($css as $file) {
+                    exec("yui-compressor " . $file . " >> public/min/css/daiquiri.css");
+                }
+                break;
+            case 'uglify':
+                exec("uglifyjs " . implode(' ',$js) . " --compress --mangle >> public/min/js/daiquiri.js");
+                exec("uglifycss --ugly-comments " . implode(' ',$css) . " >> public/min/css/daiquiri.css");
+                break;
+            default:
+                $this->_error("Unknown value in \$options['config']['core']['minify']['method'].");
         }
 
         // take care of images
