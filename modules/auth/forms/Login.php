@@ -26,7 +26,7 @@ class Auth_Form_Login extends Auth_Form_Abstract {
     public function init() {
         $this->addCsrfElement();
 
-        // add elements 
+        // add elements
         $this->addTextElement('username', array(
             'label' => 'Username',
             'required' => true

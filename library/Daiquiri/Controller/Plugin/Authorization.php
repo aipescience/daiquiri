@@ -34,16 +34,16 @@ class Daiquiri_Controller_Plugin_Authorization extends Zend_Controller_Plugin_Ab
 
         if (isset($_SERVER['PHP_AUTH_USER'])) {
             $username = $_SERVER['PHP_AUTH_USER'];
-        } else if ($request->getParam('username') !== null) {
-            $username = $request->getParam('username');
-            $request->getParam('username',null);
+        } else if ($request->getQuery('username') !== null) {
+            $username = $request->getQuery('username');
+            $request->setParam('username',null);
         }
 
         if (isset($_SERVER['PHP_AUTH_PW'])) {
             $password = $_SERVER['PHP_AUTH_PW'];
-        } else if ($request->getParam('password')) {
-            $password = $request->getParam('password');
-            $request->getParam('password',null);
+        } else if ($request->getQuery('password')) {
+            $password = $request->getQuery('password');
+            $request->setParam('password',null);
         }
 
         // get the authorisation headers

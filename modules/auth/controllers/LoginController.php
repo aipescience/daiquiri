@@ -55,7 +55,7 @@ class Auth_LoginController extends Daiquiri_Controller_Abstract {
                 }
                 $this->_redirect($redirect);
             } else {
-                // assign to view        
+                // assign to view
                 foreach ($response as $key => $value) {
                     $this->view->$key = $value;
                 }
