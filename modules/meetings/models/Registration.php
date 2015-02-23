@@ -186,7 +186,7 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                                 $values[] = $options[$value_id];
                             }
 
-                            $mailValues[$d['key']] = $values;
+                            $mailValues[$d['key']] = implode(', ',$values);
                         } else {
                             $mailValues[$d['key']] = $participant['details'][$d['key']];
                         }
