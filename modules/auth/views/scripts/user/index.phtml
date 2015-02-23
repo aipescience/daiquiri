@@ -39,19 +39,31 @@
             <div class="daiquiri-widget">
                 <ul class="unstyled">
                     <li>Export emails:
-            <?php
-            echo $this->internalLink(array(
-                'text' => 'all',
-                'href' => '/auth/user/export/mode/mail',
-                'resource' => 'Auth_Model_User',
-                'permission' => 'export',
-                'append' => ',&nbsp;'));
-            echo $this->internalLink(array(
-                'text' => 'active',
-                'href' => '/auth/user/export/mode/mail/status/active',
-                'resource' => 'Auth_Model_User',
-                'permission' => 'export'));
-            ?>
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'all',
+                        'href' => '/auth/user/export/mode/mail',
+                        'resource' => 'Auth_Model_User',
+                        'permission' => 'export',
+                        'append' => ',&nbsp;'));
+                    echo $this->internalLink(array(
+                        'text' => 'active',
+                        'href' => '/auth/user/export/mode/mail/status/active',
+                        'resource' => 'Auth_Model_User',
+                        'permission' => 'export'));
+                    ?>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="span3">
+            <div class="daiquiri-widget">
+                <ul class="unstyled">
+                    <li>
+                        <a href="#" ng-click="search('registered')">Show newly registered users</a>
+                    </li>
+                </ul>
             </div>
         </div>
 

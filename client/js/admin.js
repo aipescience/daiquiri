@@ -114,6 +114,9 @@ app.factory('AdminService', ['$http','$window','TableService','ModalService',fun
             } else {
                 ModalService.modal.enabled = false;
             }
+        },
+        search: function(string) {
+            TableService.search(string);
         }
     };
 }]);
@@ -131,4 +134,8 @@ app.controller('AdminController', ['$scope','AdminService',function($scope,Admin
     $scope.submitForm = function() {
         AdminService.submitForm($scope.submit);
     };
+
+    $scope.search = function(string) {
+        AdminService.search(string);
+    }
 }]);
