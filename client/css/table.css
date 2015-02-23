@@ -113,7 +113,10 @@
     margin: 0;
 }
 .daiquiri-table-search button {
-    padding-top: 7px;
+    padding-top: 6px;
     padding-bottom: 6px;
-    line-height: 14px;
+}
+.daiquiri-table-search i.icon-search {
+    margin-top: 2px;
+    display: block;
 }
