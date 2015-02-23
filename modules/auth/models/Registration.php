@@ -113,7 +113,7 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
 
                 // create the user and return
                 $userId = $this->getResource()->registerUser($values);
-            
+
                 // send mail
                 $link = Daiquiri_Config::getInstance()->getSiteUrl() . '/auth/registration/validate/id/' . $userId . '/code/' . $values['code'];
                 $this->getModelHelper('mail')->send('auth.register', array(

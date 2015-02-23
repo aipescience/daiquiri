@@ -349,7 +349,9 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         $select = $this->select();
         $select->from('Auth_User', array('email'));
         $select->join('Auth_Roles', '`Auth_Roles`.`id` = `Auth_User`.`role_id`', array());
+        $select->join('Auth_Status', '`Auth_Status`.`id` = `Auth_User`.`status_id`', array());
         $select->where('role = ?', $role);
+        $select->where('status = "active"');
 
         $rows = array();
         foreach ($this->fetchAll($select) as $row) {
