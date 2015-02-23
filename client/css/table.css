@@ -109,6 +109,9 @@
 .daiquiri-table-footer p {
     line-height: 30px;
 }
+.daiquiri-table-search {
+    margin: 0;
+}
 .daiquiri-table-search button {
     padding-top: 7px;
     padding-bottom: 6px;
