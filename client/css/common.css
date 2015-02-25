@@ -262,3 +262,8 @@ li.dropdown ul ul {
 .login:first-child {
     margin-top: 60px;
 }
+
+/* tooltips */
+button .tooltip-inner {
+    text-shadow: none;
+}

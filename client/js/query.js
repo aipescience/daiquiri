@@ -24,6 +24,44 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
+/* directives */
+
+app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function($timeout,SubmitService) {
+    return {
+        restrict: 'C',
+        transclude: true,
+        scope: { id: '=' },
+        template: '<div ng-transclude ng-hide="buttons"></div><div class="btn-group" data-toggle="buttons-radio" ng-show="buttons"><button type="button" class="btn" ng-repeat="button in buttons" ng-class="{\'active\': button.selected }" ng-click="changeQueue(button.value)"><div rel="tooltip" data-placement="bottom" data-original-title="{{button.tooltip}}">{{button.label}} queue</div></button></div>',
+        link: {
+            post: function(scope, element, attrs) {
+                var id = element.attr('id');
+                var buttons = [];
+
+                var select = angular.element('select',element)
+                var model = select.attr('ng-model').replace('values.','');
+                var option = angular.element('option',select);
+
+                if (option.length <= 3) {
+                    angular.element('option',element).each(function(i, option) {
+                        var e = angular.element(option);
+                        buttons.push({
+                            value: e.attr('value'),
+                            label: e.text(),
+                            selected: !angular.isUndefined(e.attr('selected')),
+                            tooltip: select.attr('data-original-title-' + (i+1))
+                        });
+                    })
+
+                    scope.buttons = buttons;
+                    scope.changeQueue = function(value) {
+                        SubmitService.values[model] = value;
+                    };
+                }
+            }
+        }
+    };
+}])
+
 /* services */
 
 app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService','PlotService',function($http,$timeout,$cookies,filterFilter,ModalService,PlotService) {
@@ -53,6 +91,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     function init() {
         startPolling();
         activateForm();
+        $('[rel=tooltip]').tooltip();
     }
 
     function poll() {
@@ -253,9 +292,10 @@ app.factory('SubmitService', ['$http','$timeout','$cookies','QueryService','Code
             CodemirrorService.refresh('sql_query');
 
             // init queues field
-            angular.element('.daiquiri-query-queues').each(function(key,element) {
-                var id = angular.element(element).attr('id');
-                var value = angular.element('[selected="selected"]',element).attr('value');
+            angular.element('.daiquiri-query-queues').each(function(key,node) {
+                // get default value for queue
+                var id = angular.element(node).attr('id');
+                var value = angular.element('[selected="selected"]',node).attr('value');
                 values[id] = value;
             });
         });
