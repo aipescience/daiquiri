@@ -126,9 +126,9 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
 
         // add display groups
         $this->addInlineGroup(array('sql_bar'), 'sql-bar-group');
-        $this->addDisplayGroup(array('sql_query'), 'sql-input-group');
+        $this->addSimpleGroup(array('sql_query'), 'sql-input-group');
 
-        $this->addDisplayGroup(array('sql_tablename'), 'sql-table-group', false, true);
+        $this->addSimpleGroup(array('sql_tablename'), 'sql-table-group', false, true);
 
         $this->addQueuesGroup(array('sql_queues'), 'sql-queues-group');
         $this->addInlineGroup(array('sql_submit','sql_clear'), 'sql-button-group');

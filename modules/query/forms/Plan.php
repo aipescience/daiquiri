@@ -88,7 +88,7 @@ class Query_Form_Plan extends Daiquiri_Form_Abstract {
         $this->addSubmitButtonElement('plan_submit', 'Submit this plan');
         $this->addButtonElement('plan_cancel', 'Cancel');
 
-        $this->addDisplayGroup(array('plan_query'), 'input-group');
+        $this->addSimpleGroup(array('plan_query'), 'input-group');
         $this->addInlineGroup(array('plan_submit', 'plan_cancel'), 'button-group');
         if ($this->_mail) {
             $this->addInlineGroup(array('plan_mail'), 'mail-group');

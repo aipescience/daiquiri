@@ -78,7 +78,7 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
 
         // add display groups
         $this->addHorizontalGroup(array('cone_ra','cone_dec','cone_radius'), 'cone-values-group');
-        $this->addDisplayGroup(array('cone_tablename'), 'cone-table-group', false, true);
+        $this->addSimpleGroup(array('cone_tablename'), 'cone-table-group', false, true);
 
         $this->addQueuesGroup(array('cone_queues'), 'cone-queues-group');
         $this->addInlineGroup(array('cone_submit'), 'cone-button-group');

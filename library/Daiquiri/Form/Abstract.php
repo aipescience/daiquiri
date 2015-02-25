@@ -280,10 +280,10 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * @param array $elements array of form element names
      * @param string $name    name of the group
      * @param string $legend  legend for the formgroup
-     * @param bool $label     show labels of the form elements 
+     * @param bool $label     show labels of the form elements
      */
-    public function addDisplayGroup(array $elements, $name = 'simple-group', $legend = Null, $label = False) {
-        parent::addDisplayGroup($elements, $name, array(
+    public function addSimpleGroup(array $elements, $name = 'simple-group', $legend = Null, $label = False) {
+        $this->addDisplayGroup($elements, $name, array(
             'displayGroupClass' => 'Daiquiri_Form_DisplayGroup',
             'legend' => $legend,
             'label' => $label
@@ -295,10 +295,10 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * @param array $elements array of form element names
      * @param string $name    name of the group
      * @param string $legend  legend for the formgroup
-     * @param bool $label     show labels of the form elements 
+     * @param bool $label     show labels of the form elements
      */
     public function addInlineGroup(array $elements, $name = 'inline-group', $legend = Null, $label = False) {
-        parent::addDisplayGroup($elements, $name, array(
+        $this->addDisplayGroup($elements, $name, array(
             'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Inline',
             'legend' => $legend,
             'label' => $label
@@ -312,7 +312,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * @param string $legend   legend for the fieldset
      */
     public function addHorizontalGroup(array $elements, $name = 'horizontal-group', $legend = Null) {
-        parent::addDisplayGroup($elements, $name, array(
+        $this->addDisplayGroup($elements, $name, array(
             'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Horizontal',
             'legend' => $legend
         ));
@@ -325,7 +325,7 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
      * @param string $legend   legend for the fieldset
      */
     public function addActionGroup(array $elements, $name = 'action-group', $legend = Null) {
-        parent::addDisplayGroup($elements, $name, array(
+        $this->addDisplayGroup($elements, $name, array(
             'displayGroupClass' => 'Daiquiri_Form_DisplayGroup_Action',
             'legend' => $legend
         ));
