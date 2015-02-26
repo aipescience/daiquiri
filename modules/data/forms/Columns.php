@@ -80,7 +80,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
             'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
         $this->addTextareaElement('description', array(
@@ -90,7 +90,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
         $this->addTextElement('order', array(
@@ -107,7 +107,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
             'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
         $this->addTextElement('unit', array(
@@ -115,7 +115,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
             'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
         $this->addTextElement('ucd', array(
@@ -123,7 +123,7 @@ class Data_Form_Columns extends Data_Form_Abstract {
             'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
         /* $this->addSelectElement('publication_role_id', array(

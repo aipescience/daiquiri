@@ -19,17 +19,26 @@
  */
 
 /**
- * A validator which allows unicode letters and numbers and certain common 
- * special characters, which we consider save.
+ * Validator class for text input fields, which allows lower case letters, and digits.
  */
 class Daiquiri_Form_Validator_LowerCaseAlnum extends Zend_Validate_Abstract {
 
     const CHARS = 'chars';
 
+    /**
+     * Default error message produced by this validator.
+     * @var array $_messageTemplates
+     */
     protected $_messageTemplates = array(
         self::CHARS => "Only digits and lower case letters are allowed"
     );
 
+    /**
+     * Checks whether given input is valid.
+     * Allowed are: Lower case letters and digits.
+     * @param  string $value   string to validate
+     * @return bool   $isValid
+     */
     public function isValid($value) {
         $this->_setValue($value);
 

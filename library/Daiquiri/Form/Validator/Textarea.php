@@ -19,51 +19,31 @@
  */
 
 /**
- * A validator which allows unicode letters and numbers and certain common 
- * special characters, which we consider save.
- */
-
-/**
- * @class   Daiquiri_Form_Validator_Textarea Textarea.php
- * @brief   Validator for unicode letters and numbers and safe characters in a
- *          text field.
- * 
- * A validator which allows unicode letters and numbers and certain common 
- * special characters, which we consider save.
- * 
- * Differences to Daiquiri_Form_Validator_Text: This validator also allows \s
- * (i.e. Whitespaces).
- * 
+ * Validator class for regular multi line text input fields.
  */
 class Daiquiri_Form_Validator_Textarea extends Zend_Validate_Abstract {
 
     const CHARS = 'chars';
 
     /**
-     * @var array $_messageTemplates
      * Default error message produced by this validator.
+     * @var array $_messageTemplates
      */
     protected $_messageTemplates = array(
-        self::CHARS => "Special Character like < > are not allowed"
+        self::CHARS => "Some special Character are not allowed"
     );
 
     /**
-     * @brief   Checks whether given input is valid according to validator
-     * @param   string $value       string to validate
-     * @return  bool
-     * 
-     * Validates given string according to given validation. This will allow
-     * unicode letters and numbers and certain common special characters, which 
-     * we consider save in text areas.
-     * 
-     * Returns true if validation is positive.
+     * Checks whether given input is valid according to validator. Allowed are:
+     * Unicode letters, digits, spaces, newlines and special characters (.,:;?!'"'+-\*=@#$%^`&()[]{}<>_)
+     * @param  string $value string to validate
+     * @return bool
      */
     public function isValid($value) {
         $this->_setValue($value);
 
         $isValid = true;
-
-        if (preg_match("/[^ \s\|\/\,\;\.\'\"\-\=\?\!\@\#\$\%\^\&\*\(\)\]\[\_\+\:\`\p{L}0-9]/u", $value)) {
+        if (preg_match("/[^ \.\,\:\;\?\!\'\"\'\+\-\/\*\=\@\#\$\%\^\`\&\(\)\[\]\{\}\<\>\_\p{L}0-9\s]/u", $value)) {
             $this->_error(self::CHARS);
             $isValid = false;
         }

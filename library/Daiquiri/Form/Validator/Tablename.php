@@ -19,26 +19,32 @@
  */
 
 /**
- * A validator which allows unicode letters and numbers and certain common 
- * special characters, which we consider save.
+ * Validator class for text input fields, which allows what we consider save for database table names.
  */
 class Daiquiri_Form_Validator_Tablename extends Zend_Validate_Abstract {
 
     const CHARS = 'chars';
     const LENGTH = 'length';
 
+    /**
+     * Default error message produced by this validator.
+     * @var array $_messageTemplates
+     */
     protected $_messageTemplates = array(
         self::CHARS => "Only digits, letters and [ ] < > + - _ , : are allowed",
         self::LENGTH => "The tablename must be shorter than 128 characters"
     );
 
+    /**
+     * Checks whether given input is valid.
+     * Allowed are valid table names.
+     * @param  string $value   string to validate
+     * @return bool   $isValid
+     */
     public function isValid($value) {
         $this->_setValue($value);
 
         $isValid = true;
-
-        // preg_match("/[^ \<\>\s\/\,\.\-\=\#\$\^\]\[\}\{\_\+\:"
-        // '/^[^;@%*?()!"`\'&]+$/'
 
         if (preg_match("/[^A-Za-z0-9\,\_\:\]\[\<\>\+\-]/", $value)) {
             $this->_error(self::CHARS);

@@ -57,7 +57,7 @@ class Query_Form_Example extends Daiquiri_Form_Model {
             'required' => true,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
         $this->addTextareaElement('description', array(
@@ -67,7 +67,7 @@ class Query_Form_Example extends Daiquiri_Form_Model {
             'required' => false,
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
         $this->addSelectElement('publication_role_id', array(

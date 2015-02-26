@@ -18,14 +18,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Validator class for text input fields, which allows valid JSON strings.
+ */
 class Daiquiri_Form_Validator_Json extends Zend_Validate_Abstract {
 
     const JSON = 'json';
 
+    /**
+     * Default error message produced by this validator.
+     * @var array $_messageTemplates
+     */
     protected $_messageTemplates = array(
         self::JSON => "Only a valid JSON string is allowed"
     );
 
+    /**
+     * Checks whether given input is valid.
+     * Allowed is a valid JSON string.
+     * @param  string $value   string to validate
+     * @return bool   $isValid
+     */
     public function isValid($value) {
         $this->_setValue($value);
 

@@ -18,14 +18,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Validator class for text input fields, which allows letters, digits, slashes, dashes, and underscores.
+ */
 class Daiquiri_Form_Validator_Path extends Zend_Validate_Abstract {
 
     const CHARS = 'chars';
 
+    /**
+     * Default error message produced by this validator.
+     * @var array $_messageTemplates
+     */
     protected $_messageTemplates = array(
-        self::CHARS => "Only digits, letters, underscores, slashes and dashes are allowed"
+        self::CHARS => "Only letters, digits, slashes, dashes, and underscores are allowed"
     );
 
+    /**
+     * Checks whether given input is valid.
+     * Allowed are: Letters, digits, slashes, dashes, and underscores
+     * @param  string $value   string to validate
+     * @return bool   $isValid
+     */
     public function isValid($value) {
         $this->_setValue($value);
 

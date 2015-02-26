@@ -19,42 +19,31 @@
  */
 
 /**
- * @class   Daiquiri_Form_Validator_Text Text.php
- * @brief   Validator for unicode letters and numbers and safe characters.
- * 
- * A validator which allows unicode letters and numbers and certain common 
- * special characters, which we consider save.
- * 
+ * Validator class for regular one line text input fields.
  */
 class Daiquiri_Form_Validator_Text extends Zend_Validate_Abstract {
 
     const CHARS = 'chars';
 
     /**
-     * @var array $_messageTemplates
      * Default error message produced by this validator.
+     * @var array $_messageTemplates
      */
     protected $_messageTemplates = array(
-        self::CHARS => "Special Character like < > or newlines are not allowed"
+        self::CHARS => "Newlines and some special characters are not allowed"
     );
 
     /**
-     * @brief   Checks whether given input is valid according to validator
-     * @param   string $value       string to validate
-     * @return  bool
-     * 
-     * Validates given string according to given validation. This will allow
-     * unicode letters and numbers and certain common special characters, which 
-     * we consider save.
-     * 
-     * Returns true if validation is positive.
+     * Checks whether given input is valid according to validator. Allowed are:
+     * Unicode letters, digits, spaces and special characters (.,:;?!'"'+-\*=@#$%^`&()[]{}<>_)
+     * @param  string $value string to validate
+     * @return bool
      */
     public function isValid($value) {
         $this->_setValue($value);
 
         $isValid = true;
-
-        if (preg_match("/[^ \|\/\,\;\.\'\"\-\=\?\!\@\#\$\%\^\&\*\(\)\]\[\_\+\:\`\p{L}0-9]/u", $value)) {
+        if (preg_match("/[^ \.\,\:\;\?\!\'\"\'\+\-\/\*\=\@\#\$\%\^\`\&\(\)\[\]\{\}\<\>\_\p{L}0-9]/u", $value)) {
             $this->_error(self::CHARS);
             $isValid = false;
         }

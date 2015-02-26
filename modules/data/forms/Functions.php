@@ -33,7 +33,7 @@ class Data_Form_Functions extends Data_Form_Abstract {
             'class' => 'span6 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
         $this->addTextareaElement('description', array(
@@ -42,7 +42,7 @@ class Data_Form_Functions extends Data_Form_Abstract {
             'rows' => '4',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Volatile()),
+                array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
         $this->addTextElement('order', array(

@@ -19,17 +19,26 @@
  */
 
 /**
- * A validator which allows unicode letters and numbers and certain common 
- * special characters, which we consider save.
+ * Validator class for text input fields, which allows letters, digits, and underscores.
  */
 class Daiquiri_Form_Validator_AlnumUnderscore extends Zend_Validate_Abstract {
 
     const CHARS = 'chars';
 
+    /**
+     * Default error message produced by this validator.
+     * @var array $_messageTemplates
+     */
     protected $_messageTemplates = array(
-        self::CHARS => "Only digits, letters, and underscores are allowed"
+        self::CHARS => "Only letters, digits, and underscores are allowed"
     );
 
+    /**
+     * Checks whether given input is valid.
+     * Allowed are: Letters, digits, and underscores.
+     * @param  string $value   string to validate
+     * @return bool   $isValid
+     */
     public function isValid($value) {
         $this->_setValue($value);
 
