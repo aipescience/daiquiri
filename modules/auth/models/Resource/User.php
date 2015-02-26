@@ -86,7 +86,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * Fetches a specific row from the (joined) Auth tables.
      * @param mixed $input primary key of the row OR array of sqloptions (start,limit,order,where)
      * @throws Exception
-     * @return array $row 
+     * @return array $row
      */
     public function fetchRow($input) {
         if (empty($input)) {
@@ -107,7 +107,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
 
         if (empty($row)) {
             return false;
-        } 
+        }
 
         // fetch details
         $select = $this->select();
@@ -139,6 +139,19 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
     public function insertRow(array $data = array()) {
         if (empty($data)) {
             throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        // create database for user
+        if (Daiquiri_Config::getInstance()->query) {
+            $userDb = Daiquiri_Config::getInstance()->getUserDbName($data['username']);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $data['username']);
+
+            try {
+                $sql = "CREATE DATABASE `{$userDb}`";
+                $adapter->query($sql)->closeCursor();
+            } catch (Zend_Db_Statement_Exception $e) {
+                return null;
+            }
         }
 
         if (isset($data['new_password'])) {
@@ -173,15 +186,6 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
                 'key' => $key,
                 'value' => $value
             ));
-        }
-
-        // create database for user
-        if (Daiquiri_Config::getInstance()->query) {
-            $userDb = Daiquiri_Config::getInstance()->getUserDbName($data['username']);
-            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $data['username']);
-
-            $sql = "CREATE DATABASE `{$userDb}`";
-            $adapter->query($sql)->closeCursor();
         }
 
         // return the id of the newly created user
@@ -259,7 +263,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         if ($type === 'default') {
             // handle main (default) password
             $select = $this->select();
-            $select->from('Auth_User', array('password'));  
+            $select->from('Auth_User', array('password'));
             $select->where('id = ?', $id);
 
             $row = $this->fetchOne($select);
@@ -272,7 +276,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         } else {
             // handle additional versions of the password
             $select = $this->select();
-            $select->from('Auth_Details', array('value'));  
+            $select->from('Auth_Details', array('value'));
             $select->where('user_id = ?', $id);
             $select->where($this->quoteIdentifier('key') .  '=?', 'password_' . $type);
 
@@ -321,12 +325,27 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
 
     /**
      * Deletes a given user from the database.
-     * @param type $id 
+     * @param type $id
      * @throws Exception
      */
     public function deleteRow($id) {
         if (empty($id)) {
             throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        // delete database for user
+        if (Daiquiri_Config::getInstance()->query) {
+            $select = $this->select();
+            $select->from('Auth_User', array('id','username'));
+            $select->where('id = ?', $id);
+
+            $row = $this->fetchOne($select);
+
+            $userDb = Daiquiri_Config::getInstance()->getUserDbName($row['username']);
+            $adapter = Daiquiri_Config::getInstance()->getUserDbAdapter('', $row['username']);
+
+            $sql = "DROP DATABASE `{$userDb}`";
+            $adapter->query($sql)->closeCursor();
         }
 
         // delete row in user table
@@ -407,11 +426,11 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
             $rows[] = $row;
         }
         return $rows;
-    }    
+    }
 
     /**
      * Deletes a singe registation entry.
-     * @param type $id 
+     * @param type $id
      * @throws Exception
      */
     public function deleteRegistration($id) {
@@ -426,7 +445,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
     /**
      * Registers a new user.
      * @param array $data
-     * @return int $id (id of the new entry in the registration table) 
+     * @return int $id (id of the new entry in the registration table)
      */
     public function registerUser(array $data) {
         // handle password
@@ -459,13 +478,13 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * Validate a registred user in the database
      * @param int $id id of the user in the registration table
      * @param string $code
-     * @return array $row credntials of the new user 
+     * @return array $row credntials of the new user
      */
     public function validateUser($id, $code) {
 
         // get entry for id
         $select = $this->select();
-        $select->from('Auth_Registration');  
+        $select->from('Auth_Registration');
         $select->where('id = ?', $id);
 
         $row = $this->fetchOne($select);
@@ -494,6 +513,10 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
 
                 // create user
                 $newId = $this->insertRow($row);
+
+                if (empty($newId)) {
+                    return false;
+                }
 
                 // remove user from registration table
                 $this->getAdapter()->delete('Auth_Registration', array('id = ?' => $id));

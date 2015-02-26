@@ -304,6 +304,11 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 // create the user
                 $id = $this->getResource()->insertRow($values);
 
+                if ($id == null) {
+                    $errors['form'] = 'Could not create user, maybe the users database is already there';
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
+                }
+
                 // log the event and return
                 Daiquiri_Log::getInstance()->notice("user '{$values['username']}' created");
                 return array('status' => 'ok');
