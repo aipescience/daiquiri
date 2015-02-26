@@ -110,6 +110,9 @@ app.factory('AdminService', ['$http','$window','TableService','ModalService',fun
                     } else {
                         errors['form'] = {'form': 'Error: Unknown response from server.'};
                     }
+                }).error(function(response,status) {
+                    errors['form'] = {'form': 'Error: The server responded with status ' + status +  '.'};
+                    console.log(response);
                 });
             } else {
                 ModalService.modal.enabled = false;
