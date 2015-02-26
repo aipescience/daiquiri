@@ -125,11 +125,17 @@ class Contact_Form_Submit extends Daiquiri_Form_Abstract {
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields if user is logged in.
-        foreach (array('firstname', 'lastname', 'email') as $key) {
-            if (isset($this->_user[$key])) {
-                $this->setDefault($key, $this->_user[$key]);
-                $this->setFieldReadonly($key);
-            }
+        if (isset($this->_user['details']['firstname'])) {
+            $this->setDefault('firstname', $this->_user['details']['firstname']);
+            $this->setFieldReadonly('firstname');
+        }
+        if (isset($this->_user['details']['lastname'])) {
+            $this->setDefault('lastname', $this->_user['details']['lastname']);
+            $this->setFieldReadonly('lastname');
+        }
+        if (isset($this->_user['email'])) {
+            $this->setDefault('email', $this->_user['email']);
+            $this->setFieldReadonly('email');
         }
     }
 
