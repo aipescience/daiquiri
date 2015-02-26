@@ -251,6 +251,7 @@ angular.module('table', ['ngSanitize'])
     };
 
     $scope.reset = function() {
+        $scope.searchString = '';
         TableService.reset($scope.nrows);
     };
 
