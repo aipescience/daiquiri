@@ -311,6 +311,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
 
                 // log the event and return
                 Daiquiri_Log::getInstance()->notice("user '{$values['username']}' created");
+
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
@@ -358,6 +359,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 $values = $form->getValues();
 
                 // process the details
+                $changed = false;
                 $values['details'] = array();
                 foreach ($detailKeys as $detailKey) {
                     if (is_array($values[$detailKey['key']])) {
@@ -368,13 +370,39 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                         $values['details'][$detailKey['key']] = $values[$detailKey['key']];
                     }
                     unset($values[$detailKey['key']]);
+
+                    if ($values['details'][$detailKey['key']] != $user['details'][$detailKey['key']]) {
+                        $changed = true;
+                    }
                 }
 
-                // update the user and redirect
-                $this->getResource()->updateRow($id, $values);
+                if (Daiquiri_Config::getInstance()->auth->changeUsername && $values['username'] != $user['username']) {
+                    $changed = true;
+                }
+                if (Daiquiri_Config::getInstance()->auth->changeEmail && $values['email'] != $user['email']) {
+                    $changed = true;
+                }
 
-                // log the event and return
-                Daiquiri_Log::getInstance()->notice("user '{$user['username']}' updated");
+                if ($changed) {
+                    // update the user
+                    $this->getResource()->updateRow($id, $values);
+
+                    // log the event and return
+                    Daiquiri_Log::getInstance()->notice("user '{$user['username']}' updated");
+
+                    // send a notification mail
+                    if (Daiquiri_Config::getInstance()->auth->notification->updateUser) {
+                        $user = $this->getResource()->fetchRow($id);
+                        $this->getModelHelper('mail')->send('auth.updateUser', array(
+                            'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
+                            'id' => $user['id'],
+                            'username' => $user['username'],
+                            'firstname' => $user['details']['firstname'],
+                            'lastname' => $user['details']['lastname']
+                        ));
+                    }
+                }
+
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);

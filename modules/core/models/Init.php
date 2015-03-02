@@ -130,7 +130,7 @@ class Core_Model_Init extends Daiquiri_Model_Init {
                 'subject' => '[Daiquiri] User Registration',
                 'body' => 'Dear _firstname_ _lastname_,
 
-Thank you for registering. 
+Thank you for registering.
 
 Please click on the following link to validate your registration:
 
@@ -182,7 +182,7 @@ Best Regards'
                 'subject' => '[Daiquiri] User account activated',
                 'body' => 'Dear _firstname_ _lastname_,
 
-your account has been created and you should be able to log in. 
+your account has been created and you should be able to log in.
 
 Best Regards'
             ),
@@ -190,7 +190,7 @@ Best Regards'
                 'subject' => '[Daiquiri] User password changed',
                 'body' => 'Dear Daiquiri admin,
 
-_firstname_ _lastname_ (username: _username_) has just changed his or her password.
+the password of _firstname_ _lastname_ (username: _username_) has just been changed.
 
 Best Regards'
             ),
@@ -198,7 +198,7 @@ Best Regards'
                 'subject' => '[Daiquiri] User credentials changed',
                 'body' => 'Dear Daiquiri admin,
 
-_firstname_ _lastname_ (username: _username_) has just updated his or her credentials.
+the credentials of _firstname_ _lastname_ (username: _username_) have just been updated.
 
 Best Regards'
             ),

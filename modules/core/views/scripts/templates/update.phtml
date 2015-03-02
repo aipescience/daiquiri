@@ -32,9 +32,11 @@
     <?php else: ?>
         <h2>Update template <?php echo $this->escape($this->template); ?></h2>
 
-        <p class="text-info">In this template you can use the variables: 
-            <?php echo $this->escape($this->variables); ?>.
-        </p>
+        <?php if (empty($this->variables)): ?>
+        <p class="text-info">In this template you can use any custom variable.</p>
+        <?php else: ?>
+        <p class="text-info">In this template you can use the variables: <?php echo $this->escape($this->variables); ?>.</p>
+        <?php endif; ?>
         <?php echo $this->form; ?>
     <?php endif; ?>
 </div>

@@ -37,11 +37,11 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
             'auth.register' => array('firstname', 'lastname', 'username', 'link'),
             'auth.forgotPassword' => array('firstname', 'lastname', 'username', 'link'),
             'auth.validate' => array('firstname', 'lastname', 'username', 'link'),
-            'auth.confirm' => array('firstname', 'lastname', 'username', 'manager'),
-            'auth.reject' => array('firstname', 'lastname', 'username', 'manager'),
-            'auth.activate' => array('firstname', 'lastname', 'username'),
-            'auth.changePassword' => array('firstname', 'lastname', 'username'),
-            'auth.updateUser' => array('firstname', 'lastname', 'username'),
+            'auth.confirm' => array('firstname', 'lastname', 'username', 'manager', 'id'),
+            'auth.reject' => array('firstname', 'lastname', 'username', 'manager', 'id'),
+            'auth.activate' => array('firstname', 'lastname', 'username', 'id'),
+            'auth.changePassword' => array('firstname', 'lastname', 'username', 'id'),
+            'auth.updateUser' => array('firstname', 'lastname', 'username', 'id'),
             'contact.submit_user' => array('firstname', 'lastname', 'username'),
             'contact.submit_support' => array('firstname', 'lastname', 'username', 'email',
                 'category', 'subject', 'message', 'link'),
@@ -85,10 +85,17 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
 
         // search replace the placeholders
         if (!empty($values)) {
-            foreach ($this->templates[$template] as $key) {
-                if (!empty($values[$key])) {
-                    $data['subject'] = str_replace('_' . $key . '_', $values[$key], $data['subject']);
-                    $data['body'] = str_replace('_' . $key . '_', $values[$key], $data['body']);
+            if (isset($this->templates[$template])) {
+                foreach ($this->templates[$template] as $key) {
+                    if (!empty($values[$key])) {
+                        $data['subject'] = str_replace('_' . $key . '_', $values[$key], $data['subject']);
+                        $data['body'] = str_replace('_' . $key . '_', $values[$key], $data['body']);
+                    }
+                }
+            } else {
+                foreach ($values as $key => $value) {
+                    $data['subject'] = str_replace('_' . $key . '_', $value, $data['subject']);
+                    $data['body'] = str_replace('_' . $key . '_', $value, $data['body']);
                 }
             }
 
@@ -162,11 +169,15 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
         }
 
         // produce variables string
-        $tmp = array();
-        foreach ($this->templates[$entry['template']] as $value) {
-            $tmp[] = '_' . $value . '_';
+        if (isset($this->templates[$entry['template']])) {
+            $tmp = array();
+            foreach ($this->templates[$entry['template']] as $value) {
+                $tmp[] = '_' . $value . '_';
+            }
+            $variables  = implode(' ', $tmp);
+        } else {
+            $variables  = false;
         }
-        $variables  = implode(' ', $tmp);
 
         // create the form object
         $form = new Core_Form_Templates(array(
@@ -182,7 +193,7 @@ class Core_Model_Templates extends Daiquiri_Model_Table {
 
                 // update the row in the database
                 $this->getResource()->updateRow($id, $values);
-                
+
                 return array('status' => 'ok');
             } else {
                 return array(

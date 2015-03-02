@@ -111,14 +111,17 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 )
             ),
             'timeout' => 0,
-            'mailOnChangePassword' => false,
-            'mailOnUpdateUser' => false,
+            'notification' => array(
+                'updateUser' => false,
+                'changePassword' => false,
+                'mail' => array()
+            ),
             'changeUsername' => false,
             'changeEmail' => true,
             'lowerCaseUsernames' => false,
             'usernameMinLength' => 4,
             'passwordMinLength' => 4,
-            'tokenLifetime' => 60
+            'tokenLifetime' => 300
         );
 
         // create config array
