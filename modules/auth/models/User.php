@@ -376,10 +376,16 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                     }
                 }
 
-                if (Daiquiri_Config::getInstance()->auth->changeUsername && $values['username'] != $user['username']) {
+                if (Daiquiri_Config::getInstance()->auth->changeUsername && $values['username'] !== $user['username']) {
                     $changed = true;
                 }
-                if (Daiquiri_Config::getInstance()->auth->changeEmail && $values['email'] != $user['email']) {
+                if (Daiquiri_Config::getInstance()->auth->changeEmail && $values['email'] !== $user['email']) {
+                    $changed = true;
+                }
+                if ($values['role_id'] !== $user['role_id']) {
+                    $changed = true;
+                }
+                if ($values['status_id'] !== $user['status_id']) {
                     $changed = true;
                 }
 
