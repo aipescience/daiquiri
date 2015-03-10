@@ -315,7 +315,6 @@ app.factory('SubmitService', ['$http','$timeout','$cookies','QueryService','Code
     }
 
     function submitted(response) {
-        console.log(response);
         if (response.job.status == 'success') {
             QueryService.activateJob(response.job.id);
         } else {
