@@ -447,10 +447,10 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // calculate queue and query times
         if ($row['timeSubmit'] != '0000-00-00 00:00:00' && $row['timeExecute'] != '0000-00-00 00:00:00') {
-            $row['timeQueue'] = strftime('%S',strtotime($row['timeExecute']) - strtotime($row['timeSubmit']));
+            $row['timeQueue'] = strtotime($row['timeExecute']) - strtotime($row['timeSubmit']);
         }
         if ($row['timeExecute'] != '0000-00-00 00:00:00' && $row['timeFinish'] != '0000-00-00 00:00:00') {
-            $row['timeQuery'] = strftime('%S',strtotime($row['timeFinish']) - strtotime($row['timeExecute']));
+            $row['timeQuery'] = strtotime($row['timeFinish']) - strtotime($row['timeExecute']);
         }
 
         // if row contains a call to spider_bg_direct_sql, the actual query run on the
