@@ -197,7 +197,7 @@
                                     <dl class="dl-horizontal">
                                         <dt>Job status</dt>
                                         <dd ng-class="{'text-success': account.job.status == 'success',
-                                                  'text-error': account.job.status == 'error',
+                                                  'text-error': account.job.status == 'error' || account.job.status == 'timeout',
                                                   'text-info': account.job.status == 'queued'}">
                                             {{account.job.status}}
                                         </dd>
@@ -243,7 +243,7 @@
                                 </div>
                             </div>
 
-                            <div class="daiquiri-widget nav">
+                            <div class="daiquiri-widget nav" ng-show="account.job.cols">
                                 <div class="nav-header">Database columns</div>
                                 <div class="nav-item">
                                     <table class="table table-condensed">

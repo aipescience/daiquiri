@@ -31,8 +31,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get the current query message
         $messagesModel = new Core_Model_Messages();
         $row = $messagesModel->getResource()->fetchRow(array(
-            'where' => array('`key` = "query"'),
-            'limit' => 1000
+            'where' => array('`key` = "query"')
         ));
         if (empty($row)) {
             $message = false;
@@ -55,6 +54,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                     'status_id != ?' => $this->getResource()->getStatusId('removed'),
                 ),
                 'order' => array($this->getResource()->getTimeField() . ' DESC'),
+                'limit' => 1000
             ));
         } catch (Exception $e) {
             $dbRows = array();

@@ -50,14 +50,14 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         'username' => 'User name',
         'database' => 'Database name',
         'table' => 'Table name',
-        'time' => 'Job submission time',
+        'time' => 'Job submitted at',
         'query' => 'Original query',
         'actualQuery' => 'Actual query',
         'status_id' => 'Internal job status id',
         'status' => 'Job status',
-        'tbl_size' => 'Total disk usage (in MB)',
-        'tbl_idx_size' => 'Index disk usage (in MB)',
-        'tbl_free' => 'Free space in table (in MB)',
+        'tbl_size' => 'Total disk usage [MB]',
+        'tbl_idx_size' => 'Index disk usage [MB]',
+        'tbl_free' => 'Free space in table [MB]',
         'tbl_row' => 'Approx. row count',
     );
 

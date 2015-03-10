@@ -57,18 +57,20 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         'username' => 'User name',
         'database' => 'Database name',
         'table' => 'Table name',
-        'timeSubmit' => 'Job submission time',
-        'timeExecute' => 'Job execution time',
-        'timeFinish' => 'Job ending time',
+        'timeSubmit' => 'Job submitted at',
+        'timeExecute' => 'Job started at',
+        'timeFinish' => 'Job finished at',
+        'timeQueue' => 'Time in queue [s]',
+        'timeQuery' => 'Time for query [s]',
         'query' => 'Original query',
         'actualQuery' => 'Actual query',
         'queue' => 'Queue',
         'status' => 'Job status',
         'status_id' => 'Internal job status id',
         'error' => 'Error message',
-        'tbl_size' => 'Total disk usage (in MB)',
-        'tbl_idx_size' => 'Index disk usage (in MB)',
-        'tbl_free' => 'Free space in table (in MB)',
+        'tbl_size' => 'Total disk usage [MB]',
+        'tbl_idx_size' => 'Index disk usage [MB]',
+        'tbl_free' => 'Free space in table [MB]',
         'tbl_row' => 'Approx. row count',
     );
 
@@ -95,11 +97,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     /**
      * Field that used best as a timestamp.
      * @var string $_timeField
-     */ 
+     */
     protected static $_timeField = 'timeSubmit';
 
     /**
-     * Construtor. Sets adapter to the user adapter and the `mysql` database. 
+     * Construtor. Sets adapter to the user adapter and the `mysql` database.
      */
     public function __construct() {
         $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter('mysql'));
@@ -442,6 +444,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // get queue
         $row['queue'] = $queues[$row['queue']]['name'];
+
+        // calculate queue and query times
+        if ($row['timeSubmit'] != '0000-00-00 00:00:00' && $row['timeExecute'] != '0000-00-00 00:00:00') {
+            $row['timeQueue'] = strftime('%S',strtotime($row['timeExecute']) - strtotime($row['timeSubmit']));
+        }
+        if ($row['timeExecute'] != '0000-00-00 00:00:00' && $row['timeFinish'] != '0000-00-00 00:00:00') {
+            $row['timeQuery'] = strftime('%S',strtotime($row['timeFinish']) - strtotime($row['timeExecute']));
+        }
 
         // if row contains a call to spider_bg_direct_sql, the actual query run on the
         // server will be hidden from the user, since spider_bg_direct_sql needs secret

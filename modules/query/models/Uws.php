@@ -148,7 +148,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                     break;
             }
         }
-        
+
         // add link to results if needed
         if ($jobUWS->phase === "COMPLETED") {
             foreach (Daiquiri_Config::getInstance()->getQueryDownloadAdapter() as $adapter) {
