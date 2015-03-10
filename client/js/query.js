@@ -109,6 +109,17 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
         $http.get(base + '/query/account/').success(function(response) {
             account.jobs = response.jobs;
             account.database = response.database;
+
+            // activate the current job again, if its status has changed
+            if (account.active.job != false && account.job.status != 'success') {
+                // get the index of the job in the jobs array (by magic)
+                var id = account.job.id;
+                // get the index of the job in the jobs array (by magic)
+                var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': id})[0]);
+                if (account.jobs[i].status != account.job.status) {
+                    account.job.status = activateJob(id);
+                }
+            }
         });
     }
 
@@ -144,7 +155,9 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
                 account.active.job = id;
 
                 // init plot
-                PlotService.init(account);
+                if (account.job.status == 'success') {
+                    PlotService.init(account);
+                }
             })
             .error(function(response, status) {
                 if (status === 404) {

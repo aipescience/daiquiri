@@ -114,13 +114,13 @@
                         <li id="overview-tab-header" ng-show="account.active.job">
                             <a href="#overview-tab" data-toggle="tab">Job Overview</a>
                         </li>
-                        <li id="results-tab-header" ng-show="account.active.job">
+                        <li id="results-tab-header" ng-show="account.active.job && account.job.status == 'success'">
                             <a href="#results-tab" data-toggle="tab">Results Table</a>
                         </li>
-                        <li id="plot-tab-header" ng-show="account.active.job">
+                        <li id="plot-tab-header" ng-show="account.active.job && account.job.status == 'success'">
                             <a href="#plot-tab" data-toggle="tab">Plot</a>
                         </li>
-                        <li id="download-tab-header" ng-show="account.active.job">
+                        <li id="download-tab-header" ng-show="account.active.job && account.job.status == 'success'">
                             <a href="#download-tab" data-toggle="tab">Download</a>
                         </li>
                     </ul>
