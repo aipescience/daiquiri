@@ -79,7 +79,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     /**
      * Field that used best as a timestamp.
      * @var string $_timeField
-     */ 
+     */
     protected static $_timeField = 'time';
 
     /**
@@ -302,7 +302,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         $select = $this->select();
         $select->from('Query_Jobs', 'COUNT(*) as count');
         $select->join('Auth_User','Query_Jobs.user_id = Auth_User.id','username');
-        
+
         if ($sqloptions) {
             if (isset($sqloptions['where'])) {
                 foreach ($sqloptions['where'] as $w) {
@@ -374,30 +374,22 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Returns statistical information about the database table corresponding to
-     * the job id if exists.
-     * @param int $id id of the job
+     * Returns statistical information about the database table if exists.
+     * @param string $database name of the database
+     * @param string $table name of the table
      * @return array $stats
      */
-    public function fetchTableStats($id) {
-        // first obtain information about this job
-        $job = $this->fetchRow($id);
-
-        // only get statistics if the job finished
-        if ($job['status'] === "success") {
-            return array();
-        }
-
+    public function fetchTableStats($database,$table) {
         // switch to user adapter
         $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
 
         // check if this table is locked and if yes, don't query information_schema. This will result in a
         // "waiting for metadata lock" and makes daiquiri hang
-        if ($this->_isTableLocked($job['table'])) {
+        if ($this->_isTableLocked($table)) {
             return array();
         } else {
             // check if table is available
-            if (!in_array($job['table'], $this->getAdapter()->listTables())) {
+            if (!in_array($table, $this->getAdapter()->listTables())) {
                 return array();
             }
 
@@ -411,7 +403,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
                     "FROM information_schema.tables " .
                     "WHERE table_schema = ? AND table_name = ?;";
 
-            return $this->getAdapter()->fetchAll($sql, array($job['database'], $job['table']));
+            return $this->getAdapter()->fetchAll($sql, array($database, $table))[0];
         }
     }
 

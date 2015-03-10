@@ -180,7 +180,11 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         }
 
         // fetch table statistics
-        $stat = $this->getResource()->fetchTableStats($id);
+        if ($job['status'] == 'success') {
+            $stat = $this->getResource()->fetchTableStats($job['database'],$job['table']);
+        } else {
+            $stat = array();
+        }
 
         // create additional array
         $translations = $this->getResource()->getTranslations();

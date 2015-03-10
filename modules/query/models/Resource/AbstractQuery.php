@@ -218,12 +218,12 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     abstract public function fetchRow($id);
 
     /**
-     * Returns statistical information about the database table corresponding to
-     * the job id if exists.
-     * @param int $id id of the job
+     * Returns statistical information about the database table if exists.
+     * @param string $database name of the database
+     * @param string $table name of the table
      * @return array $stats
      */
-    abstract public function fetchTableStats($id);
+    abstract public function fetchTableStats($database,$table);
 
     /**
      * Returns statistical information about the complete database
@@ -318,7 +318,7 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
         $sql .= " TO ";
         $sql .= $this->quoteIdentifier($db,$newTable);
         $sql .= ";";
-        
+
         try {
             $this->getAdapter()->query($sql)->closeCursor();
         } catch (Exception $e) {

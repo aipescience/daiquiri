@@ -85,7 +85,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         }
 
         // fetch table statistics
-        $stat = $this->getResource()->fetchTableStats($id);
+        $stat = $this->getResource()->fetchTableStats($row['database'],$row['table']);
         $job = array_merge($row, $stat);
 
         // fill UWS object with information

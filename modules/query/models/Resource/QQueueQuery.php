@@ -352,7 +352,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $selectHistory = $this->select($sqloptions['history']);
         $selectHistory->from('qqueue_history', Query_Model_Resource_QQueueQuery::$_cols);
         $selectHistory->where("qqueue_history.mysqlUserName = ?", $config['username']);
-        
+
         // get the union with the sqloptions
         $select = $this->select($sqloptions)->union(array($selectPending, $selectHistory));
 
@@ -449,13 +449,13 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         if (isset($row['actualQuery']) && strpos($row['actualQuery'], "spider_bg_direct_sql") !== false) {
             unset($row['actualQuery']);
         }
-        
+
         return $row;
     }
 
     /**
      * Returns the supported queues.
-     * @return array $queues 
+     * @return array $queues
      */
     public function fetchQueues() {
         $select = $this->select();
@@ -513,25 +513,25 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Returns statistical information about the database table corresponding to
-     * the job id if exists.
-     * @param int $id id of the job
+     * Returns statistical information about the database table if exists.
+     * @param string $database name of the database
+     * @param string $table name of the table
      * @return array $stats
      */
-    public function fetchTableStats($id) {
-        //first obtain information about this job
-        $job = $this->fetchRow($id);
+    public function fetchTableStats($database,$table) {
 
-        //only get statistics if the job finished
-        if ($job['status'] !== "success") {
-            return array();
-        }
-
-        if ($this->_isTableLocked($job['table'])) {
+        if ($this->_isTableLocked($table)) {
             return array();
         } else {
-            //check if table is available
-            if (!in_array($job['table'], $this->getAdapter()->listTables())) {
+            // get the user db
+            $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+            $userDb = Daiquiri_Config::getInstance()->getUserDbName($username);
+
+            $userDbAdapter = Daiquiri_Config::getInstance()->getUserDbAdapter($userDb);
+            $userTables = $userDbAdapter->listTables();
+
+            // check if table is available
+            if (!in_array($table, $userTables)) {
                 return array();
             }
 
@@ -545,7 +545,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                     "FROM information_schema.tables " .
                     "WHERE table_schema = ? AND table_name = ?;";
 
-            return $this->getAdapter()->fetchAll($sql, array($row['database'], $row['table']));
+            return $this->getAdapter()->fetchAll($sql, array($database,$table))[0];
         }
     }
 
