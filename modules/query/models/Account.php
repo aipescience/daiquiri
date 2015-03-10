@@ -172,7 +172,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'additional' => array()
         );
 
-        foreach(array('id','database','table','query','status','error','username') as $key) {
+        foreach(array('id','database','table','status','error','username') as $key) {
             if (!empty($dbRow[$key])) {
                 $job[$key] = $dbRow[$key];
             }
@@ -195,6 +195,10 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 'value' => $value
             );
         }
+
+        // extract query, throw away the plan, if one is there
+        $queryArray = explode('-- The query plan used to run this query: --',$dbRow['query']);
+        $job['query'] = $queryArray[0];
 
         // add columns if the job was a success
         if ($job['status'] == 'success') {
