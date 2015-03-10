@@ -23,7 +23,7 @@ abstract class Daiquiri_Form_Element_Abstract {
     /**
      * Sets the default decorators needed for angular.
      */
-    public function loadDaiquiriDecorators($element) {
+    static public function loadDaiquiriDecorators($element) {
 
         if ($element->loadDefaultDecoratorsIsDisabled()) {
             return $element;

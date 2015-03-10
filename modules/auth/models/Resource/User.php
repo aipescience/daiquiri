@@ -198,7 +198,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
      * @param array $data row data
      * @throws Exception
      */
-    public function updateRow($id, array $data = array()) {
+    public function updateRow($id, $data = array()) {
         if (empty($id) || empty($data)) {
             throw new Exception('$id or $data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }

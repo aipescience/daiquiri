@@ -40,7 +40,8 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
             $options = array();
         }
         if (empty($options['name'])) {
-            $options['name'] = array_pop(explode('_',get_class($this))) . 'Form';
+            $tmp = explode('_',get_class($this));
+            $options['name'] = array_pop($tmp) . 'Form';
         }
         if (empty($options['ng-submit'])) {
             $options['ng-submit'] = "submitForm()";
