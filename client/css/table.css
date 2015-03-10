@@ -17,7 +17,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.daiquiri-table {
+.daiquiri-table,
+.daiquiri-table select {
     margin-bottom: 20px;
     font-size: small;
 }
