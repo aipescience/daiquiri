@@ -191,6 +191,12 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         $job['query'] = $queryArray[0];
         unset($dbRow['query']);
 
+        // format plan
+        if (isset($queryArray[1])) {
+            $plan = str_replace("--------------------------------------------\n--\n--",'',$queryArray[1]);
+            $plan = str_replace("\n--",";\n",$plan);
+            $job['plan'] = $plan;
+        }
 
         // create additional array
         $translations = $this->getResource()->getTranslations();
@@ -199,17 +205,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 'key' => $key,
                 'name' => $translations[$key],
                 'value' => $value
-            );
-        }
-
-        // format plan
-        if (isset($queryArray[1])) {
-            $plan = str_replace("--------------------------------------------\n--\n--",'',$queryArray[1]);
-            $plan = str_replace("\n--",";\n",$plan);
-            $job['additional']['plan'] = array(
-                'key' => 'plan',
-                'name' => 'Query plan',
-                'value' => $plan
             );
         }
 
