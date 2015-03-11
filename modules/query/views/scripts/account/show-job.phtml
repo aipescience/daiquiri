@@ -39,6 +39,16 @@
 
         <dt>Status</dt>
         <dd><?php echo $this->escape($this->job['status']); ?></dd>
+
+        <?php if (isset($this->job['plan'])): ?>
+        <dt>Query plan</dt>
+        <dd><?php echo $this->escape($this->job['plan']); ?></dd>
+        <?php endif; ?>
+
+        <?php if (isset($this->job['actualQuery'])): ?>
+        <dt>Actual Query</dt>
+        <dd><?php echo $this->escape($this->job['actualQuery']); ?></dd>
+        <?php endif; ?>
     </dl>
 
     <h4>Additional infomation</h4>

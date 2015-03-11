@@ -148,6 +148,9 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
                 if (!angular.isUndefined(account.job.plan)) {
                     CodeMirror.runMode(account.job.plan,"text/x-mysql",angular.element('#overview-plan')[0]);
                 }
+                if (!angular.isUndefined(account.job.actualQuery)) {
+                    CodeMirror.runMode(account.job.actualQuery,"text/x-mysql",angular.element('#overview-actualQuery')[0]);
+                }
 
                 // if a form was active, switch to job overview tab
                 if (account.active.form != false) {
