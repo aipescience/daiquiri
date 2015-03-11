@@ -186,6 +186,12 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $stat = array();
         }
 
+        // extract query, throw away the plan, if one is there
+        $queryArray = explode('-- The query plan used to run this query: --',$dbRow['query']);
+        $job['query'] = $queryArray[0];
+        unset($dbRow['query']);
+
+
         // create additional array
         $translations = $this->getResource()->getTranslations();
         foreach (array_merge($dbRow, $stat) as $key => $value) {
@@ -196,9 +202,16 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             );
         }
 
-        // extract query, throw away the plan, if one is there
-        $queryArray = explode('-- The query plan used to run this query: --',$dbRow['query']);
-        $job['query'] = $queryArray[0];
+        // format plan
+        if (isset($queryArray[1])) {
+            $plan = str_replace("--------------------------------------------\n--\n--",'',$queryArray[1]);
+            $plan = str_replace("\n--",";\n",$plan);
+            $job['additional']['plan'] = array(
+                'key' => 'plan',
+                'name' => 'Query plan',
+                'value' => $plan
+            );
+        }
 
         // add columns if the job was a success
         if ($job['status'] == 'success') {

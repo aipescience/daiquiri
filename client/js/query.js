@@ -24,6 +24,15 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
+
+/* filter */
+
+app.filter('newlines', function () {
+    return function(text) {
+        return text.replace(/\n/g, '<br/>');
+    }
+})
+
 /* directives */
 
 app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function($timeout,SubmitService) {
