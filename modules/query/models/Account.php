@@ -201,7 +201,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         // get actial query if there is one
         if (isset($dbRow['actualQuery'])) {
-            $job['actualQuery'] = $dbRow['actualQuery'];
+            $job['actualQuery'] = str_replace("; ",";\n",$dbRow['actualQuery']);
             unset($dbRow['actualQuery']);
         }
 
