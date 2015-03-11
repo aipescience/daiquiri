@@ -65,3 +65,9 @@
 .CodeMirror-linenumber {
     color: #333;
 }
+pre.cm-s-default {
+    padding: 0;
+    border: none;
+    margin: 0 0 5px 0;
+    background-color: transparent;
+}

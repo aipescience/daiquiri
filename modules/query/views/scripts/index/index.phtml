@@ -182,7 +182,7 @@
                             <div class="daiquiri-widget nav">
                                 <div class="nav-header">Query</div>
                                 <div class="nav-item">
-                                    <p id="overview-query" class="cm-s-default"></p>
+                                    <pre id="overview-query" class="cm-s-default"></pre>
                                 </div>
                                 <div class="nav-item">
                                     <button class="linkbutton" ng-click="pasteQuery('overview-query')">
@@ -264,6 +264,13 @@
                                             </tr>
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+
+                            <div class="daiquiri-widget nav" ng-show="account.job.plan">
+                                <div class="nav-header">Query plan</div>
+                                <div class="nav-item">
+                                    <pre id="overview-plan" class="cm-s-default"></pre>
                                 </div>
                             </div>
                         </div>
