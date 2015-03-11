@@ -195,7 +195,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         if (isset($queryArray[1])) {
             $plan = str_replace("--------------------------------------------\n--\n--",'',$queryArray[1]);
             $plan = trim($plan);
-            $plan = str_replace("\n--",";\n",$plan);
+            $plan = str_replace("\n-- ",";\n",$plan);
             $job['plan'] = $plan;
         }
 
