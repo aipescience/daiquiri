@@ -200,8 +200,10 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         }
 
         // get actial query if there is one
-        $job['actualQuery'] = $dbRow['actualQuery'];
-        unset($dbRow['actualQuery']);
+        if (isset($dbRow['actualQuery'])) {
+            $job['actualQuery'] = $dbRow['actualQuery'];
+            unset($dbRow['actualQuery']);
+        }
 
         // create additional array
         $translations = $this->getResource()->getTranslations();
