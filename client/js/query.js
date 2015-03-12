@@ -534,6 +534,8 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
 
             $http.post(base + '/query/download/',$.param(data)).success(function(response) {
                 for (var error in errors) delete errors[error];
+                QueryService.account.job.download = false;
+
                 if (response.status == 'ok') {
                     QueryService.account.job.download = {
                         'status': 'ok',
@@ -552,6 +554,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                 } else {
                     console.log(response);
                     errors['form'] = ['Unknown response from server, please contact support.'];
+
                 }
             }).error(function () {
                 errors['form'] = ['Error with connection to server, please contact support.'];
@@ -567,6 +570,8 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
 
             $http.post(base + '/query/download/regenerate/',$.param(data)).success(function(response) {
                 for (var error in errors) delete errors[error];
+                QueryService.account.job.download = false;
+
                 if (response.status == 'ok') {
                     QueryService.account.job.download = {
                         'status': 'ok',
