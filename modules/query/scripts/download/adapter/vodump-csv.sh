@@ -42,7 +42,7 @@ then
 fi
 
 if [ -z "$socket" ]; then
-    ${binPath}/mysqldump_vo --tab-remote --fields-terminated-by="," --fields-optionally-enclosed-by="\"" --lines-terminated-by="\n" -h$host -P$port -u$username -p$password $dbname $table > $file 2>> $path/$fileName.err
+    ${binPath}/mysqldump_vo --tab --tab-remote --fields-terminated-by="," --fields-optionally-enclosed-by="\"" --lines-terminated-by="\n" -h$host -P$port -u$username -p$password $dbname $table > $file 2>> $path/$fileName.err
 else
     ${binPath}/mysqldump_vo --tab-remote --fields-terminated-by="," --fields-optionally-enclosed-by="\"" --lines-terminated-by="\n" --socket=$socket -u$username -p$password $dbname $table > $file 2>> $path/$fileName.err
 fi
