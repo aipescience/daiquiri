@@ -105,7 +105,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
 
         // check if execution bits are set
         if (($perm & $refPerm) !== $refPerm) {
-            throw new Exception('Error with dump script permissions. Please set them correctly.');
+            throw new Exception('Error with dump script permissions.');
         }
 
         $cmd = escapeshellcmd($adapter) . ' ' . escapeshellarg(implode('&', $args));
@@ -113,7 +113,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
         exec($cmd);
 
         if (!file_exists($file)) {
-            throw new Exception('Error: table dump could not be created.');
+            throw new Exception('Table dump could not be created.');
         }
     }
 
@@ -157,7 +157,7 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
 
         // check if execution bits are set
         if (($perm & $refPerm) !== $refPerm) {
-            throw new Exception('Error with dump script permissions. Please set them correctly.');
+            throw new Exception('Error with dump script permissions.');
         }
 
         // fire up gearman and submit job
