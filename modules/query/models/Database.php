@@ -37,7 +37,12 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
                 $values = $form->getValues();
-                return $this->_createDownloadFile($values['download_tablename'],$values['download_format']);
+                $response = $this->_createDownloadFile($values['download_tablename'],$values['download_format']);
+                if ($response['status'] == 'error') {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form,$response['error']);
+                } else {
+                    return $response;
+                }
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }
@@ -78,11 +83,11 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
      */
     public function stream($table, $format) {
         if (empty($table)) {
-            return array('status' => 'error', 'errors' => 'Error: table not set');
+            return array('status' => 'error', 'error' => 'Error: table not set');
         }
 
         if (empty($format)) {
-            return array('status' => 'error', 'errors' => 'Error: format not set');
+            return array('status' => 'error', 'error' => 'Error: format not set');
         }
 
         // create link and file sysytem path for table dump
@@ -94,7 +99,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             $parts = explode(".", $suffix);
             $suffix = "." . $parts[1];
         } else {
-            return array('status' => 'error', 'errors' => 'Error: format not supported by stream');
+            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
         }
 
         $filename = $this->_generateFileName($table, $suffix);
@@ -105,7 +110,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         // create dir if neccessary
         if (!is_dir($dir)) {
             if (mkdir($dir) === false) {
-                return array('status' => 'error', 'errors' => 'Error: configuration of download setup wrong');
+                return array('status' => 'error', 'error' => 'Error: configuration of download setup wrong');
             }
 
             chmod($dir, 0775);
@@ -120,21 +125,21 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         }
 
         if (!array_key_exists($format, $formats)) {
-            return array('status' => 'error', 'errors' => 'Error: format not supported by stream');
+            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
         }
 
         // construct the streming file name (which has to be $bin with _stream at the end)
         $scriptName = pathinfo($bin);
 
         if (empty($scriptName['dirname']) && empty($scriptName['filename'])) {
-            return array('status' => 'error', 'errors' => 'Error: format not supported by stream');
+            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
         }
 
         $newScriptName = $scriptName['dirname'] . DIRECTORY_SEPARATOR . $scriptName['filename'] . "_stream." .
                 $scriptName['extension'];
 
         if (!file_exists($newScriptName)) {
-            return array('status' => 'error', 'errors' => 'Error: format not supported by stream');
+            return array('status' => 'error', 'error' => 'Error: format not supported by stream');
         }
 
         // check permissions on the dump script
@@ -144,7 +149,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
 
         // check if execution bits are set
         if (($perm & $refPerm) !== $refPerm) {
-            return array('status' => 'error', 'errors' => 'Error with stream script permissions. Please set them correctly.');
+            return array('status' => 'error', 'error' => 'Error with stream script permissions. Please set them correctly.');
         }
 
         // get rid of all the Zend output stuff
@@ -264,7 +269,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             if (mkdir($dir) === false) {
                 return array(
                     'status' => 'error',
-                    'errors' => array('form' => array('Configuration of download directory wrong, please contact support.'))
+                    'error' => 'Configuration of download directory wrong, please contact support.'
                 );
             }
 
@@ -300,7 +305,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             } catch (Exception $e) {
                 return array(
                     'status' => 'error',
-                    'errors' => $e->getMessage()
+                    'error' => $e->getMessage()
                 );
             }
         }
@@ -330,7 +335,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                 if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->gearman->pid))) {
                     return array(
                         'status' => 'error',
-                        'errors' => array('form' => array('Cannot write to the gearman PID file, please contact support.'))
+                        'error' => 'Cannot write to the gearman PID file, please contact support.'
                     );
                 }
 
@@ -365,7 +370,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                 if (file_exists($file . ".err")) {
                     return array(
                         'status' => 'error',
-                        'errors' => 'An error occured.'
+                        'error' => 'An error file exists on the server, please contact support.'
                     );
                 }
 
@@ -386,7 +391,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                     unlink($file . ".lock");
                     return array(
                         'status' => 'error',
-                        'errors' => $e->getMessage()
+                        'error' => $e->getMessage()
                     );
                 }
 
