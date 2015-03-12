@@ -64,7 +64,7 @@ app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function(
 
 /* services */
 
-app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService','PlotService',function($http,$timeout,$cookies,filterFilter,ModalService,PlotService) {
+app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService','PlotService','BrowserService',function($http,$timeout,$cookies,filterFilter,ModalService,PlotService,BrowserService) {
     // query options, will be set inside the template via ng-init
     var options = {};
 
@@ -107,8 +107,14 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
 
     function fetchAccount() {
         $http.get(base + '/query/account/').success(function(response) {
-            account.jobs = response.jobs;
+            // update database information (top left)
             account.database = response.database;
+
+            // update job list and database browser if something has changed
+            if (!angular.equals(account.jobs,response.jobs)) {
+                account.jobs = response.jobs;
+                BrowserService.initBrowser('databases');
+            }
 
             // activate the current job again, if its status has changed
             if (account.active.job != false && account.job.status != 'success') {
