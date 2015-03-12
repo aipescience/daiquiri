@@ -423,26 +423,32 @@
 
                         <div class="tab-pane" id="download-tab" ng-show="account.active.job" ng-controller="DownloadController">
                             <h4>Download table `{{account.job.table}}`</h4>
-                            <div ng-hide="account.job.download">
+                            <div>
                                 <p>
                                     For further processing of the data, you can download the results table to your local machine. For this file several formats are available. Please choose a format for the download from the list below.
                                 </p>
                             </div>
-                            <div ng-show="account.job.download">
+
+                            <?php echo $this->action('index', 'download', 'query'); ?>
+
+                            <p class="text-info" ng-show="account.job.download.status == 'pending'">
+                                Your file is being created... Please wait...
+                            </p>
+
+                            <div ng-show="account.job.download.status == 'ok'">
                                 <p>
                                     You can now download the file using:
                                 </p>
                                 <p>
-                                    <a target="_blank" href="{{account.job.download.link}}">{{account.job.download.link}}</a>
+                                    <a class="daiquiri-query-download-link" target="_blank" href="{{account.job.download.link}}">{{account.job.download.link}}</a>
                                 </p>
                                 <p>
-                                    or <button class="linkbutton" ng-click="regenerateTable()">regenerate</button> the file.
+                                    To download the file in a different format, please choose from the list above and click "Download table" again.
                                 </p>
                                 <p>
-                                    You can also download the file in a different format.
+                                    Sometimes it can be nessesary to create the download file on the server anew. Please click <button class="linkbutton" ng-click="regenerateTable()">here</button> to regenerate the file.
                                 </p>
                             </div>
-                            <?php echo $this->action('index', 'download', 'query'); ?>
                         </div>
                     </div>
                 </div>

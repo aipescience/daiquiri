@@ -263,8 +263,8 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         if (!is_dir($dir)) {
             if (mkdir($dir) === false) {
                 return array(
-                    'status' => 'error', 
-                    'errors' => 'Configuration of download setup wrong'
+                    'status' => 'error',
+                    'errors' => array('form' => array('Configuration of download directory wrong, please contact support.'))
                 );
             }
 
@@ -312,7 +312,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                 throw new Exception('gearmand is not running.');
             }
 
-            // check if 
+            // check if
             $restartGeamanManager = false;
             $pidfile = Daiquiri_Config::getInstance()->query->download->gearman->pid;
             if (file_exists($pidfile)) {
@@ -330,7 +330,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                 if(!is_writable(dirname(Daiquiri_Config::getInstance()->query->download->gearman->pid))) {
                     return array(
                         'status' => 'error',
-                        'errors' => 'Cannot write to the gearman PID file location'
+                        'errors' => array('form' => array('Cannot write to the gearman PID file, please contact support.'))
                     );
                 }
 

@@ -66,30 +66,16 @@ form#plan .CodeMirror {
 
 /* download tab */
 
-#fieldset-downloadtablegroup {
+#fieldset-downloadtablegroup,
+#fieldset-downloadformatgroup #download_format-label {
     display: none;
 }
-#fieldset-downloadformatgroup {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding-right: 10px;
-    margin-bottom: 10px;
-}
 #fieldset-downloadformatgroup ul.text-error {
-    margin: 10px;
+    margin: 10px 0 10px 0;
 }
-.daiquiri-download-format {
+.daiquiri-query-download-link {
     display: block;
-    width: 20px;
-    float: left;
-}
-.daiquiri-download-format-name {
-    width: 200px;
-    margin-left: 10px;
-    float: left;
-}
-.daiquiri-download-format-description {
-    margin-left: 225px;
+    margin-left: 20px;
 }
 
 /* query bar (i.e. the bar on the SQL query form) */

@@ -64,6 +64,33 @@ app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function(
 
 /* services */
 
+app.factory('PollingService', ['$timeout','QueryService','DownloadService',function($timeout,QueryService,DownloadService) {
+    // query options, will be set inside the template via ng-init
+    var options = {};
+
+    function init(opt) {
+        options = opt;
+        poll();
+    }
+
+    function poll() {
+        QueryService.fetchAccount();
+
+        if (!angular.isUndefined(QueryService.account.job.download) && QueryService.account.job.download.status == 'pending') {
+            DownloadService.downloadTable();
+        }
+
+        if (options.polling.enabled == true) {
+            $timeout(poll, options.polling.timeout);
+        }
+    }
+
+    return {
+        init: init,
+        poll: poll
+    };
+}]);
+
 app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService','PlotService','BrowserService',function($http,$timeout,$cookies,filterFilter,ModalService,PlotService,BrowserService) {
     // query options, will be set inside the template via ng-init
     var options = {};
@@ -88,21 +115,10 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
 
     var base = angular.element('base').attr('href');
 
-    function init() {
-        startPolling();
+    function init(opt) {
+        options = opt;
         activateForm();
         $('[rel=tooltip]').tooltip();
-    }
-
-    function poll() {
-        fetchAccount();
-        if (options.polling.enabled == true) {
-            $timeout(poll, options.polling.timeout);
-        }
-    }
-
-    function startPolling() {
-        poll();
     }
 
     function fetchAccount() {
@@ -517,23 +533,28 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
             angular.extend(data,values);
 
             $http.post(base + '/query/download/',$.param(data)).success(function(response) {
+                for (var error in errors) delete errors[error];
                 if (response.status == 'ok') {
                     QueryService.account.job.download = {
+                        'status': 'ok',
                         'link': response.link,
                         'format': response.format
                     }
+                } else if (response.status == 'pending') {
+                    QueryService.account.job.download = {
+                        'status': 'pending'
+                    }
                 } else if (response.status == 'error') {
-                    for (var error in errors) delete errors[error];
                     console.log(response);
                     angular.forEach(response.errors, function(object, key) {
                         errors[key] = object;
                     });
                 } else {
                     console.log(response);
-                    errors[formName] = {'form': ['Unknown response.']};
+                    errors['form'] = ['Unknown response from server, please contact support.'];
                 }
             }).error(function () {
-                errors[formName] = {'form': ['Could not connect to server.']};
+                errors['form'] = ['Error with connection to server, please contact support.'];
             });
         },
         regenerateTable: function() {
@@ -545,23 +566,28 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
             };
 
             $http.post(base + '/query/download/regenerate/',$.param(data)).success(function(response) {
+                for (var error in errors) delete errors[error];
                 if (response.status == 'ok') {
                     QueryService.account.job.download = {
+                        'status': 'ok',
                         'link': response.link,
                         'format': response.format
                     }
+                } else if (response.status == 'pending') {
+                    QueryService.account.job.download = {
+                        'status': 'pending'
+                    }
                 } else if (response.status == 'error') {
-                    errors[formName] = {};
                     console.log(response);
                     angular.forEach(response.status, function(object, key) {
                         errors[key] = object;
                     });
                 } else {
                     console.log(response);
-                    errors[formName] = {'form': ['Unknown response.']};
+                    errors['form'] = ['Unknown response from server, please contact support.'];
                 }
             }).error(function () {
-                errors[formName] = {'form': ['Could not connect to server.']};
+                errors['form'] = ['Error with connection to server, please contact support.'];
             });
         }
     };
@@ -569,7 +595,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
 
 /* controllers */
 
-app.controller('QueryController',['$scope','$timeout','QueryService','SubmitService',function($scope,$timeout,QueryService,SubmitService) {
+app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService',function($scope,$timeout,PollingService,QueryService,SubmitService) {
 
     $scope.account = QueryService.account;
     $scope.dialog  = QueryService.dialog;
@@ -612,9 +638,8 @@ app.controller('QueryController',['$scope','$timeout','QueryService','SubmitServ
 
     // init query interface
     $timeout(function() {
-        for (var option in $scope.options) QueryService.options[option] = $scope.options[option];
-
-        QueryService.init();
+        PollingService.init($scope.options);
+        QueryService.init($scope.options);
         SubmitService.init();
     });
 
