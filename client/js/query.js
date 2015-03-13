@@ -641,6 +641,11 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
         SubmitService.clearInput();
     }
 
+    $scope.tabclick = function ($event) {
+        // prevents the bootstrap tabs from changing the location
+        $event.preventDefault();
+    }
+
     // init query interface
     $timeout(function() {
         PollingService.init($scope.options);

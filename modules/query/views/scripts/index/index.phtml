@@ -109,24 +109,24 @@
 
                     <ul class="nav nav-tabs">
                         <li id="submit-tab-header" ng-show="account.active.form" ng-class="{active: account.active.form}">
-                            <a href="#submit-tab" data-toggle="tab">New Query</a>
+                            <a href="#submit-tab" data-toggle="tab" ng-click="tabclick($event)">New Query</a>
                         </li>
                         <li id="overview-tab-header" ng-show="account.active.job">
-                            <a href="#overview-tab" data-toggle="tab">Job Overview</a>
+                            <a href="#overview-tab" data-toggle="tab" ng-click="tabclick($event)">Job Overview</a>
                         </li>
                         <li id="results-tab-header" ng-show="account.active.job && account.job.status == 'success'">
-                            <a href="#results-tab" data-toggle="tab">Results Table</a>
+                            <a href="#results-tab" data-toggle="tab" ng-click="tabclick($event)">Results Table</a>
                         </li>
                         <?php if ($this->samp): ?>
                         <li id="samp-tab-header" ng-show="account.active.job && account.job.status == 'success'">
-                            <a href="#samp-tab" data-toggle="tab">SAMP</a>
+                            <a href="#samp-tab" data-toggle="tab" ng-click="tabclick($event)">SAMP</a>
                         </li>
                         <?php endif; ?>
                         <li id="plot-tab-header" ng-show="account.active.job && account.job.status == 'success'">
-                            <a href="#plot-tab" data-toggle="tab">Plot</a>
+                            <a href="#plot-tab" data-toggle="tab" ng-click="tabclick($event)">Plot</a>
                         </li>
                         <li id="download-tab-header" ng-show="account.active.job && account.job.status == 'success'">
-                            <a href="#download-tab" data-toggle="tab">Download</a>
+                            <a href="#download-tab" data-toggle="tab" ng-click="tabclick($event)">Download</a>
                         </li>
                     </ul>
 
