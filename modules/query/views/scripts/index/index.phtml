@@ -83,7 +83,7 @@
             <ul id="jobs" class="daiquiri-widget nav nav-pills nav-stacked">
                 <li class="nav-header">Job list</li>
                 <li class="nav-item {{job.id == account.active.job ? 'active' : ''}}"
-                    ng-repeat="job in account.jobs  | orderBy:'-timestamp'">
+                    ng-repeat="job in account.jobs  | orderBy:'-time'">
                     <a href="" ng-click="activateJob(job.id)" >
                         <i class="icon-ok pull-right" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
                         <i class="icon-warning-sign pull-right" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
