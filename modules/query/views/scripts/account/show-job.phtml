@@ -22,32 +22,42 @@
 <div class="main">
     <h2>Details for job <?php echo $this->escape($this->job['table']); ?></h2>
 
+    <h4>Query</h4>
+    <pre><?php echo $this->escape($this->job['query']); ?></pre>
+
     <h4>Job parameters</h4>
 
     <dl class="dl-horizontal">
-        <dt>Internal job id</dt>
-        <dd><?php echo $this->escape($this->job['id']); ?></dd>
+        <dt>Status</dt>
+        <dd><?php echo $this->escape($this->job['status']); ?></dd>
+
+        <?php if (!empty($this->job['error'])): ?>
+        <dt>Error</dt>
+        <dd><?php echo $this->escape($this->job['error']); ?></dd>
+        <?php endif; ?>
 
         <dt>Full database table name</dt>
         <dd><?php echo $this->escape($this->job['database']); ?>.<?php echo $this->escape($this->job['table']); ?></dd>
 
-        <dt>Query</dt>
-        <dd><?php echo $this->escape($this->job['query']); ?></dd>
+        <dt>Internal job id</dt>
+        <dd><?php echo $this->escape($this->job['id']); ?></dd>
 
         <dt>Time submitted</dt>
         <dd><?php echo $this->escape($this->job['time']); ?></dd>
 
-        <dt>Status</dt>
-        <dd><?php echo $this->escape($this->job['status']); ?></dd>
-
-        <?php if (isset($this->job['plan'])): ?>
-        <dt>Query plan</dt>
-        <dd><?php echo $this->escape($this->job['plan']); ?></dd>
+        <?php if (isset($this->job['timeQueue'])): ?>
+        <dt>Time in queue [s]</dt>
+        <dd><?php echo $this->escape($this->job['timeQueue']); ?></dd>
         <?php endif; ?>
 
-        <?php if (isset($this->job['actualQuery'])): ?>
-        <dt>Actual Query</dt>
-        <dd><?php echo $this->escape($this->job['actualQuery']); ?></dd>
+        <?php if (isset($this->job['timeQuery'])): ?>
+        <dt>Time for query [s]</dt>
+        <dd><?php echo $this->escape($this->job['timeQuery']); ?></dd>
+        <?php endif; ?>
+
+        <?php if (isset($this->job['nrows'])): ?>
+        <dt>Number of rows (approx.)</dt>
+        <dd><?php echo $this->escape($this->job['nrows']); ?></dd>
         <?php endif; ?>
     </dl>
 
@@ -59,4 +69,14 @@
         <dd><?php echo $this->escape($element['value']); ?></dd>
         <?php endforeach; ?>
     </dl>
+
+    <?php if (isset($this->job['plan'])): ?>
+    <h4>Query plan</h4>
+    <pre><?php echo $this->escape($this->job['plan']); ?></pre>
+    <?php endif; ?>
+
+    <?php if (isset($this->job['actualQuery'])): ?>
+    <h4>Actual Query</h4>
+    <pre><?php echo $this->escape($this->job['actualQuery']); ?></pre>
+    <?php endif; ?>
 </div>

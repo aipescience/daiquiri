@@ -172,18 +172,11 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'additional' => array()
         );
 
-        foreach(array('id','database','table','status','error','username') as $key) {
-            if (!empty($dbRow[$key])) {
+        foreach(array('id','database','table','status','error','username','timeQueue','timeQuery') as $key) {
+            if (isset($dbRow[$key])) {
                 $job[$key] = $dbRow[$key];
             }
             unset($dbRow[$key]);
-        }
-
-        // fetch table statistics
-        if ($job['status'] == 'success') {
-            $stat = $this->getResource()->fetchTableStats($job['database'],$job['table']);
-        } else {
-            $stat = array();
         }
 
         // extract query, throw away the plan, if one is there
@@ -203,6 +196,19 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         if (isset($dbRow['actualQuery'])) {
             $job['actualQuery'] = str_replace("; ",";\n",$dbRow['actualQuery']);
             unset($dbRow['actualQuery']);
+        }
+
+        // fetch table statistics
+        if ($job['status'] == 'success') {
+            $stat = $this->getResource()->fetchTableStats($job['database'],$job['table']);
+        } else {
+            $stat = array();
+        }
+
+        // ret row count
+        if (isset($stat['tbl_row'])) {
+            $job['nrows'] = $stat['tbl_row'];
+            unset($stat['tbl_row']);
         }
 
         // create additional array

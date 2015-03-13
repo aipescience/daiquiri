@@ -219,6 +219,21 @@
 
                                         <dt>Time submitted</dt>
                                         <dd>{{account.job.time}}</dd>
+
+                                        <div ng-show="account.job.timeQueue != null">
+                                            <dt>Time in queue</dt>
+                                            <dd>{{account.job.timeQueue}} s</dd>
+                                        </div>
+
+                                        <div ng-show="account.job.timeQuery != null">
+                                            <dt>Time for query</dt>
+                                            <dd>{{account.job.timeQuery}} s</dd>
+                                        </div>
+
+                                        <div ng-show="account.job.nrows != null">
+                                            <dt>Number of rows (approx.)</dt>
+                                            <dd>{{account.job.nrows}}</dd>
+                                        </div>
                                     </dl>
                                 </div>
                                 <div class="nav-item">
