@@ -323,8 +323,18 @@
 
                         <?php if ($this->samp): ?>
                         <div class="tab-pane" id="samp-tab" ng-show="account.active.job" ng-controller="SampController">
+
+                            <h4>Simple Application Messaging Protocol (SAMP)</h4>
+
+                            <p>
+                                <a href="http://www.ivoa.net/documents/SAMP/" target="_blank">SAMP</a> is an <a href="http://www.ivoa.net/" target="_blank">IVOA</a> messaging protocol that enables astronomy software tools to interoperate and communicate.
+                            </p>
+                            <p>
+                                It lets you transfer the result table of a query to an application on you client and is supported by tools like <a href="http://www.star.bris.ac.uk/~mbt/topcat/" target="_blank">TOPCAT</a> and <a href="http://aladin.u-strasbg.fr/" target="_blank">Aladin</a>. Starting one of these programs will open a <em>SAMP Hub</em>. When registering to the Hub you usually get a security warning, which you have to approve in order to proceed.
+                            </p>
+
                             <div class="daiquiri-widget nav">
-                                <div class="nav-header">SAMP</div>
+                                <div class="nav-header">SAMP Connection</div>
 
                                 <div class="nav-item" ng-show="connected">
                                     <table class="table table-condensed daiquiri-samp-clients">
