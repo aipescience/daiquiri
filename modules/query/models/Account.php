@@ -476,7 +476,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function keywords() {
-        $rows = Query_Model_Resource_AbstractQuery::$keywords;
+        $rows = Query_Model_Resource_AbstractProcessor::factory()->getKeywords();
         foreach ($rows as $key => &$row) {
             $row['id'] = $key + 1;
             $row['value'] = $row['name'];
@@ -489,7 +489,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
      * @return array $response
      */
     public function nativeFunctions() {
-        $rows =Query_Model_Resource_AbstractQuery::$functions;
+        $rows = Query_Model_Resource_AbstractProcessor::factory()->getFunctions();
         foreach ($rows as $key => &$row) {
             $row['id'] = $key + 1;
             $row['value'] = $row['name'] . '()';

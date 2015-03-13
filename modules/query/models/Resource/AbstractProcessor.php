@@ -27,6 +27,18 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
     public static $planTypes = false;
 
     /**
+     * List of MySQL keywords.
+     * @var array
+     */
+    public static $keywords = array();
+
+    /**
+     * List of standard mysql functions.
+     * @var array $functions
+     */
+    public static $functions = array();
+
+    /**
      * Processor factory.
      * @return Query_Model_Resource_AbstractProcessor $processor
      */
@@ -101,7 +113,7 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
     abstract public function validatePlan(&$plan, $table, array &$errors, $options = false);
 
     /**
-     * Prepares a job object according to the query plan (if supported), otherwise just prepares a job 
+     * Prepares a job object according to the query plan (if supported), otherwise just prepares a job
      * according to the processed query (without plan, depending on implementation)
      * @param string $sql query string
      * @param array $errors array holding any errors that occur
@@ -118,7 +130,7 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
      * @param array $plan $query plan
      * @param array $errors array holding any errors that occur
      * @param array $options any options that a specific implementation of validateQuery needs to get
-     * @return array $plan 
+     * @return array $plan
      */
     abstract public function getPlan(&$sql, array &$errors, $options = false);
 
@@ -133,6 +145,22 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
         } else {
             return false;
         }
+    }
+
+    /**
+     * Returns the static array of SQL keywords
+     * @return array $keywords
+     */
+    public function getKeywords() {
+        return static::$keywords;
+    }
+
+    /**
+     * Returns the static array of nateive functions
+     * @return array $functions
+     */
+    public function getFunctions() {
+        return static::$functions;
     }
 
     /**

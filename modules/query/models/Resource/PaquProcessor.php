@@ -35,12 +35,87 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
     public static $planTypes = array("QPROC_SIMPLE", "QPROC_INFOPLAN", "QPROC_ALTERPLAN");
 
     /**
+     * List of MySQL keywords.
+     * @var array
+     */
+    public static $keywords = array(
+        array(
+            'name' => 'SELECT',
+            'description' => ''
+        ),
+        array(
+            'name' => 'SELECT DISTINCT',
+            'description' => ''
+        ),
+        array(
+            'name' => 'FROM',
+            'description' => ''
+        ),
+        array(
+            'name' => 'WHERE',
+            'description' => ''
+        ),
+        array(
+            'name' => 'AND',
+            'description' => ''
+        ),
+        array(
+            'name' => 'OR',
+            'description' => ''
+        ),
+        array(
+            'name' => 'BETWEEN',
+            'description' => ''
+        ),
+        array(
+            'name' => 'LIKE',
+            'description' => ''
+        ),
+        array(
+            'name' => 'GROUP BY',
+            'description' => ''
+        ),
+        array(
+            'name' => 'LIMIT',
+            'description' => ''
+        ),
+    );
+
+    /**
+     * List of standard mysql functions.
+     * @var array $functions
+     */
+    public static $functions = array(
+        array(
+            'name' => 'AVG',
+            'description' => ''
+        ),
+        array(
+            'name' => 'COUNT',
+            'description' => ''
+        ),
+        array(
+            'name' => 'SUM',
+            'description' => ''
+        ),
+        array(
+            'name' => 'MAX',
+            'description' => ''
+        ),
+        array(
+            'name' => 'MIN',
+            'description' => ''
+        ),
+    );
+
+    /**
      * PaQu parallel query object
      * @var string $planTypes
      */
     protected $_paraQuery;
+
     /**
-     * Construtor. 
+     * Construtor.
      */
     public function __construct() {
         parent::__construct();
@@ -203,7 +278,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         $listCreateTmpTables = array();
         $listLinkTmpTables = array();
         $listDropTmpTables = array();
-        if (!$this->_checkPaquCallSyntax($multiLineParseTrees, $errors, $listCreateTmpTables, 
+        if (!$this->_checkPaquCallSyntax($multiLineParseTrees, $errors, $listCreateTmpTables,
                     $listLinkTmpTables, $listDropTmpTables)) {
             return false;
         }
@@ -224,7 +299,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
     }
 
     /**
-     * Prepares a job object according to the query plan (if supported), otherwise just prepares a job 
+     * Prepares a job object according to the query plan (if supported), otherwise just prepares a job
      * according to the processed query (without plan, depending on implementation)
      * @param string $sql query string
      * @param array $errors array holding any errors that occur
@@ -282,7 +357,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
      * @param array $plan $query plan
      * @param array $errors array holding any errors that occur
      * @param array $options any options that a specific implementation of validateQuery needs to get
-     * @return array $plan 
+     * @return array $plan
      */
     public function getPlan(&$sql, array &$errors, $options = false) {
         $errors = array();
@@ -322,7 +397,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
     }
 
     /**
-     * Takes the output of the explan extended query, and formats it nicely. 
+     * Takes the output of the explan extended query, and formats it nicely.
      * @param array $plan
      * @return $string $plan formatted plan
      */
