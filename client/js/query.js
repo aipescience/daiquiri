@@ -91,7 +91,7 @@ app.factory('PollingService', ['$timeout','QueryService','DownloadService',funct
     };
 }]);
 
-app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','ModalService','PlotService','BrowserService',function($http,$timeout,$cookies,filterFilter,ModalService,PlotService,BrowserService) {
+app.factory('QueryService', ['$http','$timeout','$cookies','$window','filterFilter','ModalService','PlotService','BrowserService',function($http,$timeout,$cookies,$window,filterFilter,ModalService,PlotService,BrowserService) {
     // query options, will be set inside the template via ng-init
     var options = {};
 
@@ -122,27 +122,31 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
     }
 
     function fetchAccount() {
-        $http.get(base + '/query/account/').success(function(response) {
-            // update database information (top left)
-            account.database = response.database;
+        $http.get(base + '/query/account/')
+            .success(function(response) {
+                // update database information (top left)
+                account.database = response.database;
 
-            // update job list and database browser if something has changed
-            if (!angular.equals(account.jobs,response.jobs)) {
-                account.jobs = response.jobs;
-                BrowserService.initBrowser('databases');
-            }
-
-            // activate the current job again, if its status has changed
-            if (account.active.job != false && account.job.status != 'success') {
-                // get the index of the job in the jobs array (by magic)
-                var id = account.job.id;
-                // get the index of the job in the jobs array (by magic)
-                var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': id})[0]);
-                if (account.jobs[i].status != account.job.status) {
-                    account.job.status = activateJob(id);
+                // update job list and database browser if something has changed
+                if (!angular.equals(account.jobs,response.jobs)) {
+                    account.jobs = response.jobs;
+                    BrowserService.initBrowser('databases');
                 }
-            }
-        });
+
+                // activate the current job again, if its status has changed
+                if (account.active.job != false && account.job.status != 'success') {
+                    // get the index of the job in the jobs array (by magic)
+                    var id = account.job.id;
+                    // get the index of the job in the jobs array (by magic)
+                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': id})[0]);
+                    if (account.jobs[i].status != account.job.status) {
+                        account.job.status = activateJob(id);
+                    }
+                }
+            })
+            .error(function(response,status) {
+                $window.location.reload();
+            });
     }
 
     function activateForm(formName) {
@@ -188,16 +192,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','filterFilter','Modal
                 }
             })
             .error(function(response, status) {
-                if (status === 404) {
-                    fetchAccount();
-                    // TODO load another job
-                } else if (status === 403) {
-                    // TODO show a modal to reload
-                    console.log(status);
-                } else {
-                    // show a modal
-                    console.log(status);
-                }
+                $window.location.reload();
             });
     }
 
