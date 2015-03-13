@@ -145,7 +145,11 @@ app.factory('QueryService', ['$http','$timeout','$cookies','$window','filterFilt
                 }
             })
             .error(function(response,status) {
-                $window.location.reload();
+                if (status === 403) {
+                    $window.location.reload();
+                } else {
+                    console.log(response);
+                }
             });
     }
 
@@ -192,7 +196,11 @@ app.factory('QueryService', ['$http','$timeout','$cookies','$window','filterFilt
                 }
             })
             .error(function(response, status) {
-                $window.location.reload();
+                if (status === 403) {
+                    $window.location.reload();
+                } else {
+                    console.log(response);
+                }
             });
     }
 
