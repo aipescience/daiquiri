@@ -49,6 +49,12 @@ form#sql .CodeMirror {
     margin-right: 10px;
 }
 
+/* SAMP tab */
+
+.daiquiri-query-samp {
+    margin-top: 20px;
+}
+
 /* plan */
 
 form#plan .CodeMirror {
