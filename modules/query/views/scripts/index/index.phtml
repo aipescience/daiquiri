@@ -330,7 +330,17 @@
                                 <a href="http://www.ivoa.net/documents/SAMP/" target="_blank">SAMP</a> is an <a href="http://www.ivoa.net/" target="_blank">IVOA</a> messaging protocol that enables astronomy software tools to interoperate and communicate.
                             </p>
                             <p>
-                                It lets you transfer the result table of a query to an application on you client and is supported by tools like <a href="http://www.star.bris.ac.uk/~mbt/topcat/" target="_blank">TOPCAT</a> and <a href="http://aladin.u-strasbg.fr/" target="_blank">Aladin</a>. Starting one of these programs will open a <em>SAMP Hub</em>. When registering to the Hub you usually get a security warning, which you have to approve in order to proceed.
+                                It lets you transfer the result table of a query to an application on you client and is supported by tools like <a href="http://www.star.bris.ac.uk/~mbt/topcat/" target="_blank">TOPCAT</a> and <a href="http://aladin.u-strasbg.fr/" target="_blank">Aladin</a>. Starting one of these programs will open a <em>SAMP Hub</em>, which this webpage uses to connect to the application.
+                            </p>
+                            <p>
+                                Since the connection to a local service is considered a security risk, modern browsers will prevent these connections, especially when using HTTPS. For SAMP to work, you might need to:
+                            </p>
+                            <ul>
+                                <li><em>(in Firefox)</em> click on the 'shield' icon in the top-left corner of the address bar and select 'Disable Protection on This Page'.</li>
+                                <li><em>(in Chrome/Chromium)</em> ... </li>
+                            </ul>
+                            <p>
+                                In addition, when registering to the Hub you usually get java security warning <em>in a different window</em>, which you have to approve in order to proceed.
                             </p>
 
                             <div class="daiquiri-widget nav daiquiri-query-samp">
