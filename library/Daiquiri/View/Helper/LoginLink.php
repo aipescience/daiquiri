@@ -50,7 +50,7 @@ class Daiquiri_View_Helper_LoginLink extends Zend_View_Helper_Abstract {
             $link = '<a href="' . $this->view->baseUrl('/auth/login/logout') . '">Logout</a>';
         } else {
             // user not logged in, display the login link
-            $link = '<a href="' . $this->view->baseUrl('/auth/login') . '">Login</a>';
+            $link = '<a href="' . $this->view->baseUrl('/auth/login?redirect=' . $this->view->url()) . '">Login</a>';
         }
         return $link;
     }
