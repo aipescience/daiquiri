@@ -196,11 +196,20 @@
                                 <div class="nav-item">
                                     <dl class="dl-horizontal">
                                         <dt>Job status</dt>
-                                        <dd ng-class="{'text-success': account.job.status == 'success',
-                                                  'text-error': account.job.status == 'error' || account.job.status == 'timeout',
-                                                  'text-info': account.job.status == 'queued'}">
+                                        <dd ng-class="{
+                                            'text-success': account.job.status == 'success',
+                                            'text-warning': account.job.status == 'timeout',
+                                            'text-error': account.job.status == 'error',
+                                            'text-info': account.job.status == 'queued'}">
                                             {{account.job.status}}
                                         </dd>
+
+                                        <div ng-show="account.job.status == 'error'">
+                                            <dt>Error</dt>
+                                            <dd class="text-error">
+                                                {{account.job.error}}
+                                            </dd>
+                                        </div>
 
                                         <dt>Full database table name</dt>
                                         <dd>{{account.job.database}}.{{account.job.table}}</dd>
