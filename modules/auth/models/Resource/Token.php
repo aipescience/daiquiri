@@ -29,9 +29,10 @@ class Auth_Model_Resource_Token extends Daiquiri_Model_Resource_Table {
 
     /**
      * Creates inserts and returns a new token.
+     * @param   array   $data   row data
      * @return  string  $token  the new token
      */
-    public function insertRow($path) {
+    public function insertRow(array $data = array()) {
         // get lifetime for token
         $lifetime = Daiquiri_Config::getInstance()->auth->tokenLifetime;
 
@@ -45,7 +46,7 @@ class Auth_Model_Resource_Token extends Daiquiri_Model_Resource_Table {
         $this->getAdapter()->insert('Auth_Token', array(
             'username' => Daiquiri_Auth::getInstance()->getCurrentUsername(),
             'token' => $token,
-            'path' => $path,
+            'path' => $data['path'],
             'expires' => $expires
         ));
 

@@ -42,7 +42,7 @@ class Auth_Model_Token extends Daiquiri_Model_Table {
                 // get the form values
                 $values = $form->getValues();
 
-                $token = $this->getResource()->insertRow($values['path']);
+                $token = $this->getResource()->insertRow($values);
 
                 return array('status' => 'ok', 'token' => $token);
             } else {
