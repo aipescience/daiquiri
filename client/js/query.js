@@ -424,7 +424,7 @@ app.factory('SubmitService', ['$http','$timeout','QueryService','CodemirrorServi
         }
 
         $http.post(base + '/query/form/plan',$.param({
-            'plan_csrf': oprions.csrf,
+            'plan_csrf': options.csrf,
             'plan_query': angular.element('#plan_query').val()
         })).success(function(response) {
             if (response.status == 'ok') {
