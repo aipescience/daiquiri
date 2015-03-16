@@ -19,8 +19,10 @@
  */
 ?>
 
+
 <link href="<?php echo $this->baseUrl('/daiquiri/css/query.css'); ?>" media="screen" rel="stylesheet" type="text/css" >
 <script type="text/javascript" src="<?php echo $this->baseUrl('/daiquiri/js/query.js'); ?>"></script>
+<meta name="csrf-token" content="" />
 
 <div class="main" ng-app="query" ng-controller="QueryController"
     ng-init='options = <?php echo Zend_Json::encode($this->options); ?>'>
@@ -343,7 +345,7 @@
                                 In addition, when registering to the Hub you usually get java security warning <em>in a different window</em>, which you have to approve in order to proceed.
                             </p>
 
-                            <div class="daiquiri-widget nav daiquiri-query-samp">
+                            <div class="daiquiri-widget nav daiquiri-query-samp" data-csrf-token="<?php echo $this->options['csrf']; ?>">
                                 <div class="nav-header">SAMP Connection</div>
 
                                 <div class="nav-item" ng-show="connected">

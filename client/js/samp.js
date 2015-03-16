@@ -19,7 +19,7 @@
 
 angular.module('samp', [])
 
-.factory('SampService', ['$timeout','$window','$location','$http','$cookies',function($timeout,$window,$location,$http,$cookies) {
+.factory('SampService', ['$timeout','$window','$location','$http',function($timeout,$window,$location,$http) {
 
     var clients = {};
     var errors = {};
@@ -132,7 +132,7 @@ angular.module('samp', [])
         var path = '/query/download/stream/format/votable/table/' + table;
 
         var data = {
-            'csrf': $cookies['XSRF-TOKEN'],
+            'csrf': angular.element('.daiquiri-query-samp').attr('data-csrf-token'),
             'path': path
         };
 

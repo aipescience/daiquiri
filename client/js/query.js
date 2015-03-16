@@ -91,7 +91,7 @@ app.factory('PollingService', ['$timeout','QueryService','DownloadService',funct
     };
 }]);
 
-app.factory('QueryService', ['$http','$timeout','$cookies','$window','filterFilter','ModalService','PlotService','BrowserService',function($http,$timeout,$cookies,$window,filterFilter,ModalService,PlotService,BrowserService) {
+app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalService','PlotService','BrowserService',function($http,$timeout,$window,filterFilter,ModalService,PlotService,BrowserService) {
     // query options, will be set inside the template via ng-init
     var options = {};
 
@@ -206,7 +206,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','$window','filterFilt
 
     function renameJob () {
         var data = {
-            'csrf': $cookies['XSRF-TOKEN'],
+            'csrf': options.csrf,
             'tablename': dialog.values.tablename
         };
 
@@ -223,7 +223,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','$window','filterFilt
     }
 
     function killJob () {
-        $http.post(base + '/query/account/kill-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
+        $http.post(base + '/query/account/kill-job/id/' + account.job.id,$.param({'csrf': options.csrf}))
             .success(function(response) {
                 dialogSuccess(response, function() {
                     // get the index of the job in the jobs array (by magic)
@@ -247,7 +247,7 @@ app.factory('QueryService', ['$http','$timeout','$cookies','$window','filterFilt
     }
 
     function removeJob() {
-        $http.post(base + '/query/account/remove-job/id/' + account.job.id,$.param({'csrf': $cookies['XSRF-TOKEN']}))
+        $http.post(base + '/query/account/remove-job/id/' + account.job.id,$.param({'csrf': options.csrf}))
             .success(function(response) {
                 dialogSuccess(response, function() {
                     // get the index of the job in the jobs array (by magic)
@@ -324,13 +324,17 @@ app.factory('QueryService', ['$http','$timeout','$cookies','$window','filterFilt
     };
 }]);
 
-app.factory('SubmitService', ['$http','$timeout','$cookies','QueryService','CodemirrorService',function($http,$timeout,$cookies,QueryService,CodemirrorService) {
+app.factory('SubmitService', ['$http','$timeout','QueryService','CodemirrorService',function($http,$timeout,QueryService,CodemirrorService) {
+    // query options, will be set inside the template via ng-init
+    var options = {};
+
     var values = {};
     var errors = {};
 
     var base = angular.element('base').attr('href');
 
-    function init() {
+    function init(opt) {
+        options = opt;
         $timeout(function() {
             // refresh codemirror
             CodemirrorService.refresh('sql_query');
@@ -420,7 +424,7 @@ app.factory('SubmitService', ['$http','$timeout','$cookies','QueryService','Code
         }
 
         $http.post(base + '/query/form/plan',$.param({
-            'plan_csrf': $cookies['XSRF-TOKEN'],
+            'plan_csrf': oprions.csrf,
             'plan_query': angular.element('#plan_query').val()
         })).success(function(response) {
             if (response.status == 'ok') {
@@ -653,7 +657,7 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
     $timeout(function() {
         PollingService.init($scope.options);
         QueryService.init($scope.options);
-        SubmitService.init();
+        SubmitService.init($scope.options);
     });
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {

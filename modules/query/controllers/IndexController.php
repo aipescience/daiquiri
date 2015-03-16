@@ -34,11 +34,16 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
     public function indexAction() {
         $this->view->status = 'ok';
 
+        // get the csrf token
+        $session = new Zend_Session_Namespace('csrf');
+        $csrf = $session->hash;
+
         // get the forms to display
         $options = array(
             'defaultForm' => Null,
             'polling' => Daiquiri_Config::getInstance()->query->polling->toArray(),
-            'forms' => array()
+            'forms' => array(),
+            'csrf' => $csrf
         );
 
         foreach(Daiquiri_Config::getInstance()->query->forms as $key => $form) {
