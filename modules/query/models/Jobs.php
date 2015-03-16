@@ -34,7 +34,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
     }
 
     /**
-     * Returns the columns of the jobs table specified by some parameters. 
+     * Returns the columns of the jobs table specified by some parameters.
      * @param array $params get params of the request
      * @return array $response
      */
@@ -43,19 +43,15 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
         foreach ($this->_cols as $colname) {
             $col = array(
                 'name' => $colname,
-                'sortable' => 'true'
+                'sortable' => true
             );
-            if ($colname === 'id') {
-                $col['width'] = '120px';
-            } else if (in_array($colname, array('database', 'table'))) {
-                $col['width'] = '120px';
-            } else if ($colname === 'username') {
-                $col['width'] = '60px';
+            if (in_array($colname, array('id','database','table','timeSubmit'))) {
+                $col['width'] = 160;
             } else if (in_array($colname, array('queue', 'status'))) {
-                $col['width'] = '40px';
-                $col['sortable'] = 'false';
+                $col['width'] = 70;
+                $col['sortable'] = false;
             } else {
-                $col['width'] = '100px';
+                $col['width'] = 100;
             }
             $cols[] = $col;
         }
@@ -66,17 +62,20 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
             'sortable' => 'false',
             'search' => 'false'
         );
-        
+
         return array('cols' => $cols, 'status' => 'ok');
     }
 
     /**
-     * Returns the rows of the jobs table specified by some parameters. 
+     * Returns the rows of the jobs table specified by some parameters.
      * @param array $params get params of the request
      * @return array $response
      */
     public function rows(array $params = array()) {
         // parse params
+        if (!isset($params['sort'])) {
+            $params['sort'] = 'timeSubmit DESC';
+        }
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
         // get the data from the database
