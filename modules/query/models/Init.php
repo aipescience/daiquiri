@@ -153,12 +153,12 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             ),
             'download' => array(
                 'type' => 'direct', // or gearman
-                'dir' => "/var/lib/daiquiri/download",
+                'dir' => "/srv/download",
                 'gearman' => array(
                     'port' => '4730',
                     'host' => 'localhost',
                     'numThread' => '2',
-                    'pid' => '/var/lib/daiquiri/download/GearmanManager.pid',
+                    'pid' => '/srv/download/GearmanManager.pid',
                     'workerDir' => $this->_init->daiquiri_path . '/modules/query/scripts/download/worker',
                     'manager' => $this->_init->daiquiri_path . '/library/GearmanManager/pecl-manager.php'
                 ),

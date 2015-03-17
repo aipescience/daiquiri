@@ -66,7 +66,7 @@ class Core_Model_Init extends Daiquiri_Model_Init {
         $defaults = array(
             'captcha' => array(
                 'fontpath' => $this->_init->daiquiri_path . "/client/font/DroidSans.ttf",
-                'dir' => "/var/lib/daiquiri/captcha",
+                'dir' => "/srv/captcha",
                 'url' => "/captcha",
             ),
             'minify' => array(
@@ -88,12 +88,12 @@ class Core_Model_Init extends Daiquiri_Model_Init {
                 'url' => '/cms/',
                 'type' => 'wordpress',
                 'path' => '/var/lib/daiquiri/wordpress',
-                'navPath' => '/var/lib/daiquiri/navigation',
+                'navPath' => '/srv/navigation',
             ),
             'log' => array(
                 'enabled' => true,
                 'loglevel' => 'notice',
-                'logfile' => '/var/lib/daiquiri/log/daiquiri.log'
+                'logfile' => '/srv/log/daiquiri.log'
             )
         );
 
