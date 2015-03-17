@@ -157,7 +157,7 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
                 for (var error in errors) delete errors[error];
 
                 if (response.status === 'ok') {
-                    ModalService.open();
+                    ModalService.close();
 
                     var m = active.url.match(/\/data\/(\w+)\/(\w+)/);
                     var model = m[1];
@@ -171,7 +171,8 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
 
                     if (action === 'update') {
                         var id = active.url.match(/\/(\d+)$/)[1];
-                        fetchView(model, id);
+                        var url = base + '/data/' + model + '/show/id/' + id;
+                        fetchView(url);
                     } else {
                         for (var value in view) delete view[value];
                     }
