@@ -115,7 +115,7 @@ app.factory('AdminService', ['$http','$window','TableService','ModalService',fun
                     console.log(response);
                 });
             } else {
-                ModalService.modal.enabled = false;
+                ModalService.close();
             }
         },
         search: function(string) {
