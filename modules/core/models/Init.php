@@ -87,7 +87,7 @@ class Core_Model_Init extends Daiquiri_Model_Init {
                 'enabled' => false,
                 'url' => '/cms/',
                 'type' => 'wordpress',
-                'path' => '/var/lib/daiquiri/wordpress',
+                'path' => '/srv/wordpress',
                 'navPath' => '/srv/navigation',
             ),
             'log' => array(
