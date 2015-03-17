@@ -140,7 +140,7 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
             }
 
             active.url = url;
-            ModalService.modal.enabled = true;
+            ModalService.open();
         });
     }
 
@@ -157,7 +157,7 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
                 for (var error in errors) delete errors[error];
 
                 if (response.status === 'ok') {
-                    ModalService.modal.enabled = false;
+                    ModalService.open();
 
                     var m = active.url.match(/\/data\/(\w+)\/(\w+)/);
                     var model = m[1];
@@ -184,7 +184,7 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
                 }
             });
         } else {
-            ModalService.modal.enabled = false;
+            ModalService.close();
         }
     }
 

@@ -1,6 +1,6 @@
 <div class="daiquiri-modal" ng-show="modal.enabled" ng-controller="ModalController" ng-click="closeModal($event)">
     <div class="daiquiri-modal-dialog" ng-style="{'width': modal.width, 'top': modal.top, 'max-height': modal.maxHeight}">
-        <button class="linkbutton daiquiri-modal-close" href="" ng-click="modal.enabled = false">&times;</button>
+        <button class="linkbutton daiquiri-modal-close" href="" ng-click="closeModal()">&times;</button>
         <div class="daiquiri-modal-body" ng-transclude></div>
     </div>
 </div>

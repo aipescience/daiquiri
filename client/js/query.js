@@ -274,7 +274,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         if (response.status == 'ok') {
             if (angular.isFunction(callback)) callback(response);
             fetchAccount();
-            ModalService.modal.enabled = false;
+            ModalService.close();
         } else if (response.status == 'error') {
             angular.forEach(response.errors, function(error, key) {
                 dialog.errors[key] = error;
@@ -300,12 +300,12 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             dialog.values.tablename = account.job.table;
         }
         dialog.enabled = key;
-        ModalService.modal.enabled = true;
+        ModalService.open();
     }
 
     function hideDialog() {
         dialog.enabled = false;
-        ModalService.modal.enabled = false;
+        ModalService.close();
     }
 
     return {

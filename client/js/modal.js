@@ -150,7 +150,15 @@ angular.module('modal', ['ngSanitize'])
     };
 
     return {
-        modal: modal
+        modal: modal,
+        open: function () {
+            modal.enabled = true;
+            angular.element('body').css('overflow','hidden');
+        },
+        close: function() {
+            modal.enabled = false;
+            angular.element('body').css('overflow','auto');
+        }
     };
 }])
 
@@ -166,7 +174,7 @@ angular.module('modal', ['ngSanitize'])
     $(document).keyup(function(e) {
         if (e.keyCode == 27) {
             $scope.$apply(function() {
-                $scope.modal.enabled = false;
+                ModalService.close();
             });
             return false;
         }
@@ -176,10 +184,10 @@ angular.module('modal', ['ngSanitize'])
 
     $scope.closeModal = function($event) {
         if (angular.isUndefined($event)) {
-            $scope.modal.enabled = false;
+            ModalService.close();
         };
         if (angular.element($event.target).hasClass('daiquiri-modal')) {
-            $scope.modal.enabled = false;
+            ModalService.close();
         };
     }
 
