@@ -3,7 +3,7 @@
         <ul class="daiquiri-browser-head nav nav-pills nav-stacked">
             <li class="nav-header">{{col.name}}</li>
         </ul>
-        <ul class="daiquiri-browser-body nav nav-pills nav-stacked" ng-style="{'height': col.height}">
+        <ul class="daiquiri-browser-body nav nav-pills nav-stacked">
             <li class="nav-item" ng-repeat="(i,item) in col.items" ng-class="{'active': browser.active.browsername == browser.name && browser.active.colname == col.name && browser.active.id == item.id}">
                 <a href="" data-toggle="tooltip" title="" data-placement="right" data-original-title="" 
                     ng-click="browserItemClicked(browser.name,item,col.name,i);" 

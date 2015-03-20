@@ -137,3 +137,6 @@ form#plan .CodeMirror {
     font-size: small;
     color: #666;
 }
+#query .daiquiri-browser-body {
+    height: 120px;
+}

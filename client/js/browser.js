@@ -29,7 +29,6 @@ angular.module('browser',[])
 }])
 
 .factory('BrowserService', ['$http',function($http) {
-    var height = 200;
     var browser = {};
 
     var base = angular.element('base').attr('href');
@@ -118,7 +117,6 @@ angular.module('browser',[])
                         browser[name].cols.push({
                             'id': i,
                             'name': colname.replace('_',' '),
-                            'height': height,
                             'width': width,
                             'items': []
                         });

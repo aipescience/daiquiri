@@ -39,6 +39,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     margin: 0;
+    height: 300px;
 }
 .daiquiri-browser div:last-child {
     border-right: 0px;
