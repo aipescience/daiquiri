@@ -1,7 +1,7 @@
 2015/03/02
 ==========
 
-Auth_Token needs to be created, run 
+Auth_Token needs to be created, run
 
     ./init.php -s
 
@@ -9,6 +9,8 @@ Requrired columns for detail keys:
 
 ALTER TABLE `Auth_DetailKeys` ADD COLUMN `required` BOOL NOT NULL;
 ALTER TABLE `Meetings_ParticipantDetailKeys` ADD COLUMN `required` BOOL NOT NULL;
+
+ALTER TABLE `Meetings_ParticipantDetailKeys` ADD COLUMN `hint` VARCHAR(256);
 
 2014/12/08
 ==========
