@@ -285,4 +285,8 @@ angular.module('table', ['ngSanitize'])
         $document.on('mouseup', exitResize);
     };
 
+    $scope.openFile = function(file) {
+        $scope.$emit('tableOpenFile',file);
+    }
+
 }]);

@@ -55,8 +55,14 @@
             </thead>
             <tbody>
                 <tr ng-repeat="row in table.data.rows">
-                    <td ng-repeat="(i,element) in row.cell track by $index">
-                        <div class="cell" ng-bind-html="element"></div>
+                    <td ng-repeat="(i,col) in table.data.cols">
+                        <div class="cell" ng-if="col.format.type == 'file'">
+                            <a href="" ng-click="openFile(col.format.base + row.cell[i])">{{row.cell[i]}}</a>
+                        </div>
+                        <div class="cell" ng-if="col.format.type == 'link'">
+                            <a href="{{row.cell[i]}}" target="blank">{{row.cell[i]}}</a>
+                        </div>
+                        <div class="cell" ng-if="!col.format" ng-bind-html="row.cell[i]"></div>
                     </td>
                 </tr>
             </tbody>

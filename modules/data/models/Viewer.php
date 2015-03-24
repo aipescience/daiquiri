@@ -109,14 +109,13 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
                     // this is a file we host and can be downloaded
                     $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
                     $col['format'] = array(
-                        'type' => 'filelink',
-                        'base' => $baseurl . '/data/files/single',
+                        'type' => 'file',
+                        'base' => $baseurl . '/data/files/single/name/',
                     );
                 } else {
                     // we just show this as a link - meta.ref.url also ends up here
                     $col['format'] = array(
-                        'type' => 'link',
-                        'target' => 'blank'
+                        'type' => 'link'
                     );
                 }
                 // TODO treat uri and ivorn different
@@ -145,7 +144,7 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
     /**
      * Returns the rows of the given table and database.
      * @param array $params get params of the request
-     * @return array 
+     * @return array
      */
     public function rows(array $params = array()) {
         // get db and table from params
