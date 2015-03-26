@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','modal','browser','plot','codemirror','samp','ngCookies']);
+var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -660,10 +660,6 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
         SubmitService.init($scope.options);
     });
 
-    $scope.$on('browserItemDblClicked', function(event,browsername,value) {
-        SubmitService.insertIntoQuery(browsername,value);
-    });
-
 }]);
 
 app.controller('SubmitController',['$scope','SubmitService',function($scope,SubmitService) {
@@ -679,6 +675,10 @@ app.controller('SubmitController',['$scope','SubmitService',function($scope,Subm
     $scope.submitPlan = function() {
         SubmitService.submitPlan();
     }
+
+    $scope.$on('browserItemDblClicked', function(event,browsername,value) {
+        SubmitService.insertIntoQuery(browsername,value);
+    });
 }]);
 
 app.controller('BarController',['$scope','BarService',function($scope,BarService) {
@@ -714,7 +714,7 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
     };
 }]);
 
-app.controller('ResultsController',['$scope','QueryService','TableService',function($scope,QueryService,TableService) {
+app.controller('ResultsController',['$scope','$window','QueryService','ImagesService','DownloadService','TableService',function($scope,$window,QueryService,ImagesService,DownloadService,TableService) {
 
     $scope.$watch(function() {
         return QueryService.account.job;
@@ -727,6 +727,55 @@ app.controller('ResultsController',['$scope','QueryService','TableService',funct
             TableService.init();
         }
     });
+
+    $scope.$on('tableReferenceClicked', function(event,iCol,iRow) {
+
+        var col = TableService.data.cols[iCol];
+        var value = TableService.data.rows[iRow].cell[iCol];
+
+        if (col.ucd.indexOf('meta.file') != -1) {
+
+            extension = value.match(/(?:\.([^.]+))?$/)[1];
+            if (['jpg','jpeg','png','bmp'].indexOf(extension) != -1) {
+                // an image file
+                ImagesService.init(iCol,iRow);
+                $('#images-tab-header a').tab('show');
+            } else {
+                // a regular file to be downloaded
+                var base = angular.element('base').attr('href');
+                $window.open(base + '/data/files/single/name/' + value,'_blank');
+            }
+        } else if (col.ucd.indexOf('meta.fits') != -1) {
+            // a fits file
+            var base = angular.element('base').attr('href');
+            $window.open(base + '/data/files/single/name/' + value,'_blank');
+        } else {
+            // regular link
+            $window.open(value,'_blank');
+        }
+    });
+
+}]);
+
+app.controller('ImagesController',['$scope','ImagesService',function($scope,ImagesService) {
+
+    $scope.values = ImagesService.values;
+
+    $scope.first = function() {
+        ImagesService.first();
+    };
+
+    $scope.prev = function() {
+        ImagesService.prev();
+    };
+
+    $scope.next = function() {
+        ImagesService.next();
+    };
+
+    $scope.last = function() {
+        ImagesService.last();
+    };
 }]);
 
 app.controller('SampController',['$scope','SampService','QueryService',function($scope,SampService,QueryService) {

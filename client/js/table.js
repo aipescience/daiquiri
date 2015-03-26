@@ -263,10 +263,10 @@ angular.module('table', ['ngSanitize'])
         TableService.sort(col);
     };
 
-    $scope.resize = function (colId) {
+    $scope.resize = function (iCol) {
         var zero = event.pageX;
         var table = angular.element('.daiquiri-table table');
-        var th = angular.element('[data-col-id="' + colId + '"]');
+        var th = angular.element('[data-col-id="' + iCol + '"]');
         var width = th.width();
 
         table.addClass('no-select');
@@ -285,8 +285,8 @@ angular.module('table', ['ngSanitize'])
         $document.on('mouseup', exitResize);
     };
 
-    $scope.openFile = function(file) {
-        $scope.$emit('tableOpenFile',file);
+    $scope.reference = function(iCol,iRow) {
+        $scope.$emit('tableReferenceClicked',iCol,iRow);
     }
 
 }]);

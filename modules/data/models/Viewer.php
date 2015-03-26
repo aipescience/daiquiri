@@ -97,41 +97,20 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
                 'id' => $meta[$colname]['id'],
                 'name' => $colname,
                 'sortable' => true,
-                'ucfirst' => false
+                'ucfirst' => false,
+                'ucd' => $meta[$colname]['ucd']
             );
 
-            if (in_array('meta.ref', $meta[$colname]['ucd'])) {
-                // this is a link, it needs more space
-                $col['width'] = 140;
-
-                // is this a file daiquiri hosts or just a link?
-                if (in_array('meta.file', $meta[$colname]['ucd']) || in_array('meta.fits', $meta[$colname]['ucd'])) {
-                    // this is a file we host and can be downloaded
-                    $baseurl = Daiquiri_Config::getInstance()->getSiteUrl();
-                    $col['format'] = array(
-                        'type' => 'file',
-                        'base' => $baseurl . '/data/files/single/name/',
-                    );
-                } else {
-                    // we just show this as a link - meta.ref.url also ends up here
-                    $col['format'] = array(
-                        'type' => 'link'
-                    );
-                }
-                // TODO treat uri and ivorn different
+            // add removenewline flag if this is set in the config
+            if (Daiquiri_Config::getInstance()->data->viewer->columnWidth) {
+                $col['width'] = Daiquiri_Config::getInstance()->data->viewer->columnWidth;
             } else {
-                // regular column, take the with from the config or a default one
-                $width = Daiquiri_Config::getInstance()->data->viewer->columnWidth;
-                if (empty($width)) {
-                    $col['width'] = 100;
-                } else {
-                    $col['width'] = $width;
-                }
+                $col['width'] = 100;
+            }
 
-                // add removenewline flag if this is set in the config
-                if (Daiquiri_Config::getInstance()->data->viewer->removeNewline) {
-                    $col['format'] = array('removeNewline' => true);
-                }
+            // add removenewline flag if this is set in the config
+            if (Daiquiri_Config::getInstance()->data->viewer->removeNewline) {
+                $col['format'] = array('removeNewline' => true);
             }
 
             // append col to cols array

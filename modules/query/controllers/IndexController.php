@@ -64,11 +64,25 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
             'mail' => Daiquiri_Config::getInstance()->query->processor->mail->enabled,
         );
 
+        // check if imageviewer is enabled
+        if (Daiquiri_Config::getInstance()->query->images->enabled) {
+            $this->view->images = true;
+        } else {
+            $this->view->images = false;
+        }
+
         // check if samp is enabled
-        if (Daiquiri_Config::getInstance()->query->samp && Daiquiri_Auth::getInstance()->getCurrentUsername() !== 'guest') {
+        if (Daiquiri_Config::getInstance()->query->samp->enabled && Daiquiri_Auth::getInstance()->getCurrentUsername() !== 'guest') {
             $this->view->samp = true;
         } else {
             $this->view->samp = false;
+        }
+
+        // check if plot is enabled
+        if (Daiquiri_Config::getInstance()->query->plot->enabled) {
+            $this->view->plot = true;
+        } else {
+            $this->view->plot = false;
         }
     }
 }

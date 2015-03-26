@@ -141,7 +141,6 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                     'mail' => array()
                 )
             ),
-            'samp' => true,
             'quota' => array(
                 'guest' => '100 MB',
                 'user' => '500 MB',
@@ -150,6 +149,15 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             'polling' => array(
                 'enabled' => true,
                 'timeout' => 2000
+            ),
+            'images' => array(
+                'enabled' => true,
+            ),
+            'samp' => array(
+                'enabled' => true,
+            ),
+            'plot' => array(
+                'enabled' => true,
             ),
             'download' => array(
                 'type' => 'direct', // or gearman
