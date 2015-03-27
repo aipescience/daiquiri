@@ -19,28 +19,30 @@
  */
 
 /**
- * @class   Daiquiri_View_Helper_LoginLink LoginLink.php
- * @brief   Daiquiri View helper for displaying the login link.
- * 
- * View helper for showing the link to the Daiquiri login page if the user is not 
- * yet logged in. Otherwise show the logout link.
+ * View helper class for showing the link to the Daiquiri login page if the user is not
+ * yet logged in. Otherwise shows the logout link.
  *
+ * @class   Daiquiri_View_Helper_LoginLink LoginLink.php
  */
 class Daiquiri_View_Helper_LoginLink extends Zend_View_Helper_Abstract {
 
+    /**
+     * Zend's View object
+     * @var Zend_View_Interface
+     */
     public $view;
 
+    /**
+     * Setter for $view
+     * @param Zend_View_Interface $view Zend's View object
+     */
     public function setView(Zend_View_Interface $view) {
         $this->view = $view;
     }
 
     /**
-     * @brief   loginLink method - return link to login if user not yet logged in, otherwise logout
-     * @return  HTML with link
-     * 
-     * Produces the link to the Daiquiri login page if the user is not 
-     * yet logged in. Otherwise show the logout link.
-     *
+     * Returns the login or logout link.
+     * @return string $link
      */
     public function loginLink() {
         // get the auth object
@@ -50,7 +52,7 @@ class Daiquiri_View_Helper_LoginLink extends Zend_View_Helper_Abstract {
             $link = '<a href="' . $this->view->baseUrl('/auth/login/logout') . '">Logout</a>';
         } else {
             // user not logged in, display the login link
-            $link = '<a href="' . $this->view->baseUrl('/auth/login?redirect=' . $this->view->url()) . '">Login</a>';
+            $link = '<a href="' . $this->view->baseUrl('/auth/login?redirect=' . $this->view->path()) . '">Login</a>';
         }
         return $link;
     }
