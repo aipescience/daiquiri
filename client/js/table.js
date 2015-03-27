@@ -69,7 +69,7 @@ angular.module('table', ['ngSanitize'])
     };
 }])
 
-.factory('TableService', ['$http',function($http) {
+.factory('TableService', ['$http','$q',function($http,$q) {
 
     var url = {
         cols: null,
@@ -109,28 +109,36 @@ angular.module('table', ['ngSanitize'])
     function first() {
         if (params.page != 1) {
             params.page = 1;
-            fetchRows();
+            return fetchRows();
+        } else {
+            return $q.reject();
         }
     }
 
     function prev() {
         if (params.page > 1) {
             params.page -= 1;
-            fetchRows();
+            return fetchRows();
+        } else {
+            return $q.reject();
         }
     }
 
     function next() {
         if (params.page < meta.pages) {
             params.page += 1;
-            fetchRows();
+            return fetchRows();
+        } else {
+            return $q.reject();
         }
     }
 
     function last() {
         if (params.page != meta.pages) {
             params.page = meta.pages;
-            fetchRows();
+            return fetchRows();
+        } else {
+            return $q.reject();
         }
     }
 
@@ -172,19 +180,30 @@ angular.module('table', ['ngSanitize'])
     }
 
     function fetchCols() {
+        var deferred = $q.defer();
+
         if (url.cols !== null) {
             $http.get(url.cols,{'params': params}).success(function(response) {
                 if (response.status == 'ok') {
                     data.cols = response.cols;
                     trigger.cols = !trigger.cols;
+
+                    deferred.resolve();
                 } else {
+                    deferred.reject();
                     console.log('Error');
                 }
             });
+        } else {
+            deferred.reject();
         }
+
+        return deferred.promise;
     }
 
     function fetchRows() {
+        var deferred = $q.defer();
+
         if (url.rows !== null) {
             $http.get(url.rows,{'params': params}).success(function(response) {
                 if (response.status == 'ok') {
@@ -194,11 +213,18 @@ angular.module('table', ['ngSanitize'])
                     meta.pages = response.pages;
                     meta.total = response.total;
                     trigger.rows = !trigger.rows;
+
+                    deferred.resolve();
                 } else {
+                    deferred.reject();
                     console.log('Error');
                 }
             });
+        } else {
+            deferred.reject();
         }
+
+        return deferred.promise;
     }
 
     return {

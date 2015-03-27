@@ -19,7 +19,7 @@
 
 angular.module('images', [])
 
-.factory('ImagesService', ['$http','TableService',function($http,TableService) {
+.factory('ImagesService', ['$http','$timeout','TableService',function($http,$timeout,TableService) {
     var values = {}
     var meta = {}
 
@@ -40,28 +40,45 @@ angular.module('images', [])
     }
 
     function first() {
-        meta.iRow = 0;
-        show();
+        // turn back table to page one
+        TableService.first().then(function() {
+            meta.iRow = 0;
+            show();
+        });
     }
 
     function prev() {
-        if (meta.iRow > 0) {
+        if (meta.iRow % TableService.meta.nrows == 0) {
+            // turn back table page
+            TableService.prev().then(function() {
+                meta.iRow = TableService.meta.nrows - 1;
+                show();
+            });
+        } else {
             meta.iRow -= 1;
             show();
         }
     }
 
     function next() {
-        if (meta.iRow < TableService.meta.total - 1) {
+        if (meta.iRow % TableService.meta.nrows == TableService.meta.nrows - 1) {
+            // turn over table page
+            TableService.next().then(function() {
+                meta.iRow = 0;
+                show();
+            });
+        } else {
             meta.iRow += 1;
             show();
         }
     }
 
     function last() {
-
-        meta.iRow = TableService.meta.total-1;
-        show();
+        // turn back table to the last page
+        TableService.last().then(function() {
+            meta.iRow = TableService.meta.nrows - 1;
+            show();
+        });
     }
 
     return {

@@ -47,7 +47,7 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         'bootstrap-datepicker.css' => 'daiquiri/lib/bootstrap-datepicker/css/datepicker.css',
         'bootstrap-datepicker.js' => 'daiquiri/lib/bootstrap-datepicker/js/bootstrap-datepicker.js',
         // other libs
-        'samp.js' => 'daiquiri/lib/sampjs/samp.js',
+        'samp.js' => 'daiquiri/lib/samp.js',
         // daiquiri client files
         'daiquiri_common.css' => 'daiquiri/css/common.css',
         'daiquiri_form.css' => 'daiquiri/css/form.css',

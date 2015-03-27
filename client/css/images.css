@@ -28,11 +28,17 @@
 .daiquiri-images-title {
     height: 30px;
     line-height: 30px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .daiquiri-images img {
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+.daiquiri-images-hint {
+    margin-top: 5px;
+    font-size: small;
+    color: #666;
 }
