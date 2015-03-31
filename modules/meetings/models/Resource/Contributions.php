@@ -46,7 +46,7 @@ class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Tabl
      * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows
      */
-    public function fetchRows($sqloptions = array()) {
+    public function fetchRows(array $sqloptions = array()) {
         $select = $this->select($sqloptions);
         $select->from('Meetings_Contributions');
         $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array('participant_firstname' => 'firstname','participant_lastname' => 'lastname'));
@@ -59,7 +59,7 @@ class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Tabl
      * Fetches a specific row from the contributions table.
      * @param int $id primary key of the row
      * @throws Exception
-     * @return array $row 
+     * @return array $row
      */
     public function fetchRow($id) {
         if (empty($id)) {
@@ -72,7 +72,7 @@ class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Tabl
         $select->join('Meetings_Participants', 'Meetings_Contributions.participant_id = Meetings_Participants.id', array('participant_email' => 'email'));
         $select->join('Meetings_Meetings', 'Meetings_Participants.meeting_id = Meetings_Meetings.id', array('meeting_id' => 'id', 'meeting_title' => 'title'));
         $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id');
-        
+
         return $this->fetchOne($select);
     }
 

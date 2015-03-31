@@ -43,7 +43,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
      * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows
      */
-    public function fetchRows($sqloptions = array()) {
+    public function fetchRows(array $sqloptions = array()) {
         $select = $this->select($sqloptions);
         $select->from($this->getTablename());
         $select->join('Meetings_Meetings','Meetings_Meetings.id = Meetings_Participants.meeting_id',array('meeting_title' => 'title'));
@@ -134,7 +134,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
     }
 
     /**
-     * Fetches the id and one specified field from participants table for a specific meeting 
+     * Fetches the id and one specified field from participants table for a specific meeting
      * as a flat array.
      * @param string $field name of the field
      * @param int $meetingId id of the meeting

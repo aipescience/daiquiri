@@ -70,7 +70,7 @@ angular.module('modal', ['ngSanitize'])
 
                                 } else {
                                     // this belongs to a multiple checkbox
-                                    var group = id.match(/^([a-zA-Z0-9]*)/)[0];
+                                    var group = id.match(/^([a-zA-Z0-9_]*)/)[0];
                                     var value = element.attr('value');
 
                                     element.attr('ng-model','values.' + group + "['" + value + "']");
@@ -185,10 +185,12 @@ angular.module('modal', ['ngSanitize'])
     $scope.closeModal = function($event) {
         if (angular.isUndefined($event)) {
             ModalService.close();
-        };
-        if (angular.element($event.target).hasClass('daiquiri-modal')) {
-            ModalService.close();
-        };
+        } else {
+            if (angular.element($event.target).hasClass('daiquiri-modal')) {
+                ModalService.close();
+            };
+        }
+
     }
 
 }]);
