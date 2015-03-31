@@ -20,7 +20,10 @@
 angular.module('images', [])
 
 .factory('ImagesService', ['$http','$timeout','TableService',function($http,$timeout,TableService) {
-    var values = {}
+    var values = {
+        show: false
+    };
+
     var meta = {}
 
     var base = angular.element('base').attr('href');
@@ -34,9 +37,20 @@ angular.module('images', [])
     }
 
     function show() {
-        var value = TableService.data.rows[meta.iRow].cell[meta.iCol];
-        values.name = value;
-        values.link = base + '/data/files/single/name/' + value;
+        values.name = TableService.data.rows[meta.iRow].cell[meta.iCol];
+        values.link = base + '/data/files/single/name/' + values.name;
+
+        $timeout(function() {
+            wheelzoom(document.querySelectorAll('.daiquiri-images img'));
+
+            // hack for first image
+            if (!values.show) {
+                angular.element('.daiquiri-images img').on('load', function() {
+                    angular.element('.daiquiri-images img').off('load');
+                    values.show = true;
+                });
+            }
+        });
     }
 
     function first() {
