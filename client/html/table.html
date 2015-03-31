@@ -36,7 +36,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th ng-repeat="(iCol,col) in table.data.cols" style="width: {{col.width}}px;" data-col-id="{{iCol}}">
+                    <th ng-repeat="(iCol,col) in table.data.cols" style="width: {{col.width}}px;" data-col-id="{{iCol}}" ng-class="{'selected': table.meta.selected.iCol == iCol}">
                         <div class="cell">
                             <div class="handle-left" ng-mousedown="resize(iCol-1)"></div>
                             <div class="handle-right" ng-mousedown="resize(iCol)"></div>
@@ -47,15 +47,15 @@
                                     'sorted icon-chevron-up': table.meta.sort == col.name + ' DESC'
                                 }"></i>
                             </div>
-                            <div class="name" ng-if="col.ucfirst == false">{{col.name}}</div>
-                            <div class="name" ng-if="col.ucfirst != false">{{col.name|ucfirst}}</div>
+                            <div class="name" ng-if="col.ucfirst == false" ng-click="selectCol(iCol)">{{col.name}}</div>
+                            <div class="name" ng-if="col.ucfirst != false" ng-click="selectCol(iCol)">{{col.name|ucfirst}}</div>
                         </div>
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="(iRow,row) in table.data.rows">
-                    <td ng-repeat="(iCol,col) in table.data.cols">
+                <tr ng-repeat="(iRow,row) in table.data.rows" ng-click="selectRow(iRow)" ng-class="{'selected': table.meta.selected.iRow == iRow}">
+                    <td ng-repeat="(iCol,col) in table.data.cols" ng-class="{'selected': table.meta.selected.iCol == iCol}">
                         <div class="cell" ng-if="col.ucd.indexOf('meta.ref') != -1">
                             <a href="" ng-click="reference(iCol,iRow)">{{row.cell[iCol]}}</a>
                         </div>

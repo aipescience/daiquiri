@@ -86,7 +86,11 @@ angular.module('table', ['ngSanitize'])
         page: null,
         pages: null,
         total: null,
-        sorted: null
+        sorted: null,
+        selected: {
+            iCol: null,
+            iRow: null
+        }
     };
 
     var params = {
@@ -313,6 +317,24 @@ angular.module('table', ['ngSanitize'])
 
     $scope.reference = function(iCol,iRow) {
         $scope.$emit('tableReferenceClicked',iCol,iRow);
-    }
+    };
+
+    $scope.selectCol = function(iCol) {
+        if (TableService.meta.selected.iCol != iCol) {
+            TableService.meta.selected.iCol = iCol;
+        } else {
+            TableService.meta.selected.iCol = null
+        }
+        console.log(iCol);
+    };
+
+    $scope.selectRow = function(iRow) {
+        if (TableService.meta.selected.iRow != iRow) {
+            TableService.meta.selected.iRow = iRow;
+        } else {
+            TableService.meta.selected.iRow = null
+        }
+        console.log(iRow);
+    };
 
 }]);

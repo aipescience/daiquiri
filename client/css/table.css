@@ -77,6 +77,11 @@
 .daiquiri-table th .handle-right:hover {
     cursor: move;
 }
+.daiquiri-table tr.selected,
+.daiquiri-table th.selected,
+.daiquiri-table td.selected {
+    background-color: #eee;
+}
 .daiquiri-table table.no-select {
     -webkit-user-select: none;
     -moz-user-select: none;
