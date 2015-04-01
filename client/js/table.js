@@ -40,6 +40,11 @@ angular.module('table', ['ngSanitize'])
                     TableService.url.rows = angular.element('base').attr('href') + attrs.rows;
                 }
 
+                // look if the cols/rows should be selectable
+                if (!angular.isUndefined(attrs.select)) {
+                    TableService.meta.select = attrs.select;
+                }
+
                 // watch the cols for a change, and perform callback
                 if (angular.isFunction(TableService.callback.cols)) {
                     scope.$watch(function () {
@@ -87,9 +92,10 @@ angular.module('table', ['ngSanitize'])
         pages: null,
         total: null,
         sorted: null,
+        select: false,
         selected: {
             iCol: null,
-            iRow: null
+            iRows: []
         }
     };
 
@@ -320,21 +326,26 @@ angular.module('table', ['ngSanitize'])
     };
 
     $scope.selectCol = function(iCol) {
-        if (TableService.meta.selected.iCol != iCol) {
-            TableService.meta.selected.iCol = iCol;
-        } else {
-            TableService.meta.selected.iCol = null
+        if (TableService.meta.select) {
+            if (TableService.meta.selected.iCol != iCol) {
+                TableService.meta.selected.iCol = iCol;
+            } else {
+                TableService.meta.selected.iCol = null
+            }
+            $scope.$emit('tableColSelected',TableService.meta.selected.iCol);
         }
-        console.log(iCol);
     };
 
     $scope.selectRow = function(iRow) {
-        if (TableService.meta.selected.iRow != iRow) {
-            TableService.meta.selected.iRow = iRow;
-        } else {
-            TableService.meta.selected.iRow = null
+        if (TableService.meta.select) {
+            var index = TableService.meta.selected.iRows.indexOf(iRow)
+            if (index == -1) {
+                TableService.meta.selected.iRows.push(iRow);
+            } else {
+                TableService.meta.selected.iRows.splice(index, 1);
+            }
+            $scope.$emit('tableRowSelected',TableService.meta.selected.iRows);
         }
-        console.log(iRow);
     };
 
 }]);

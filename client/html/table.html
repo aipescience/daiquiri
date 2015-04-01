@@ -54,7 +54,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="(iRow,row) in table.data.rows" ng-click="selectRow(iRow)" ng-class="{'selected': table.meta.selected.iRow == iRow}">
+                <tr ng-repeat="(iRow,row) in table.data.rows" ng-click="selectRow(iRow)" ng-class="{'selected': table.meta.selected.iRows.indexOf(iRow) != -1}">
                     <td ng-repeat="(iCol,col) in table.data.cols" ng-class="{'selected': table.meta.selected.iCol == iCol}">
                         <div class="cell" ng-if="col.ucd.indexOf('meta.ref') != -1">
                             <a href="" ng-click="reference(iCol,iRow)">{{row.cell[iCol]}}</a>

@@ -104,7 +104,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         $colFiles = $this->_getFilesInCol($table, $column);
         if (empty($colFiles)) {
             throw new Daiquiri_Exception_NotFound();
-        } 
+        }
 
         // leave some time for the file to be transferred
         ini_set('max_execution_time', 3600);
@@ -143,7 +143,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         $colFiles = $this->_getFilesInCol($table, $column);
         if (empty($colFiles)) {
             throw new Daiquiri_Exception_NotFound();
-        } 
+        }
 
         // look for the files in the file system and aggregate size
         $size = 0;
@@ -170,7 +170,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         $rowFiles = $this->_getFilesInRow($table, $rowIds);
         if (empty($rowFiles)) {
             throw new Daiquiri_Exception_NotFound();
-        } 
+        }
 
         // leave some time for the file to be transferred
         ini_set('max_execution_time', 3600);
@@ -209,7 +209,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         $rowFiles = $this->_getFilesInRow($table, $rowIds);
         if (empty($rowFiles)) {
             throw new Daiquiri_Exception_NotFound();
-        } 
+        }
 
         $size = 0;
         foreach ($rowFiles as $rowFile) {
@@ -251,7 +251,7 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
 
         }
 
-        if (count($files) > 1) { 
+        if (count($files) > 1) {
             throw new Exception('More than one file found.');
         } elseif (count($files) === 0) {
             return false;
@@ -304,8 +304,8 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
 
         // extract file link columns by looking for the format type filelink ...
         $fileCols = array();
-        foreach ($response['cols'] as $key => $col) {
-            if (isset($col['format']['type']) && $col['format']['type'] === "filelink") {
+        foreach ($response['cols'] as $col) {
+            if ($column === $col['name'] && $this->_colIsDownloadable($col)) {
                 $fileCols[] = $col['name'];
             }
         }
@@ -346,12 +346,12 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
 
         // extract file link columns by looking for the format type filelink ...
         $fileCols = array();
-        foreach ($response['cols'] as $key => $col) {
-            if (isset($col['format']['type']) && $col['format']['type'] === "filelink") {
+        foreach ($response['cols'] as $col) {
+            if ($this->_colIsDownloadable($col)) {
                 $fileCols[] = $col['name'];
             }
         }
-        
+
         // escape input row ids
         $escapedIds = array();
         foreach ($rowIds as $rowId) {
@@ -372,6 +372,12 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         return $files;
     }
 
-
-
+    /**
+     * Returns wether a column has the right ucds to be downloaded.
+     * @param  array $col the column to be checked
+     * @return bool $result
+     */
+    private function _colIsDownloadable($col) {
+        return in_array('meta.file',$col['ucd']) || in_array('meta.fits',$col['ucd']);
+    }
 }

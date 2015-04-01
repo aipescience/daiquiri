@@ -716,6 +716,11 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
 
 app.controller('ResultsController',['$scope','$window','QueryService','ImagesService','DownloadService','TableService',function($scope,$window,QueryService,ImagesService,DownloadService,TableService) {
 
+    $scope.values = {
+        iCol: null,
+        iRows: []
+    };
+
     $scope.$watch(function() {
         return QueryService.account.job;
     }, function (job) {
@@ -743,17 +748,51 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
             } else {
                 // a regular file to be downloaded
                 var base = angular.element('base').attr('href');
-                $window.open(base + '/data/files/single/name/' + value,'_blank');
+                var link = base + '/data/files/single/name/' + value;
+                $('<iframe />', {
+                    'style': 'visibility: hidden; height: 0; width: 0;',
+                    'src': link
+                }).appendTo('body');
             }
         } else if (col.ucd.indexOf('meta.fits') != -1) {
             // a fits file
             var base = angular.element('base').attr('href');
-            $window.open(base + '/data/files/single/name/' + value,'_blank');
+            var link = base + '/data/files/single/name/' + value;
+            $('<iframe />', {
+                'style': 'visibility: hidden; height: 0; width: 0;',
+                'src': link
+            }).appendTo('body');
         } else {
             // regular link
             $window.open(value,'_blank');
         }
     });
+
+    $scope.$on('tableColSelected', function(event,iCol) {
+        $scope.values.iCol = iCol;
+    });
+
+    $scope.$on('tableRowSelected', function(event,iRows) {
+        $scope.values.iRows = iRows;
+    });
+
+    $scope.downloadCol = function(iCol) {
+        var base = angular.element('base').attr('href');
+        var link = base + '/data/files/multi?table=' + QueryService.account.job.table + '&column=' + QueryService.account.job.cols[iCol].name;
+        $('<iframe />', {
+             'style': 'visibility: hidden; height: 0; width: 0;',
+             'src': link
+        }).appendTo('body');
+    }
+
+    $scope.downloadRows = function(iRows) {
+        var base = angular.element('base').attr('href');
+        var link = base + '/data/files/row?table=' + QueryService.account.job.table + '&id=' + iRows.map(function(i) {return i+1;}).join();
+        $('<iframe />', {
+             'style': 'visibility: hidden; height: 0; width: 0;',
+             'src': link
+        }).appendTo('body');
+    }
 
 }]);
 

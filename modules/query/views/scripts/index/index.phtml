@@ -322,10 +322,24 @@
 
                         <!-- results table tab -->
 
-                        <div class="tab-pane" id="results-tab" ng-show="account.active.job">
-                            <div ng-controller="ResultsController">
-                                <div daiquiri-table></div>
+                        <div class="tab-pane" id="results-tab" ng-show="account.active.job" ng-controller="ResultsController">
+                            <div daiquiri-table select="<?php echo $this->select; ?>"></div>
+
+                            <?php if ($this->select): ?>
+                            <div>
+                                <p class="daiquiri-file-download-message help-block">
+                                    To download all files in one or more rows, please select the corresponding rows by mouse click. In order to download all files in a particular column, please select the column by a mouse click on the column's title.
+                                </p>
+                                <p ng-show="values.iCol
+                                    && (account.job.cols[values.iCol].ucd.indexOf('meta.file') != -1
+                                        || account.job.cols[values.iCol].ucd.indexOf('meta.fits') != -1)">
+                                    <a href="" ng-click="downloadCol(values.iCol)">Download all files from column `{{account.job.cols[values.iCol].name}}`</a>
+                                </p>
+                                <p ng-show="values.iRows.length > 0">
+                                    <a href="" ng-click="downloadRows(values.iRows)">Download files from selected row(s)</a>
+                                </p>
                             </div>
+                            <?php endif; ?>
                         </div>
 
                         <!-- image viewer tab -->

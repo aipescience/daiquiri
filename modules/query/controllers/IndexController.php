@@ -71,6 +71,13 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
             $this->view->images = false;
         }
 
+        // check if the table cols/rows should be selectable
+        if (Daiquiri_Config::getInstance()->query->results->select) {
+            $this->view->select = true;
+        } else {
+            $this->view->select = false;
+        }
+
         // check if samp is enabled
         if (Daiquiri_Config::getInstance()->query->samp->enabled && Daiquiri_Auth::getInstance()->getCurrentUsername() !== 'guest') {
             $this->view->samp = true;
@@ -84,5 +91,7 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
         } else {
             $this->view->plot = false;
         }
+
+
     }
 }
