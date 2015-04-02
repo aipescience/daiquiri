@@ -109,7 +109,8 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
             'contributionTypes' => array('poster','talk'),
             'participantDetailKeys' => array(),
             'participantStatus' => array('organizer', 'invited', 'registered', 'accepted', 'rejected'),
-            'meetings' => array()
+            'meetings' => array(),
+            'participants' => array()
         );
 
         // construct init array
@@ -188,6 +189,23 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
                 unset($a['participant_detail_keys']);
 
                 $r = $meetingsMeetingModel->create($a);
+                $this->_check($r, $a);
+            }
+        }
+
+        // create participants
+        $meetingsParticipantsModel = new Meetings_Model_Participants();
+        if ($meetingsParticipantsModel->getResource()->countRows() == 0) {
+            $participantStatusIds = array_flip($meetingsParticipantStatusModel->getResource()->fetchValues('status'));
+
+            foreach ($this->_init->options['init']['meetings']['participants'] as $a) {
+                $slug = $a['meeting_slug'];
+                unset($a['meeting_slug']);
+
+                $a['status_id'] = $participantStatusIds[$a['status']];
+                unset($a['status']);
+
+                $r = $meetingsParticipantsModel->create($slug, $a);
                 $this->_check($r, $a);
             }
         }

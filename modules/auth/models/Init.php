@@ -311,7 +311,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         $authUserModel = new Auth_Model_User();
         if ($authUserModel->getResource()->countRows() === 0) {
             foreach ($this->_init->options['init']['auth']['user'] as $credentials) {
-                // get the corresponding role_id and status_id 
+                // get the corresponding role_id and status_id
                 $credentials['role_id'] = Daiquiri_Auth::getInstance()->getRoleId($credentials['role']);
                 unset($credentials['role']);
                 $credentials['status_id'] = Daiquiri_Auth::getInstance()->getStatusId($credentials['status']);
@@ -340,9 +340,9 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                     }
                 }
 
-                // fake request parametes to make 
+                // fake request parametes to make
                 Zend_Controller_Front::getInstance()->getRequest()->setParams($credentials);
-                
+
                 // create user
                 $r = $authUserModel->create($credentials);
 
