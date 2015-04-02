@@ -150,6 +150,9 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'enabled' => true,
                 'timeout' => 2000
             ),
+            'results' => array(
+                'select' => true
+            ),
             'images' => array(
                 'enabled' => true,
             ),
