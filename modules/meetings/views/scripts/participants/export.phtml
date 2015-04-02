@@ -21,10 +21,13 @@
 <?php
 if (in_array($this->mode, array('csv','excel'))) {
     $values = array();
-    foreach (array_merge($this->keys, $this->detailKeys, $this->contributionKeys) as $key) {
+    foreach (array_merge($this->keys, $this->detailKeys) as $key) {
         $values[] = '"' . ucfirst($this->escape($key)) . '"';
     }
-
+    foreach ($this->contributionTypes as $contibutionType) {
+        $values[] = $contibutionType . ' title';
+        $values[] = $contibutionType . ' abstract';
+    }
     if ($this->mode == 'csv') {
         echo implode(',',$values) . "\n";
     } else {
@@ -33,55 +36,40 @@ if (in_array($this->mode, array('csv','excel'))) {
 }
 
 foreach ($this->rows as $row) {
-    switch ($this->mode) {
-        case 'mail':
-            echo $row['firstname'] . ' ' . $row['lastname'] . ' <' . $row['email'] . ">\n";
-            break;
-        case 'affiliation':
-            echo $row['lastname'] . ', ' . $row['firstname'] . ' (' . $row['affiliation'] . ")\n";
-            break;
-        case 'csv':
-            $values = array();
-            foreach ($this->keys as $key) {
-                $values[] = '"' . $this->escape($row[$key]) . '"';
+    if ($this->mode == 'mail') {
+        echo $row['firstname'] . ' ' . $row['lastname'] . ' <' . $row['email'] . ">\n";
+    } else if ($this->mode == 'affiliation') {
+        echo $row['lastname'] . ', ' . $row['firstname'] . ' (' . $row['affiliation'] . ")\n";
+    } else if ($this->mode == 'csv' || $this->mode == 'excel') {
+        $values = array();
+        foreach ($this->keys as $key) {
+            $values[] = '"' . $this->escape($row[$key]) . '"';
+        }
+        foreach ($row['details'] as $key => $value) {
+            if (is_array($value)) {
+                $values[] = '"' . $this->escape(implode(', ',$value)) . '"';
+            } else if (empty($value)) {
+                $values[] = '""';
+            } else {
+                $values[] = '"' . $this->escape($value) . '"';
             }
-            foreach ($row['details'] as $key => $value) {
-                if (is_array($value)) {
-                    $values[] = '"' . $this->escape(implode(', ',$value)) . '"';
-                } else if (empty($value)) {
-                    $values[] = '""';
-                } else {
-                    $values[] = '"' . $this->escape($value) . '"';
-                }
+        }
+        foreach ($this->contributionTypes as $contributionType) {
+            if (isset($row['contributions'][$contributionType])) {
+                $values[] = '"' . $this->escape($row['contributions'][$contributionType]['title']) . '"';
+                $values[] = '"' . $this->escape($row['contributions'][$contributionType]['abstract']) . '"';
+            } else {
+                $values[] = '""';
+                $values[] = '""';
             }
-            foreach ($row['contributions'] as $contribution) {
-                $values[] = '"' . $this->escape($contribution['title']) . '"';
-                $values[] = '"' . $this->escape($contribution['abstract']) . '"';
-            }
+        }
+        if ($this->mode == 'csv') {
             echo implode(',',$values) . "\n";
-            break;
-        case 'excel':
-            $values = array();
-            foreach ($this->keys as $key) {
-                $values[] = '"' . $this->escape($row[$key]) . '"';
-            }
-            foreach ($row['details'] as $key => $value) {
-                if (is_array($value)) {
-                    $values[] = '"' . $this->escape(implode(', ',$value)) . '"';
-                } else if (empty($value)) {
-                    $values[] = '""';
-                } else {
-                    $values[] = '"' . $this->escape($value) . '"';
-                }
-            }
-            foreach ($row['contributions'] as $contribution) {
-                $values[] = '"' . $this->escape($contribution['title']) . '"';
-                $values[] = '"' . $this->escape($contribution['abstract']) . '"';
-            }
+        } else if ($this->mode == 'excel') {
             echo implode(';',$values) . "\n";
-            break;
-        default:
-            echo $row['lastname'] . ', ' . $row['firstname'] . "\n";
+        }
+    } else {
+        echo $row['lastname'] . ', ' . $row['firstname'] . "\n";
     }
 }
 ?>

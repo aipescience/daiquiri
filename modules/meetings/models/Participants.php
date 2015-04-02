@@ -122,18 +122,12 @@ class Meetings_Model_Participants extends Daiquiri_Model_Table {
         foreach($meeting['participant_detail_keys'] as $d) {
             $detailKeys[] = $d['key'];
         }
-        $contributionKeys = array();
-        foreach ($meeting['contribution_types'] as $contibutionType) {
-            $contributionKeys[] = $contibutionType . '_title';
-            $contributionKeys[] = $contibutionType . '_abstract';
-        }
-
         return array(
             'status' => 'ok',
             'rows' => $rows,
             'keys' => $keys,
             'detailKeys' => $detailKeys,
-            'contributionKeys' => $contributionKeys
+            'contributionTypes' => $meeting['contribution_types']
         );
 
     }
