@@ -74,6 +74,10 @@ foreach ($this->rows as $row) {
                     $values[] = '"' . $this->escape($value) . '"';
                 }
             }
+            foreach ($row['contributions'] as $contribution) {
+                $values[] = '"' . $this->escape($contribution['title']) . '"';
+                $values[] = '"' . $this->escape($contribution['abstract']) . '"';
+            }
             echo implode(';',$values) . "\n";
             break;
         default:
