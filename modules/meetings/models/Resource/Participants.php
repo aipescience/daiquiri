@@ -46,7 +46,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
     public function fetchRows(array $sqloptions = array()) {
         $select = $this->select($sqloptions);
         $select->from($this->getTablename());
-        $select->join('Meetings_Meetings','Meetings_Meetings.id = Meetings_Participants.meeting_id',array('meeting_title' => 'title'));
+        $select->join('Meetings_Meetings','Meetings_Meetings.id = Meetings_Participants.meeting_id',array('meeting_title' => 'title','meeting_id' => 'id'));
         $select->join('Meetings_ParticipantStatus','Meetings_ParticipantStatus.id = Meetings_Participants.status_id',array('status' => 'status'));
 
         return $this->fetchAll($select);
@@ -134,31 +134,6 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
     }
 
     /**
-     * Fetches the id and one specified field from participants table for a specific meeting
-     * as a flat array.
-     * @param string $field name of the field
-     * @param int $meetingId id of the meeting
-     * @return array $rows
-     */
-    public function fetchValues($fieldname, $meetingId) {
-        if (empty($fieldname) || empty($meetingId)) {
-            throw new Exception('$fieldname or $meetingId not provided in ' . get_class($this) . '::insertRow()');
-        }
-
-        // get select object
-        $select = $this->select();
-        $select->from('Meetings_Participants', array('id', $fieldname));
-        $select->where('meeting_id = ?', $meetingId);
-
-        // query database, construct array, and return
-        $data = array();
-        foreach($this->getAdapter()->fetchAll($select) as $row) {
-            $data[$row['id']] = $row[$fieldname];
-        }
-        return $data;
-    }
-
-    /**
      * Inserts a participant.
      * Returns the primary key of the new row.
      * @param array $data row data
@@ -213,7 +188,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
      * @param array $data row data
      * @throws Exception
      */
-    public function updateRow($id, array $data) {
+    public function updateRow($id, $data) {
         if (empty($id) || empty($data)) {
             throw new Exception('$id or $data not provided in ' . get_class($this) . '::insertRow()');
         }

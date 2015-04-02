@@ -21,7 +21,7 @@
 <?php
 if (in_array($this->mode, array('csv','excel'))) {
     $values = array();
-    foreach (array_merge($this->keys, $this->detailKeys) as $key) {
+    foreach (array_merge($this->keys, $this->detailKeys, $this->contributionKeys) as $key) {
         $values[] = '"' . ucfirst($this->escape($key)) . '"';
     }
 
@@ -53,6 +53,10 @@ foreach ($this->rows as $row) {
                 } else {
                     $values[] = '"' . $this->escape($value) . '"';
                 }
+            }
+            foreach ($row['contributions'] as $contribution) {
+                $values[] = '"' . $this->escape($contribution['title']) . '"';
+                $values[] = '"' . $this->escape($contribution['abstract']) . '"';
             }
             echo implode(',',$values) . "\n";
             break;

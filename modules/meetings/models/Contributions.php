@@ -238,13 +238,22 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
             throw new Daiquiri_Exception_NotFound();
         }
 
+        // get the participants for this meeting
         $participantsModel = new Meetings_Model_Participants();
+        $dbRows = $participantsModel->getResource()->fetchRows(array(
+            'where' => array('meeting_id = ?' => $meeting['id']),
+            'order' => 'lastname ASC'
+        ));
+        $participants = array();
+        foreach($dbRows as $dbRow) {
+            $participants[] = "{$dbRow['lastname']}, {$dbRow['firstname']} <{$dbRow['email']}>";
+        }
 
         // create the form object
         $form = new Meetings_Form_Contributions(array(
             'submit'=> 'Create contribution',
             'meeting' => $meeting,
-            'participants' => $participantsModel->getResource()->fetchValues('email', $meeting['id'])
+            'participants' => $participants
         ));
 
         // valiadate the form if POST
@@ -280,13 +289,24 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
 
         // get the meeting
         $meetingsModel = new Meetings_Model_Meetings();
+        $meeting = $meetingsModel->getResource()->fetchRow($entry['meeting_id']);
+
+        // get the participants for this meeting
         $participantsModel = new Meetings_Model_Participants();
+        $dbRows = $participantsModel->getResource()->fetchRows(array(
+            'where' => array('meeting_id = ?' => $meeting['id']),
+            'order' => 'lastname ASC'
+        ));
+        $participants = array();
+        foreach($dbRows as $dbRow) {
+            $participants[$dbRow['id']] = "{$dbRow['lastname']}, {$dbRow['firstname']} <{$dbRow['email']}>";
+        }
 
         // create the form object
         $form = new Meetings_Form_Contributions(array(
             'submit'=> 'Update contribution',
-            'meeting' => $meetingsModel->getResource()->fetchRow($entry['meeting_id']),
-            'participants' => $participantsModel->getResource()->fetchValues('email', $entry['meeting_id']),
+            'meeting' => $meeting,
+            'participants' => $participants,
             'entry' => $entry
         ));
 

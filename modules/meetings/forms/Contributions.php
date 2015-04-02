@@ -49,7 +49,7 @@ class Meetings_Form_Contributions extends Meetings_Form_Abstract {
         $this->addSelectElement('contribution_type_id', array(
             'label' => 'Contribution type',
             'required' => true,
-            'multiOptions' => $this->_meeting['contribution_types'],
+            'multiOptions' => array_map('ucfirst',$this->_meeting['contribution_types'])
         ));
         $this->addTextElement('title', array(
             'label' => 'Title',
@@ -70,7 +70,7 @@ class Meetings_Form_Contributions extends Meetings_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
-        
+
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addCancelButtonElement('cancel', 'Cancel');
 
