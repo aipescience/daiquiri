@@ -21,10 +21,10 @@
 /**
  * @class   Daiquiri_Model_Pagination Pagination.php
  * @brief   Class, which adds pagination (for daiquiri_table.js) functionality to model.
- * 
- * This class provides, pagination of the SQL query results. It is used in connection 
+ *
+ * This class provides, pagination of the SQL query results. It is used in connection
  * with the daiquiri_table.js.
- * 
+ *
  * It further handles basic functionality of daiquiri_table.js such as sorting, filters and
  * editing of elements.
  */
@@ -40,7 +40,7 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
      * @brief   Maps options from daiquiri_table to SQL query options
      * @param   array $tableParams
      * @return  array $sqloptions
-     * 
+     *
      * This function returns an array with the elements 'from', 'limit',
      * 'start', 'order', and 'where'. These map to the corresponding SQL
      * tags.
@@ -48,7 +48,7 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
     public function sqloptions(array $queryParams = array()) {
         // parse options
         $sqloptions = array();
-        
+
         if (isset($queryParams['nrows'])) {
             $sqloptions['limit'] = $queryParams['nrows'];
 
@@ -137,7 +137,7 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
      * @param   array $rows         array of rows to return
      * @param   array $sqloptions   sql options array encoding SQL filters
      * @return  data class
-     * 
+     *
      * This function returns the data queried from the database in a form that
      * jqGrid can handle them. It returns a class with the following attributes:
      *  - <b>rows</b>       array holding the data ('id' and 'cell')
@@ -155,7 +155,7 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
             $d = array("cell" => array_values($row));
             if ($pk !== false) {
                 $d['id'] = $row[$pk];
-            } 
+            }
             $data['rows'][] = $d;
         }
 
@@ -176,7 +176,7 @@ class Daiquiri_Model_Helper_Pagination extends Daiquiri_Model_Helper_Abstract {
             $data['pages'] = 1;
         }
 
-        $data['status'] = 'ok'; 
+        $data['status'] = 'ok';
 
         return $data;
     }

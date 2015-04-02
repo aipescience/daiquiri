@@ -133,7 +133,7 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
     }
 
     /**
-     * Fetches the primary key and one specified field from the previously set database table 
+     * Fetches the primary key and one specified field from the previously set database table
      * as a flat array.
      * @param string $field name of the field
      * @return array $rows
@@ -169,16 +169,8 @@ class Daiquiri_Model_Resource_Table extends Daiquiri_Model_Resource_Adapter {
         $select->from($this->getTablename(), 'COUNT(*) as count');
 
         if ($sqloptions) {
-            if (isset($sqloptions['where'])) {
-                foreach ($sqloptions['where'] as $w) {
-                    $select = $select->where($w);
-                }
-            }
-            if (isset($sqloptions['orWhere'])) {
-                foreach ($sqloptions['orWhere'] as $w) {
-                    $select = $select->orWhere($w);
-                }
-            }
+            $select->setWhere($sqloptions);
+            $select->setOrWhere($sqloptions);
         }
 
         // query database and return

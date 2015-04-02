@@ -65,16 +65,8 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         $select->join('Auth_Status', 'Auth_Status.id = Auth_User.status_id', array('status'));
 
         if ($sqloptions) {
-            if (isset($sqloptions['where'])) {
-                foreach ($sqloptions['where'] as $w) {
-                    $select = $select->where($w);
-                }
-            }
-            if (isset($sqloptions['orWhere'])) {
-                foreach ($sqloptions['orWhere'] as $w) {
-                    $select = $select->orWhere($w);
-                }
-            }
+            $select->setWhere($sqloptions);
+            $select->setOrWhere($sqloptions);
         }
 
         // query database and return

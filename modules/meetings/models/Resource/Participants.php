@@ -65,16 +65,8 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
         $select->join('Meetings_ParticipantStatus','Meetings_ParticipantStatus.id = Meetings_Participants.status_id', array());
 
         if ($sqloptions) {
-            if (isset($sqloptions['where'])) {
-                foreach ($sqloptions['where'] as $w) {
-                    $select = $select->where($w);
-                }
-            }
-            if (isset($sqloptions['orWhere'])) {
-                foreach ($sqloptions['orWhere'] as $w) {
-                    $select = $select->orWhere($w);
-                }
-            }
+            $select->setWhere($sqloptions);
+            $select->setOrWhere($sqloptions);
         }
 
         // query database
@@ -86,7 +78,7 @@ class Meetings_Model_Resource_Participants extends Daiquiri_Model_Resource_Table
      * Fetches a specific row from the participants table.
      * @param mixed $id primary key of the row
      * @throws Exception
-     * @return array $row 
+     * @return array $row
      */
     public function fetchRow($id) {
         if (empty($id)) {

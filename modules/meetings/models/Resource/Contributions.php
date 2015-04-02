@@ -90,16 +90,8 @@ class Meetings_Model_Resource_Contributions extends Daiquiri_Model_Resource_Tabl
         $select->join('Meetings_ContributionTypes', 'Meetings_Contributions.contribution_type_id = Meetings_ContributionTypes.id', array());
 
         if ($sqloptions) {
-            if (isset($sqloptions['where'])) {
-                foreach ($sqloptions['where'] as $w) {
-                    $select = $select->where($w);
-                }
-            }
-            if (isset($sqloptions['orWhere'])) {
-                foreach ($sqloptions['orWhere'] as $w) {
-                    $select = $select->orWhere($w);
-                }
-            }
+            $select->setWhere($sqloptions);
+            $select->setOrWhere($sqloptions);
         }
 
         // query database

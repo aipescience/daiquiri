@@ -304,16 +304,8 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         $select->join('Auth_User','Query_Jobs.user_id = Auth_User.id','username');
 
         if ($sqloptions) {
-            if (isset($sqloptions['where'])) {
-                foreach ($sqloptions['where'] as $w) {
-                    $select = $select->where($w);
-                }
-            }
-            if (isset($sqloptions['orWhere'])) {
-                foreach ($sqloptions['orWhere'] as $w) {
-                    $select = $select->orWhere($w);
-                }
-            }
+            $select->setWhere($sqloptions);
+            $select->setOrWhere($sqloptions);
         }
 
         // query database and return

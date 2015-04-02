@@ -96,7 +96,7 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
         $singleQuotedUserId = $this->getAdapter()->quoteInto('?', $userId);
         $doubleQuotedUserId = str_replace("'", '"', $singleQuotedUserId);
         $select->where("`data` REGEXP 's:2:" . '"id";s:[0-9]*:' . $doubleQuotedUserId . "'");
-        
+
         // get the rowset and convert to flat array
         $rows = array();
         foreach ($this->fetchAll($select) as $row) {
@@ -115,18 +115,10 @@ class Auth_Model_Resource_Sessions extends Daiquiri_Model_Resource_Table {
         $select = $this->select();
         $select->from('Auth_Sessions', 'COUNT(*) as count');
         $select->where("`data` LIKE '%Zend_Auth%'");
-        
+
         if ($sqloptions) {
-            if (isset($sqloptions['where'])) {
-                foreach ($sqloptions['where'] as $w) {
-                    $select = $select->where($w);
-                }
-            }
-            if (isset($sqloptions['orWhere'])) {
-                foreach ($sqloptions['orWhere'] as $w) {
-                    $select = $select->orWhere($w);
-                }
-            }
+            $select->setWhere($sqloptions);
+            $select->setOrWhere($sqloptions);
         }
 
         // query database and return
