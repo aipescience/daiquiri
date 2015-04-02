@@ -56,10 +56,10 @@
             <tbody>
                 <tr ng-repeat="(iRow,row) in table.data.rows" ng-click="selectRow(iRow)" ng-class="{'selected': table.meta.selected.iRows.indexOf(iRow) != -1}">
                     <td ng-repeat="(iCol,col) in table.data.cols" ng-class="{'selected': table.meta.selected.iCol == iCol}">
-                        <div class="cell" ng-if="col.ucd.indexOf('meta.ref') != -1">
+                        <div class="cell" ng-if="col.ucd && col.ucd.indexOf('meta.ref') != -1">
                             <a href="" ng-click="reference(iCol,iRow)">{{row.cell[iCol]}}</a>
                         </div>
-                        <div class="cell" ng-if="col.ucd.indexOf('meta.ref') == -1" ng-bind-html="row.cell[iCol]"></div>
+                        <div class="cell" ng-if="!col.ucd || col.ucd.indexOf('meta.ref') == -1" ng-bind-html="row.cell[iCol]"></div>
                     </td>
                 </tr>
             </tbody>
