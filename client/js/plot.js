@@ -73,7 +73,7 @@ angular.module('plot', [])
             angular.forEach(['plot_x_min','plot_x_max'], function(key) {
                 if (values[key] === '') delete values[key];
 
-                if (!angular.isUndefined(values[key])) {
+                if (angular.isDefined(values[key])) {
                     var f = parseFloat(values[key]);
                     if (isNaN(f)) {
                         errors.plot_x_range = ['Please give a numerial value'];
@@ -86,7 +86,7 @@ angular.module('plot', [])
             angular.forEach(['plot_y_min','plot_y_max'], function(key) {
                 if (values[key] === '') delete values[key];
 
-                if (!angular.isUndefined(values[key])) {
+                if (angular.isDefined(values[key])) {
                     var f = parseFloat(values[key]);
                     if (isNaN(f)) {
                         errors.plot_y_range = ['Please give a numerial value'];
@@ -135,10 +135,10 @@ angular.module('plot', [])
                         }
                     };
 
-                    if (!angular.isUndefined(values.plot_x_min)) options.xaxis.min = values.plot_x_min;
-                    if (!angular.isUndefined(values.plot_x_max)) options.xaxis.max = values.plot_x_max;
-                    if (!angular.isUndefined(values.plot_y_min)) options.yaxis.min = values.plot_y_min;
-                    if (!angular.isUndefined(values.plot_y_max)) options.yaxis.max = values.plot_y_max;
+                    if (angular.isDefined(values.plot_x_min)) options.xaxis.min = values.plot_x_min;
+                    if (angular.isDefined(values.plot_x_max)) options.xaxis.max = values.plot_x_max;
+                    if (angular.isDefined(values.plot_y_min)) options.yaxis.min = values.plot_y_min;
+                    if (angular.isDefined(values.plot_y_max)) options.yaxis.max = values.plot_y_max;
 
                     if (values.plot_x_scale === 'log') options.xaxis.transform = function(v) {return Math.log(v+0.0001)};
                     if (values.plot_y_scale === 'log') options.yaxis.transform = function(v) {return Math.log(v+0.0001)};

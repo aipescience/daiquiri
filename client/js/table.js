@@ -31,17 +31,17 @@ angular.module('table', ['ngSanitize'])
         link: {
             pre: function (scope, element, attrs) {
                 // look for the cols url in the attributes
-                if (!angular.isUndefined(attrs.cols)) {
+                if (angular.isDefined(attrs.cols)) {
                     TableService.url.cols = angular.element('base').attr('href') + attrs.cols;
                 }
 
                 // look for the rows url in the attributes
-                if (!angular.isUndefined(attrs.rows)) {
+                if (angular.isDefined(attrs.rows)) {
                     TableService.url.rows = angular.element('base').attr('href') + attrs.rows;
                 }
 
                 // look if the cols/rows should be selectable
-                if (!angular.isUndefined(attrs.select)) {
+                if (angular.isDefined(attrs.select)) {
                     TableService.meta.select = attrs.select;
                 }
 

@@ -47,7 +47,7 @@ app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function(
                         buttons.push({
                             value: e.attr('value'),
                             label: e.text(),
-                            selected: !angular.isUndefined(e.attr('selected')),
+                            selected: angular.isDefined(e.attr('selected')),
                             tooltip: select.attr('data-original-title-' + (i+1))
                         });
                     })
@@ -76,7 +76,7 @@ app.factory('PollingService', ['$timeout','QueryService','DownloadService',funct
     function poll() {
         QueryService.fetchAccount();
 
-        if (!angular.isUndefined(QueryService.account.job.download) && QueryService.account.job.download.status == 'pending') {
+        if (angular.isDefined(QueryService.account.job.download) && QueryService.account.job.download.status == 'pending') {
             DownloadService.downloadTable();
         }
 
@@ -175,10 +175,10 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
 
                 // codemirrorfy the query and the plan
                 CodeMirror.runMode(account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
-                if (!angular.isUndefined(account.job.plan)) {
+                if (angular.isDefined(account.job.plan)) {
                     CodeMirror.runMode(account.job.plan,"text/x-mysql",angular.element('#overview-plan')[0]);
                 }
-                if (!angular.isUndefined(account.job.actualQuery)) {
+                if (angular.isDefined(account.job.actualQuery)) {
                     CodeMirror.runMode(account.job.actualQuery,"text/x-mysql",angular.element('#overview-actualQuery')[0]);
                 }
 
@@ -724,7 +724,7 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
     $scope.$watch(function() {
         return QueryService.account.job;
     }, function (job) {
-        if (!angular.isUndefined(job.cols)) {
+        if (angular.isDefined(job.cols)) {
             var base = angular.element('base').attr('href');
 
             TableService.url.cols = base + '/data/viewer/cols?db=' + job.database + '&table=' + job.table;

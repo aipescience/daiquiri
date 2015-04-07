@@ -52,7 +52,7 @@ angular.module('browser',[])
         var colname2 = browser[name].colnames[2];
 
         // the FIRST column was clicked
-        if (colname === colname0 && !angular.isUndefined(colname1) && i != browser[name].cols[0].selected) {
+        if (colname === colname0 && angular.isDefined(colname1) && i != browser[name].cols[0].selected) {
             browser[name].cols[0].selected = i;
             browser[name].cols[1].selected = 0;
 
@@ -60,13 +60,13 @@ angular.module('browser',[])
             browser[name].cols[1].items = getItems(browser[name].data[colname0][i][colname1]);
 
             // update THIRD column
-            if (!angular.isUndefined(colname2) && browser[name].data[colname0][i][colname1].length !== 0) {
+            if (angular.isDefined(colname2) && browser[name].data[colname0][i][colname1].length !== 0) {
                 browser[name].cols[2].items = getItems(browser[name].data[colname0][i][colname1][0][colname2]);
             }
         }
 
         // the SECOND column was clicked
-        if (colname === colname1 && !angular.isUndefined(colname2) && i != browser[name].cols[1].selected) {
+        if (colname === colname1 && angular.isDefined(colname2) && i != browser[name].cols[1].selected) {
             var active0 = browser[name].cols[0].selected;
             browser[name].cols[1].selected = i;
 
@@ -113,7 +113,7 @@ angular.module('browser',[])
 
                 for (var i=0; i<browser[name].colnames.length; i++) {
                     var colname = browser[name].colnames[i];
-                    if (!angular.isUndefined(colname)) {
+                    if (angular.isDefined(colname)) {
                         browser[name].cols.push({
                             'id': i,
                             'name': colname.replace('_',' '),
@@ -124,11 +124,11 @@ angular.module('browser',[])
                 }
 
                 // init FIRST column
-                if (!angular.isUndefined(colname0)) {
+                if (angular.isDefined(colname0)) {
                     browser[name].cols[0].items = getItems(browser[name].data[colname0]);
 
                     // check if something in the FIRST column is active
-                    if (!angular.isUndefined(active) && active.colname === colname0) {
+                    if (angular.isDefined(active) && active.colname === colname0) {
                         for (var i=0; i<browser[name].cols[0].items.length;i++) {
                             if (browser[name].cols[0].items[i].id == active.id) {
                                 selected0 = i;
@@ -139,12 +139,12 @@ angular.module('browser',[])
 
                     // init SECOND column
                     var data0 = browser[name].data[colname0][selected0];
-                    if (!angular.isUndefined(colname1) && !angular.isUndefined(data0)) {
+                    if (angular.isDefined(colname1) && angular.isDefined(data0)) {
                         browser[name].cols[1].items = getItems(data0[colname1]);
                         browser[name].cols[0].selected = selected0;
 
                         // check if something in the SECOND column is active
-                        if (!angular.isUndefined(active) && active.colname === colname1) {
+                        if (angular.isDefined(active) && active.colname === colname1) {
                             for (var i=0; i<browser[name].cols[1].items.length;i++) {
                                 if (browser[name].cols[1].items[i].id == active.id) {
                                     selected1 = i;
@@ -155,7 +155,7 @@ angular.module('browser',[])
 
                         // init THIRD column
                         var data1 = data0[colname1][selected1];
-                        if (!angular.isUndefined(colname2) && !angular.isUndefined(data1)) {
+                        if (angular.isDefined(colname2) && angular.isDefined(data1)) {
                             browser[name].cols[2].items = getItems(data1[colname2]);
                             browser[name].cols[1].selected = selected1;
                         }

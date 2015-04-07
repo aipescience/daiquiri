@@ -65,23 +65,23 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
             view.model = model.substring(0,1).toUpperCase() + model.substring(1,model.length-1);
 
             view.name = '';
-            if (!angular.isUndefined(data.row.database)) {
+            if (angular.isDefined(data.row.database)) {
                 view.name += data.row.database + '.';
             }
-            if (!angular.isUndefined(data.row.table)) {
+            if (angular.isDefined(data.row.table)) {
                 view.name += data.row.table + '.';
             }
             view.name += data.row.name;
 
             view.description = data.row.description;
 
-            if (!angular.isUndefined(data.row.type)) {
+            if (angular.isDefined(data.row.type)) {
                 view.type = data.row.type;
             }
-            if (!angular.isUndefined(data.row.unit)) {
+            if (angular.isDefined(data.row.unit)) {
                 view.unit = data.row.unit;
             }
-            if (!angular.isUndefined(data.row.ucd)) {
+            if (angular.isDefined(data.row.ucd)) {
                 view.ucd = data.row.ucd;
             }
 
@@ -132,10 +132,10 @@ app.factory('DataService', ['$http','BrowserService','ModalService',function($ht
 
             ModalService.modal.html = html;
 
-            if (url.indexOf('/data/tables/create') != -1 && !angular.isUndefined(active.database_id)) {
+            if (url.indexOf('/data/tables/create') != -1 && angular.isDefined(active.database_id)) {
                 values.database_id = active.database_id;
             }
-            if (url.indexOf('/data/columns/create') != -1 && !angular.isUndefined(active.table_id)) {
+            if (url.indexOf('/data/columns/create') != -1 && angular.isDefined(active.table_id)) {
                 values.table_id = active.table_id;
             }
 
