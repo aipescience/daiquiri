@@ -39,7 +39,9 @@ unset($this->row['status_id']);
 
         foreach (Daiquiri_Auth::getInstance()->getDetailKeys() as $key) {
             echo "<dt>{$this->escape(ucfirst($key))}</dt>";
-            if (is_array($this->row['details'][$key])) {
+            if (!isset($this->row['details'][$key])) {
+                echo "<dd>&nbsp;</dd>";
+            } else if (is_array($this->row['details'][$key])) {
                 echo "<dd>{$this->escape(implode(', ',$this->row['details'][$key]))}</dd>";
             } else {
                 echo "<dd>{$this->escape($this->row['details'][$key])}</dd>";
