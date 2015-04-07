@@ -1,0 +1,27 @@
+---
+
+- name: Daiquiri setup - WordPress (CentOS)
+  hosts: all
+  remote_user: root
+  tasks:
+
+  - name: create build dir
+    file: path=/srv/src/mysqldump-vo/build state=directory
+
+  - name: obtain the latest WordPress
+    get_url: url=https://wordpress.org/latest.tar.gz dest=/srv/src/latest.tar.gz
+
+  - name: untar WordPress
+    command: tar xzvf src/latest.tar.gz chdir=/srv creates=wordpress
+
+  - name: create a soft link for the Daiquiri WordPress plugin
+    file: src=/srv/daiquiri/library/Wordpress/plugin dest=/srv/wordpress/wp-content/plugins/daiquiri state=link
+
+  - name: create a soft link for the Daiquiri WordPress theme
+    file: src=/srv/daiquiri/library/Wordpress/theme dest=/srv/wordpress/wp-content/themes/daiquiri state=link
+
+  - name: copy the WordPress config file
+    command: cp /srv/wordpress/wp-config-sample.php /srv/wordpress/wp-config.php creates=/srv/wordpress/wp-config.php
+
+  - name: set owner and group for the WordPress directory
+    file: path=/srv/wordpress recurse=yes  owner=apache group=apache
