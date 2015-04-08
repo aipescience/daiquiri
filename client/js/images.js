@@ -21,7 +21,7 @@ angular.module('images', [])
 
 .factory('ImagesService', ['$http','$timeout','TableService',function($http,$timeout,TableService) {
     var values = {
-        show: false
+        first: true
     };
 
     var meta = {}
@@ -33,22 +33,24 @@ angular.module('images', [])
         meta.iRow = iRow;
 
         values.colname = TableService.data.cols[iCol].name;
+        values.first = true;
         show();
     }
 
     function show() {
-        values.name = TableService.data.rows[meta.iRow].cell[meta.iCol];
-        values.link = base + '/data/files/single/name/' + values.name;
+        var name = TableService.data.rows[meta.iRow].cell[meta.iCol];
+        var link = base + '/data/files/single/name/' + name;
+
+        values.name = name;
+        values.link = link;
 
         $timeout(function() {
             wheelzoom(document.querySelectorAll('.daiquiri-images img'));
 
-            // hack for first image
             if (!values.show) {
-                angular.element('.daiquiri-images img').on('load', function() {
-                    angular.element('.daiquiri-images img').off('load');
-                    values.show = true;
-                });
+                $timeout(function() {
+                    values.first = false;
+                }, 300);
             }
         });
     }

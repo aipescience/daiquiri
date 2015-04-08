@@ -35,6 +35,11 @@
     display: block;
     margin-left: auto;
     margin-right: auto;
+    cursor: move;
+}
+
+.daiquiri-images-area.transparent {
+    opacity: 0;
 }
 
 .daiquiri-images-hint {

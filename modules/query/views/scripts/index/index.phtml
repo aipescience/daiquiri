@@ -373,11 +373,13 @@
                                     <strong>{{values.colname|ucfirst}}</strong> <a href="{{values.link}}" target="_blank">{{values.name}}</a>
                                 </div>
 
-                                <img ng-src="{{values.link}}" ng-show="values.show" />
-
-                                <div class="daiquiri-images-hint">
-                                    You can zoom with the mousewheel and than drag the image by holding the mouse button.
+                                <div class="daiquiri-images-area" ng-class="{'transparent': values.first}">
+                                    <img ng-src="{{values.link}}" />
+                                    <div class="daiquiri-images-hint">
+                                        You can zoom with the mousewheel and than drag the image by holding the mouse button.
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                         <?php endif; ?>
