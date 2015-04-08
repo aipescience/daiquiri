@@ -41,7 +41,7 @@ class Data_Form_Static extends Daiquiri_Form_Model {
         $this->addCsrfElement();
 
         // add elements
-        $this->addElement('text', 'alias', array(
+        $this->addTextElement('alias', array(
             'label' => 'Alias',
             'class' => 'input-xxlarge',
             'required' => true,
@@ -50,7 +50,7 @@ class Data_Form_Static extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('text', 'path', array(
+        $this->addTextElement('path', array(
             'label' => 'Path',
             'class' => 'input-xxlarge',
             'required' => true,
@@ -59,17 +59,17 @@ class Data_Form_Static extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addElement('select', 'publication_role_id', array(
+        $this->addSelectElement('publication_role_id', array(
             'label' => 'Published for',
             'required' => true,
             'multiOptions' => $this->_roles,
         ));
-        $this->addPrimaryButtonElement('submit', $this->_submit);
-        $this->addButtonElement('cancel', 'Cancel');
+        $this->addSubmitButtonElement('submit', $this->_submit);
+        $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
         $this->addHorizontalGroup(array('alias', 'path', 'publication_role_id'));
-        $this->addHorizontalButtonGroup(array('submit', 'cancel'));
+        $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
         if (isset($this->_entry)) {

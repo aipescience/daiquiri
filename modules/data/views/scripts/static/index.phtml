@@ -19,10 +19,10 @@
  */
 ?>
 
-<div class="main">
+<div class="main" ng-app="admin" ng-controller="AdminController">
     <h2>Static file alias management</h2>
 
-    <table class="table table-condensed">
+    <table class="table table-condensed table-bordered">
         <thead>
             <tr>
                 <th>Alias</th>
@@ -49,13 +49,15 @@
                             'href' => '/data/static/update/id/' . $this->escape($row['id']),
                             'resource' => 'Data_Model_Static',
                             'permission' => 'update',
-                            'prepend' => '&nbsp;'));
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         echo $this->internalLink(array(
                             'text' => 'Delete',
                             'href' => '/data/static/delete/id/' . $this->escape($row['id']),
                             'resource' => 'Data_Model_Static',
                             'permission' => 'delete',
-                            'prepend' => '&nbsp;'));
+                            'prepend' => '&nbsp;',
+                            'ng-click' => 'fetchHtml($event)'));
                         ?>
                     </td>
                 </tr>
@@ -64,19 +66,31 @@
         </tbody>
     </table>
 
-    <?php
-    echo $this->internalLink(array(
-        'text' => 'Create static file alias',
-        'href' => '/data/static/create',
-        'resource' => 'Data_Model_Static',
-        'permission' => 'create',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->internalLink(array(
-        'text' => 'Export to init.php syntax',
-        'href' => '/data/static/export',
-        'prepend' => '<p>',
-        'append' => '</p>'));
-    echo $this->adminLink();
-    ?>
+    <div class="row">
+        <div class="span3">
+            <?php
+            echo $this->internalLink(array(
+                'text' => 'Create static file alias',
+                'href' => '/data/static/create',
+                'resource' => 'Data_Model_Static',
+                'permission' => 'create',
+                'prepend' => '<div class="daiquiri-widget"><p>',
+                'append' => '</p></div>',
+                'ng-click' => 'fetchHtml($event)'));
+            echo $this->internalLink(array(
+                'text' => 'Export to init.php syntax',
+                'href' => '/data/static/export',
+                'prepend' => '<div class="daiquiri-widget"><p>',
+                'append' => '</p></div>'));
+            ?>
+        </div>
+
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+            <?php echo $this->adminLink(); ?>
+            </div>
+        </div>
+    </div>
+
+    <div daiquiri-modal></div>
 </div>

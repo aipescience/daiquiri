@@ -63,6 +63,12 @@ class Core_AdminController extends Daiquiri_Controller_Abstract {
                 'resource' => 'Data_Model_Databases',
                 'permission' => 'show',
                 'icon' => 'fa-database'),
+            'static' => array(
+                'text' => 'Static HTML management',
+                'href' => '/data/static',
+                'resource' => 'Data_Model_Static',
+                'permission' => 'show',
+                'icon' => 'fa-file'),
             'meetings' => array(
                 'text' => 'Meetings management',
                 'href' => '/meetings/',
@@ -123,7 +129,7 @@ class Core_AdminController extends Daiquiri_Controller_Abstract {
         $this->view->links = array();
         foreach ($this->_items as $item) {
             unset($item['icon']);
-            
+
             $link = $this->internalLink($item);
 
             if (!empty($link)) {
