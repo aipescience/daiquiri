@@ -321,8 +321,9 @@ angular.module('table', ['ngSanitize'])
         $document.on('mouseup', exitResize);
     };
 
-    $scope.reference = function(iCol,iRow) {
+    $scope.reference = function(event,iCol,iRow) {
         $scope.$emit('tableReferenceClicked',iCol,iRow);
+        event.stopPropagation();
     };
 
     $scope.selectCol = function(iCol) {
