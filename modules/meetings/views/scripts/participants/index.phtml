@@ -35,7 +35,7 @@
     <div daiquiri-table data-cols="<?php echo $cols; ?>" data-rows="<?php echo $rows; ?>"></div>
 
     <div class="row">
-        <div class="span6">
+        <div class="span9">
             <div class="daiquiri-widget">
                 <ul class="unstyled">
                     <li>Export names:
@@ -45,24 +45,18 @@
                         'href' => '/meetings/' . $this->slug . '/participants/export/',
                         'target' => 'blank',
                         'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'accepted',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/status/accepted',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'rejected',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/status/rejected',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
                         'permission' => 'export'
                     ));
+                    foreach (array('accepted','rejected','registered','invited','organizer') as $status) {
+                        echo $this->internalLink(array(
+                            'text' => $status,
+                            'href' => '/meetings/' . $this->slug . '/participants/export/status/' . $status,
+                            'target' => 'blank',
+                            'resource' => 'Meetings_Model_Participants',
+                            'permission' => 'export',
+                            'prepend' => ',&nbsp;'
+                        ));
+                    }
                     ?>
                     </li>
 
@@ -73,24 +67,18 @@
                         'href' => '/meetings/' . $this->slug . '/participants/export/mode/mail',
                         'target' => 'blank',
                         'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'accepted',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/mail/status/accepted',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'rejected',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/mail/status/rejected',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
                         'permission' => 'export'
                     ));
+                    foreach (array('accepted','rejected','registered','invited','organizer') as $status) {
+                        echo $this->internalLink(array(
+                            'text' => $status,
+                            'href' => '/meetings/' . $this->slug . '/participants/export/mode/mail/status/' . $status,
+                            'target' => 'blank',
+                            'resource' => 'Meetings_Model_Participants',
+                            'permission' => 'export',
+                            'prepend' => ',&nbsp;'
+                        ));
+                    }
                     ?>
                     </li>
 
@@ -101,24 +89,18 @@
                         'href' => '/meetings/' . $this->slug . '/participants/export/mode/affiliation',
                         'target' => 'blank',
                         'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'accepted',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/affiliation/status/accepted',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'rejected',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/affiliation/status/rejected',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
                         'permission' => 'export'
                     ));
+                    foreach (array('accepted','rejected','registered','invited','organizer') as $status) {
+                        echo $this->internalLink(array(
+                            'text' => $status,
+                            'href' => '/meetings/' . $this->slug . '/participants/export/mode/affiliation/status/' . $status,
+                            'target' => 'blank',
+                            'resource' => 'Meetings_Model_Participants',
+                            'permission' => 'export',
+                            'prepend' => ',&nbsp;'
+                        ));
+                    }
                     ?>
                     </li>
 
@@ -129,24 +111,18 @@
                         'href' => '/meetings/' . $this->slug . '/participants/export/mode/csv',
                         'target' => 'blank',
                         'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'accepted',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/csv/status/accepted',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'rejected',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/csv/status/rejected',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
                         'permission' => 'export'
                     ));
+                    foreach (array('accepted','rejected','registered','invited','organizer') as $status) {
+                        echo $this->internalLink(array(
+                            'text' => $status,
+                            'href' => '/meetings/' . $this->slug . '/participants/export/mode/csv/status/' . $status,
+                            'target' => 'blank',
+                            'resource' => 'Meetings_Model_Participants',
+                            'permission' => 'export',
+                            'prepend' => ',&nbsp;'
+                        ));
+                    }
                     ?>
                     </li>
 
@@ -157,24 +133,18 @@
                         'href' => '/meetings/' . $this->slug . '/participants/export/mode/excel',
                         'target' => 'blank',
                         'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'accepted',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/excel/status/accepted',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
-                        'permission' => 'export',
-                        'append' => ',&nbsp;'
-                    ));
-                    echo $this->internalLink(array(
-                        'text' => 'rejected',
-                        'href' => '/meetings/' . $this->slug . '/participants/export/mode/excel/status/rejected',
-                        'target' => 'blank',
-                        'resource' => 'Meetings_Model_Participants',
                         'permission' => 'export'
                     ));
+                    foreach (array('accepted','rejected','registered','invited','organizer') as $status) {
+                        echo $this->internalLink(array(
+                            'text' => $status,
+                            'href' => '/meetings/' . $this->slug . '/participants/export/mode/excel/status/' . $status,
+                            'target' => 'blank',
+                            'resource' => 'Meetings_Model_Participants',
+                            'permission' => 'export',
+                            'prepend' => ',&nbsp;'
+                        ));
+                    }
                     ?>
                     </li>
                 </ul>
@@ -191,9 +161,7 @@
                 'ng-click' => 'fetchHtml($event)'));
             ?>
             </div>
-        </div>
 
-        <div class="span3 pull-right">
             <div class="daiquiri-widget">
                 <?php
                 echo $this->internalLink(array(
