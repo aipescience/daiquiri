@@ -57,7 +57,7 @@ foreach ($this->rows as $row) {
         foreach ($this->contributionTypes as $contributionType) {
             if (isset($row['contributions'][$contributionType])) {
                 $values[] = '"' . $this->escape($row['contributions'][$contributionType]['title']) . '"';
-                $values[] = '"' . $this->escape($row['contributions'][$contributionType]['abstract']) . '"';
+                $values[] = '"' . $this->escape(trim(preg_replace('/\s+/', ' ', $row['contributions'][$contributionType]['abstract']))) . '"';
             } else {
                 $values[] = '""';
                 $values[] = '""';
