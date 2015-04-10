@@ -335,6 +335,18 @@ app.factory('SubmitService', ['$http','$timeout','QueryService','CodemirrorServi
 
     function init(opt) {
         options = opt;
+
+        angular.element('input[type="text"]').each(function(key, node) {
+            var element = angular.element(node);
+
+            var id = element.attr('id');
+            var value = element.attr('value');
+
+            if (angular.isDefined(value)) {
+                values[id] = value;
+            }
+        });
+
         $timeout(function() {
             // refresh codemirror
             CodemirrorService.refresh('sql_query');
