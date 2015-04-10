@@ -66,7 +66,7 @@ foreach ($this->rows as $row) {
         if ($this->mode == 'csv') {
             echo implode(',',$values) . "\n";
         } else if ($this->mode == 'excel') {
-            echo implode(';',$values) . "\n";
+            echo utf8_decode(implode(';',$values)) . "\n";
         }
     } else {
         echo $row['lastname'] . ', ' . $row['firstname'] . "\n";
