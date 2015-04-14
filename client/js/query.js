@@ -183,7 +183,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 }
 
                 // if a form was active, switch to job overview tab
-                if (account.active.form != false) {
+                if (account.active.form != false || $('#images-tab-header').hasClass('active')) {
                     $('#overview-tab-header a').tab('show');
                 }
 
@@ -742,6 +742,8 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
             TableService.url.cols = base + '/data/viewer/cols?db=' + job.database + '&table=' + job.table;
             TableService.url.rows = base + '/data/viewer/rows?db=' + job.database + '&table=' + job.table;
             TableService.init();
+
+            ImagesService.init();
         }
     });
 
@@ -755,7 +757,7 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
             extension = value.match(/(?:\.([^.]+))?$/)[1];
             if (['jpg','jpeg','png','bmp'].indexOf(extension) != -1) {
                 // an image file
-                ImagesService.init(iCol,iRow);
+                ImagesService.show(iCol,iRow);
                 $('#images-tab-header a').tab('show');
             } else {
                 // a regular file to be downloaded

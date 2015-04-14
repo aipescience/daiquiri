@@ -28,29 +28,38 @@ angular.module('images', [])
 
     var base = angular.element('base').attr('href');
 
-    function init(iCol,iRow) {
+    function init() {
+        meta.iCol = null;
+        meta.iRow = null;
+
+        values.name = null;
+        values.link = null;
+
+        values.colname = null;
+        values.first = true;
+    }
+
+    function show(iCol,iRow) {
         meta.iCol = iCol;
         meta.iRow = iRow;
 
         values.colname = TableService.data.cols[iCol].name;
         values.first = true;
-        show();
+        refresh();
     }
 
-    function show() {
-        var name = TableService.data.rows[meta.iRow].cell[meta.iCol];
-        var link = base + '/data/files/single/name/' + name;
-
-        values.name = name;
-        values.link = link;
+    function refresh() {
+        values.name = TableService.data.rows[meta.iRow].cell[meta.iCol];
+        values.link = base + '/data/files/single/name/' + values.name;
+        values.row_id = TableService.data.rows[meta.iRow].cell[0];
 
         $timeout(function() {
             wheelzoom(document.querySelectorAll('.daiquiri-images img'));
 
-            if (!values.show) {
+            if (values.first) {
                 $timeout(function() {
                     values.first = false;
-                }, 300);
+                }, 500);
             }
         });
     }
@@ -59,7 +68,7 @@ angular.module('images', [])
         // turn back table to page one
         TableService.first().then(function() {
             meta.iRow = 0;
-            show();
+            refresh();
         });
     }
 
@@ -68,11 +77,11 @@ angular.module('images', [])
             // turn back table page
             TableService.prev().then(function() {
                 meta.iRow = TableService.meta.nrows - 1;
-                show();
+                refresh();
             });
         } else {
             meta.iRow -= 1;
-            show();
+            refresh();
         }
     }
 
@@ -81,11 +90,11 @@ angular.module('images', [])
             // turn over table page
             TableService.next().then(function() {
                 meta.iRow = 0;
-                show();
+                refresh();
             });
         } else {
             meta.iRow += 1;
-            show();
+            refresh();
         }
     }
 
@@ -93,13 +102,14 @@ angular.module('images', [])
         // turn back table to the last page
         TableService.last().then(function() {
             meta.iRow = TableService.meta.nrows - 1;
-            show();
+            refresh();
         });
     }
 
     return {
         values: values,
         init: init,
+        show: show,
         first: first,
         prev: prev,
         next: next,
