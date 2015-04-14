@@ -116,6 +116,9 @@ class Auth_Model_User extends Daiquiri_Model_Table {
      */
     public function rows(array $params = array()) {
         // parse params
+        if (!isset($params['sort'])) {
+            $params['sort'] = 'id DESC';
+        }
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
         // get the data from the database

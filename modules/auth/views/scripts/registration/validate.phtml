@@ -30,7 +30,7 @@
             <p>
                 Your account has been activated and you should be able to log in.
             </p>
-            <?php echo $this->loginLink(); ?>
+            <?php echo $this->internalLink(array('text' => 'Login','href' => '/auth/login')); ?>
         <?php endif; ?>
     <?php else: ?>
         <p>Your registration could not been validated. The provided url is not valid.</p>

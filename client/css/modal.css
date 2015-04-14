@@ -117,3 +117,7 @@ button.daiquiri-modal-close:hover {
 .daiquiri-modal-body .form-action {
     text-align: right;
 }
+.daiquiri-modal-body .align-form-horizontal {
+    margin-left: 195px;
+    margin-right: 15px;
+}
