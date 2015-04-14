@@ -52,7 +52,12 @@ class Daiquiri_View_Helper_LoginLink extends Zend_View_Helper_Abstract {
             $link = '<a href="' . $this->view->baseUrl('/auth/login/logout') . '">Logout</a>';
         } else {
             // user not logged in, display the login link
-            $link = '<a href="' . $this->view->baseUrl('/auth/login?redirect=' . $this->view->path()) . '">Login</a>';
+            $path = $this->view->path();
+            if (strpos($path,'/core/layout') === false) {
+                $link = '<a href="' . $this->view->baseUrl('/auth/login?redirect=' . $path) . '">Login</a>';
+            } else {
+                $link = '<a href="' . $this->view->baseUrl('/auth/login') . '">Login</a>';
+            }
         }
         return $link;
     }
