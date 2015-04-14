@@ -19,10 +19,8 @@
  */
 ?>
 
-
-<link href="<?php echo $this->baseUrl('/daiquiri/css/query.css'); ?>" media="screen" rel="stylesheet" type="text/css" >
-<script type="text/javascript" src="<?php echo $this->baseUrl('/daiquiri/js/query.js'); ?>"></script>
-<meta name="csrf-token" content="" />
+<?php $this->headLink()->appendStylesheet($this->baseUrl('/daiquiri/css/query.css')); ?>
+<?php $this->headScript()->prependFile($this->baseUrl('/daiquiri/js/query.js')); ?>
 
 <div class="main" ng-app="query" ng-controller="QueryController"
     ng-init='options = <?php echo Zend_Json::encode($this->options); ?>'>

@@ -19,7 +19,7 @@
  */
 ?>
 
-<script type="text/javascript" src="<?php echo $this->baseUrl('/daiquiri/js/data.js'); ?>"></script>
+<?php $this->headScript()->prependFile($this->baseUrl('/daiquiri/js/data.js')); ?>
 
 <div class="main" ng-app="data" ng-controller="DataController">
     <h2>Database management</h2>
