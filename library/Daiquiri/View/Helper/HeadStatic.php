@@ -139,12 +139,10 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
             }
         }
 
-        // append css files
-        foreach ($css as $file) {
-            $hl->appendStylesheet($this->view->baseUrl($file));
+        // prepend files in reverse order
+        foreach (array_reverse($css) as $file) {
+            $hl->prependStylesheet($this->view->baseUrl($file));
         }
-
-        // prepend js files in reverse order
         foreach (array_reverse($js) as $file) {
             $hs->prependFile($this->view->baseUrl($file));
         }
