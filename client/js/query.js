@@ -458,10 +458,9 @@ app.factory('SubmitService', ['$http','$timeout','QueryService','CodemirrorServi
     function pasteQuery() {
         QueryService.activateForm('sql');
 
-        var query = angular.element('#overview-query')[0].innerText;
         $timeout(function() {
             CodemirrorService.clear('sql_query');
-            CodemirrorService.insert('sql_query',query);
+            CodemirrorService.insert('sql_query',QueryService.account.job.query);
             CodemirrorService.refresh('sql_query');
         });
     }
