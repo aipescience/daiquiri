@@ -527,7 +527,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
     public function examples() {
         $model = new Query_Model_Examples();
         $rows = array();
-        foreach ($model->getResource()->fetchRows() as $row) {
+        foreach ($model->getResource()->fetchRows(array('order' => 'order ASC')) as $row) {
             if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id'])) {
                 $row['publication_role'] = Daiquiri_Auth::getInstance()->getRole($row['publication_role_id']);
                 $row['value'] = $row['query'];

@@ -32,7 +32,9 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function index() {
-        $rows = $this->getResource()->fetchRows();
+        $rows = $this->getResource()->fetchRows(array(
+            'order' => 'order ASC'
+        ));
         foreach ($rows as &$row) {
             $row['publication_role'] = Daiquiri_Auth::getInstance()->getRole($row['publication_role_id']);
         }
@@ -59,6 +61,11 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
+                }
 
                 $this->getResource()->insertRow($values);
                 return array('status' => 'ok');

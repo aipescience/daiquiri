@@ -70,6 +70,14 @@ class Query_Form_Example extends Daiquiri_Form_Model {
                 array('validator' => new Daiquiri_Form_Validator_Textarea()),
             )
         ));
+        $this->addTextElement('order', array(
+            'label' => 'Order in list',
+            'class' => 'span1',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => 'int'),
+            )
+        ));
         $this->addSelectElement('publication_role_id', array(
             'label' => 'Published for',
             'required' => true,
@@ -79,12 +87,12 @@ class Query_Form_Example extends Daiquiri_Form_Model {
         $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('name', 'query', 'description', 'publication_role_id'));
+        $this->addHorizontalGroup(array('name', 'query', 'description', 'order', 'publication_role_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        if (isset($this->_entry)) {
-            foreach (array('name', 'query', 'description', 'publication_role_id') as $element) {
+        foreach (array('name', 'query', 'description', 'order', 'publication_role_id') as $element) {
+            if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }
         }

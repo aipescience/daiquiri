@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
 
 CREATE TABLE IF NOT EXISTS `Query_Examples` (
   `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `order` INTEGER,
   `name` VARCHAR(256) NOT NULL,
   `query` TEXT NOT NULL,
   `description` TEXT,

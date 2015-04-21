@@ -1,3 +1,10 @@
+2015/04/21
+==========
+
+Query_Examples needs to be altered:
+
+ALTER TABLE `Query_Examples` ADD COLUMN `order` INTEGER;
+
 2015/03/02
 ==========
 
