@@ -60,13 +60,14 @@ unset($this->row['status_id']);
             <?php echo $this->escape($value); ?>
             <?php
                 echo $this->internalLink(array(
-                    'text' => '<i class="icon-pencil"></i>',
+                    'text' => 'Update',
                     'href' => "/auth/details/update?id={$id}&key={$key}",
                     'target' => '_blank',
-                    'append' => '&nbsp;'));
+                    'prepend' => '&nbsp;'));
                 echo $this->internalLink(array(
-                    'text' => '<i class="icon-remove"></i>',
+                    'text' => 'Delete',
                     'href' => "/auth/details/delete?id={$id}&key={$key}",
+                    'prepend' => '&nbsp;',
                     'target' => '_blank'));
             ?>
         </dd>
@@ -75,4 +76,14 @@ unset($this->row['status_id']);
     <?php else: ?>
         <p>none</p>
     <?php endif; ?>
+
+    <?php
+    echo $this->internalLink(array(
+        'text' => 'Add key',
+        'href' => "/auth/details/create?id={$id}",
+        'target' => '_blank',
+        'prepend' => '<p>',
+        'append' => '</p>'));
+    ?>
+
 </div>
