@@ -62,11 +62,15 @@ unset($this->row['status_id']);
                 echo $this->internalLink(array(
                     'text' => 'Update',
                     'href' => "/auth/details/update?id={$id}&key={$key}",
+                    'resource' => 'Auth_Model_Details',
+                    'permission' => 'update',
                     'target' => '_blank',
                     'prepend' => '&nbsp;'));
                 echo $this->internalLink(array(
                     'text' => 'Delete',
                     'href' => "/auth/details/delete?id={$id}&key={$key}",
+                    'resource' => 'Auth_Model_Details',
+                    'permission' => 'delete',
                     'prepend' => '&nbsp;',
                     'target' => '_blank'));
             ?>
@@ -81,6 +85,8 @@ unset($this->row['status_id']);
     echo $this->internalLink(array(
         'text' => 'Add key',
         'href' => "/auth/details/create?id={$id}",
+        'resource' => 'Auth_Model_Details',
+        'permission' => 'create',
         'target' => '_blank',
         'prepend' => '<p>',
         'append' => '</p>'));
