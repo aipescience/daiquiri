@@ -137,11 +137,11 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
         $db = Daiquiri_Config::getInstance()->getUserDbName($username);
 
         // get list of locked tables
-        /*$lockedTables = $this->getAdapter()->query('SHOW OPEN TABLES IN `' . $db . '` WHERE In_use > 0')->fetchAll();
+        $lockedTables = $this->getAdapter()->query('SHOW OPEN TABLES IN `' . $db . '` WHERE In_use > 0')->fetchAll();
         $where = "";
         foreach ($lockedTables as $table) {
             $where .= " AND table_name != '" . $table['Table'] . "'";
-        }*/
+        }
 
         // obtain row count
         // obtain table size in byte
@@ -150,8 +150,8 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
         $sql = "SELECT round( sum(data_length + index_length), 3 ) AS 'db_size', " .
                 "round( sum(index_length), 3) AS 'db_idx_size', " .
                 "round( sum(data_free), 3 ) AS 'db_free', sum(table_rows) AS 'db_row' " .
-                "FROM information_schema.tables WHERE table_schema = ?";
-                // . $where;
+                "FROM information_schema.tables WHERE table_schema = ?"
+                . $where;
 
         return $this->getAdapter()->query($sql, array($db))->fetch();
     }
