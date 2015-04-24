@@ -74,6 +74,10 @@ angular.module('browser',[])
             // update THIRD column
             browser[name].cols[2].items = getItems(browser[name].data[colname0][active0][colname1][i][colname2]);
         }
+
+        $timeout(function() {
+            $("[data-toggle='tooltip']").tooltip();
+        });
     };
 
     function initBrowser(name) {

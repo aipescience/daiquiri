@@ -280,11 +280,9 @@ li.dropdown ul ul {
 /* tooltips */
 
 .tooltip-inner {
-    text-shadow: none;
     white-space: normal;
     text-align: left;
 }
-
 .tooltip-inner code {
     color: white;
     padding: 0;
