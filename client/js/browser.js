@@ -28,7 +28,7 @@ angular.module('browser',[])
     };
 }])
 
-.factory('BrowserService', ['$http',function($http) {
+.factory('BrowserService', ['$http','$timeout',function($http,$timeout) {
     var browser = {};
 
     var base = angular.element('base').attr('href');
@@ -40,6 +40,7 @@ angular.module('browser',[])
                 'id': item.id,
                 'name': item.name,
                 'value': item.value,
+                'tooltip': item.tooltip,
                 'order': item.order
             })
         });
@@ -161,6 +162,10 @@ angular.module('browser',[])
                         }
                     }
                 }
+
+                $timeout(function() {
+                    $("[data-toggle='tooltip']").tooltip();
+                });
 
             } else {
                 console.log('Error');

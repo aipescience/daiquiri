@@ -383,7 +383,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                     'id' => $database['id'],
                     'name' => $database['name'],
                     'value' => $databasesModel->getResource()->quoteIdentifier($database['name']),
-                    'description' => $database['description'],
+                    'tooltip' => $database['description'],
                     'tables' => array()
                 );
 
@@ -393,16 +393,22 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                             'id' => $table['id'],
                             'name' => $table['name'],
                             'value' => $databasesModel->getResource()->quoteIdentifier($database['name'],$table['name']),
-                            'description' => $table['description'],
+                            'tooltip' => $table['description'],
                             'columns' => array(),
                         );
 
                         foreach ($table['columns'] as $column) {
+                            $tooltip = '';
+                            if (!empty($column['description'])) $tooltip .= "<p>{$column['description']}</p>";
+                            if (!empty($column['type'])) $tooltip .= "<p><i>Type:</i> {$column['type']}</p>";
+                            if (!empty($column['unit'])) $tooltip .= "<p><i>Unit:</i> {$column['unit']}</p>";
+                            if (!empty($column['ucd'])) $tooltip .= "<p><i>UCD:</i> {$column['ucd']}</p>";
+
                             $t['columns'][] = array(
                                 'id' => $column['id'],
                                 'name' => $column['name'],
                                 'value' => $databasesModel->getResource()->quoteIdentifier($column['name']),
-                                'description' => $column['description'],
+                                'tooltip' => $tooltip
                             );
                         }
                         $db['tables'][] = $t;
@@ -425,7 +431,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'id' => 'userdb',
             'name' => $userDbName,
             'value' => $databasesModel->getResource()->quoteIdentifier($userDbName),
-            'description' => 'Your personal database',
+            'tooltip' => 'Your personal database',
             'tables' => array()
         );
 
@@ -450,7 +456,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 'id' => 'userdb-table-' . $table_id++,
                 'name' => $usertable,
                 'value' => $databasesModel->getResource()->quoteIdentifier($userDbName,$usertable),
-                'description' => '',
                 'columns' => array()
             );
 
@@ -466,7 +471,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                     'id' => 'userdb-column-' . $column_id++,
                     'name' => $usercolumn,
                     'value' => $databasesModel->getResource()->quoteIdentifier($usercolumn),
-                    'description' => ''
                 );
             }
 
@@ -510,11 +514,15 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
     public function customFunctions() {
         $resource = new Data_Model_Resource_Functions();
         $rows = array();
-        foreach ($resource->fetchRows() as $row) {
-            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id'])) {
-                $row['publication_role'] = Daiquiri_Auth::getInstance()->getRole($row['publication_role_id']);
-                $row['value'] = $row['name'] . '()';
-                $rows[] = $row;
+        foreach ($resource->fetchRows() as $dbRow) {
+            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($dbRow['publication_role_id'])) {
+                $rows[] = array(
+                    'id' => $dbRow['id'],
+                    'name' => $dbRow['name'],
+                    'value' => $dbRow['query'],
+                    'order' => $dbRow['order'],
+                    'tooltip' => $dbRow['description']
+                );
             }
         }
         return array('custom_functions' => $rows, 'status' => 'ok');
@@ -527,12 +535,14 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
     public function examples() {
         $model = new Query_Model_Examples();
         $rows = array();
-        foreach ($model->getResource()->fetchRows(array('order' => 'order ASC')) as $row) {
-            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($row['publication_role_id'])) {
-                $row['publication_role'] = Daiquiri_Auth::getInstance()->getRole($row['publication_role_id']);
-                $row['value'] = $row['query'];
-                unset($row['query']);
-                $rows[] = $row;
+        foreach ($model->getResource()->fetchRows(array('order' => 'order ASC')) as $dbRow) {
+            if (Daiquiri_Auth::getInstance()->checkPublicationRoleId($dbRow['publication_role_id'])) {
+                $rows[] = array(
+                    'id' => $dbRow['id'],
+                    'name' => $dbRow['name'],
+                    'value' => $dbRow['query'],
+                    'order' => $dbRow['order']
+                );
             }
         }
         return array('examples' => $rows, 'status' => 'ok');

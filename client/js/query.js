@@ -498,6 +498,7 @@ app.factory('BarService', ['BrowserService',function(BrowserService) {
     };
     BrowserService.initBrowser('databases');
 
+
     BrowserService.browser.keywords = {
         'url': '/query/account/keywords/',
         'colnames': ['keywords']

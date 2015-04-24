@@ -106,6 +106,11 @@ class Query_Model_Examples extends Daiquiri_Model_Table {
                 // get the form values
                 $values = $form->getValues();
 
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
+                }
+
                 $this->getResource()->updateRow($id, $values);
                 return array('status' => 'ok');
             } else {

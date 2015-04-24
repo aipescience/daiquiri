@@ -5,8 +5,8 @@
         </ul>
         <ul class="daiquiri-browser-body nav nav-pills nav-stacked">
             <li class="nav-item" ng-repeat="(i,item) in col.items" ng-class="{'active': browser.active.browsername == browser.name && browser.active.colname == col.name && browser.active.id == item.id}">
-                <a href="" data-toggle="tooltip" title="" data-placement="right" data-original-title="" 
-                    ng-click="browserItemClicked(browser.name,item,col.name,i);" 
+                <a href="" data-toggle="tooltip" title="{{item.tooltip}}" data-placement="top" data-html="1" data-delay="500"
+                    ng-click="browserItemClicked(browser.name,item,col.name,i);"
                     ng-dblclick="browserItemDblClicked(browser.name,item);">
                     <span>{{item.name}}</span>
                     <i class="pull-right icon-chevron-right" ng-show="i == col.selected"></i>
