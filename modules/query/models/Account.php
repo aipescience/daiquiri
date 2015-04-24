@@ -398,17 +398,17 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                         );
 
                         foreach ($table['columns'] as $column) {
-                            $tooltip = '';
-                            if (!empty($column['description'])) $tooltip .= "<p>{$column['description']}</p>";
-                            if (!empty($column['type'])) $tooltip .= "<p><i>Type:</i> {$column['type']}</p>";
-                            if (!empty($column['unit'])) $tooltip .= "<p><i>Unit:</i> {$column['unit']}</p>";
-                            if (!empty($column['ucd'])) $tooltip .= "<p><i>UCD:</i> {$column['ucd']}</p>";
+                            $tooltip = array();
+                            if (!empty($column['description'])) $tooltip[] = $column['description'];
+                            if (!empty($column['type'])) $tooltip[] = "<i>Type:</i> {$column['type']}";
+                            if (!empty($column['unit'])) $tooltip[] = "<i>Unit:</i> {$column['unit']}";
+                            if (!empty($column['ucd'])) $tooltip[] = "<i>UCD:</i> {$column['ucd']}";
 
                             $t['columns'][] = array(
                                 'id' => $column['id'],
                                 'name' => $column['name'],
                                 'value' => $databasesModel->getResource()->quoteIdentifier($column['name']),
-                                'tooltip' => $tooltip
+                                'tooltip' => implode('<br />',$tooltip)
                             );
                         }
                         $db['tables'][] = $t;
