@@ -563,7 +563,7 @@ class Daiquiri_Init {
     private function _clean() {
         foreach ($this->options['database'] as $db) {
             if (!in_array($db['host'], array('localhost','127.0.0.1','::1'))) {
-                $host  = trim(`hostname -f`);
+                $host  = trim(`ip addr | awk '/inet/ && /eth0/{sub(/\/.*$/,"",$2); print $2}'`);
             } else {
                 $host = $db['host'];
             }
@@ -572,9 +572,9 @@ class Daiquiri_Init {
 
 -- on {$db['host']}
 
-DELETE FROM mysql.user where User='{$db['username']}';
-DELETE FROM mysql.tables_priv where User='{$db['username']}';
-DELETE FROM mysql.db where User='{$db['username']}';
+DELETE FROM mysql.user where User='{$db['username']}' AND Host='{$host}';
+DELETE FROM mysql.tables_priv where User='{$db['username']}' AND Host='{$host}';
+DELETE FROM mysql.db where User='{$db['username']}' AND Host='{$host}';
 FLUSH PRIVILEGES;
 
 EOT;
@@ -590,7 +590,7 @@ EOT;
             $db = $this->options['database']['web'];
 
             if (!in_array($db['host'], array('localhost','127.0.0.1','::1'))) {
-                $host  = trim(`hostname -f`);
+                $host  = trim(`ip addr | awk '/inet/ && /eth0/{sub(/\/.*$/,"",$2); print $2}'`);
             } else {
                 $host = $db['host'];
             }
@@ -599,8 +599,8 @@ EOT;
 
 -- on {$db['host']}
 
-CREATE USER `{$db['username']}`@`{$host}` IDENTIFIED BY '{$db['password']}';
-GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to `{$db['username']}`@`{$host}`;
+CREATE USER '{$db['username']}'@'{$host}' IDENTIFIED BY '{$db['password']}';
+GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to '{$db['username']}'@'{$host}';
 FLUSH PRIVILEGES;
 
 EOT;
@@ -610,7 +610,7 @@ EOT;
             $db = $this->options['database']['user'];
 
             if (!in_array($db['host'], array('localhost','127.0.0.1','::1'))) {
-                $host  = trim(`hostname -f`);
+                $host  = trim(`ip addr | awk '/inet/ && /eth0/{sub(/\/.*$/,"",$2); print $2}'`);
             } else {
                 $host = $db['host'];
             }
@@ -621,18 +621,18 @@ EOT;
 
 -- on {$db['host']}
 
-CREATE USER `{$db['username']}`@`{$host}` IDENTIFIED BY '{$db['password']}';
-GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to `{$db['username']}`@`{$host}`;
-GRANT SELECT ON `mysql`.`func` to `{$db['username']}`@`{$host}`;
+CREATE USER '{$db['username']}'@'{$host}' IDENTIFIED BY '{$db['password']}';
+GRANT ALL PRIVILEGES ON `{$db['dbname']}`.* to '{$db['username']}'@'{$host}';
+GRANT SELECT ON `mysql`.`func` to '{$db['username']}'@'{$host}';
 
 EOT;
 
             if ($this->options['config']['query']['query']['type'] === 'qqueue') {
                 echo <<<EOT
-GRANT SELECT ON `mysql`.`qqueue_queues` to `{$db['username']}`@`{$host}`;
-GRANT SELECT ON `mysql`.`qqueue_usrGrps` to `{$db['username']}`@`{$host}`;
-GRANT SELECT ON `mysql`.`qqueue_jobs` to `{$db['username']}`@`{$host}`;
-GRANT SELECT, UPDATE ON `mysql`.`qqueue_history` to `{$db['username']}`@`{$host}`;
+GRANT SELECT ON `mysql`.`qqueue_queues` to '{$db['username']}'@'{$host}';
+GRANT SELECT ON `mysql`.`qqueue_usrGrps` to '{$db['username']}'@'{$host}';
+GRANT SELECT ON `mysql`.`qqueue_jobs` to '{$db['username']}'@'{$host}';
+GRANT SELECT, UPDATE ON `mysql`.`qqueue_history` to '{$db['username']}'@'{$host}';
 
 EOT;
             }
@@ -641,7 +641,7 @@ EOT;
                 echo <<<EOT
 
 -- on {$db['host']} for the scratch db
-GRANT ALL PRIVILEGES ON `{$this->options['config']['query']['scratchdb']}`.* to `{$db['username']}`@`{$host}`;
+GRANT ALL PRIVILEGES ON `{$this->options['config']['query']['scratchdb']}`.* to '{$db['username']}'@'{$host}';
 
 EOT;
             }
@@ -649,7 +649,7 @@ EOT;
                 echo <<<EOT
 
 -- on {$db['host']} for every science database
-GRANT SELECT{$alter} ON `DB`.* to `{$db['username']}`@`{$host}`;
+GRANT SELECT{$alter} ON `SCIENCE_DATABASE`.* to '{$db['username']}'@'{$host}';
 
 
 EOT;
