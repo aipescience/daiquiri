@@ -21,7 +21,7 @@
 /**
  * @class   Daiquiri_Init Init.php
  * @brief   Daiquiri initialisation process handler.
- * 
+ *
  * Daiquiri initialisation process handler. The big class that does all the setup
  * magic... And it also works as a CLI tool.
  *
@@ -95,7 +95,7 @@ class Daiquiri_Init {
         $this->_processMailOptions();
         $this->_processModulesOptions();
 
-        // setup zend application environment 
+        // setup zend application environment
         $this->_setupEnvironment();
 
         // get init models from the modules
@@ -104,7 +104,7 @@ class Daiquiri_Init {
             $this->models[$module] = new $classname($this);
         }
 
-        // parse the config array for each model 
+        // parse the config array for each model
         $this->options['config'] = array();
         foreach($this->options['modules'] as $module) {
             $model = $this->models[$module];
@@ -113,13 +113,13 @@ class Daiquiri_Init {
 
         // update config singleton
         Daiquiri_Config::getInstance()->setConfig($this->options['config']);
-        
+
         // parse the init array for each model
         $this->options['init'] = array();
         foreach($this->options['modules'] as $module) {
             $model = $this->models[$module];
             $model->processInit();
-        } 
+        }
     }
 
     /**
@@ -220,7 +220,7 @@ class Daiquiri_Init {
                 ->bootstrap('frontController')
                 ->getResource('frontController');
 
-        // fake request    
+        // fake request
         $request = new Daiquiri_Controller_Request_Init();
         $front->setRequest($request);
 
@@ -318,8 +318,8 @@ class Daiquiri_Init {
     }
 
     /**
-     * Processes the 'modules' part of $options. Sets the correct modules in the 
-     * right order based on the input and the dependencies. 
+     * Processes the 'modules' part of $options. Sets the correct modules in the
+     * right order based on the input and the dependencies.
      */
     private function _processModulesOptions() {
         if (!isset($this->input['modules'])) {
@@ -696,7 +696,13 @@ EOT;
      * Drops the databases including the user databases.
      */
     private function _drop() {
-        echo "Dropping databases." . PHP_EOL;
+        // confirm drop
+        printf("Dropping databases. Please type 'yes' to confirm: ");
+        $fp = fopen("php://stdin","r");
+        if (trim(fgets($fp)) !== 'yes') {
+            echo "exiting." . PHP_EOL;;
+            die(0);
+        }
 
         if (isset($this->options['database']['web'])) {
             $webDb = $this->options['database']['web'];
