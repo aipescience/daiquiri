@@ -47,23 +47,33 @@ angular.module('codemirror', [])
     return {
         elements: elements,
         insert: function (key, string) {
-            var pos = elements[key].getCursor();
-            pos['ch'] += string.length;
-            elements[key].replaceSelection(string);
-            elements[key].setCursor(pos);
-            elements[key].focus();
+            if (angular.isDefined(elements[key])) {
+                var pos = elements[key].getCursor();
+                pos['ch'] += string.length;
+                elements[key].replaceSelection(string);
+                elements[key].setCursor(pos);
+                elements[key].focus();
+            }
         },
         clear: function(key) {
-            elements[key].setValue('');
+            if (angular.isDefined(elements[key])) {
+                elements[key].setValue('');
+            }
         },
         refresh: function(key) {
-            elements[key].refresh();
+            if (angular.isDefined(elements[key])) {
+                elements[key].refresh();
+            }
         },
         save: function(key) {
-            elements[key].save();
+            if (angular.isDefined(elements[key])) {
+                elements[key].save();
+            }
         },
         setReadOnly: function(key) {
-            elements[key].readOnly = true;
+            if (angular.isDefined(elements[key])) {
+                elements[key].readOnly = true;
+            }
         }
     };
 }]);

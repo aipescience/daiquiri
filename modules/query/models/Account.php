@@ -39,9 +39,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $message = $row['value'];
         }
 
-        // set job resource
-        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
-
         // get the sqloptions needed to show the list of jobs
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
 
@@ -72,7 +69,11 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get number of currently active jobs
         $resourceClass = get_class($this->getResource());
         if ($resourceClass::$hasQueues) {
-            $nactive = $this->getResource()->fetchNActive();
+            try {
+                $nactive = $this->getResource()->fetchNActive();
+            } catch (Exception $e) {
+                $nactive = false;
+            }
         } else {
             $nactive = false;
         }
@@ -86,52 +87,59 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $quota = array();
 
             // get database stats
-            $stats = $this->getResource()->fetchDatabaseStats();
-
-            // space in byte
-            $usedSpace = (float) $stats['db_size'];
+            try {
+                $stats = $this->getResource()->fetchDatabaseStats();
+            } catch (Exception $e) {
+                $stats = array();
+            }
 
             // get the quota space
             $quota['max'] = Daiquiri_Config::getInstance()->query->quota->$usrGrp;
 
-            // parse the quota to resolve KB, MB, GB, TB, PB, EB...
-            preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quota['max'], $parse);
-            $quotaSpace = (float) $parse[1];
-            $unit = $parse[2];
+            if (!empty($stats)) {
+                // space in byte
+                $usedSpace = (float) $stats['db_size'];
 
-            switch (strtoupper($unit)) {
-                case 'EB':
-                    $quotaSpace *= 1024;
-                case 'PB':
-                    $quotaSpace *= 1024;
-                case 'TB':
-                    $quotaSpace *= 1024;
-                case 'GB':
-                    $quotaSpace *= 1024;
-                case 'MB':
-                    $quotaSpace *= 1024;
-                case 'KB':
-                    $quotaSpace *= 1024;
-                default:
-                    break;
-            }
+                // parse the quota to resolve KB, MB, GB, TB, PB, EB...
+                preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quota['max'], $parse);
+                $quotaSpace = (float) $parse[1];
+                $unit = $parse[2];
 
-            if ($usedSpace > $quotaSpace) {
-                $quota['exceeded'] = true;
-            } else {
-                $quota['exceeded'] = false;
-            }
-
-            $unit = ' byte';
-            foreach (array('KB','MB','GB','TB','PB','EB') as $u) {
-                if ($usedSpace > 1024) {
-                    $usedSpace /= 1024.0;
-                    $unit = $u;
+                switch (strtoupper($unit)) {
+                    case 'EB':
+                        $quotaSpace *= 1024;
+                    case 'PB':
+                        $quotaSpace *= 1024;
+                    case 'TB':
+                        $quotaSpace *= 1024;
+                    case 'GB':
+                        $quotaSpace *= 1024;
+                    case 'MB':
+                        $quotaSpace *= 1024;
+                    case 'KB':
+                        $quotaSpace *= 1024;
+                    default:
+                        break;
                 }
+
+                if ($usedSpace > $quotaSpace) {
+                    $quota['exceeded'] = true;
+                } else {
+                    $quota['exceeded'] = false;
+                }
+
+                $unit = ' byte';
+                foreach (array('KB','MB','GB','TB','PB','EB') as $u) {
+                    if ($usedSpace > 1024) {
+                        $usedSpace /= 1024.0;
+                        $unit = $u;
+                    }
+                }
+
+                $quota['used'] = ((string) floor($usedSpace * 100) / 100 ) . ' ' . $unit;
+            } else {
+                $quota['used'] = '?';
             }
-
-            $quota['used'] = ((string) floor($usedSpace * 100) / 100 ) . ' ' . $unit;
-
         } else {
             $quota = false;
         }

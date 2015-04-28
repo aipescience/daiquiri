@@ -24,6 +24,10 @@
         <p>Query successfully submitted.</p>
     <?php elseif ($this->status === 'plan'): ?>
         <?php $this->redirector($this->redirect); ?>
+    <?php elseif ($this->status === 'error'): ?>
+        <h4>Error</h4>
+        <p>The database is currently not available. Plase try again later.</p>
+        <p>We are sorry for the inconvenience.</p>
     <?php else: ?>
         <h4><?php echo $this->formOptions['title']; ?></h4>
         <p><?php echo $this->formOptions['help']; ?></p>
