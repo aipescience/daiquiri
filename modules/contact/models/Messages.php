@@ -125,9 +125,17 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
                 $values = $form->getValues();
                 unset($values['submit']);
 
+                // get manager
+                $userResource = new Auth_Model_Resource_User();
+                $manager = array_merge(
+                    $userResource->fetchEmailByRole('admin'),
+                    $userResource->fetchEmailByRole('manager')
+                );
+
                 // send mail to user who used the contact form
                 $this->getModelHelper('mail')->send('contact.respond', array(
                     'to' => $message['email'],
+                    'bcc' => $manager,
                     'subject' => $values['subject'],
                     'body' => $values['body']
                 ));
