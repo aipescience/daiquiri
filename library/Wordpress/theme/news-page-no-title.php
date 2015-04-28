@@ -32,7 +32,7 @@ Template Name: News (no title)
             <?php the_content(); ?>
 
             <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>
-                
+
             <?php if (comments_open(get_the_ID())): ?>
                 <?php comments_template() ?>
             <?php endif ?>
@@ -40,25 +40,26 @@ Template Name: News (no title)
     <?php endwhile; else: ?>
         <p>Sorry, no page found.</p>
     <?php endif; ?>
-	
-	<div id="recent-news">
-    	<h3>Recent News</h3>
-    	<ul class="unstyled">
-            <?php 
+
+    <div id="recent-news">
+        <h3>Recent News</h3>
+        <ul class="unstyled">
+            <?php
             foreach (wp_get_recent_posts() as $post) {
-        	    echo '<li class="news-entry">';
-        	    echo '<div class="pull-left onehundredeighty" class="news-entry-date">';
-        	    echo date('F jS, Y', strtotime($post["post_date"]));
-        	    echo '</div>';
+                $content = explode('<!--more-->',$post["post_content"])[0];
+                echo '<li class="news-entry">';
+                echo '<div class="pull-left onehundredeighty" class="news-entry-date">';
+                echo date('F jS, Y', strtotime($post["post_date"]));
+                echo '</div>';
                 echo '<div class="align-form-horizontal">';
-        	    echo '<p><a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"].'</a></p>';
-                echo '<p>' . $post["post_content"] . '</p>';
+                echo '<p><a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"] .'</a></p>';
+                echo '<p>' . $content . '</p>';
                 echo '</div>';
                 echo '</li>';
             }
             ?>
-    	</ul>
+        </ul>
     </div>
-</div> 
+</div>
 
 <?php get_footer(); ?>

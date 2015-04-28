@@ -29,14 +29,14 @@ Template Name: News
 <div id="wp-content" class="main">
     <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
         <div class="post">
-    	    <h2>
+            <h2>
                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
             </h2>
 
             <?php the_content(); ?>
 
             <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>
-                    
+
             <?php if (comments_open(get_the_ID())): ?>
                 <?php comments_template() ?>
             <?php endif ?>
@@ -44,18 +44,22 @@ Template Name: News
     <?php endwhile; else: ?>
         <p>Sorry, no page found.</p>
     <?php endif; ?>
-	
-	<div id="recent-news">
-    	<h3>Recent News</h3>
+
+    <div id="recent-news">
+        <h3>Recent News</h3>
         <ul class="unstyled">
-            <?php 
+            <?php
             foreach (wp_get_recent_posts() as $post) {
-            echo '<li class="news-entry">';
-            echo '<span class="news-entry-date">';
-            echo date('F jS, Y', strtotime($post["post_date"]));
-            echo '</span>';
-            echo '<a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"].'</a>';
-            echo '</li>';
+                $content = explode('<!--more-->',$post["post_content"])[0];
+                echo '<li class="news-entry">';
+                echo '<div class="pull-left onehundredeighty" class="news-entry-date">';
+                echo date('F jS, Y', strtotime($post["post_date"]));
+                echo '</div>';
+                echo '<div class="align-form-horizontal">';
+                echo '<p><a href="' . get_permalink($post["ID"]) . '">' . $post["post_title"] .'</a></p>';
+                echo '<p>' . $content . '</p>';
+                echo '</div>';
+                echo '</li>';
             }
             ?>
         </ul>

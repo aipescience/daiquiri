@@ -39,6 +39,8 @@
                 <?php next_post_link('Next post: %link'); ?>
             </div>
 
+            <?php edit_post_link('Edit Page', '<div>', '</div>'); ?>
+
             <?php if (comments_open(get_the_ID())): ?>
                 <?php comments_template() ?>
             <?php endif ?>
