@@ -808,6 +808,17 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
         }).appendTo('body');
     }
 
+    $scope.toggleColumn = function(iCol) {
+        var col = QueryService.account.job.cols[iCol];
+        if (angular.isUndefined(col.hidden) || col.hidden !== true) {
+            col.hidden = true;
+            TableService.hideCol(iCol);
+        } else {
+            col.hidden = false;
+            TableService.showCol(iCol);
+        }
+    }
+
 }]);
 
 app.controller('ImagesController',['$scope','ImagesService',function($scope,ImagesService) {

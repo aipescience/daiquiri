@@ -279,30 +279,6 @@
                                 </div>
                             </div>
 
-                            <div class="daiquiri-widget nav" ng-show="account.job.cols">
-                                <div class="nav-header">Database columns</div>
-                                <div class="nav-item">
-                                    <table class="table table-condensed">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Type</th>
-                                                <th>Unit</th>
-                                                <th>UCD</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="element in account.job.cols">
-                                                <td>{{element.name}}</td>
-                                                <td>{{element.type}}</td>
-                                                <td>{{element.unit}}</td>
-                                                <td>{{element.ucd}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
                             <div class="daiquiri-widget nav" ng-show="account.job.plan">
                                 <div class="nav-header">Query plan</div>
                                 <div class="nav-item">
@@ -324,7 +300,7 @@
                             <div daiquiri-table select="<?php echo $this->select; ?>"></div>
 
                             <?php if ($this->select): ?>
-                            <div>
+                            <div class="daiquiri-file-download">
                                 <p class="daiquiri-file-download-message help-block">
                                     To download all files in one or more rows, please select the corresponding rows by mouse click. In order to download all files in a particular column, please select the column by a mouse click on the column's title.
                                 </p>
@@ -338,6 +314,37 @@
                                 </p>
                             </div>
                             <?php endif; ?>
+
+                            <div class="daiquiri-widget nav">
+                                <div class="nav-header">Database columns</div>
+                                <div class="nav-item">
+                                    <table class="table table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Unit</th>
+                                                <th>UCD</th>
+                                                <th style="width: 40px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="(iCol,col) in account.job.cols">
+                                                <td>{{col.name}}</td>
+                                                <td>{{col.type}}</td>
+                                                <td>{{col.unit}}</td>
+                                                <td>{{col.ucd}}</td>
+                                                <td>
+                                                    <a href="" ng-click="toggleColumn(iCol)">
+                                                        <span ng-show="col.hidden">show</span>
+                                                        <span ng-show="!col.hidden">hide</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- image viewer tab -->

@@ -36,7 +36,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th ng-repeat="(iCol,col) in table.data.cols" style="width: {{col.width}}px;" data-col-id="{{iCol}}" ng-class="{'selected': table.meta.selected.iCol == iCol}">
+                    <th ng-repeat="(iCol,col) in table.data.cols" style="width: {{col.width}}px;" data-col-id="{{iCol}}" ng-class="{'first': table.meta.first === iCol, 'selected': table.meta.selected.iCol == iCol}" ng-hide="col.hidden">
                         <div class="cell">
                             <div class="handle-left" ng-mousedown="resize(iCol-1)"></div>
                             <div class="handle-right" ng-mousedown="resize(iCol)"></div>
@@ -55,7 +55,7 @@
             </thead>
             <tbody>
                 <tr ng-repeat="(iRow,row) in table.data.rows" ng-click="selectRow(iRow)" ng-class="{'selected': table.meta.selected.iRows.indexOf(iRow) != -1}">
-                    <td ng-repeat="(iCol,col) in table.data.cols" ng-class="{'selected': table.meta.selected.iCol == iCol}">
+                    <td ng-repeat="(iCol,col) in table.data.cols" ng-class="{'first': table.meta.first === iCol, 'selected': table.meta.selected.iCol == iCol}" ng-hide="col.hidden">
                         <div class="cell" ng-if="col.ucd && col.ucd.indexOf('meta.ref') != -1">
                             <a href="" ng-click="reference($event,iCol,iRow)">{{row.cell[iCol]}}</a>
                         </div>

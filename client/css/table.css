@@ -24,6 +24,7 @@
 }
 .daiquiri-table table {
     table-layout: fixed !important;
+    min-height: 30px;
     margin: 0;
 }
 .daiquiri-table th,
@@ -31,8 +32,8 @@
     border-left: 1px solid #ddd;
     padding: 0;
 }
-.daiquiri-table th:first-child,
-.daiquiri-table td:first-child {
+.daiquiri-table th.first,
+.daiquiri-table td.first {
     border-left: none;
 }
 .daiquiri-table th .cell,

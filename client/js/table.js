@@ -74,7 +74,7 @@ angular.module('table', ['ngSanitize'])
     };
 }])
 
-.factory('TableService', ['$http','$q',function($http,$q) {
+.factory('TableService', ['$http','$q','$timeout',function($http,$q,$timeout) {
 
     var url = {
         cols: null,
@@ -96,7 +96,8 @@ angular.module('table', ['ngSanitize'])
         selected: {
             iCol: null,
             iRows: []
-        }
+        },
+        first: null,
     };
 
     var params = {
@@ -196,6 +197,7 @@ angular.module('table', ['ngSanitize'])
             $http.get(url.cols,{'params': params}).success(function(response) {
                 if (response.status == 'ok') {
                     data.cols = response.cols;
+                    meta.first = 0;
                     trigger.cols = !trigger.cols;
 
                     deferred.resolve();
@@ -237,6 +239,26 @@ angular.module('table', ['ngSanitize'])
         return deferred.promise;
     }
 
+    function hideCol(iCol) {
+        data.cols[iCol].hidden = true;
+        findFirst();
+    }
+
+    function showCol(iCol) {
+        data.cols[iCol].hidden = false;
+        findFirst();
+    }
+
+    function findFirst() {
+        for (var i = 0; i < data.cols.length; i++) {
+            console.log(data.cols[i].hidden);
+            if (data.cols[i].hidden !== true) {
+                meta.first = i;
+                break;
+            }
+        }
+    }
+
     return {
         url: url,
         data: data,
@@ -252,6 +274,8 @@ angular.module('table', ['ngSanitize'])
         sort: sort,
         fetchCols: fetchCols,
         fetchRows: fetchRows,
+        hideCol: hideCol,
+        showCol: showCol,
         init: init
     };
 }])

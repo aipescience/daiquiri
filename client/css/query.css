@@ -140,3 +140,8 @@ form#plan .CodeMirror {
 #query .daiquiri-browser-body {
     height: 120px;
 }
+
+/* file download */
+.daiquiri-file-download {
+    margin-bottom: 20px;
+}
