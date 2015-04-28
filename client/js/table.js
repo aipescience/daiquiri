@@ -251,7 +251,6 @@ angular.module('table', ['ngSanitize'])
 
     function findFirst() {
         for (var i = 0; i < data.cols.length; i++) {
-            console.log(data.cols[i].hidden);
             if (data.cols[i].hidden !== true) {
                 meta.first = i;
                 break;
