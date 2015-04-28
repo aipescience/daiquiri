@@ -444,7 +444,7 @@ app.factory('SubmitService', ['$http','$timeout','QueryService','CodemirrorServi
             } else if (response.status == 'error') {
                 console.log(response);
                 angular.forEach(response.errors, function(error, key) {
-                    errors[key] = error;
+                    errors['plan_query'] = error;
                 });
             } else {
                 console.log(response);
