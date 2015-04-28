@@ -54,12 +54,12 @@ angular.module('images', [])
         values.row_id = TableService.data.rows[meta.iRow].cell[0];
 
         $timeout(function() {
-            wheelzoom(document.querySelectorAll('.daiquiri-images img'));
+            // wheelzoom(document.querySelectorAll('.daiquiri-images img'));
 
             if (values.first) {
                 $timeout(function() {
                     values.first = false;
-                }, 500);
+                });
             }
         });
     }
