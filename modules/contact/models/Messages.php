@@ -110,9 +110,6 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
         // get the message
         $message = $this->getResource()->fetchRow($id);
 
-        $subject = 'Re: ' . $message['subject'];
-        $body = 'Dear _firstname_ _lastname_,\n\n';
-
         // create the form object
         $form = new Contact_Form_Respond(array(
             'subject' => "Re: {$message['subject']}",
