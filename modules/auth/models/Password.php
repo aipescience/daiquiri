@@ -225,24 +225,23 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                 $result = Daiquiri_Auth::getInstance()->authenticateUser($user['username'], $values['old_password']);
 
                 if ($result) {
-                    if ($values['new_password'] !== $values['old_password']) {
-                        // update the user and redirect
-                        $this->getResource()->updatePassword($userId, $values['new_password']);
+                    // update the user and redirect
+                    $this->getResource()->updatePassword($userId, $values['new_password']);
 
-                        // log the event
-                        Daiquiri_Log::getInstance()->notice('password changed by user');
+                    // log the event
+                    Daiquiri_Log::getInstance()->notice('password changed by user');
 
-                        // send a notification mail
-                        if (Daiquiri_Config::getInstance()->auth->notification->changePassword) {
-                            $this->getModelHelper('mail')->send('auth.changePassword', array(
-                                'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
-                                'id' => $user['id'],
-                                'username' => $user['username'],
-                                'firstname' => $user['details']['firstname'],
-                                'lastname' => $user['details']['lastname']
-                            ));
-                        }
+                    // send a notification mail
+                    if (Daiquiri_Config::getInstance()->auth->notification->changePassword) {
+                        $this->getModelHelper('mail')->send('auth.changePassword', array(
+                            'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
+                            'id' => $user['id'],
+                            'username' => $user['username'],
+                            'firstname' => $user['details']['firstname'],
+                            'lastname' => $user['details']['lastname']
+                        ));
                     }
+
                     return array('status' => 'ok');
                 } else {
                     return $this->getModelHelper('CRUD')->validationErrorResponse($form, 'Wrong (old) password provided');
