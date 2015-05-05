@@ -153,7 +153,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
             // handle additional versions of the password
             foreach (array_keys(Daiquiri_Config::getInstance()->auth->password->toArray()) as $type) {
                 if ($type != 'default') {
-                    $data['password_' . $type] = Daiquiri_Crypt_Abstract::factory($type)->encrypt($data['new_password']);
+                    $data['details']['password_' . $type] = Daiquiri_Crypt_Abstract::factory($type)->encrypt($data['new_password']);
                 }
             }
 
@@ -304,13 +304,27 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
             if ($type !== 'default') {
                 $hash = Daiquiri_Crypt_Abstract::factory($type)->encrypt($newPassword);
 
-                // update details table in database
-                $this->getAdapter()->update('Auth_Details', array(
-                    'value' => $hash
-                ), array(
-                    'user_id = ?' => $id,
-                    $this->quoteIdentifier('key') .  '=?' => 'password_' . $type
-                ));
+                $select = $this->getAdapter()->select();
+                $select->from('Auth_Details');
+                $select->where('user_id=?',$id);
+                $select->where($this->quoteIdentifier('key') .  '=?', 'password_' . $type);
+
+                $row = $this->getAdapter()->fetchRow($select);
+
+                if (empty($row)) {
+                    $this->getAdapter()->insert('Auth_Details', array(
+                        'user_id' => $id,
+                        'key' => 'password_' . $type,
+                        'value' => $hash
+                    ));
+                } else {
+                    $this->getAdapter()->update('Auth_Details', array(
+                        'value' => $hash
+                    ), array(
+                        'user_id = ?' => $id,
+                        $this->quoteIdentifier('key') .  '=?' => 'password_' . $type
+                    ));
+                }
             }
         }
     }
