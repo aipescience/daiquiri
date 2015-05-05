@@ -555,7 +555,8 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                     "FROM information_schema.tables " .
                     "WHERE table_schema = ? AND table_name = ?;";
 
-            return $this->getAdapter()->fetchAll($sql, array($database,$table))[0];
+            $rows = $this->getAdapter()->fetchAll($sql, array($database,$table));
+            return $rows[0];
         }
     }
 
