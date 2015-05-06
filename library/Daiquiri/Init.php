@@ -662,6 +662,23 @@ EOT;
     private function _vhost() {
         echo <<<EOT
     #SetEnv APPLICATION_ENV development
+
+    XSendFile on
+    XSendFilePath {$this->options['config']['query']['download']['dir']}
+
+EOT;
+
+
+        foreach($this->options['config']['data']['files']['static'] as $path) {
+            echo "    XSendFilePath {$path}\n";
+        }
+
+        foreach($this->options['init']['data']['static'] as $static) {
+            echo "    XSendFilePath {$static['path']}\n";
+        }
+
+        echo <<<EOT
+
     DocumentRoot "{$this->application_path}/public"
     <Directory "{$this->application_path}/public">
         Options FollowSymLinks -Indexes -MultiViews
