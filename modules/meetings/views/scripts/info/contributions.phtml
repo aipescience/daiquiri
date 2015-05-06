@@ -26,7 +26,7 @@
     <?php $flatArray = call_user_func_array('array_merge',$this->rows); // this is nasty... ?>
     <?php foreach ($this->rows as $contributionType => $contributions): ?>
         <?php if (!empty($contributions)): ?>
-            <h3><?php echo $this->escape(ucfirst($contributionType)); ?></h3>
+            <h3><?php echo $this->escape(ucfirst($contributionType)); ?>s</h3>
 
             <?php foreach ($contributions as $contribution): ?>
                 <h4><?php echo $this->escape($contribution['title']); ?></h4>

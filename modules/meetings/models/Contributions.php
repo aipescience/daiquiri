@@ -51,10 +51,13 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
                 'message' => $meeting['contributions_message']
             );
         } else {
-            $dbRows = $this->getResource()->fetchRows(array('where' => array(
-                '`meeting_id` = ?' => $meeting['id'],
-                '`accepted` = 1'
-            )));
+            $dbRows = $this->getResource()->fetchRows(array(
+                'where' => array(
+                    '`meeting_id` = ?' => $meeting['id'],
+                    '`accepted` = 1'
+                ),
+                'order' => 'participant_lastname ASC'
+            ));
 
             $rows = array();
             foreach($dbRows as $dbRow) {
