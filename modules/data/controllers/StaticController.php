@@ -85,9 +85,9 @@ class Data_StaticController extends Daiquiri_Controller_Abstract {
         $mime = $finfo->file($file, FILEINFO_MIME);
 
         // image or something, deliver!
-        http_send_content_disposition(basename($file), true);
-        http_send_content_type($mime);
-        http_send_file($file);
+        header ('X-Sendfile: ' . $file);
+        header ('Content-Type: ' . $mime);
+        exit;
     }
 
 }

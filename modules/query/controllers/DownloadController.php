@@ -58,13 +58,16 @@ class Query_DownloadController extends Daiquiri_Controller_Abstract {
         $table = $this->_getParam('table');
         $format = $this->_getParam('format');
 
-        // getting rid of all the output buffering in Zend
-        $this->_helper->layout()->disableLayout();
-        $this->_helper->viewRenderer->setNoRender(true);
-        Zend_Controller_Front::getInstance()->getDispatcher()->setParam('disableOutputBuffering', true);
-        ob_end_clean();
+        // Zend stuff is killed inside $model->stream so that errors can still be shown
+        $response = $this->_model->file($table, $format);
 
-        return $this->_model->file($table, $format);
+        // exit here before zend does something else ...
+        if ($response['status'] === "ok") {
+            exit();
+        } else {
+            $this->view->status = $response['status'];
+            $this->view->errors = $response['errors'];
+        }
     }
 
     public function streamAction() {

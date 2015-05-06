@@ -94,10 +94,6 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         if (isset(Daiquiri_Config::getInstance()->query->download->adapter->config->$format)) {
             $suffix = Daiquiri_Config::getInstance()->query->download->adapter->config->$format->suffix;
-
-            //remove any additional stuff (like compression endings) from suffix
-            $parts = explode(".", $suffix);
-            $suffix = "." . $parts[1];
         } else {
             return array('status' => 'error', 'error' => 'Error: format not supported by stream');
         }
@@ -155,20 +151,17 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
         // get rid of all the Zend output stuff
         $controller = Zend_Controller_Front::getInstance();
         $controller->getDispatcher()->setParam('disableOutputBuffering', true);
-
         ob_end_clean();
 
-        http_send_content_disposition($filename);
-        http_send_content_type("application/octet-stream");
+        // set the right headers for stream
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
 
-        // check if this file already exists...
-        // if yes just stream
+        // check if this file already exis
+        // ts, if yes just stream
         if (file_exists($file)) {
-            passthru("cat " . escapeshellarg($file));
-            exit();
-        }
-
-        if (!file_exists($file)) {
+            header('X-Sendfile: ' . $file);
+        } else {
             //get the user db name
             $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
             $db = Daiquiri_Config::getInstance()->getUserDbName($username);
@@ -176,7 +169,7 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             // get the resource and create dump
             $resource = new Data_Model_Resource_Viewer();
             $resource->init($db, $table);
-            $resource->streamTable($format, $file, $newScriptName);
+            $resource->streamTable($format, $file, $newScriptName); // this funtion will exit()
         }
 
         return array('status' => 'ok');
@@ -213,11 +206,17 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
 
         $mime = $finfo->file($file, FILEINFO_MIME);
 
-        http_send_content_disposition($filename);
-        http_send_content_type($mime);
-        http_send_file($file);
+        // get rid of all the Zend output stuff
+        $controller = Zend_Controller_Front::getInstance();
+        $controller->getDispatcher()->setParam('disableOutputBuffering', true);
+        ob_end_clean();
 
-        // return array('file' => $file, 'filename' => $filename, 'mime' => $mime, 'compress' => $compress, 'status' => 'ok');
+        // set the right headers for file download
+        header('X-Sendfile: ' . $file);
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        return array('status' => 'ok');
     }
 
     /**

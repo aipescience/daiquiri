@@ -63,11 +63,12 @@ class Data_Model_Files extends Daiquiri_Model_Abstract {
         $finfo = new finfo;
 
         $mime = $finfo->file($file, FILEINFO_MIME);
-        $fileName = basename($file);
+        $filename = basename($file);
 
-        http_send_content_disposition($fileName, true);
-        http_send_content_type($mime);
-        http_send_file($file);
+        header('X-Sendfile: ' . $file);
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        exit;
     }
 
     /**
