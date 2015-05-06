@@ -660,21 +660,29 @@ EOT;
      * Displays the virtual host configuration.
      */
     private function _vhost() {
-        echo <<<EOT
-    #SetEnv APPLICATION_ENV development
+        echo "    #SetEnv APPLICATION_ENV development\n\n";
+        echo "    XSendFile on\n";
 
-    XSendFile on
-    XSendFilePath {$this->options['config']['query']['download']['dir']}
+        if (isset($this->options['config']['query'])
+            && isset($this->options['config']['query']['download'])
+            && isset($this->options['config']['query']['download']['dir'])) {
 
-EOT;
-
-
-        foreach($this->options['config']['data']['files']['static'] as $path) {
-            echo "    XSendFilePath {$path}\n";
+            echo "    XSendFilePath {$this->options['config']['query']['download']['dir']}\n";
         }
+        if (isset($this->options['config']['data'])
+            && isset($this->options['config']['data']['files'])
+            && isset($this->options['config']['data']['files']['static'])) {
 
-        foreach($this->options['init']['data']['static'] as $static) {
-            echo "    XSendFilePath {$static['path']}\n";
+            foreach($this->options['config']['data']['files']['static'] as $path) {
+                echo "    XSendFilePath {$path}\n";
+            }
+        }
+        if (isset($this->options['init']['data'])
+            && isset($this->options['init']['data']['static'])) {
+
+            foreach($this->options['init']['data']['static'] as $static) {
+                echo "    XSendFilePath {$static['path']}\n";
+            }
         }
 
         echo <<<EOT
