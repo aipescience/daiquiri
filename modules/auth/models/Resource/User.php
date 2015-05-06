@@ -460,7 +460,7 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
         // handle additional versions of the password
         foreach (array_keys(Daiquiri_Config::getInstance()->auth->password->toArray()) as $type) {
             if ($type != 'default') {
-                $data['password_' . $type] = Daiquiri_Crypt_Abstract::factory($type)->encrypt($data['new_password']);
+                $data['details']['password_' . $type] = Daiquiri_Crypt_Abstract::factory($type)->encrypt($data['new_password']);
             }
         }
 
