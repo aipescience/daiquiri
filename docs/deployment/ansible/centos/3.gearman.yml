@@ -1,0 +1,19 @@
+---
+
+- name: Daiquiri setup - gearman (CentOS)
+  hosts: all
+  remote_user: root
+  tasks:
+
+  # gearman and php wrapper to libgearman
+
+  - name: packages for gearman are installed
+    yum: name={{item}} state=present
+    with_items:
+    - gearmand
+    - libgearman
+    - libgearman-devel
+    - php-pecl-gearman
+
+  - name: start gearmand
+    service: name=gearmand state=started enabled=yes

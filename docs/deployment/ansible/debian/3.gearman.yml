@@ -1,0 +1,17 @@
+---
+
+- name: Daiquiri setup - gearman (Debian)
+  hosts: all
+  remote_user: root
+  tasks:
+
+  # gearman and php wrapper to libgearman
+
+  - name: packages for gearman are installed
+    apt: name={{item}} state=present
+    with_items:
+    - gearman
+    - php5-gearman
+
+  - name: start gearmand
+    service: name=gearman-job-server state=started enabled=yes

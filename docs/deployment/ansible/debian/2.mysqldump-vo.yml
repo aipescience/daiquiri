@@ -1,0 +1,43 @@
+---
+
+- name: Daiquiri setup - mysqldump-vo (Debian)
+  hosts: all
+  remote_user: root
+  tasks:
+
+  # MySQL source
+
+  - name: install packages
+    apt: name={{item}} state=present
+    with_items:
+    - mysql-source-5.5
+    - libmysqlclient-dev # for mysql-config
+
+  - name: create src directory
+    file: path=/srv/src state=directory
+
+  - name: untar MySQL
+    command: tar xzvf mysql-source-5.5.tar.gz chdir=/usr/src/mysql creates=mysql-5.5
+
+  # mysqldump_vo
+
+  - name: obtain mysqldump-vo from github
+    git: repo=https://github.com/adrpar/mysqldump-vo.git dest=/srv/src/mysqldump-vo version=master
+
+  - name: copy default.CMakeLists.txt to CMakeLists.txt
+    command: cp default.CMakeLists.txt CMakeLists.txt chdir=/srv/src/mysqldump-vo creates=CMakeLists.txt
+
+  - name: configure cmake for mysqldump-vo
+    lineinfile: dest=/srv/src/mysqldump-vo/CMakeLists.txt regexp='^set\(MYSQL_SOURCES_PATH' line='set(MYSQL_SOURCES_PATH "/usr/src/mysql/mysql-5.5/")'
+
+  - name: create build dir
+    file: path=/srv/src/mysqldump-vo/build state=directory
+
+  - name: run cmake
+    command: cmake .. chdir=/srv/src/mysqldump-vo/build creates=Makefile
+
+  - name: run make
+    command: make chdir=/srv/src/mysqldump-vo/build creates=mysqldump_vo
+
+  - name: run make install
+    command: make install chdir=/srv/src/mysqldump-vo/build creates=/usr/local/bin/mysqldump_vo

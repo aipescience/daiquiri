@@ -1,0 +1,71 @@
+---
+
+- name: Daiquiri setup (Debian)
+  hosts: all
+  remote_user: root
+  tasks:
+
+  # install packages
+
+  - name: install packages
+    apt: name={{item}} state=present
+    with_items:
+    - gcc
+    - g++
+    - apache2
+    - cmake
+    - git
+    - php5
+    - php5-dev
+    - php5-mysql
+    - php5-gd
+    - mysql-client
+    - mysql-server
+    - php-http-request2
+    - php5-pecl-http
+
+  # configure apache
+
+  - name: copy vhosts.conf file
+    copy: src=../../apache/debian.conf dest=/etc/apache2/sites-available/000-default.conf
+
+  - name: enable mod rewrite
+    apache2_module: state=present name=rewrite
+
+  # php config
+
+  - name: extend php execution time
+    lineinfile: dest=/etc/php5/apache2/php.ini regexp=^max_execution_time line="max_execution_time = 600"
+
+  - name: extend php POST max size
+    lineinfile: dest=/etc/php5/apache2/php.ini regexp=^post_max_size line="post_max_size = 32M"
+
+  - name: extend php max upload filesize
+    lineinfile: dest=/etc/php5/apache2/php.ini regexp=^upload_max_filesize line="upload_max_filesize = 32M"
+
+  # start/enable services
+
+  - name: start Apache
+    service: name=apache2 state=started enabled=yes
+
+  - name: start MySQL
+    service: name=mysql state=started enabled=yes
+
+  # directories
+
+  - name: create captcha directory
+    file: path=/srv/captcha state=directory owner=www-data group=www-data
+
+  - name: create download directory
+    file: path=/srv/download state=directory owner=www-data group=www-data
+
+  - name: create navigation directory
+    file: path=/srv/navigation state=directory owner=www-data group=www-data
+
+  - name: create log directory
+    file: path=/srv/log state=directory owner=www-data group=www-data
+
+  # obtain daiquiri
+
+  - name: clone the daiquiri repository
+    git: repo=https://github.com/jochenklar/daiquiri.git dest=/srv/daiquiri update=no

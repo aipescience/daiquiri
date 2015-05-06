@@ -1,0 +1,20 @@
+---
+
+- name: Daiquiri setup - UglifyJS and UglifyCSS (Debian)
+  hosts: all
+  remote_user: root
+  tasks:
+
+  # UglifyJS 2 and UglifyCSS
+
+  - name: npm is installed
+    apt: name=npm state=present
+
+  - name: nodejs-legacy is installed
+    apt: name=nodejs-legacy state=present
+
+  - name: UglifyJS 2 is installed
+    npm: name=uglify-js global=yes
+
+  - name: UglifyCSS  is installed
+    npm: name=uglifycss global=yes

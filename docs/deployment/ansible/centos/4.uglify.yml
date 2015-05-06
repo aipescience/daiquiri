@@ -1,0 +1,17 @@
+---
+
+- name: Daiquiri setup - UglifyJS and UglifyCSS (CentOS)
+  hosts: all
+  remote_user: root
+  tasks:
+
+  # UglifyJS 2 and UglifyCSS
+
+  - name: npm is installed
+    yum: name=npm state=present
+
+  - name: UglifyJS 2 is installed
+    npm: name=uglify-js global=yes
+
+  - name: UglifyCSS  is installed
+    npm: name=uglifycss global=yes
