@@ -21,13 +21,13 @@
     - gcc
     - gcc-c++
     - httpd
+    - mod_xsendfile
     - cmake
     - git
     - php
     - php-devel
     - php-mysql
     - php-gd
-    - php-pecl-http
     - php-pear-HTTP-Request2
     - mysql-community-client
     - mysql-community-server

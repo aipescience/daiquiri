@@ -13,16 +13,16 @@
     - gcc
     - g++
     - apache2
+    - libapache2-mod-xsendfile
     - cmake
     - git
     - php5
     - php5-dev
     - php5-mysql
     - php5-gd
+    - php-http-request2
     - mysql-client
     - mysql-server
-    - php-http-request2
-    - php5-pecl-http
 
   # configure apache
 
@@ -31,6 +31,9 @@
 
   - name: enable mod rewrite
     apache2_module: state=present name=rewrite
+
+  - name: enable mod xsendfile
+    apache2_module: state=present name=xsendfile
 
   # php config
 
