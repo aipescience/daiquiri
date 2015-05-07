@@ -191,10 +191,10 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                             $mailValues[$d['key']] = $participant['details'][$d['key']];
                         }
                     }
-                    foreach ($meeting['contribution_types'] as $key => $contribution_type) {
-                        if (!empty($participant['contributions'][$key])) {
-                            $mailValues[$contribution_type . '_title'] = $participant['contributions'][$key]['title'];
-                            $mailValues[$contribution_type . '_abstract'] = $participant['contributions'][$key]['abstract'];
+                    foreach ($meeting['contribution_types'] as $contribution_type) {
+                        if (!empty($participant['contributions'][$contribution_type])) {
+                            $mailValues[$contribution_type . '_title'] = $participant['contributions'][$contribution_type]['title'];
+                            $mailValues[$contribution_type . '_abstract'] = $participant['contributions'][$contribution_type]['abstract'];
                         } else {
                             $mailValues[$contribution_type . '_title'] = '---';
                         }
@@ -264,10 +264,10 @@ class Meetings_Model_Registration extends Daiquiri_Model_Table {
                     $mailValues[$d['key']] = $participant['details'][$d['key']];
                 }
             }
-            foreach ($meeting['contribution_types'] as $key => $contribution_type) {
-                if (!empty($participant['contributions'][$key])) {
-                    $mailValues[$contribution_type . '_title'] = $participant['contributions'][$key]['title'];
-                    $mailValues[$contribution_type . '_abstract'] = $participant['contributions'][$key]['abstract'];
+            foreach ($meeting['contribution_types'] as $contribution_type) {
+                if (!empty($participant['contributions'][$contribution_type])) {
+                    $mailValues[$contribution_type . '_title'] = $participant['contributions'][$contribution_type]['title'];
+                    $mailValues[$contribution_type . '_abstract'] = $participant['contributions'][$contribution_type]['abstract'];
                 } else {
                     $mailValues[$contribution_type . '_title'] = '---';
                 }
