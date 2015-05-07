@@ -42,7 +42,7 @@ then
 fi
 
 if [ -z "$socket" ]; then
-    ${binPath}/mysqldump_vo --tab --vo-bin -h$host -P$port -u$username -p$password $dbname $table > $file 2>> $path/$fileName.err
+    ${binPath}/mysqldump_vo --vo-bin -h$host -P$port -u$username -p$password $dbname $table > $file 2>> $path/$fileName.err
 else
     ${binPath}/mysqldump_vo --vo-bin --socket=$socket -u$username -p$password $dbname $table > $file 2>> $path/$fileName.err
 fi

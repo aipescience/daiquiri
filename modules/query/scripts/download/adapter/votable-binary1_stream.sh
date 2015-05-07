@@ -27,7 +27,7 @@ for a in $(echo $1 | tr "&" " "); do
 done
 
 if [ -z "$socket" ]; then
-    ${binPath}/mysqldump_vo --tab --vo-bin -h$host -P$port -u$username -p$password $dbname $table
+    ${binPath}/mysqldump_vo --vo-bin -h$host -P$port -u$username -p$password $dbname $table
 else
     ${binPath}/mysqldump_vo --vo-bin --socket=$socket -u$username -p$password $dbname $table
 fi
