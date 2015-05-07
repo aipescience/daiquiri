@@ -28,6 +28,7 @@
     - php-devel
     - php-mysql
     - php-gd
+    - php-process
     - php-pear-HTTP-Request2
     - mysql-community-client
     - mysql-community-server

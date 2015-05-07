@@ -10,7 +10,7 @@
   - name: packages for gearman are installed
     apt: name={{item}} state=present
     with_items:
-    - gearman
+    - gearman-job-server
     - php5-gearman
 
   - name: start gearmand
