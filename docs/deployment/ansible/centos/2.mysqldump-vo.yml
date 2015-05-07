@@ -38,3 +38,14 @@
 
   - name: run make install
     command: make install chdir=/srv/src/mysqldump-vo/build creates=/usr/local/bin/mysqldump_vo
+
+  - name: rename mysqldump_vo binary (CentOS 7)
+    command: mv /usr/local/bin/mysqldump_vo /usr/local/bin/mysqldump_vo_bin
+    when: ansible_distribution_major_version == "7"
+
+  - name: copy wrapper script (CentOS 7)
+    copy: src=../../misc/mysqldump_vo dest=/usr/local/bin/mysqldump_vo force=yes
+    when: ansible_distribution_major_version == "7"
+
+  - name: make wrapper script executable (Centos 7)
+    file: path=/usr/local/bin/mysqldump_vo mode=755
