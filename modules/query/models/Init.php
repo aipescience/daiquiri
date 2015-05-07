@@ -167,7 +167,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'dir' => "/srv/download",
                 'gearman' => array(
                     'port' => '4730',
-                    'host' => 'localhost',
+                    'host' => '127.0.0.1',
                     'numThread' => '2',
                     'pid' => '/srv/download/GearmanManager.pid',
                     'workerDir' => $this->_init->daiquiri_path . '/modules/query/scripts/download/worker',
