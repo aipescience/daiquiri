@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# this is a wrapper script for mysqldump_vo needed for CentOS 7
+
+/usr/local/bin/mysqldump_vo_bin --tab $@
