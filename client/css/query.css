@@ -49,6 +49,12 @@ form#sql .CodeMirror {
     margin-right: 10px;
 }
 
+/* jobs */
+.daiquiri-query-jobs-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* SAMP tab */
 
 .daiquiri-query-samp {
