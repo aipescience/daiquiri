@@ -301,7 +301,6 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
 
         $select = $this->select();
         $select->from('Query_Jobs', 'COUNT(*) as count');
-        $select->join('Auth_User','Query_Jobs.user_id = Auth_User.id','username');
 
         if ($sqloptions) {
             $select->setWhere($sqloptions);
@@ -325,7 +324,6 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         // get the primary sql select object
         $select = $this->select($sqloptions);
         $select->from('Query_Jobs', Query_Model_Resource_DirectQuery::$_cols);
-        $select->join('Auth_User','Query_Jobs.user_id = Auth_User.id','username');
 
         // get the rowset and return
         $rows = $this->fetchAll($select);
@@ -352,7 +350,6 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         // get the primary sql select object
         $select = $this->select();
         $select->from('Query_Jobs', Query_Model_Resource_DirectQuery::$_cols);
-        $select->join('Auth_User','Query_Jobs.user_id = Auth_User.id','username');
         $select->where('Query_Jobs.id = ?', $id);
 
         // get the rowset and return

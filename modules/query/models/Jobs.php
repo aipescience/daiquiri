@@ -74,7 +74,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
     public function rows(array $params = array()) {
         // parse params
         if (!isset($params['sort'])) {
-            $params['sort'] = 'timeSubmit DESC';
+            $params['sort'] = $this->getResource()->getTimeField() . ' DESC';
         }
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
