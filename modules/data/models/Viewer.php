@@ -46,24 +46,8 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
         // init table
         $this->getResource()->init($params['db'], $params['table']);
 
-        // get columns from params or from the database
-        if (empty($params['cols'])) {
-            $colnames = array_keys($this->getResource()->fetchCols());
-        } else {
-            // we can not use explode here since there can be commas in functions
-            $lexer = new PHPSQLParser\lexer\PHPSQLLexer();
-            $string = '';
-            $colnames = array();
-            foreach($lexer->split($params['cols']) as $token) {
-                if ($token !== ',') {
-                    $string .= $token;
-                } else {
-                    $colnames[] = $string;
-                    $string = '';
-                }
-            }
-            $colnames[] = $string;
-        }
+        // get columns from the database
+        $colnames = array_keys($this->getResource()->fetchCols());
 
         // obtain table metadata
         $tablesResource = new Data_Model_Resource_Tables();
@@ -83,11 +67,6 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
                 'id' => $key,
                 'ucd' => explode(';',str_replace(' ','',$colMeta['ucd']))
             );
-        }
-
-        // check if all colums are in the database
-        if (count(array_intersect($colnames,array_keys($meta))) != count($colnames)) {
-            throw new Exception('Some Columns are not in the database table');
         }
 
         // return columns of this table
@@ -137,38 +116,12 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
         // set init table
         $this->getResource()->init($db, $table);
 
-        // get columns from params or from the database
-        if (empty($params['cols'])) {
-            $colnames = array_keys($this->getResource()->fetchCols());
-        } else {
-            // we can not use explode here since there can be commas in functions
-            $lexer = new PHPSQLParser\lexer\PHPSQLLexer();
-            $string = '';
-            $colnames = array();
-            foreach($lexer->split($params['cols']) as $token) {
-                if ($token !== ',') {
-                    $string .= $token;
-                } else {
-                    $colnames[] = $string;
-                    $string = '';
-                }
-            }
-            $colnames[] = $string;
-        }
+        // get columns from the database
+        $colnames = array_keys($this->getResource()->fetchCols());
 
         // get the table from the resource
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
-        $dbRows = $this->getResource()->fetchRows($sqloptions);
-
-        // filter rows
-        $rows = array();
-        foreach($dbRows as $dbRow) {
-            $row = array();
-            foreach($colnames as $colname) {
-                $row[$colname] = $dbRow[$colname];
-            }
-            $rows[] = $row;
-        }
+        $rows = $this->getResource()->fetchRows($sqloptions);
 
         if (in_array('row_id', $colnames)) {
             $pk = 'row_id';
@@ -177,6 +130,46 @@ class Data_Model_Viewer extends Daiquiri_Model_Table {
         }
 
         return $this->getModelHelper('pagination')->response($rows,$sqloptions,$pk);
+    }
+
+    /**
+     * Returns a pair of rows of the given table and database for plotting.
+     * @param array $params get params of the request
+     * @return array
+     */
+    public function plot(array $params = array()) {
+        // get db and table from params
+        if (empty($params['db']) || empty($params['table'])) {
+            return array('status' => 'error');
+        } else {
+            $db = $params['db'];
+            $table = $params['table'];
+        }
+
+        // set init table
+        $this->getResource()->init($db, $table);
+
+        // get columns from the database
+        $colnames = array_keys($this->getResource()->fetchCols());
+
+        // check if x and y are indeed in the database
+        if (!in_array($params['x'],$colnames)) {
+            return array(
+                'status' => 'error',
+                'errors' => array('plot_x' => array("Column `{$params['x']}` is not in the database table"))
+            );
+        }
+        if (!in_array($params['y'],$colnames)) {
+            return array(
+                'status' => 'error',
+                'errors' => array('plot_y' => array("Column `{$params['y']}` is not in the database table"))
+            );
+        }
+
+        // get the table from the resource
+        $rows = $this->getResource()->fetchPlot($params['x'],$params['y'],$params['nrows']);
+
+        return array('status' => 'ok', 'rows' => $rows, 'x' => $params['x'], 'y' => $params['y']);
     }
 
 }

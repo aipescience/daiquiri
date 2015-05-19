@@ -101,19 +101,17 @@ angular.module('plot', [])
             if (valid === false) return;
 
             // obtain the data from the server
-            $http.get(base + '/data/viewer/rows/',{
+            $http.get(base + '/data/viewer/plot/',{
                 'params': {
                     'db': values.db,
                     'table': values.table,
-                    'cols': values.plot_x.name + ',' + values.plot_y.name,
+                    'x': values.plot_x.name,
+                    'y': values.plot_y.name,
                     'nrows': values.plot_nrows
                 }
             }).success(function(response) {
                 if (response.status == 'ok') {
-                    var data = [];
-                    for (var i=0; i<response.nrows; i++) {
-                        data.push([response.rows[i].cell[0],response.rows[i].cell[1]]);
-                    }
+                    var data = response.rows;
 
                     // create plot
                     var options = {

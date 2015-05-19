@@ -61,6 +61,25 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
     }
 
     /**
+     * Fetches a pair of colums for plotting from the database table set init().
+     * @param   string  $x      first column
+     * @param   string  $y      second column
+     * @param   int     $nrows  number of rows to return
+     * @return  array   $rows
+     */
+    public function fetchPlot($x, $y, $nrows) {
+        // get select object
+        $select = $this->select(array('limit' => $nrows));
+        $select->from($this->getTablename(), array($x,$y));
+
+        // set fetch mode
+        $this->getAdapter()->setFetchMode(Zend_Db::FETCH_NUM);
+
+        // query database and return
+        return $this->fetchAll($select);
+    }
+
+    /**
      * Returns the list of tables from the database adapter.
      * @return array $tables
      */

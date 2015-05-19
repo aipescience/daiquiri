@@ -46,4 +46,9 @@ class Data_ViewerController extends Daiquiri_Controller_Abstract {
         $this->getControllerHelper('pagination')->rows();
     }
 
+    public function plotAction() {
+        $queryParams = $this->getRequest()->getQuery();
+        $response = $this->_model->plot($queryParams);
+        $this->view->assign($response);
+    }
 }

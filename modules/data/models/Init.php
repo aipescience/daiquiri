@@ -43,7 +43,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
     public function getRules() {
         return array(
             'guest' => array(
-                'Data_Model_Viewer' => array('rows','cols'),
+                'Data_Model_Viewer' => array('rows','cols','plot'),
                 'Data_Model_Static'=>  array('file'),
                 'Data_Model_Files' => array('index','single','singleSize','multi','multiSize','row','rowSize')
             ),
