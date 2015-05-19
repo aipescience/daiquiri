@@ -304,7 +304,9 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
             } catch (Exception $e) {
                 return array(
                     'status' => 'error',
-                    'error' => $e->getMessage() . ' Please contact support.'
+                    'error' => array(
+                        'form' => $e->getMessage() . ' Please contact support.'
+                    )
                 );
             }
         }
@@ -390,7 +392,9 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                     unlink($file . ".lock");
                     return array(
                         'status' => 'error',
-                        'error' => $e->getMessage() . ' Please contact support.'
+                        'error' => array(
+                            'form' => $e->getMessage() . ' Please contact support.'
+                        )
                     );
                 }
 

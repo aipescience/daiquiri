@@ -112,7 +112,12 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             $args[] = 'host=' . $config['host'];
             $args[] = 'port=' . $config['port'];
         } elseif ($config['host'] === 'localhost') {
-            $args[] = 'socket=' . Daiquiri_Config::getInstance()->core->system->mysql->socket;
+            $socket = Daiquiri_Config::getInstance()->core->system->mysql->socket;
+            if (empty($socket) || !is_writable($socket)) {
+                throw new Exception('Error with database socket.');
+            } else {
+                $args[] = 'socket=' . $socket;
+            }
         } else {
             throw new Exception('Error in database connection configuration.');
         }
@@ -164,7 +169,12 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             $job['host'] = $config['host'];
             $job['port'] = $config['port'];
         } elseif ($config['host'] === 'localhost') {
-            $job['socket'] = Daiquiri_Config::getInstance()->core->system->mysql->socket;
+            $socket = Daiquiri_Config::getInstance()->core->system->mysql->socket;
+            if (empty($socket) || !is_writable($socket)) {
+                throw new Exception('Error with database socket.');
+            } else {
+                $job['socket'] = $socket;
+            }
         } else {
             throw new Exception('Error in database connection configuration.');
         }
@@ -215,7 +225,12 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
             $args[] = 'host=' . $config['host'];
             $args[] = 'port=' . $config['port'];
         } elseif ($config['host'] === 'localhost') {
-            $args[] = 'socket=' . Daiquiri_Config::getInstance()->core->system->mysql->socket;
+            $socket = Daiquiri_Config::getInstance()->core->system->mysql->socket;
+            if (empty($socket) || !is_writable($socket)) {
+                throw new Exception('Error with database socket.');
+            } else {
+                $args[] = 'socket=' . $socket;
+            }
         } else {
             throw new Exception('Error in database connection configuration.');
         }
