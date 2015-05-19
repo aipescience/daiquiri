@@ -182,8 +182,8 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     CodeMirror.runMode(account.job.actualQuery,"text/x-mysql",angular.element('#overview-actualQuery')[0]);
                 }
 
-                // if a form was active, switch to job overview tab
-                if (account.active.form != false || $('#images-tab-header').hasClass('active')) {
+                // if a form was active, the image tab was active or the job was not a success, switch to job overview tab
+                if (account.active.form != false || $('#images-tab-header').hasClass('active') || account.job.status != 'success') {
                     $('#overview-tab-header a').tab('show');
                 }
 
