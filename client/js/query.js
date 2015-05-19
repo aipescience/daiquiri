@@ -214,6 +214,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             .success(function(response) {
                 dialogSuccess(response, function() {
                     account.job.table = data.tablename;
+                    PlotService.values.table = data.tablename;
                     fetchAccount();
                 });
             })
