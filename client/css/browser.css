@@ -26,7 +26,6 @@
 }
 .daiquiri-browser > div {
     border-right: 1px solid #ccc;
-    display: table-cell;
 }
 .daiquiri-browser > div:last-child {
     border-right: 0px;

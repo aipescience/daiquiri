@@ -1,5 +1,5 @@
 <div class="daiquiri-browser" ng-controller="BrowserController">
-    <div ng-repeat="col in browser.cols" ng-style="{'width': col.width}">
+    <div ng-repeat="col in browser.cols" ng-style="{'width': col.width, 'display': col.display}">
         <ul class="daiquiri-browser-head nav nav-pills nav-stacked">
             <li class="nav-header">{{col.name}}</li>
         </ul>

@@ -83,10 +83,13 @@ angular.module('browser',[])
     function initBrowser(name) {
         // with of one column of the browser
         var width;
+        var display;
         if (browser[name].colnames.length == 1) {
             width = '100%';
+            display = 'block';
         } else {
             width = Math.floor(220 + (1 - 1 / browser[name].colnames.length) * 20 - 1);
+            display = 'table-cell';
         }
 
         var selected0;
@@ -123,6 +126,7 @@ angular.module('browser',[])
                             'id': i,
                             'name': colname.replace('_',' '),
                             'width': width,
+                            'display': display,
                             'items': []
                         });
                     }
