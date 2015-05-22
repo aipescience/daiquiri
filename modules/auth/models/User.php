@@ -86,7 +86,7 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                 'sortable' => true
             );
             if ($colname === 'id') {
-                $col['width'] = 40;
+                $col['width'] = 45;
             } else if ($colname === 'username') {
                 $col['width'] = 180;
             } else if ($colname === 'email') {

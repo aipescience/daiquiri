@@ -134,7 +134,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
         foreach(array('id','title','type','participant','accepted') as $colname) {
             $col = array('name' => str_replace('_',' ',$colname));
             if ($colname === 'id') {
-                $col['width'] = 40;
+                $col['width'] = 45;
             } else {
                 $col['width'] = 100;
             }

@@ -18,6 +18,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// [disclaimer]
+add_shortcode('disclaimer', 'disclaimer_func' );
+
+function disclaimer_func($atts) {
+    extract(shortcode_atts(array(
+        'doi' => null,
+        'license' => null,
+    ), $atts ) );
+
+    $html = '';
+
+    if ($license === 'cc0') $html .= '<p>This data set is released under the <a href="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons CC0</a> waiver. We do not endorse any works, scientific or otherwise, produced using these data.</p>';
+
+    if ($doi) $html .= "<p>Please cite this data set using the unique permanent identifier <a href=\"http://dx.doi.org/{$doi}\">doi:{$doi}</a>.";
+
+    return $html;
+}
+
 // [dbinfo db="DBName"]
 add_shortcode('dbinfo', 'dbinfo_func' );
 

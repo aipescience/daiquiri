@@ -29,7 +29,7 @@
 }
 .daiquiri-table th,
 .daiquiri-table td {
-    border-left: 1px solid #ddd;
+    border-left: 1px solid #ccc;
     padding: 0;
 }
 .daiquiri-table th.first,
@@ -98,13 +98,13 @@
     width: auto;
     margin-top: 10px;
     margin-bottom: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
 }
 .daiquiri-table-empty {
     margin-top: 10px;
     margin-bottom: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
     padding: 5px 12px;
 }

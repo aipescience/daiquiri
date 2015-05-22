@@ -47,7 +47,7 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
                 'sortable' => true
             );
             if ($colname === 'id') {
-                $col['width'] = 40;
+                $col['width'] = 45;
             } else if ($colname === 'email') {
                 $col['width'] = 180;
             } else if ($colname === 'datetime') {
