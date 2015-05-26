@@ -43,7 +43,7 @@ class Daiquiri_Controller_Request_Init extends Zend_Controller_Request_Simple {
      * Sets the parameter array.
      * 
      */
-    public function setParams($params) {
+    public function setParams(array $params) {
         $this->_params = $params;
     }
 
