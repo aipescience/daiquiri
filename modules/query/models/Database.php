@@ -398,9 +398,15 @@ class Query_Model_Database extends Daiquiri_Model_Abstract {
                     );
                 }
 
-                return array('status' => 'pending');
+                return array(
+                    'status' => 'pending',
+                    'format' => $format
+                );
             } else {
-                return array('status' => 'pending');
+                return array(
+                    'status' => 'pending',
+                    'format' => $format
+                );
             }
         }
 

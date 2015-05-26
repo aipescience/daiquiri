@@ -544,32 +544,47 @@
 
                         <div class="tab-pane" id="download-tab" ng-show="account.active.job" ng-controller="DownloadController">
                             <h4>Download table `{{account.job.table}}`</h4>
-                            <div>
-                                <p>
-                                    For further processing of the data, you can download the results table to your local machine. For this file several formats are available. Please choose a format for the download from the list below.
-                                </p>
+
+                            <p>
+                                For further processing of the data, you can download the results table to your local machine. For this file several formats are available. Please choose a format for the download from the list below.
+                            </p>
+
+                            <div class="daiquiri-query-download-options">
+                                <?php foreach($this->downloadAdapter as $adapter): ?>
+                                <div class="daiquiri-query-download-option">
+                                    <div>
+                                        <a href="" ng-click="downloadTable('<?php echo $this->escape($adapter['format']); ?>');">
+                                            <?php echo $this->escape($adapter['name']); ?>
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <?php echo $this->escape($adapter['description']); ?>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
                             </div>
 
-                            <?php echo $this->action('index', 'download', 'query'); ?>
-
-                            <p class="text-info" ng-show="account.job.download.status == 'pending'">
-                                Your file is being created... Please wait...
-                            </p>
+                            <div ng-show="account.job.download.status == 'pending'">
+                                <p class="text-info">
+                                    Your file is being created... Please wait...
+                                </p>
+                            </div>
 
                             <div ng-show="account.job.download.status == 'ok'">
                                 <p>
                                     You can now download the file using:
                                 </p>
                                 <p>
-                                    <a class="daiquiri-query-download-link" target="_blank" href="{{account.job.download.link}}">{{account.job.download.link}}</a>
+                                    <a class="daiquiri-query-download-link" href="" ng-click="downloadFile(account.job.download.link)">{{account.job.download.link}}</a>
                                 </p>
                                 <p>
-                                    To download the file in a different format, please choose from the list above and click "Download table" again.
-                                </p>
-                                <p>
-                                    Sometimes it can be nessesary to create the download file on the server anew. Please click <button class="linkbutton" ng-click="regenerateTable()">here</button> to regenerate the file.
+                                    To download the file in a different format, please choose from the list above and click "Download table" again. Sometimes it can be nessesary to create the download file on the server anew. Please click <button class="linkbutton" ng-click="regenerateTable()">here</button> to regenerate the file.
                                 </p>
                             </div>
+
+                            <ul class="unstyled text-error" ng-show="errors.form">
+                                <li ng-repeat="error in errors.form">{{error}}</li>
+                            </ul>
                         </div>
                     </div>
                 </div>

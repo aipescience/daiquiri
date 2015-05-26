@@ -45,7 +45,6 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
             'forms' => array(),
             'csrf' => $csrf
         );
-
         foreach(Daiquiri_Config::getInstance()->query->forms as $key => $form) {
             if ($form->default) $options['defaultForm'] = $key;
             $options['forms'][] = array(
@@ -53,7 +52,6 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
                 'title' => $form->title
             );
         }
-
         $this->view->options = $options;
 
         // get options for the query plan
@@ -63,6 +61,9 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
             'editable' => $queryModel->canAlterPlan(),
             'mail' => Daiquiri_Config::getInstance()->query->processor->mail->enabled,
         );
+
+        // get the different download options
+        $this->view->downloadAdapter = Daiquiri_Config::getInstance()->getQueryDownloadAdapter();
 
         // check if imageviewer is enabled
         if (Daiquiri_Config::getInstance()->query->images->enabled) {

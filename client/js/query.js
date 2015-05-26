@@ -77,7 +77,7 @@ app.factory('PollingService', ['$timeout','QueryService','DownloadService',funct
         QueryService.fetchAccount();
 
         if (angular.isDefined(QueryService.account.job.download) && QueryService.account.job.download.status == 'pending') {
-            DownloadService.downloadTable();
+            DownloadService.downloadTable(QueryService.account.job.download.format);
         }
 
         if (options.polling.enabled == true) {
@@ -534,23 +534,25 @@ app.factory('BarService', ['BrowserService',function(BrowserService) {
 }]);
 
 app.factory('DownloadService', ['$http','QueryService',function($http,QueryService) {
-    var values = {};
+    // query options, will be set inside the template via ng-init
+    var options = {};
+
     var errors = {};
 
     var base = angular.element('base').attr('href');
 
     return {
-        values: values,
         errors: errors,
-        downloadTable: function() {
+        init: function(opt) {
+            options = opt;
+        },
+        downloadTable: function(format) {
             var data = {};
             data = {
-                'download_csrf': $('#download_csrf').attr('value'),
-                'download_tablename': QueryService.account.job.table
+                'download_csrf': options.csrf,
+                'download_tablename': QueryService.account.job.table,
+                'download_format': format
             };
-
-            // merge with form values
-            angular.extend(data,values);
 
             $http.post(base + '/query/download/',$.param(data)).success(function(response) {
                 for (var error in errors) delete errors[error];
@@ -564,7 +566,8 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                     }
                 } else if (response.status == 'pending') {
                     QueryService.account.job.download = {
-                        'status': 'pending'
+                        'status': 'pending',
+                        'format': response.format
                     }
                 } else if (response.status == 'error') {
                     console.log(response);
@@ -580,10 +583,10 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                 errors['form'] = ['Error with connection to server, please contact support.'];
             });
         },
-        regenerateTable: function() {
+        regenerateTable: function(format) {
             var data = {};
             data = {
-                'download_csrf': $('#download_csrf').attr('value'),
+                'download_csrf': options.csrf,
                 'download_tablename': QueryService.account.job.table,
                 'download_format': QueryService.account.job.download.format
             };
@@ -600,7 +603,8 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                     }
                 } else if (response.status == 'pending') {
                     QueryService.account.job.download = {
-                        'status': 'pending'
+                        'status': 'pending',
+                        'format': response.format
                     }
                 } else if (response.status == 'error') {
                     console.log(response);
@@ -620,7 +624,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
 
 /* controllers */
 
-app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService',function($scope,$timeout,PollingService,QueryService,SubmitService) {
+app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService','DownloadService',function($scope,$timeout,PollingService,QueryService,SubmitService,DownloadService) {
 
     $scope.account = QueryService.account;
     $scope.dialog  = QueryService.dialog;
@@ -671,6 +675,7 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
         PollingService.init($scope.options);
         QueryService.init($scope.options);
         SubmitService.init($scope.options);
+        DownloadService.init($scope.options);
     });
 
 }]);
@@ -894,16 +899,21 @@ app.controller('PlotController',['$scope','PlotService',function($scope,PlotServ
 
 app.controller('DownloadController',['$scope','DownloadService',function($scope,DownloadService) {
 
-    $scope.values = DownloadService.values;
     $scope.errors = DownloadService.errors;
 
-    $scope.downloadTable = function(event) {
-        DownloadService.downloadTable();
-        event.preventDefault();
+    $scope.downloadTable = function(format) {
+        DownloadService.downloadTable(format);
     };
 
-    $scope.regenerateTable = function() {
-        DownloadService.regenerateTable();
+    $scope.regenerateTable = function(format) {
+        DownloadService.regenerateTable(format);
+    };
+
+    $scope.downloadFile = function(link) {
+        $('<iframe />', {
+             'style': 'visibility: hidden; height: 0; width: 0;',
+             'src': link
+        }).appendTo('body');
     };
 
 }]);

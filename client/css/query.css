@@ -77,17 +77,15 @@ form#plan .CodeMirror {
 }
 
 /* download tab */
-
-#fieldset-downloadtablegroup,
-#fieldset-downloadformatgroup #download_format-label {
-    display: none;
+.daiquiri-query-download-option {
+    margin-bottom: 20px;
 }
-#fieldset-downloadformatgroup ul.text-error {
-    margin: 10px 0 10px 0;
+.daiquiri-query-download-option > :first-child {
+    float: left;
+    width: 180px;
 }
-.daiquiri-query-download-link {
-    display: block;
-    margin-left: 20px;
+.daiquiri-query-download-option > :last-child {
+    margin-left: 200px;
 }
 
 /* query bar (i.e. the bar on the SQL query form) */
