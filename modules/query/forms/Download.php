@@ -31,7 +31,10 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
      * @param array $adapter the set of adapter to choose from
      */
     public function setAdapter(array $adapter) {
-        $this->_adapter = $adapter;
+        $this->_adapter = array();
+        foreach($adapter as $adapter) {
+            $this->_adapter[$adapter['format']] = $adapter['name'];
+        }
     }
 
     /**
@@ -40,47 +43,21 @@ class Query_Form_Download extends Daiquiri_Form_Abstract {
     public function init() {
         // add elements
         $this->addCsrfElement('download_csrf');
+
+        $this->addRadioElement('download_format', array(
+            'label' => 'Download formats',
+            'multiOptions' => $this->_adapter
+        ));
         $this->addElement(new Daiquiri_Form_Element_Tablename('download_tablename', array(
             'label' => 'Name of the table',
-            'class' => 'span9',
             'required' => true
-        )));
-        $this->addElement(new Query_Form_Element_DownloadFormat('download_format', array(
-            'adapter' => $this->_adapter
         )));
         $this->addSubmitButtonElement('download_submit',array(
             'label' => 'Download table'
         ));
 
-        $this->addSimpleGroup(array('download_tablename'),'download-table-group', false, true);
-        $this->addSimpleGroup(array('download_format'),'download-format-group');
+        $this->addHorizontalGroup(array('download_format'),'download-format-group');
+        $this->addHorizontalGroup(array('download_tablename'),'download-table-group', false, true);
         $this->addInlineGroup(array('download_submit'));
-
-        // add angular directives
-        $this->setAttrib('name',"download");
-        $this->setAttrib('ng-submit',"downloadTable(\$event)");
-
-        // add angular model and error model decorators to elements
-        foreach (array('download_csrf','download_tablename','download_format') as $name) {
-            $element = $this->getElement($name);
-            $element->setAttrib('ng-model',"values.{$name}");
-
-            // inject new decorator in penultimate position
-            $decorators = $element->getDecorators();
-            $last = array_pop($decorators);
-
-            $element->setDecorators($decorators);
-            $element->addDecorator(array('field' => 'Callback'), array(
-                'callback' => function($content, $element, $options) {
-                    $errorModel = "errors.{$element->getName()}";
-                    return "<ul class=\"text-error unstyled\"><li ng-repeat=\"error in {$errorModel}\">{{error}}</li></ul>";
-                },
-                'placement' => 'append'
-            ));
-            $element->addDecorator($last);
-        }
-
-        // add form error to the description
-        $this->setDescription("<ul class=\"text-error form-error unstyled\"><li ng-repeat=\"error in errors.form\">{{error}}</li></ul>");
     }
 }
