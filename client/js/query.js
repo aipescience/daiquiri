@@ -508,13 +508,13 @@ app.factory('BarService', ['BrowserService',function(BrowserService) {
 
     BrowserService.browser.nativeFunctions = {
         'url': '/query/account/native-functions/',
-        'colnames': ['native_functions']
+        'colnames': ['basic_functions']
     };
     BrowserService.initBrowser('nativeFunctions');
 
     BrowserService.browser.customFunctions = {
         'url': '/query/account/custom-functions/',
-        'colnames': ['custom_functions']
+        'colnames': ['advanced_functions']
     };
     BrowserService.initBrowser('customFunctions');
 

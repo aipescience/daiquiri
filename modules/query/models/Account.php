@@ -512,7 +512,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $row['id'] = $key + 1;
             $row['value'] = $row['name'] . '()';
         }
-        return array('native_functions' => $rows, 'status' => 'ok');
+        return array('basic_functions' => $rows, 'status' => 'ok');
     }
 
     /**
@@ -533,7 +533,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 );
             }
         }
-        return array('custom_functions' => $rows, 'status' => 'ok');
+        return array('advanced_functions' => $rows, 'status' => 'ok');
     }
 
     /**
