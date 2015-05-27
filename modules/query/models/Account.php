@@ -527,7 +527,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 $rows[] = array(
                     'id' => $dbRow['id'],
                     'name' => $dbRow['name'],
-                    'value' => $dbRow['query'],
+                    'value' => $dbRow['name'] . '()',
                     'order' => $dbRow['order'],
                     'tooltip' => $dbRow['description']
                 );
