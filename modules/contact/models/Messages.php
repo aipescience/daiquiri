@@ -76,8 +76,13 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
      * @return array $response
      */
     public function rows(array $params = array()) {
-        // get the data from the database
+        // parse params
+        if (!isset($params['sort'])) {
+            $params['sort'] = 'datetime DESC';
+        }
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
+
+        // get the data from the database
         $dbRows = $this->getResource()->fetchRows($sqloptions);
 
         // loop through the table and add an options to show the message
