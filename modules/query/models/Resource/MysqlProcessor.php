@@ -258,7 +258,6 @@ class Query_Model_Resource_MysqlProcessor extends Query_Model_Resource_AbstractP
         $job = array(
             'table' => $resultTableName,
             'database' => $this->_userDb,
-            'host' => false,
             'query' => $sql,
             'actualQuery' => $combinedQuery,
             'fullActualQuery' => $combinedQuery, // this is set, if we want to use a query we don't want to show the user
