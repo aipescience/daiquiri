@@ -6,9 +6,19 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
   `query` TEXT NOT NULL,
   `actualQuery` TEXT NOT NULL,
   `user_id` INTEGER,
-  `status_id` INTEGER NOT NULL,  
+  `status_id` INTEGER NOT NULL,
+  `type_id` INTEGER NOT NULL,
+  `group_id` INTEGER,
+  `order` INTEGER,
   `time` DATETIME,
+  `ip` VARCHAR(45),
   `comment` TEXT
+) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
+
+CREATE TABLE IF NOT EXISTS `Query_Groups` (
+  `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `order` INTEGER,
+  `name` VARCHAR(256) NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Query_Examples` (
