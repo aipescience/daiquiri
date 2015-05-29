@@ -97,13 +97,15 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         // get adapter config
         $config = $this->getAdapter()->getConfig();
 
-        // get tablename
-        $table = $job['table'];
-
         // check if the table already exists
-        if ($this->_tableExists($table)) {
-            $errors['submitError'] = "Table '{$table}' already exists";
-            return false;
+        if ($this->_tableExists($job['table'])) {
+            $errors['submitError'] = "Table '{$job['table']}' already exists";
+            return;
+        }
+
+        // get jobId from the options, or not
+        if (!empty($options) && array_key_exists('jobId', $options)) {
+            $job['id'] = "{$options['jobId']}";
         }
 
         // create the actual sql statement
@@ -117,10 +119,9 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
 
         $adaptType = get_class($this->getAdapter());
 
-        // if query syntax is checked server side without executing query (like using paqu_validateSQL in MySQL), 
+        // if query syntax is checked server side without executing query (like using paqu_validateSQL in MySQL),
         // we just fire up the query. if not, we need to split multiline queries up and check for any exception
         // raised by the server
-
         if (Daiquiri_Config::getInstance()->query->validate->serverSide) {
             if (strpos(strtolower($adaptType), "pdo") !== false) {
                 try {
@@ -169,45 +170,23 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
 
         // if error has been raised just report it and don't add a job
         if (!empty($errors)) {
-            return Query_Model_Resource_DirectQuery::$_status['error'];
+            $job['status_id'] = Query_Model_Resource_DirectQuery::$_status['error'];
+            return;
         }
 
         // switch to user adapter (it could have been changed by the query, due to a "USE" statement)
         $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
 
         // check if it worked
-        if (in_array($table, $this->getAdapter()->listTables())) {
+        if (in_array($job['table'], $this->getAdapter()->listTables())) {
             // set status
-            $statusId = Query_Model_Resource_DirectQuery::$_status['success'];
+            $job['status_id'] = Query_Model_Resource_DirectQuery::$_status['success'];
         } else {
-            $statusId = Query_Model_Resource_DirectQuery::$_status['error'];
+            $job['status_id'] = Query_Model_Resource_DirectQuery::$_status['error'];
         }
 
-        if (!empty($options) && array_key_exists('jobId', $options)) {
-            $job['id'] = "{$options['jobId']}";
-        }
-
-        $job['database'] = $config['dbname'];
-        $job['host'] = $config['host'];
+        // set timestamp in job object
         $job['time'] = date("Y-m-d\TH:i:s");
-        $job['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
-        $job['status_id'] = $statusId;
-
-        // switch to web adapter
-        $this->setAdapter(Daiquiri_Config::getInstance()->getWebAdapter());
-
-        // insert job into jobs table
-        $this->getAdapter()->insert('Query_Jobs', $job);
-
-        // get Id of the new job
-        $job['id'] = $this->getAdapter()->lastInsertId();
-
-        // get username and status
-        $statusStrings = array_flip(Query_Model_Resource_DirectQuery::$_status);
-        $job['status'] = $statusStrings[$statusId];
-        $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
-
-        return $statusId;
     }
 
     /**

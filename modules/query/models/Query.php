@@ -109,7 +109,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
      * @param bool $plan flag for plan creation
      * @param string $table result table
      * @param array $options for further options that are handeled by the queue
-     * @return array $response 
+     * @return array $response
      */
     public function query($sql, $plan = false, $table, $options = array()) {
         // init error array
@@ -149,8 +149,11 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             return array('status' => 'error', 'errors' => $errors);
         }
 
+        // get group of the user
+        $options['usrGrp'] = Daiquiri_Auth::getInstance()->getCurrentRole();
+
         // before submission, see if user has enough quota
-        if ($this->_checkQuota($this->_queue, $usrGrp)) {
+        if ($this->_checkQuota($this->_queue, $options['usrGrp'])) {
             $errors['quotaError'] = 'Your quota has been reached. Drop some tables to free space or contact the administrators';
             return array('status' => 'error', 'errors' => $errors);
         }
@@ -158,16 +161,25 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
         // get user database name
         $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $job['database'] = Daiquiri_Config::getInstance()->getUserDbName($username);
+        $job['host'] = Daiquiri_Config::getInstance()->getUserDbHost();
 
         // get some more infomation about the job
         $job['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
         $job['ip'] = Daiquiri_Auth::getInstance()->getRemoteAddr();
 
         // submit job
-        $statusId = $this->_queue->submitJob($job, $errors, $options);
+        $this->_queue->submitJob($job, $errors, $options);
         if (!empty($errors)) {
             return array('status' => 'error', 'errors' => $errors);
         }
+
+        // insert job into jobs table
+        $jobResource = new Query_Model_Resource_Jobs();
+        $job['id'] = $jobResource->insertRow($job);
+
+        // get username and status
+        $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $job['status'] = $this->_queue->getStatus($job['status_id']);
 
         // return with success
         return array(
@@ -179,7 +191,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     /**
      * Returns the query plan.
      * @param string $sql the sql string
-     * @return array $response 
+     * @return array $response
      */
     public function plan($sql, array &$errors) {
         // init error array

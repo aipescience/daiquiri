@@ -124,7 +124,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             return false;
         }
 
-        // get jobId from the options, or not
+        // get jobId from the options, or calculate
         if (!empty($options) && isset($options['jobId'])) {
             $job['id'] = "{$options['jobId']}";
         } else {
@@ -138,8 +138,12 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
         }
 
-        // get the group of the user
-        $group = Daiquiri_Auth::getInstance()->getCurrentRole();
+        // get the group of the user from the options
+        if (!empty($options) && isset($options['usrGrp']) && in_array($options['usrGrp'],$this->fetchUserGroups())) {
+            $usrGrp = $options['usrGrp'];
+        } else {
+            $usrGrp = Daiquiri_Config::getInstance()->query->query->qqueue->defaultUsrGrp;
+        }
 
         // create the actual sql statement
         $query = $job['query'];
@@ -161,10 +165,9 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         }
 
         // create sql statement
-        $sql = "SELECT qqueue_addJob({$job['id']}, {$job['user_id']}, '{$group}', '{$queue}', " .
-            $this->getAdapter()->quote($actualQuery) .
-            ", '{$job['database']}', '{$job['table']}', NULL, 1, " .
-            $this->getAdapter()->quote($query) . ");";
+        $quotedQuery = $this->getAdapter()->quote($query);
+        $quotedActualQuery = $this->getAdapter()->quote($actualQuery);
+        $sql = "SELECT qqueue_addJob({$job['id']}, {$job['user_id']}, '{$usrGrp}', '{$queue}', {$quotedActualQuery}, '{$job['database']}', '{$job['table']}', NULL, 1, {$quotedQuery});";
 
         // fire up the database
         try {
@@ -174,7 +177,10 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             return Query_Model_Resource_QQueueQuery::$_status['error'];
         }
 
-        return $result;
+        // fetch the new jobs row for the timestamp and the status
+        $row = $this->fetchRow($job['id']);
+        $job['time'] = $row['timeSubmit'];
+        $job['status_id'] = $row['status_id'];
     }
 
     /**
@@ -191,7 +197,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         if ($this->isStatusKillable($job['status'])) {
             throw new Exception("Job is still running.");
         }
-
 
         // check if the table already exists
         if ($this->_tableExists($newTable)) {

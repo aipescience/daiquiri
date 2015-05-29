@@ -183,6 +183,14 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     }
 
     /**
+     * Returns the name of the host, where the user database are stored
+     * @return string $host
+     */
+    public function getUserDbHost() {
+        return $this->_application->resources->multidb->user->host;
+    }
+
+    /**
      * Returns the user database adapter
      * @return Zend_
      */
