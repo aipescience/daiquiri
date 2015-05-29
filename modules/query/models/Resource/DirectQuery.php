@@ -62,25 +62,11 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     );
 
     /**
-     * Array for the columns of the jobs tables.
-     * @var array $_cols
+     * Construtor. Sets adapter to the user adapter and the users database.
      */
-    protected static $_cols = array(
-        'id' => 'id',
-        'table' => 'table',
-        'database' => 'database',
-        'query' => 'query',
-        'actualQuery' => 'actualQuery',
-        'user_id' => 'user_id',
-        'status_id' => 'Query_Jobs.status_id',
-        'time' => 'time'
-    );
-
-    /**
-     * Field that used best as a timestamp.
-     * @var string $_timeField
-     */
-    protected static $_timeField = 'time';
+    public function __construct() {
+        $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
+    }
 
     /**
      * Creates a new table in the database with the given sql query.
@@ -91,12 +77,6 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return int $status
      */
     public function submitJob(&$job, array &$errors, $options = false) {
-        // switch to user adapter
-        $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
-
-        // get adapter config
-        $config = $this->getAdapter()->getConfig();
-
         // check if the table already exists
         if ($this->_tableExists($job['table'])) {
             $errors['submitError'] = "Table '{$job['table']}' already exists";
@@ -187,6 +167,12 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
 
         // set timestamp in job object
         $job['time'] = date("Y-m-d\TH:i:s");
+
+        // insert job into jobs table
+        $this->getJobResource()->insertRow($job);
+
+        // get job id from database
+        $job['id'] = $this->getJobResource()->getAdapter()->lastInsertId();
     }
 
     /**
@@ -197,10 +183,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      */
     public function renameJob($id, $newTable) {
         // get job from the database
-        $job = $this->fetchRow($id);
-
-        // switch to user adapter
-        $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
+        $job = $this->getJobResource()->fetchRow($id);
 
         // check if the table already exists
         if ($this->_tableExists($newTable)) {
@@ -210,11 +193,8 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         // rename result table for job
         $this->_renameTable($job['database'], $job['table'], $newTable);
 
-        // switch to web adapter
-        $this->setAdapter(Daiquiri_Config::getInstance()->getWebAdapter());
-
-        // Updating the job entry
-        $this->getAdapter()->update('Query_Jobs', array('table' => $newTable), array('id = ?' => $id));
+        // Update the job entry in the user table
+        $this->getJobResource()->updateRow($id, array('table' => $newTable));
     }
 
     /**
@@ -223,19 +203,13 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      */
     public function removeJob($id) {
         // get job from the database
-        $job = $this->fetchRow($id);
-
-        // switch to user adapter
-        $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
+        $job = $this->getJobResource()->fetchRow($id);
 
         // drop result table for job
         $this->_dropTable($job['database'], $job['table']);
 
-        // switch to web adapter
-        $this->setAdapter(Daiquiri_Config::getInstance()->getWebAdapter());
-
         // remove job from job table
-        $this->getAdapter()->delete('Query_Jobs', array('id = ?' => $id));
+        $this->getJobResource()->deleteRow($id);
     }
 
     /**
@@ -260,12 +234,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return array $cols
      */
     public function fetchCols() {
-        $cols = array();
-        foreach (Query_Model_Resource_DirectQuery::$_cols as $col => $dbCol) {
-            $cols[$col] = $this->quoteIdentifier('Query_Jobs',$dbCol);
-        }
-        $cols['username'] = $this->quoteIdentifier('Auth_User','username');
-        return $cols;
+        return $this->getJobResource()->fetchCols();
     }
 
     /**
@@ -275,20 +244,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return int $count
      */
     public function countRows(array $sqloptions = null) {
-        // rewrite sqloptions especially where
-        $sqloptions = $this->_processWhere($sqloptions);
-
-        $select = $this->select();
-        $select->from('Query_Jobs', 'COUNT(*) as count');
-
-        if ($sqloptions) {
-            $select->setWhere($sqloptions);
-            $select->setOrWhere($sqloptions);
-        }
-
-        // query database and return
-        $row = $this->fetchOne($select);
-        return (int) $row['count'];
+        return $this->getJobResource()->countRows($sqloptions);
     }
 
     /**
@@ -297,20 +253,10 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return array $rows
      */
     public function fetchRows(array $sqloptions = array()) {
-        // rewrite sqloptions especially where
-        $sqloptions = $this->_processWhere($sqloptions);
+        $rows = $this->getJobResource()->fetchRows($sqloptions);
 
-        // get the primary sql select object
-        $select = $this->select($sqloptions);
-        $select->from('Query_Jobs', Query_Model_Resource_DirectQuery::$_cols);
-
-        // get the rowset and return
-        $rows = $this->fetchAll($select);
-
-        // go through the result set and replace all instances of status with string
-        $statusStrings = array_flip(Query_Model_Resource_DirectQuery::$_status);
         foreach ($rows as &$row) {
-            $row['status'] = $statusStrings[$row['status_id']];
+            $row['status'] = $this->getStatus($row['status_id']);
         }
 
         return $rows;
@@ -322,22 +268,10 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return array $row
      */
     public function fetchRow($id) {
-        if (empty($id)) {
-            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
-        }
-
-        // get the primary sql select object
-        $select = $this->select();
-        $select->from('Query_Jobs', Query_Model_Resource_DirectQuery::$_cols);
-        $select->where('Query_Jobs.id = ?', $id);
-
-        // get the rowset and return
-        $row = $this->fetchOne($select);
+        $row = $this->getJobResource()->fetchRow($id);
         if (!empty($row)) {
-            $statusStrings = array_flip(Query_Model_Resource_DirectQuery::$_status);
-            $row['status'] = $statusStrings[$row['status_id']];
+            $row['status'] = $this->getStatus($row['status_id']);
         }
-
         return $row;
     }
 
@@ -348,9 +282,6 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return array $stats
      */
     public function fetchTableStats($database,$table) {
-        // switch to user adapter
-        $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
-
         // check if this table is locked and if yes, don't query information_schema. This will result in a
         // "waiting for metadata lock" and makes daiquiri hang
         if ($this->_isTableLocked($table)) {
@@ -388,67 +319,4 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         }
         return false;
     }
-
-    /**
-     * Returns rewritten sqloptions array.
-     * @param array $sqloptions
-     * @return array $sqloptions
-     */
-    protected function _processWhere($sqloptions) {
-        if ($sqloptions) {
-            $lexer = new PHPSQLParser\lexer\PHPSQLLexer();
-
-            if (isset($sqloptions['where'])) {
-                $where = array();
-                foreach($sqloptions['where'] as $key => $value) {
-                    if (is_int($key)) {
-                        $split = $lexer->split(trim($value));
-                    } else {
-                        $split = $lexer->split(trim($key));
-                    }
-
-                    // replace field
-                    $split[0] = str_replace(
-                        array_keys(Query_Model_Resource_DirectQuery::$_cols),
-                        Query_Model_Resource_DirectQuery::$_cols,
-                        $split[0]
-                    );
-
-                    if (is_int($key)) {
-                        $where[$key] = implode($split);
-                    } else {
-                        $where[implode($split)] = $value;
-                    }
-                }
-                $sqloptions['where'] = $where;
-            }
-            if (isset($sqloptions['orWhere'])) {
-                $orWhere = array();
-                foreach($sqloptions['orWhere'] as $key => $value) {
-                    if (is_int($key)) {
-                        $split = $lexer->split(trim($value));
-                    } else {
-                        $split = $lexer->split(trim($key));
-                    }
-
-                    // replace field
-                    $split[0] = str_replace(
-                        array_keys(Query_Model_Resource_DirectQuery::$_cols),
-                        Query_Model_Resource_DirectQuery::$_cols,
-                        $split[0]
-                    );
-
-                    if (is_int($key)) {
-                        $orWhere[$key] = implode($split);
-                    } else {
-                        $orWhere[implode($split)] = $value;
-                    }
-                }
-                $sqloptions['orWhere'] = $orWhere;
-            }
-        }
-
-        return $sqloptions;
-    }
-
 }

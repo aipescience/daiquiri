@@ -173,10 +173,6 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             return array('status' => 'error', 'errors' => $errors);
         }
 
-        // insert job into jobs table
-        $jobResource = new Query_Model_Resource_Jobs();
-        $job['id'] = $jobResource->insertRow($job);
-
         // get username and status
         $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $job['status'] = $this->_queue->getStatus($job['status_id']);

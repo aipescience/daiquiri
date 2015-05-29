@@ -50,7 +50,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                     'user_id = ?' => $userId,
                     'status_id != ?' => $this->getResource()->getStatusId('removed'),
                 ),
-                'order' => array($this->getResource()->getTimeField() . ' DESC'),
+                'order' => array('time DESC'),
                 'limit' => 1000
             ));
         } catch (Exception $e) {
@@ -59,10 +59,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         foreach ($dbRows as $dbRow) {
             $row = array();
-            foreach (array('id', 'table', 'status') as $col) {
+            foreach (array('id', 'table', 'status', 'time') as $col) {
                 $row[$col] = $dbRow[$col];
             }
-            $row['time'] = $dbRow[$this->getResource()->getTimeField()];
             $rows[] = $row;
         }
 
@@ -176,11 +175,10 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         // create return array
         $job = array(
-            'time' => $dbRow[$this->getResource()->getTimeField()],
             'additional' => array()
         );
 
-        foreach(array('id','database','table','status','error','username','timeQueue','timeQuery') as $key) {
+        foreach(array('id','database','table','status','error','username','time','timeQueue','timeQuery') as $key) {
             if (isset($dbRow[$key])) {
                 $job[$key] = $dbRow[$key];
             }

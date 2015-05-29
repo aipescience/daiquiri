@@ -75,13 +75,12 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     );
 
     /**
-     * Array for the columns of the jobs tables.
-     * @var array $_cols
+     * Array for the fields of qqueue_jobs and qqueue_history tables.
+     * @var array $_fields
      */
-    protected static $_cols = array(
+    protected static $_fields = array(
         'id' => 'id',
         'user_id' => 'usrId',
-        'username' => 'usrId',
         'database' => 'resultDBName',
         'table' => 'resultTableName',
         'timeSubmit' => 'timeSubmit',
@@ -93,12 +92,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         'status_id' => 'status',
         'error' => 'error'
     );
-
-    /**
-     * Field that used best as a timestamp.
-     * @var string $_timeField
-     */
-    protected static $_timeField = 'timeSubmit';
 
     /**
      * Construtor. Sets adapter to the user adapter and the `mysql` database.
@@ -115,9 +108,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      * @return int $status
      */
     public function submitJob(&$job, array &$errors, $options = false) {
-        // get adapter config
-        $config = $this->getAdapter()->getConfig();
-
         // check if the table already exists
         if ($this->_tableExists($job['table'])) {
             $errors['submitError'] = "Table '{$job['table']}' already exists";
@@ -181,6 +171,9 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $row = $this->fetchRow($job['id']);
         $job['time'] = $row['timeSubmit'];
         $job['status_id'] = $row['status_id'];
+
+        // insert job into jobs table
+        $this->getJobResource()->insertRow($job);
     }
 
     /**
@@ -206,7 +199,10 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $this->_renameTable($job['database'], $job['table'], $newTable);
 
         // update the job entry
-        $this->getAdapter()->update('qqueue_history', array('resultTableName' => $newTable), array('id = ?' => $id));
+        $this->getAdapter()->update('qqueue_history', array(
+            'resultTableName' => $newTable
+        ), array('id = ?' => $id));
+        $this->getJobResource()->updateRow($id, array('table' => $newTable));
     }
 
     /**
@@ -229,6 +225,9 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $this->getAdapter()->update('qqueue_history', array(
                 'status' => Query_Model_Resource_QQueueQuery::$_status['removed']
             ), array('id = ?' => $id));
+
+            // update the job in the Query_Jobs table
+            $this->_updateJob($job);
         }
     }
 
@@ -243,9 +242,15 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         if ($this->isStatusKillable($job['status'])) {
             try {
                 $this->getAdapter()->fetchAll("SELECT qqueue_killJob({$job['id']});");
+                $this->getJobResource()->updateRow($id, array(
+                    'status_id' => Query_Model_Resource_QQueueQuery::$_status['killed']
+                ));
             } catch (Exception $e) {
                 // ignore errors here
             }
+
+            // update the job in the Query_Jobs table
+            $this->_updateJob($job);
         }
     }
 
@@ -266,14 +271,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      * @return array $cols
      */
     public function fetchCols() {
-        $cols = array();
-        foreach (Query_Model_Resource_QQueueQuery::$_cols as $col => $dbCol) {
-            $cols[$col] = array(
-                $this->quoteIdentifier('qqueue_jobs',$dbCol),
-                $this->quoteIdentifier('qqueue_history',$dbCol)
-            );
-        }
-        return $cols;
+        return $this->getJobResource()->fetchCols();
     }
 
     /**
@@ -283,96 +281,34 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      * @return int $count
      */
     public function countRows(array $sqloptions = null, $tableclass = null) {
-        // get adapter config
-        $config = $this->getAdapter()->getConfig();
-
-        // rewrite sqloptions especially where
-        $sqloptions = $this->_processOptions($sqloptions);
-
-        // get the sql select object for the running jobs
-        $selectPending = $this->select($sqloptions['pending']);
-        $selectPending->from('qqueue_jobs', 'COUNT(*) as count');
-        $selectPending->where("qqueue_jobs.mysqlUserName = ?", $config['username']);
-
-        // get the sql select object for the old jobs
-        $selectHistory = $this->select($sqloptions['history']);
-        $selectHistory->from('qqueue_history', 'COUNT(*) as count');
-        $selectHistory->where("qqueue_history.mysqlUserName = ?", $config['username']);
-
-        // get rows
-        $rowPending = $this->fetchOne($selectPending);
-        $rowHistory = $this->fetchOne($selectHistory);
-
-        // add counts and return
-        return ((int) $rowPending['count']) + ((int) $rowHistory['count']);
+        return $this->getJobResource()->countRows($sqloptions);
     }
 
     /**
-     * Fetches a set of rows from the jobs table specified by $sqloptions.
+     * Fetches a set of rows from Query_Jobs specified by $sqloptions.
+     * Checks the current status for non finished jobs and updates accordingly.
      * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows
      */
     public function fetchRows(array $sqloptions = array()) {
-        // get adapter config
-        $config = $this->getAdapter()->getConfig();
+        $rows = $this->getJobResource()->fetchRows($sqloptions);
 
-        // rewrite sqloptions especially where
-        $sqloptions = $this->_processOptions($sqloptions);
-
-        // get the sql select object for the running jobs
-        $selectPending = $this->select($sqloptions['pending']);
-        $selectPending->from('qqueue_jobs', Query_Model_Resource_QQueueQuery::$_cols);
-        $selectPending->where("qqueue_jobs.mysqlUserName = ?", $config['username']);
-
-        // get the sql select object for the old jobs
-        $selectHistory = $this->select($sqloptions['history']);
-        $selectHistory->from('qqueue_history', Query_Model_Resource_QQueueQuery::$_cols);
-        $selectHistory->where("qqueue_history.mysqlUserName = ?", $config['username']);
-
-        // get the union with the sqloptions
-        $select = $this->select($sqloptions)->union(array($selectPending, $selectHistory));
-
-        // fetch rows fromtatbase
-        $rows = $this->fetchAll($select);
-
-        // get all usernames, status, queues
-        $userResource = new Auth_Model_Resource_User();
-        $userCache = array();
-        $statusStrings = array_flip(Query_Model_Resource_QQueueQuery::$_status);
-        $queues = $this->fetchQueues();
         foreach ($rows as &$row) {
-            // check if user is already in cache
-            if (!array_key_exists($row['user_id'], $userCache)) {
-                $userRow = $userResource->fetchRow($row['user_id']);
-                if (empty($userRow)) {
-                    $userCache[$row['user_id']] = 'unknown';
-                } else {
-                    $userCache[$row['user_id']] = $userRow['username'];
-                }
+            if (in_array($row['status_id'], array(
+                    Query_Model_Resource_QQueueQuery::$_status['queued'],
+                    Query_Model_Resource_QQueueQuery::$_status['running']))) {
+
+                $this->_updateJob($row);
             }
 
-            // get username from cache
-            $row['username'] = $userCache[$row['user_id']];
-
-            // get status from status string array
-            $row['status'] = $statusStrings[$row['status_id']];
-
-            // get queue
-            $row['queue'] = $queues[$row['queue']]['name'];
-
-            // if row contains a call to spider_bg_direct_sql, the actual query run on the
-            // server will be hidden from the user, since spider_bg_direct_sql needs secret
-            // information that nobody should know...
-            if (isset($row['actualQuery']) && strpos($row['actualQuery'], "spider_bg_direct_sql") !== false) {
-                unset($row['actualQuery']);
-            }
+            $row['status'] = $this->getStatus($row['status_id']);
         }
 
         return $rows;
     }
 
     /**
-     * Fetches one row specified by its primary key from the jobs table.
+     * Fetches one job from the qqueue_jobs and qqueue_history tables.
      * @param array $sqloptions
      * @return array $row
      */
@@ -382,13 +318,13 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // get the sql select object for the running jobs
         $selectPending = $this->select();
-        $selectPending->from('qqueue_jobs', Query_Model_Resource_QQueueQuery::$_cols);
+        $selectPending->from('qqueue_jobs', Query_Model_Resource_QQueueQuery::$_fields);
         $selectPending->where('qqueue_jobs.mysqlUserName = ?', $config['username']);
         $selectPending->where('qqueue_jobs.id = ?', $id);
 
         // get the sql select object for the old jobs
         $selectHistory = $this->select();
-        $selectHistory->from('qqueue_history', Query_Model_Resource_QQueueQuery::$_cols);
+        $selectHistory->from('qqueue_history', Query_Model_Resource_QQueueQuery::$_fields);
         $selectHistory->where('qqueue_history.mysqlUserName = ?', $config['username']);
         $selectHistory->where('qqueue_history.id = ?', $id);
 
@@ -400,21 +336,10 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             return false;
         }
 
-        // get all usernames, status, queues
-        $userResource = new Auth_Model_Resource_User();
-        $statusStrings = array_flip(Query_Model_Resource_QQueueQuery::$_status);
         $queues = $this->fetchQueues();
 
-        // get username from cache
-        $userRow = $userResource->fetchRow($row['user_id']);
-        if (empty($userRow)) {
-            $row['username'] = 'unknown';
-        } else {
-            $row['username'] = $userRow['username'];
-        }
-
         // get status from status string array
-        $row['status'] = $statusStrings[$row['status_id']];
+        $row['status'] = $this->getStatus([$row['status_id']]);
 
         // get queue
         $row['queue'] = $queues[$row['queue']]['name'];
@@ -433,6 +358,9 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         if (isset($row['actualQuery']) && strpos($row['actualQuery'], "spider_bg_direct_sql") !== false) {
             unset($row['actualQuery']);
         }
+
+        // get time field
+        $row['time'] = $row['timeSubmit'];
 
         return $row;
     }
@@ -465,7 +393,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      */
     public function fetchDefaultQueue() {
         if(empty(Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue)) {
-            throw new Exception("PaquQQueue: No default queue defined");
+            throw new Exception("No default queue defined");
         }
 
         $select = $this->select();
@@ -585,127 +513,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Returns rewritten sqloptions array.
-     * @param array $sqloptions
-     * @return array $sqloptions
-     */
-    protected function _processOptions($sqloptions) {
-        // prepare sqloptions
-        $sqloptions['pending'] = array();
-        $sqloptions['history'] = array();
-
-        if ($sqloptions) {
-            $lexer = new PHPSQLParser\lexer\PHPSQLLexer();
-
-            $fieldStringPending = $this->quoteIdentifier('qqueue_jobs');
-            $fieldStringHistory = $this->quoteIdentifier('qqueue_history');
-
-            if (isset($sqloptions['order'])) {
-                $order = array();
-                foreach($sqloptions['order'] as $value) {
-                    $split = $lexer->split(trim($value));
-                    $tmp = explode('.',$split[0]);
-                    $order[end($split)] = end($tmp);
-                }
-
-                if (count($order) != 1) {
-                    throw new Expection('More than one col in '  . get_class($this) . '::' . __METHOD__);
-                } else {
-                    // revert column again
-                    $orderField = array_search(reset($order), Query_Model_Resource_QQueueQuery::$_cols);
-                    $sqloptions['order'] = $orderField . ' ' . key($order);
-                }
-            }
-
-            if (isset($sqloptions['where'])) {
-                $sqloptions['pending']['where'] = array();
-                $sqloptions['history']['where'] = array();
-
-                foreach($sqloptions['where'] as $key => $value) {
-                    if (is_int($key)) {
-                        $split = $lexer->split(trim($value));
-                    } else {
-                        $split = $lexer->split(trim($key));
-                    }
-
-                    // replace field
-                    $split[0] = str_replace(
-                        array_keys(Query_Model_Resource_QQueueQuery::$_cols),
-                        Query_Model_Resource_QQueueQuery::$_cols,
-                        $split[0]
-                    );
-
-                    if (is_int($key)) {
-                        if (strpos($split[0],'qqueue_jobs') !== false) {
-                            $sqloptions['pending']['where'][] = implode($split);
-                        } else if (strpos($split[0],'qqueue_history') !== false) {
-                            $sqloptions['history']['where'][] = implode($split);
-                        } else {
-                            $sqloptions['pending']['where'][] = implode($split);
-                            $sqloptions['history']['where'][] = implode($split);
-                        }
-                    } else {
-                        if (strpos($split[0],'qqueue_jobs') !== false) {
-                            $sqloptions['pending']['where'][implode($split)] = $value;
-                        } else if (strpos($split[0],'qqueue_history') === 0) {
-                            $sqloptions['history']['where'][implode($split)] = $value;
-                        } else {
-                            $sqloptions['pending']['where'][implode($split)] = $value;
-                            $sqloptions['history']['where'][implode($split)] = $value;
-                        }
-                    }
-                }
-
-                unset($sqloptions['where']);
-            }
-
-            if (isset($sqloptions['orWhere'])) {
-                $sqloptions['pending']['orWhere'] = array();
-                $sqloptions['history']['orWhere'] = array();
-
-                foreach($sqloptions['orWhere'] as $key => $value) {
-                    if (is_int($key)) {
-                        $split = $lexer->split(trim($value));
-                    } else {
-                        $split = $lexer->split(trim($key));
-                    }
-
-                    // replace field
-                    $split[0] = str_replace(
-                        array_keys(Query_Model_Resource_QQueueQuery::$_cols),
-                        Query_Model_Resource_QQueueQuery::$_cols,
-                        $split[0]
-                    );
-
-                    if (is_int($key)) {
-                        if (strpos($split[0],$fieldStringPending) === 0) {
-                            $sqloptions['pending']['orWhere'][] = implode($split);
-                        } else if (strpos($split[0],$fieldStringHistory) === 0) {
-                            $sqloptions['history']['orWhere'][] = implode($split);
-                        } else {
-                            $sqloptions['pending']['orWhere'][] = implode($split);
-                            $sqloptions['history']['orWhere'][] = implode($split);
-                        }
-                    } else {
-                        if (strpos($split[0],$fieldStringPending) === 0) {
-                            $sqloptions['pending']['orWhere'][implode($split)] = $value;
-                        } else if (strpos($split[0],$fieldStringHistory) === 0) {
-                            $sqloptions['history']['orWhere'][implode($split)] = $value;
-                        } else {
-                            $sqloptions['pending']['orWhere'][implode($split)] = $value;
-                            $sqloptions['history']['orWhere'][implode($split)] = $value;
-                        }
-                    }
-                }
-
-                unset($sqloptions['orWhere']);
-            }
-        }
-
-        return $sqloptions;
-    }
-
-    /**
      * Calculate unique (hopefully) job id in the simular but not identical way qqueue does it
      * @return int $jobId
      */
@@ -713,5 +520,38 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $now = gettimeofday();
         $jobId = $now['sec'] * 1000000000 + $now['usec'] * 1000 + mt_rand(0,999);
         return $jobId;
+    }
+
+    /**
+     * Update job
+     */
+    private function _updateJob(&$job) {
+        // get adapter config
+        $config = $this->getAdapter()->getConfig();
+
+        // get the sql select object for the running jobs
+        $selectPending = $this->select();
+        $selectPending->from('qqueue_jobs');
+        $selectPending->where('qqueue_jobs.mysqlUserName = ?', $config['username']);
+        $selectPending->where('qqueue_jobs.id = ?', $job['id']);
+
+        // get the sql select object for the old jobs
+        $selectHistory = $this->select();
+        $selectHistory->from('qqueue_history');
+        $selectHistory->where('qqueue_history.mysqlUserName = ?', $config['username']);
+        $selectHistory->where('qqueue_history.id = ?', $job['id']);
+
+        $select = $this->select()->union(array($selectPending, $selectHistory));
+
+        // get the rowset and return
+        $row = $this->fetchOne($select);
+        if (empty($row)) {
+            throw new Exception('Job not found');
+        }
+
+        if ($job['status_id'] != $row['status']) {
+            $job['status_id'] = $row['status'];
+            $this->getJobResource()->updateRow($job['id'], array('status_id' => $job['status_id']));
+        }
     }
 }

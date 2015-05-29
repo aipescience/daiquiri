@@ -41,7 +41,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 'status_id != ?' => $this->getResource()->getStatusId('removed'),
             ),
             'limit' => 1000,
-            'order' => array($this->getResource()->getTimeField() . ' DESC'),
+            'order' => array('time DESC'),
         ));
 
         $jobs = new Uws_Model_Resource_Jobs();

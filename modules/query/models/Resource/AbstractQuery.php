@@ -33,6 +33,12 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     public static $hasQueues = false;
 
     /**
+     * Instance of Query_Model_Resource_Jobs to be used with this ressource
+     * @var Query_Model_Resource_Jobs $_jobResource
+     */
+    private $_jobResource = null;
+
+    /**
      * Queue factory.
      * @return Query_Model_Resource_AbstractQuery $queue
      */
@@ -157,6 +163,17 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     }
 
     /**
+     * Returns (and creates) and instance of Query_Model_Resource_Jobs
+     * @return Query_Model_Resource_Jobs $jobResource
+     */
+    function getJobResource() {
+        if (empty($this->_jobResource)) {
+            $this->_jobResource = new Query_Model_Resource_Jobs;
+        }
+        return $this->_jobResource;
+    }
+
+    /**
      * Returns the translation array for the columns in show jobs.
      * @return array $translations
      */
@@ -177,15 +194,6 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
         } else {
             return false;
         }
-    }
-
-    /**
-     * Returns the field used best as a timestamp.
-     * returns string $timeField
-     */ 
-    public function getTimeField() {
-        $classname = get_class($this);
-        return $classname::$_timeField;
     }
 
     /**

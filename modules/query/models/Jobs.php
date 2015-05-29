@@ -26,11 +26,8 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
     public function __construct() {
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
-        $this->_cols = array('id','database','table',$this->getResource()->getTimeField(),'status');
+        $this->_cols = array('id','database','table','time','status');
         $resourceClass = get_class($this->getResource());
-        if ($resourceClass::$hasQueues) {
-            $this->_cols[] = 'queue';
-        } 
     }
 
     /**
@@ -74,7 +71,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
     public function rows(array $params = array()) {
         // parse params
         if (!isset($params['sort'])) {
-            $params['sort'] = $this->getResource()->getTimeField() . ' DESC';
+            $params['sort'] = 'time DESC';
         }
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
