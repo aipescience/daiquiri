@@ -122,14 +122,6 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             $tablename = $table;
         }
 
-        // get group of the user
-        $usrGrp = Daiquiri_Auth::getInstance()->getCurrentRole();
-        if ($usrGrp !== null) {
-            $options['usrGrp'] = $usrGrp;
-        } else {
-            $options['usrGrp'] = "guest";
-        }
-
         // if plan type direct, obtain query plan
         if ($this->_processor->supportsPlanType("QPROC_SIMPLE") === true and $plan === false) {
             $plan = $this->_processor->getPlan($sql, $errors);
@@ -162,6 +154,14 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             $errors['quotaError'] = 'Your quota has been reached. Drop some tables to free space or contact the administrators';
             return array('status' => 'error', 'errors' => $errors);
         }
+
+        // get user database name
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $job['database'] = Daiquiri_Config::getInstance()->getUserDbName($username);
+
+        // get some more infomation about the job
+        $job['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
+        $job['ip'] = Daiquiri_Auth::getInstance()->getRemoteAddr();
 
         // submit job
         $statusId = $this->_queue->submitJob($job, $errors, $options);

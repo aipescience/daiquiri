@@ -118,58 +118,34 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         // get adapter config
         $config = $this->getAdapter()->getConfig();
 
-        // get database name
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $database = Daiquiri_Config::getInstance()->getUserDbName($username);
-
-        // get tablename
-        $table = $job['table'];
-
         // check if the table already exists
-        if ($this->_tableExists($table)) {
-            $errors['submitError'] = "Table '{$table}' already exists";
+        if ($this->_tableExists($job['table'])) {
+            $errors['submitError'] = "Table '{$job['table']}' already exists";
             return false;
         }
+
+        // get jobId from the options, or not
+        if (!empty($options) && isset($options['jobId'])) {
+            $job['id'] = "{$options['jobId']}";
+        } else {
+            $job['id'] = $this->_calculateJobId();
+        }
+
+        // get the queue from the options
+        if (!empty($options) && isset($options['queue']) && in_array($options['queue'],$this->fetchQueues())) {
+            $queue = $options['queue'];
+        } else {
+            $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
+        }
+
+        // get the group of the user
+        $group = Daiquiri_Auth::getInstance()->getCurrentRole();
 
         // create the actual sql statement
         $query = $job['query'];
         $planQuery = $job['actualQuery'];
         $actualQuery = $job['fullActualQuery'];
         unset($job['fullActualQuery']);
-
-        // create the job submission query
-        if (empty($options) || !array_key_exists('queue', $options)) {
-            $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
-        } else {
-            // check if queue exists on server, if not use default
-            $queues = $this->fetchQueues();
-
-            $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
-            foreach ($queues as $currQueue) {
-                if ($currQueue['name'] === $options['queue']) {
-                    $queue = $options['queue'];
-                }
-            }
-        }
-
-        if (empty($options) || !array_key_exists('usrGrp', $options)) {
-            $userGroup = Daiquiri_Config::getInstance()->query->query->qqueue->defaultUsrGrp;
-        } else {
-            //check if user group exists on server, if not use default.
-            $groups = $this->fetchUserGroups();
-
-            $userGroup = Daiquiri_Config::getInstance()->query->query->qqueue->defaultUsrGrp;
-            foreach ($groups as $group) {
-                if ($group['name'] === $options['usrGrp']) {
-                    $userGroup = $options['usrGrp'];
-                }
-            }
-        }
-
-        $job['id'] = "NULL";
-        if (!empty($options) && array_key_exists('jobId', $options)) {
-            $job['id'] = "{$options['jobId']}";
-        }
 
         // if the plan query is not the same as the actual query, this means this is run in the context
         // of paqu and we are going to hide the actual query from the user. We therefore add the plan query
@@ -184,17 +160,10 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             }
         }
 
-        // get user id
-        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
-
-        // are we guest?
-        if ($userId === null) {
-            $userId = 0;
-        }
-
-        $sql = "SELECT qqueue_addJob({$job['id']}, {$userId}, '{$userGroup}', '{$queue}', " .
+        // create sql statement
+        $sql = "SELECT qqueue_addJob({$job['id']}, {$job['user_id']}, '{$group}', '{$queue}', " .
             $this->getAdapter()->quote($actualQuery) .
-            ", '{$database}', '{$table}', NULL, 1, " .
+            ", '{$job['database']}', '{$job['table']}', NULL, 1, " .
             $this->getAdapter()->quote($query) . ");";
 
         // fire up the database
@@ -729,5 +698,15 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         }
 
         return $sqloptions;
+    }
+
+    /**
+     * Calculate unique (hopefully) job id in the simular but not identical way qqueue does it
+     * @return int $jobId
+     */
+    private function _calculateJobId() {
+        $now = gettimeofday();
+        $jobId = $now['sec'] * 1000000000 + $now['usec'] * 1000 + mt_rand(0,999);
+        return $jobId;
     }
 }
