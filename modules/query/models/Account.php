@@ -42,10 +42,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // get the sqloptions needed to show the list of jobs
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
 
-        // get rows and return
-        $rows = array();
+        // get rows
         try {
-            $dbRows = $this->getResource()->fetchRows(array(
+            $rows = $this->getResource()->fetchRows(array(
                 'where' => array(
                     'user_id = ?' => $userId,
                     'status_id != ?' => $this->getResource()->getStatusId('removed'),
@@ -54,15 +53,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 'limit' => 1000
             ));
         } catch (Exception $e) {
-            $dbRows = array();
-        }
-
-        foreach ($dbRows as $dbRow) {
-            $row = array();
-            foreach (array('id', 'table', 'status', 'time') as $col) {
-                $row[$col] = $dbRow[$col];
-            }
-            $rows[] = $row;
+            $rows = array();
         }
 
         // get number of currently active jobs

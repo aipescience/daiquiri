@@ -64,16 +64,17 @@
         <tbody>
         <?php foreach ($this->jobs as $job): ?>
             <tr>
-            <?php foreach ($job as $key => $value): ?>
-                <?php if ($key === 'id'): ?>
-                    <td><?php echo $this->internalLink(array(
+                <td>
+                    <?php echo $this->internalLink(array(
                         'href' => '/query/account/show-job/id/' . $job['id'],
                         'text' => $job['id']
-                    )); ?></td>
-                <?php else: ?>
-                    <td><?php echo $this->escape($value); ?></td>
-                <?php endif; ?>
-            <?php endforeach; ?>
+                    )); ?>
+                </td>
+                <?php foreach (array('table','status','time') as $key): ?>
+                <td>
+                    <?php echo $this->escape($job[$key]); ?>
+                </td>
+                <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>
         </tbody>
