@@ -336,12 +336,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             return false;
         }
 
-        $queues = $this->fetchQueues();
-
         // get status from status string array
-        $row['status'] = $this->getStatus([$row['status_id']]);
+        $row['status'] = $this->getStatus($row['status_id']);
 
         // get queue
+        $queues = $this->fetchQueues();
         $row['queue'] = $queues[$row['queue']]['name'];
 
         // calculate queue and query times
