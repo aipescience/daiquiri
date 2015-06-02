@@ -35,7 +35,7 @@ class Daiquiri_Form_Validator_Text extends Zend_Validate_Abstract {
 
     /**
      * Checks whether given input is valid according to validator. Allowed are:
-     * Unicode letters, digits, spaces and special characters (.,:;?!'"'+-\*=@#$%^`&()[]{}<>_)
+     * Unicode letters, digits, spaces and special characters (.,:;?!'"'+-\*=@#$%^`&()[]{}<>_~)
      * @param  string $value string to validate
      * @return bool
      */
@@ -43,7 +43,7 @@ class Daiquiri_Form_Validator_Text extends Zend_Validate_Abstract {
         $this->_setValue($value);
 
         $isValid = true;
-        if (preg_match("/[^ \.\,\:\;\?\!\'\"\'\+\-\/\*\=\@\#\$\%\^\`\&\(\)\[\]\{\}\<\>\_\p{L}0-9]/u", $value)) {
+        if (preg_match("/[^ \.\,\:\;\?\!\'\"\'\+\-\/\*\=\@\#\$\%\^\`\&\(\)\[\]\{\}\<\>\_\~\p{L}0-9]/u", $value)) {
             $this->_error(self::CHARS);
             $isValid = false;
         }
