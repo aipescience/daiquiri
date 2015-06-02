@@ -268,4 +268,37 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         return $output;
     }
 
+    /**
+     * Returns the quota of a given role in bytes;
+     * @param   $role  role
+     * @return  $quotaBytes
+     */
+    public function getQueryQuota($role) {
+        $quota = Daiquiri_Config::getInstance()->query->quota->$role;
+
+        // parse the quota to resolve KB, MB, GB, TB, PB, EB...
+        preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quota, $parse);
+        $quotaBytes = (float) $parse[1];
+        $unit = $parse[2];
+
+        switch (strtoupper($unit)) {
+            case 'EB':
+                $quotaBytes *= 1024;
+            case 'PB':
+                $quotaBytes *= 1024;
+            case 'TB':
+                $quotaBytes *= 1024;
+            case 'GB':
+                $quotaBytes *= 1024;
+            case 'MB':
+                $quotaBytes *= 1024;
+            case 'KB':
+                $quotaBytes *= 1024;
+            default:
+                break;
+        }
+
+        return (int) $quotaBytes;
+    }
+
 }

@@ -72,66 +72,19 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         $guest = (Daiquiri_Auth::getInstance()->getCurrentRole() === 'guest');
 
         // get the quota information
-        $usrGrp = Daiquiri_Auth::getInstance()->getCurrentRole();
-        if ($usrGrp !== null) {
-            $quota = array();
+        $role = Daiquiri_Auth::getInstance()->getCurrentRole();
 
-            // get database stats
-            try {
-                $stats = $this->getResource()->fetchDatabaseStats();
-            } catch (Exception $e) {
-                $stats = array();
-            }
+        // get the quota space
+        $stats =  $this->getResource()->fetchDatabaseStats($userId);
+        $quota = array(
+            'used' => $stats['size'],
+            'max' => Daiquiri_Config::getInstance()->getQueryQuota($role),
+        );
 
-            // get the quota space
-            $quota['max'] = Daiquiri_Config::getInstance()->query->quota->$usrGrp;
-
-            if (!empty($stats)) {
-                // space in byte
-                $usedSpace = (float) $stats['db_size'];
-
-                // parse the quota to resolve KB, MB, GB, TB, PB, EB...
-                preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quota['max'], $parse);
-                $quotaSpace = (float) $parse[1];
-                $unit = $parse[2];
-
-                switch (strtoupper($unit)) {
-                    case 'EB':
-                        $quotaSpace *= 1024;
-                    case 'PB':
-                        $quotaSpace *= 1024;
-                    case 'TB':
-                        $quotaSpace *= 1024;
-                    case 'GB':
-                        $quotaSpace *= 1024;
-                    case 'MB':
-                        $quotaSpace *= 1024;
-                    case 'KB':
-                        $quotaSpace *= 1024;
-                    default:
-                        break;
-                }
-
-                if ($usedSpace > $quotaSpace) {
-                    $quota['exceeded'] = true;
-                } else {
-                    $quota['exceeded'] = false;
-                }
-
-                $unit = ' byte';
-                foreach (array('KB','MB','GB','TB','PB','EB') as $u) {
-                    if ($usedSpace > 1024) {
-                        $usedSpace /= 1024.0;
-                        $unit = $u;
-                    }
-                }
-
-                $quota['used'] = ((string) floor($usedSpace * 100) / 100 ) . ' ' . $unit;
-            } else {
-                $quota['used'] = '?';
-            }
+        if ($quota['used'] > $quota['max']) {
+            $quota['exceeded'] = true;
         } else {
-            $quota = false;
+            $quota['exceeded'] = false;
         }
 
         return array(
@@ -141,7 +94,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 'message' => $message,
                 'nactive' => $nactive,
                 'guest' => $guest,
-                'quota' => $quota,
+                'quota' => $quota
             )
         );
     }
@@ -169,7 +122,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'additional' => array()
         );
 
-        foreach(array('id','database','table','status','error','username','time','timeQueue','timeQuery') as $key) {
+        foreach(array('id','database','table','status','error','username','time','timeQueue','timeQuery','nrows','size','finished','removed') as $key) {
             if (isset($dbRow[$key])) {
                 $job[$key] = $dbRow[$key];
             }
@@ -189,28 +142,15 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $job['plan'] = $plan;
         }
 
-        // get actial query if there is one
+        // get actual query if there is one
         if (isset($dbRow['actualQuery'])) {
             $job['actualQuery'] = str_replace("; ",";\n",$dbRow['actualQuery']);
             unset($dbRow['actualQuery']);
         }
 
-        // fetch table statistics
-        if ($job['status'] == 'success') {
-            $stat = $this->getResource()->fetchTableStats($job['database'],$job['table']);
-        } else {
-            $stat = array();
-        }
-
-        // ret row count
-        if (isset($stat['tbl_row'])) {
-            $job['nrows'] = $stat['tbl_row'];
-            unset($stat['tbl_row']);
-        }
-
         // create additional array
         $translations = $this->getResource()->getTranslations();
-        foreach (array_merge($dbRow, $stat) as $key => $value) {
+        foreach ($dbRow as $key => $value) {
             $job['additional'][] = array(
                 'key' => $key,
                 'name' => $translations[$key],

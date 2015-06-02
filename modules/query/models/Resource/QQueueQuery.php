@@ -54,24 +54,11 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
      */
     protected static $_translations = array('id' => 'Job id',
         'user_id' => 'Internal user id',
-        'username' => 'User name',
-        'database' => 'Database name',
-        'table' => 'Table name',
         'timeSubmit' => 'Job submitted at',
         'timeExecute' => 'Job started at',
         'timeFinish' => 'Job finished at',
-        'timeQueue' => 'Time in queue [s]',
-        'timeQuery' => 'Time for query [s]',
-        'query' => 'Original query',
-        'actualQuery' => 'Actual query',
         'queue' => 'Queue',
-        'status' => 'Job status',
-        'status_id' => 'Internal job status id',
-        'error' => 'Error message',
-        'tbl_size' => 'Total disk usage [MB]',
-        'tbl_idx_size' => 'Index disk usage [MB]',
-        'tbl_free' => 'Free space in table [MB]',
-        'tbl_row' => 'Approx. row count',
+        'status_id' => 'Internal job status id'
     );
 
     /**
@@ -294,10 +281,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $rows = $this->getJobResource()->fetchRows($sqloptions);
 
         foreach ($rows as &$row) {
-            if (in_array($row['status_id'], array(
-                    Query_Model_Resource_QQueueQuery::$_status['queued'],
-                    Query_Model_Resource_QQueueQuery::$_status['running']))) {
-
+            if ($row['finished'] !== '1') {
                 $this->_updateJob($row);
             }
 
@@ -358,8 +342,12 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             unset($row['actualQuery']);
         }
 
-        // get time field
-        $row['time'] = $row['timeSubmit'];
+        // get the values from the Query_Jobs table
+        $jobRow = $this->getJobResource()->fetchRow($id);
+
+        foreach (array('time','finished','removed','nrows','size') as $key) {
+            $row[$key] = $jobRow[$key];
+        }
 
         return $row;
     }
@@ -424,7 +412,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Returns statistical information about the database table if exists.
+     * Returns the number of rows and the size of the table (in bytes).
      * @param string $database name of the database
      * @param string $table name of the table
      * @return array $stats
@@ -446,15 +434,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                 return array();
             }
 
-            // obtain row count
-            // obtain table size in MB
-            // obtain index size in MB
-            // obtain free space (in table) in MB
-            $sql = "SELECT round( (data_length + index_length) / 1024 / 1024, 3 ) AS 'tbl_size', " .
-                    "round( index_length / 1024 / 1024, 3) AS 'tbl_idx_size', " .
-                    "round( data_free / 1024 / 1024, 3 ) AS 'tbl_free', table_rows AS 'tbl_row' " .
-                    "FROM information_schema.tables " .
-                    "WHERE table_schema = ? AND table_name = ?;";
+            $sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM information_schema.tables WHERE table_schema = ? AND table_name = ?;';
 
             $rows = $this->getAdapter()->fetchAll($sql, array($database,$table));
             return $rows[0];
@@ -548,9 +528,37 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             throw new Exception('Job not found');
         }
 
+        // check if the status has changed
         if ($job['status_id'] != $row['status']) {
             $job['status_id'] = $row['status'];
             $this->getJobResource()->updateRow($job['id'], array('status_id' => $job['status_id']));
+        }
+
+        // try to get the table stats
+        if ($this->getStatus($job['status_id']) === 'success') {
+            $stats = $this->fetchTableStats($job['database'],$job['table']);
+
+            if (!empty($stats)) {
+                $job['nrows'] = $stats['nrows'];
+                $job['size'] = $stats['size'];
+
+                // set the values and the finished flag
+                $this->getJobResource()->updateRow($job['id'], array(
+                    'nrows' => $job['nrows'],
+                    'size' => $job['size'],
+                    'finished' => true
+                ));
+            }
+        } else if (in_array($this->getStatus($row['status']), array('removed','error','timeout','killed'))) {
+            $job['nrows'] = 0;
+            $job['size'] = 0;
+
+            // set the finished flag
+            $this->getJobResource()->updateRow($job['id'], array(
+                'nrows' => 0,
+                'size' => 0,
+                'finished' => true
+            ));
         }
     }
 }

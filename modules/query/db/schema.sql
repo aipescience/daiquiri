@@ -12,7 +12,11 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
   `order` INTEGER,
   `time` DATETIME,
   `ip` VARCHAR(45),
-  `comment` TEXT
+  `nrows` BIGINT,
+  `size` BIGINT,
+  `comment` TEXT,
+  `finished` BOOL NOT NULL,
+  `removed` BOOL NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Query_Groups` (

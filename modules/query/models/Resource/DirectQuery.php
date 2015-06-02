@@ -47,18 +47,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     protected static $_translations = array(
         'id' => 'Job id',
         'user_id' => 'Internal user id',
-        'username' => 'User name',
-        'database' => 'Database name',
-        'table' => 'Table name',
-        'time' => 'Job submitted at',
-        'query' => 'Original query',
-        'actualQuery' => 'Actual query',
         'status_id' => 'Internal job status id',
-        'status' => 'Job status',
-        'tbl_size' => 'Total disk usage [MB]',
-        'tbl_idx_size' => 'Index disk usage [MB]',
-        'tbl_free' => 'Free space in table [MB]',
-        'tbl_row' => 'Approx. row count',
     );
 
     /**

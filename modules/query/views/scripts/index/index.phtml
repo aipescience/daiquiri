@@ -54,10 +54,10 @@
                         You are using the guest user. For a personal account, please sign up <a href="/auth/registration/register">here</a>.
                     </p>
                     <p ng-show="account.database.guest === true">
-                        The guest user is using {{account.database.quota.used}} of its quota of {{account.database.quota.max}}.
+                        The guest user is using {{account.database.quota.used | bytes}} of its quota of {{account.database.quota.max | bytes}}.
                     </p>
                     <p ng-show="account.database.guest === false">
-                        You are using {{account.database.quota.used}} of your quota of {{account.database.quota.max}}.
+                        You are using {{account.database.quota.used | bytes}} of your quota of {{account.database.quota.max | bytes}}.
                     </p>
                     <p ng-show="account.database.quota.exceeded" class="text-error">
                         Please remove some jobs to free space or contact the administrators.
@@ -248,6 +248,11 @@
                                         <div ng-show="account.job.nrows != null">
                                             <dt>Number of rows</dt>
                                             <dd>{{account.job.nrows}}</dd>
+                                        </div>
+
+                                        <div ng-show="account.job.size != null">
+                                            <dt>Size of the table</dt>
+                                            <dd>{{account.job.size | bytes}}</dd>
                                         </div>
                                     </dl>
                                 </div>

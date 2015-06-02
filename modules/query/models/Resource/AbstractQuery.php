@@ -133,33 +133,12 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     abstract public function fetchTableStats($database,$table);
 
     /**
-     * Returns statistical information about the complete database
+     * Returns the number of rows and the size of a given user database.
+     * @param int $userId id of the user
      * @return array $stats
      */
-    public function fetchDatabaseStats() {
-        // check if this table is locked and if yes, don't query information_schema. This will result in a
-        // "waiting for metadata lock" and makes daiquiri hang
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $db = Daiquiri_Config::getInstance()->getUserDbName($username);
-
-        // get list of locked tables
-        $lockedTables = $this->getAdapter()->query('SHOW OPEN TABLES IN `' . $db . '` WHERE In_use > 0')->fetchAll();
-        $where = "";
-        foreach ($lockedTables as $table) {
-            $where .= " AND table_name != '" . $table['Table'] . "'";
-        }
-
-        // obtain row count
-        // obtain table size in byte
-        // obtain index size in byte
-        // obtain free space (in table) in byte
-        $sql = "SELECT round( sum(data_length + index_length), 3 ) AS 'db_size', " .
-                "round( sum(index_length), 3) AS 'db_idx_size', " .
-                "round( sum(data_free), 3 ) AS 'db_free', sum(table_rows) AS 'db_row' " .
-                "FROM information_schema.tables WHERE table_schema = ?"
-                . $where;
-
-        return $this->getAdapter()->query($sql, array($db))->fetch();
+    public function fetchDatabaseStats($userId) {
+        return $this->getJobResource()->fetchDatabaseStats($userId);
     }
 
     /**

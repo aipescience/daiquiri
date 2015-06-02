@@ -24,6 +24,20 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
+/* filter */
+
+app.filter('bytes', function() {
+    return function(bytes) {
+        if (angular.isUndefined(bytes) || isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '';
+        if (bytes === '0') return '0 bytes';
+
+        var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'];
+        var number = Math.floor(Math.log(bytes) / Math.log(1024));
+
+        return (bytes / Math.pow(1024, Math.floor(number))).toFixed(1) +  ' ' + units[number];
+    }
+});
+
 /* directives */
 
 app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function($timeout,SubmitService) {
@@ -139,7 +153,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     var id = account.job.id;
                     // get the index of the job in the jobs array (by magic)
                     var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': id})[0]);
-                    if (account.jobs[i].status != account.job.status) {
+                    if (account.jobs[i].status != account.job.status || account.jobs[i].finished != account.job.finished) {
                         account.job.status = activateJob(id);
                     }
                 }

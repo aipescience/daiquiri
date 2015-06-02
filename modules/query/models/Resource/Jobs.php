@@ -35,7 +35,7 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
     public function fetchRows(array $sqloptions = array()) {
         // get select object
         $select = $this->select($sqloptions);
-        $select->from($this->getTablename(), array('id','database','table','time','status_id'));
+        $select->from($this->getTablename(), array('id','database','table','time','status_id','finished','removed'));
 
         // query database and return
         return $this->fetchAll($select);
@@ -53,12 +53,14 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
             throw new Exception('$id or $sqloptions not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
+        $fields = array('id','database','table','time','status_id','finished','removed','user_id','query','actualQuery','nrows','size');
+
         if (is_array($input)) {
             $select = $this->select($input);
-            $select->from($this->getTablename(), array('id','database','table','time','status_id','user_id','query','actualQuery'));
+            $select->from($this->getTablename(), $fields);
         } else {
             $select = $this->select();
-            $select->from($this->getTablename(), array('id','database','table','time','status_id','user_id','query','actualQuery'));
+            $select->from($this->getTablename(), $fields);
             $identifier = $this->quoteIdentifier($this->fetchPrimary());
             $select->where($identifier . '= ?', $input);
         }
@@ -67,4 +69,15 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         return $this->fetchOne($select);
     }
 
+    /**
+     * Returns the number of rows and the size of a given user database.
+     * @param int $userId id of the user
+     * @return array $stats
+     */
+    public function fetchDatabaseStats($userId) {
+        $select = $this->select();
+        $select->from($this->getTablename(), 'SUM(nrows) as nrows,SUM(size) as size');
+        $select->where('user_id = ?', $userId);
+        return $this->fetchOne($select);
+    }
 }
