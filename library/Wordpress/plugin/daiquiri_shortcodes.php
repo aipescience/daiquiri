@@ -18,6 +18,52 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// [userinfo]
+add_shortcode('userinfo', 'userinfo_func' );
+
+function userinfo_func($atts) {
+    global $wpdb;
+
+    extract(shortcode_atts(array(
+        'id' => null,
+        'username' => null,
+        'email' => null,
+    ), $atts ) );
+
+    if (($id === null && $username === null) || ($id !== null && $username !== null)) {
+        return '<p class="text-error">Error with daiquiri userinfo shortcode. Please give username OR id.</p>';
+    }
+
+    $u = '`' . DAIQUIRI_DB . '`.`Auth_User`';
+    $d = '`' . DAIQUIRI_DB . '`.`Auth_Details`';
+
+    $querystring = "
+        SELECT email,d1.value as firstname,d2.value as lastname
+        FROM {$u} as u
+        JOIN {$d} as d1 ON d1.user_id = u.id AND d1.key = 'firstname'
+        JOIN {$d} as d2 ON d2.user_id = u.id AND d2.key = 'lastname'
+    ";
+
+    if ($id !== null) {
+        $query = $wpdb->prepare($querystring . 'WHERE u.id = %s', $id);
+    } else {
+        $query = $wpdb->prepare($querystring . 'WHERE u.username = %s', $username);
+    }
+
+    $rows = $wpdb->get_results($query);
+    if (count($rows) != 1) {
+        return '<p class="text-error">Error with daiquiri userinfo shortcode. User not found.</p>';
+    }
+
+    $user = $rows[0];
+
+    if (empty($email)) {
+        return "<span>{$user->firstname} {$user->lastname}</span>";
+    } else {
+        return "<a href=\"mailto:{$user->email}\">{$user->firstname} {$user->lastname}</a>";
+    }
+}
+
 // [licenseinfo]
 add_shortcode('license', 'license_func' );
 
