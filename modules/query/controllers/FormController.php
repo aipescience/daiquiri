@@ -45,8 +45,7 @@ class Query_FormController extends Daiquiri_Controller_Abstract {
 
     public function planAction() {
         // get form from request default is sql
-        $form = $this->_getParam('form', 'sql');
-        $mail = $this->_getParam('mail');
+        $mail = $this->_getParam('plan_mail');
         $this->getControllerHelper('form')->plan($mail);
     }
 

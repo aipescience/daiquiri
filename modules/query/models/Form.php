@@ -227,7 +227,16 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                     $plan = false;
                 }
 
-                if (!empty($mail)) {
+                if (empty($mail)) {
+                    // submit query
+                    $response = $model->query($ns->sql, $plan, $ns->tablename, array("queue" => $ns->queue));
+
+                    if ($response['status'] === 'ok') {
+                        return $response;
+                    } else {
+                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$response['errors']);
+                    }
+                } else {
                     // store plan in session
                     if ($plan !== false) {
                         $ns->planString = $plan;
@@ -241,15 +250,6 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                         'status' => 'redirect',
                         'redirect' => $baseurl . '/query/form/mail'
                     );
-                } else {
-                    // submit query
-                    $response = $model->query($ns->sql, $plan, $ns->tablename, array("queue" => $ns->queue));
-
-                    if ($response['status'] === 'ok') {
-                        return $response;
-                    } else {
-                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$response['errors']);
-                    }
                 }
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);

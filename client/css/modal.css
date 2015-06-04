@@ -74,6 +74,7 @@ button.daiquiri-modal-close:hover {
 .daiquiri-modal-body h4,
 .daiquiri-modal-body dl,
 .daiquiri-modal-body p,
+.daiquiri-modal-body ul,
 .daiquiri-modal-body fieldset {
     padding-left: 15px;
     padding-right: 15px;

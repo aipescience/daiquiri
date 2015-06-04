@@ -170,11 +170,14 @@
                                     </fieldset>
                                     <?php if (!empty($this->plan['mail'])): ?>
                                     <p>
-                                        <a href="<?php echo $this->baseUrl('/query/form/mail'); ?>" target="blank">
+                                        <a href="" ng-click="submitPlan(true)">
                                             Send this plan as a bug report to the Daiquiri developers (opens a new window/tab).
                                         </a>
                                     </p>
                                     <?php endif; ?>
+                                    <ul class="unstyled text-error" ng-show="errors.plan_mail">
+                                        <li ng-repeat="error in errors.plan_mail">{{error}}</li>
+                                    </ul>
                                     <fieldset id="fieldset-actiongroup" class="form-action">
                                         <input type="submit" name="submit" value="Submit this plan" class="btn btn-primary" ng-click="submitPlan()" />
                                         <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
