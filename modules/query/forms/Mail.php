@@ -99,7 +99,6 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
             'size' => '30',
             'required' => true,
             'filters' => array('StringTrim'),
-            'required' => false,
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
@@ -110,7 +109,6 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
             'size' => '30',
             'required' => true,
             'filters' => array('StringTrim'),
-            'required' => false,
             'validators' => array(
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
@@ -120,7 +118,6 @@ class Query_Form_Mail extends Daiquiri_Form_Abstract {
             'size' => '30',
             'required' => true,
             'filters' => array('StringTrim'),
-            'required' => false,
             'validators' => array(
                 array('validator' => 'EmailAddress'),
             )
