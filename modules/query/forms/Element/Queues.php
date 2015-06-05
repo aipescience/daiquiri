@@ -47,9 +47,9 @@ class Query_Form_Element_Queues extends Zend_Form_Element_Select {
         // set multioptions and attributes
         $entries = array();
         $attribs = array();
-        foreach ($this->_queues as $queue) {
-            $entries[$queue['id']] = ucfirst($queue['name']);
-            $attribs["data-original-title-{$queue['id']}"] = "Priority: {$queue['priority']} Timeout: {$queue['timeout']}";
+        foreach ($this->_queues as $key => $queue) {
+            $entries[$key] = ucfirst($key);
+            $attribs["data-original-title-{$key}"] = "Priority: {$queue['priority']} Timeout: {$queue['timeout']} s";
         }
         $element = $this->addMultiOptions($entries);
         $this->setAttribs($attribs);

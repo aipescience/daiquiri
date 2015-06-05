@@ -125,6 +125,12 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     abstract public function fetchStats($userId);
 
     /**
+     * Fetches information about the queues or false if no queues are available.
+     * @return mixed $queues
+     */
+    abstract public function fetchConfig();
+
+    /**
      * Returns the number of jobs in the queue or false if no queues are available.
      * @return mixed $nactive
      */

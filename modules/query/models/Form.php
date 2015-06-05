@@ -36,30 +36,20 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             $formOptions['name'] = $formstring;
         }
 
+        // get current role
+        $role = Daiquiri_Auth::getInstance()->getCurrentRole();
+
         // get queues
         $resource = Query_Model_Resource_AbstractQuery::factory();
-        $queues = array();
-        $defaultQueue = false;
+        $config = $resource->fetchConfig();
+
         if ($resource::$hasQueues === true) {
-            try {
-                $queues = $resource->fetchQueues();
-                $defaultQueue = $resource->fetchDefaultQueue();
-            } catch (Exception $e) {
-                return array('status' => 'error');
-            }
-
-            $usrGrp = Daiquiri_Auth::getInstance()->getCurrentRole();
-
-            foreach ($queues as $key => $value) {
-                // show only the guest queue for the guest user:
-                if ($value['name'] !== "guest" && $usrGrp === "guest") {
-                    unset($queues[$key]);
-                }
-
-                // remove the guest queue if this is a non guest user
-                if ($value['name'] === "guest" && $usrGrp !== "guest") {
-                    unset($queues[$key]);
-                }
+            if ($role === 'guest') {
+                $queues = false;
+                $defaultQueue = false;
+            } else {
+                $queues = $config['userQueues'];
+                $defaultQueue = $config['defaultQueue'];
             }
         }
 
@@ -78,18 +68,20 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             if ($form->isValid($formParams)) {
                 // form is valid, get sql string from functions
                 $sql = $form->getQuery();
-                $tablename = $form->getTablename();
-                $queueId = $form->getQueue();
-                //clean from default flag
-                $queueId = str_replace("_def", "", $queueId);
 
+                // get tablename
+                $tablename = $form->getTablename();
                 if (empty($tablename)) {
                     $tablename = null;
                 }
 
-                $options = array();
-                if (!empty($queueId)) {
-                    $options['queue'] = $queues[$queueId]['name'];
+                // get queue
+                if ($resource::$hasQueues === true) {
+                    if ($role === 'guest') {
+                        $queue = $config['guestQueue'];
+                    } else {
+                        $queue = $form->getQueue();
+                    }
                 }
 
                 // validate query
@@ -117,10 +109,10 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                     $ns->sql = $sql;
                     $ns->tablename = $tablename;
 
-                    if (isset($options['queue'])) {
-                        $ns->queue = $options['queue'];
+                    if (isset($queue)) {
+                        $ns->queue = $queue;
                     } else {
-                        $ns->queue = null;
+                        $ns->queue = $queue;
                     }
 
                     $ns->plan = $model->plan($sql, $errors);
@@ -136,6 +128,12 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                         'redirect' => $baseurl . '/query/form/plan?form=' . $formstring,
                     );
                 } else {
+                    // set queue in options array
+                    $options = array();
+                    if (isset($queue)) {
+                        $options['queue'] = $queue;
+                    }
+
                     // submit query
                     $response = $model->query($sql, false, $tablename, $options);
 

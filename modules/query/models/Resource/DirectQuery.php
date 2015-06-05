@@ -271,6 +271,14 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
 
     /**
      * Returns false since no queues are available.
+     * @return mixed $queues
+     */
+    public function fetchConfig() {
+        return false;
+    }
+
+    /**
+     * Returns false since no queues are available.
      * @return mixed $nactive
      */
     public function fetchNActive() {

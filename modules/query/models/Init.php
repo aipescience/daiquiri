@@ -129,7 +129,18 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'type' => 'direct', // or qqueue
                 'qqueue' => array(
                     'defaultUsrGrp' => 'user',
-                    'defaultQueue' => 'short'
+                    'defaultQueue' => 'long',
+                    'guestQueue' => 'guest',
+                    'userQueues' => array(
+                        'short' => array(
+                            'priority' => '20',
+                            'timeout' => '30'
+                        ),
+                        'long' => array(
+                            'priority' => '10',
+                            'timeout' => '2400'
+                        )
+                    )
                 )
             ),
             'scratchdb' => '',

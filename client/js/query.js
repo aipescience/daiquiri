@@ -58,11 +58,12 @@ app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function(
                 if (option.length <= 3) {
                     angular.element('option',element).each(function(i, option) {
                         var e = angular.element(option);
+                        var queue = e.attr('value');
                         buttons.push({
-                            value: e.attr('value'),
+                            value: queue,
                             label: e.text(),
                             selected: angular.isDefined(e.attr('selected')),
-                            tooltip: select.attr('data-original-title-' + (i+1))
+                            tooltip: select.attr('data-original-title-' + queue)
                         });
                     })
 

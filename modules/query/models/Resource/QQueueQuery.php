@@ -58,7 +58,8 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         'timeExecute' => 'Job started at',
         'timeFinish' => 'Job finished at',
         'queue' => 'Queue',
-        'status_id' => 'Internal job status id'
+        'status_id' => 'Internal job status id',
+        'queue_id' => 'Internal queue id'
     );
 
     /**
@@ -109,14 +110,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         }
 
         // get the queue from the options
-        if (!empty($options) && isset($options['queue']) && in_array($options['queue'],$this->fetchQueues())) {
+        if (!empty($options) && isset($options['queue']) && in_array($options['queue'],$this->_queues())) {
             $queue = $options['queue'];
         } else {
             $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
         }
 
         // get the group of the user from the options
-        if (!empty($options) && isset($options['usrGrp']) && in_array($options['usrGrp'],$this->fetchUserGroups())) {
+        if (!empty($options) && isset($options['usrGrp']) && in_array($options['usrGrp'],$this->_usrGrps())) {
             $usrGrp = $options['usrGrp'];
         } else {
             $usrGrp = Daiquiri_Config::getInstance()->query->query->qqueue->defaultUsrGrp;
@@ -308,12 +309,12 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             return false;
         }
 
+        // get queue
+        $queues = $this->_queues();
+        $row['queue'] = $queues[$row['queue']];
+
         // get status from status string array
         $row['status'] = $this->getStatus($row['status_id']);
-
-        // get queue
-        $queues = $this->fetchQueues();
-        $row['queue'] = $queues[$row['queue']]['name'];
 
         // calculate queue and query times
         if ($row['timeSubmit'] != '0000-00-00 00:00:00' && $row['timeExecute'] != '0000-00-00 00:00:00') {
@@ -350,6 +351,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
+     * Fetches information about the queues.
+     * @return array $queues
+     */
+    public function fetchConfig() {
+        return Daiquiri_Config::getInstance()->query->query->qqueue->toArray();
+    }
+
+    /**
      * Fetches the number of active jobs in the queue.
      * @return int $nactive
      */
@@ -376,65 +385,24 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Returns the supported queues.
+     * Returns the supported from the qqueue tables queues.
      * @return array $queues
      */
-    public function fetchQueues() {
+    public function _queues() {
         $select = $this->select();
-        $select->from('qqueue_queues', array("id", "name", "priority", "timeout"));
-        return $this->fetchAssoc($select);
+        $select->from('qqueue_queues', array("id", "name"));
+        return $this->fetchPairs($select);
     }
 
     /**
-     * Returns a specific supported queue.
-     * @param int $id id of the queue
-     * @return array $queue
-     */
-    public function fetchQueue($id) {
-        $select = $this->select();
-        $select->from('qqueue_queues', array("id", "name", "priority", "timeout"));
-        $select->where("id = ?", $id);
-        return $this->fetchOne($select);
-    }
-
-    /**
-     * Returns the default queue.
-     * @return array $queue
-     */
-    public function fetchDefaultQueue() {
-        if(empty(Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue)) {
-            throw new Exception("No default queue defined");
-        }
-
-        $select = $this->select();
-        $select->from('qqueue_queues', array("id", "name", "priority", "timeout"));
-        $select->where("name = ?", Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue);
-        return $this->fetchOne($select);
-    }
-
-    /**
-     * Returns the supported user groups.
+     * Returns the supported user groups from the qqueue tables .
      * @return array $userGroups
      */
-    public function fetchUserGroups() {
+    public function _usrGrps() {
         $select = $this->select();
-        $select->from('qqueue_usrGrps', array("id", "name", "priority"));
-        return $this->fetchAssoc($select);
+        $select->from('qqueue_usrGrps', array("id", "name"));
+        return $this->fetchPairs($select);
     }
-
-    /**
-     * Returns a specific supported user group.
-     * @param int $id id of the user group
-     * @return array $userGroup
-     */
-    public function fetchUserGroup($id) {
-        $select = $this->select();
-        $select->from('qqueue_usrGrps', array("id", "name", "priority"));
-        $select->where("id = ?", $id);
-        return $this->fetchOne($select);
-    }
-
-
 
     /**
      * Returns the number of rows and the size of the table (in bytes).
