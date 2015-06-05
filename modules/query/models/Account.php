@@ -74,7 +74,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         $role = Daiquiri_Auth::getInstance()->getCurrentRole();
 
         // get the quota space
-        $stats =  $this->getResource()->fetchDatabaseStats($userId);
+        $stats =  $this->getResource()->fetchStats($userId);
         $quota = array(
             'used' => $stats['size'],
             'max' => Daiquiri_Config::getInstance()->getQueryQuota($role),

@@ -147,7 +147,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
 
         // get stats of the new table
-        $stats = $this->fetchTableStats($job['database'],$job['table']);
+        $stats = $this->_tableStats($job['database'],$job['table']);
 
         // set status
         if (empty($stats)) {
@@ -215,15 +215,6 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Returns true if given status is killable and false, if job cannot be killed
-     * @param string $status
-     * @return bool
-     */
-    public function isStatusKillable($status) {
-        return false;
-    }
-
-    /**
      * Returns the columns of the jobs table.
      * @return array $cols
      */
@@ -270,12 +261,30 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Returns statistical information about the database table if exists.
+     * Returns the number of rows and the size of a given user database.
+     * @param int $userId id of the user
+     * @return array $stats
+     */
+    public function fetchStats($userId) {
+        return $this->getJobResource()->fetchStats($userId);
+    }
+
+    /**
+     * Returns true if given status is killable.
+     * @param string $status
+     * @return bool $killable
+     */
+    public function isStatusKillable($status) {
+        return false;
+    }
+
+    /**
+     * Returns the number of rows and the size of the table (in bytes).
      * @param string $database name of the database
      * @param string $table name of the table
      * @return array $stats
      */
-    public function fetchTableStats($database,$table) {
+    protected function _tableStats($database,$table) {
         // check if table is available
         if (!in_array($table, $this->getAdapter()->listTables())) {
             return array();

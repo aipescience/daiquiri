@@ -242,18 +242,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
-     * Returns whether a given status is killable  (true) or not (false).
-     * @param string $status
-     * @return bool
-     */
-    public function isStatusKillable($status) {
-        if (($status === "queued") || ($status === "running"))
-            return true;
-        else
-            return false;
-    }
-
-    /**
      * Returns the columns of the jobs table.
      * @return array $cols
      */
@@ -353,6 +341,28 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
+     * Returns the number of rows and the size of a given user database.
+     * @param int $userId id of the user
+     * @return array $stats
+     */
+    public function fetchStats($userId) {
+        return $this->getJobResource()->fetchStats($userId);
+    }
+
+    /**
+     * Returns true if given status is killable.
+     * @param string $status
+     * @return bool $killable
+     */
+    public function isStatusKillable($status) {
+        if (($status === "queued") || ($status === "running")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Returns the supported queues.
      * @return array $queues
      */
@@ -412,12 +422,26 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
+     * Fetches the number of active jobs in the queue.
+     * @return int $count
+     */
+    public function fetchNActive() {
+        // get number of running jobs for all applications
+        $select = $this->select();
+        $select->from('qqueue_jobs', 'COUNT(*) as count');
+
+        $row = $this->fetchOne($select);
+
+        return (int) $row['count'];
+    }
+
+    /**
      * Returns the number of rows and the size of the table (in bytes).
      * @param string $database name of the database
      * @param string $table name of the table
      * @return array $stats
      */
-    public function fetchTableStats($database,$table) {
+    protected function _tableStats($database,$table) {
 
         if ($this->_isTableLocked($table)) {
             return array();
@@ -439,20 +463,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             $rows = $this->getAdapter()->fetchAll($sql, array($database,$table));
             return $rows[0];
         }
-    }
-
-    /**
-     * Fetches the number of active jobs in the queue.
-     * @return int $count
-     */
-    public function fetchNActive() {
-        // get number of running jobs for all applications
-        $select = $this->select();
-        $select->from('qqueue_jobs', 'COUNT(*) as count');
-
-        $row = $this->fetchOne($select);
-
-        return (int) $row['count'];
     }
 
     /**
@@ -536,7 +546,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // try to get the table stats
         if ($this->getStatus($job['status_id']) === 'success') {
-            $stats = $this->fetchTableStats($job['database'],$job['table']);
+            $stats = $this->_tableStats($job['database'],$job['table']);
 
             if (!empty($stats)) {
                 $job['nrows'] = $stats['nrows'];

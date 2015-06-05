@@ -90,13 +90,6 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     abstract public function killJob($id);
 
     /**
-     * Returns true if given status is killable and false, if job cannot be killed
-     * @param string $status
-     * @return bool
-     */
-    abstract public function isStatusKillable($status);
-
-    /**
      * Returns the columns of the (joined) tables.
      * @return array $cols
      */
@@ -125,27 +118,24 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     abstract public function fetchRow($id);
 
     /**
-     * Returns statistical information about the database table if exists.
-     * @param string $database name of the database
-     * @param string $table name of the table
-     * @return array $stats
-     */
-    abstract public function fetchTableStats($database,$table);
-
-    /**
      * Returns the number of rows and the size of a given user database.
      * @param int $userId id of the user
      * @return array $stats
      */
-    public function fetchDatabaseStats($userId) {
-        return $this->getJobResource()->fetchDatabaseStats($userId);
-    }
+    abstract public function fetchStats($userId);
+
+    /**
+     * Returns true if given status is killable.
+     * @param string $status
+     * @return bool $killable
+     */
+    abstract public function isStatusKillable($status);
 
     /**
      * Returns (and creates) and instance of Query_Model_Resource_Jobs
      * @return Query_Model_Resource_Jobs $jobResource
      */
-    function getJobResource() {
+    public function getJobResource() {
         if (empty($this->_jobResource)) {
             $this->_jobResource = new Query_Model_Resource_Jobs;
         }

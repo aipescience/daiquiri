@@ -208,7 +208,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
 
         // get current database stats and auota
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
-        $stats = $resource->fetchDatabaseStats($userId);
+        $stats = $resource->fetchStats($userId);
         $quota = Daiquiri_Config::getInstance()->getQueryQuota($usrGrp);
 
         // if no quota given, let them fill the disks!

@@ -74,7 +74,7 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
      * @param int $userId id of the user
      * @return array $stats
      */
-    public function fetchDatabaseStats($userId) {
+    public function fetchStats($userId) {
         $select = $this->select();
         $select->from($this->getTablename(), 'SUM(nrows) as nrows,SUM(size) as size');
         $select->where('user_id = ?', $userId);
