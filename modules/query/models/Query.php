@@ -70,12 +70,12 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Validates a plain text query. TRUE if valid, FALSE if not. 
+     * Validates a plain text query. TRUE if valid, FALSE if not.
      * @param string $sql the sql string
      * @param bool $plan flag for plan creation
      * @param string $table result table
      * @param array &$errors buffer array for errors
-     * @return bool 
+     * @return bool
      */
     public function validate($sql, $plan = false, $table, array &$errors) {
         // init error array

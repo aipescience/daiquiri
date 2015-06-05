@@ -273,7 +273,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
         } else {
             $this->_error("Unknown value '{$output['download']['type']}' in query.download.queue.type");
         }
-        
+
         // check download adapters
         if (!empty($output['download']['adapter']['enabled'])) {
             foreach ($output['download']['adapter']['enabled'] as $key => $adapter) {
