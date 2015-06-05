@@ -146,16 +146,21 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         // switch to user adapter (it could have been changed by the query, due to a "USE" statement)
         $this->setAdapter(Daiquiri_Config::getInstance()->getUserDbAdapter());
 
-        // check if it worked
-        if (in_array($job['table'], $this->getAdapter()->listTables())) {
-            // set status
-            $job['status_id'] = Query_Model_Resource_DirectQuery::$_status['success'];
-        } else {
+        // get stats of the new table
+        $stats = $this->fetchTableStats($job['database'],$job['table']);
+
+        // set status
+        if (empty($stats)) {
             $job['status_id'] = Query_Model_Resource_DirectQuery::$_status['error'];
+        } else {
+            $job['status_id'] = Query_Model_Resource_DirectQuery::$_status['success'];
+            $job['nrows'] = $stats['nrows'];
+            $job['size'] = $stats['size'];
         }
 
-        // set timestamp in job object
+        // set other fields in job object
         $job['time'] = date("Y-m-d\TH:i:s");
+        $job['finished'] = '1';
 
         // insert job into jobs table
         $this->getJobResource()->insertRow($job);
@@ -271,29 +276,15 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * @return array $stats
      */
     public function fetchTableStats($database,$table) {
-        // check if this table is locked and if yes, don't query information_schema. This will result in a
-        // "waiting for metadata lock" and makes daiquiri hang
-        if ($this->_isTableLocked($table)) {
+        // check if table is available
+        if (!in_array($table, $this->getAdapter()->listTables())) {
             return array();
-        } else {
-            // check if table is available
-            if (!in_array($table, $this->getAdapter()->listTables())) {
-                return array();
-            }
-
-            // obtain row count
-            // obtain table size in MB
-            // obtain index size in MB
-            // obtain free space (in table) in MB
-            $sql = "SELECT round( (data_length + index_length) / 1024 / 1024, 3 ) AS 'tbl_size', " .
-                    "round( index_length / 1024 / 1024, 3) AS 'tbl_idx_size', " .
-                    "round( data_free / 1024 / 1024, 3 ) AS 'tbl_free', table_rows AS 'tbl_row' " .
-                    "FROM information_schema.tables " .
-                    "WHERE table_schema = ? AND table_name = ?;";
-
-            $rows = $this->getAdapter()->fetchAll($sql, array($database, $table));
-            return $rows[0];
         }
+
+        $sql = $sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM information_schema.tables WHERE table_schema = ? AND table_name = ?;';
+
+        $rows = $this->getAdapter()->fetchAll($sql, array($database, $table));
+        return $rows[0];
     }
 
     /**

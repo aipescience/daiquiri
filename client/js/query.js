@@ -29,7 +29,7 @@ app.config(['$httpProvider', function($httpProvider) {
 app.filter('bytes', function() {
     return function(bytes) {
         if (angular.isUndefined(bytes) || isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '';
-        if (bytes === '0') return '0 bytes';
+        if (bytes === 0 || bytes === '0' ) return '0 bytes';
 
         var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'];
         var number = Math.floor(Math.log(bytes) / Math.log(1024));
@@ -462,6 +462,7 @@ app.factory('SubmitService', ['$http','$timeout','$window','QueryService','Codem
 
         $http.post(base + '/query/form/plan',$.param(data)).success(function(response) {
             if (response.status == 'ok') {
+                QueryService.hideDialog();
                 submitted(response);
             } else if (response.status == 'redirect') {
                 var win = $window.open(response.redirect,'_blank');

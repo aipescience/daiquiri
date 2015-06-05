@@ -205,40 +205,18 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
      * @return bool
      */
     private function _checkQuota($resource, $usrGrp) {
-        $dbStatData = $resource->fetchDatabaseStats();
 
-        $usedSpace = (float) $dbStatData['db_size'];
+        // get current database stats and auota
+        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
+        $stats = $resource->fetchDatabaseStats($userId);
+        $quota = Daiquiri_Config::getInstance()->getQueryQuota($usrGrp);
 
-        $quotaStr = Daiquiri_Config::getInstance()->query->quota->$usrGrp;
-
-        //if no quota given, let them fill the disks!
-        if (empty($quotaStr)) {
+        // if no quota given, let them fill the disks!
+        if (empty($quota)) {
             return false;
         }
 
-        //parse the quota to resolve KB, MB, GB, TB, PB, EB...
-        preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quotaStr, $parse);
-        $quota = (float) $parse[1];
-        $unit = $parse[2];
-
-        switch (strtoupper($unit)) {
-            case 'EB':
-                $quota *= 1024;
-            case 'PB':
-                $quota *= 1024;
-            case 'TB':
-                $quota *= 1024;
-            case 'GB':
-                $quota *= 1024;
-            case 'MB':
-                $quota *= 1024;
-            case 'KB':
-                $quota *= 1024;
-            default:
-                break;
-        }
-
-        if ($usedSpace > $quota) {
+        if ($stats['size'] > $quota) {
             return true;
         } else {
             return false;

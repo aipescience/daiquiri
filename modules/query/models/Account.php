@@ -39,7 +39,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $message = $row['value'];
         }
 
-        // get the sqloptions needed to show the list of jobs
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
 
         // get rows

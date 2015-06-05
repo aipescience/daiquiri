@@ -78,6 +78,11 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         $select = $this->select();
         $select->from($this->getTablename(), 'SUM(nrows) as nrows,SUM(size) as size');
         $select->where('user_id = ?', $userId);
-        return $this->fetchOne($select);
+        $row = $this->fetchOne($select);
+
+        if ($row['nrows'] === NULL) $row['nrows'] = 0;
+        if ($row['size'] === null) $row['size'] = 0;
+
+        return $row;
     }
 }
