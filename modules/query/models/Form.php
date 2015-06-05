@@ -76,13 +76,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 }
 
                 // get queue
-                if ($resource::$hasQueues === true) {
-                    if ($role === 'guest') {
-                        $queue = $config['guestQueue'];
-                    } else {
-                        $queue = $form->getQueue();
-                    }
-                }
+                $queue = $form->getQueue();
 
                 // validate query
                 $model = new Query_Model_Query();
@@ -228,7 +222,6 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 if (empty($mail)) {
                     // submit query
                     $response = $model->query($ns->sql, $plan, $ns->tablename, array("queue" => $ns->queue));
-
                     if ($response['status'] === 'ok') {
                         return $response;
                     } else {
