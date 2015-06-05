@@ -270,6 +270,14 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
+     * Returns false since no queues are available.
+     * @return mixed $nactive
+     */
+    public function fetchNActive() {
+        return false;
+    }
+
+    /**
      * Returns true if given status is killable.
      * @param string $status
      * @return bool $killable

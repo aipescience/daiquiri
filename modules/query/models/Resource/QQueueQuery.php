@@ -350,6 +350,19 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
     }
 
     /**
+     * Fetches the number of active jobs in the queue.
+     * @return int $nactive
+     */
+    public function fetchNActive() {
+        // get number of running jobs for all applications
+        $select = $this->select();
+        $select->from('qqueue_jobs', 'COUNT(*) as count');
+
+        $row = $this->fetchOne($select);
+        return (int) $row['count'];
+    }
+
+    /**
      * Returns true if given status is killable.
      * @param string $status
      * @return bool $killable
@@ -421,19 +434,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         return $this->fetchOne($select);
     }
 
-    /**
-     * Fetches the number of active jobs in the queue.
-     * @return int $count
-     */
-    public function fetchNActive() {
-        // get number of running jobs for all applications
-        $select = $this->select();
-        $select->from('qqueue_jobs', 'COUNT(*) as count');
 
-        $row = $this->fetchOne($select);
-
-        return (int) $row['count'];
-    }
 
     /**
      * Returns the number of rows and the size of the table (in bytes).

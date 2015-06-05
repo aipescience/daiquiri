@@ -125,6 +125,12 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     abstract public function fetchStats($userId);
 
     /**
+     * Returns the number of jobs in the queue or false if no queues are available.
+     * @return mixed $nactive
+     */
+    abstract public function fetchNActive();
+
+    /**
      * Returns true if given status is killable.
      * @param string $status
      * @return bool $killable

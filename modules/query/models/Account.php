@@ -56,16 +56,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         }
 
         // get number of currently active jobs
-        $resourceClass = get_class($this->getResource());
-        if ($resourceClass::$hasQueues) {
-            try {
-                $nactive = $this->getResource()->fetchNActive();
-            } catch (Exception $e) {
-                $nactive = false;
-            }
-        } else {
-            $nactive = false;
-        }
+        $nactive = $this->getResource()->fetchNActive();
 
         // check if guest or not
         $guest = (Daiquiri_Auth::getInstance()->getCurrentRole() === 'guest');
