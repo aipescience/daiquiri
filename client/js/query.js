@@ -325,7 +325,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     };
 }]);
 
-app.factory('SubmitService', ['$http','$timeout','QueryService','CodemirrorService',function($http,$timeout,QueryService,CodemirrorService) {
+app.factory('SubmitService', ['$http','$timeout','$window','QueryService','CodemirrorService',function($http,$timeout,$window,QueryService,CodemirrorService) {
     // query options, will be set inside the template via ng-init
     var options = {};
 
@@ -431,17 +431,31 @@ app.factory('SubmitService', ['$http','$timeout','QueryService','CodemirrorServi
         });
     }
 
-    function submitPlan() {
+    function submitPlan(mail) {
         if (angular.element('#plan_query.codemirror').length !== 0) {
             CodemirrorService.save('plan_query');
         }
 
-        $http.post(base + '/query/form/plan',$.param({
+        var data = {
             'plan_csrf': options.csrf,
             'plan_query': angular.element('#plan_query').val()
-        })).success(function(response) {
+        }
+
+        if (mail === true) data['plan_mail'] = '1';
+
+        // reset errors for all forms
+        for (var error in errors) delete errors[error];
+
+        $http.post(base + '/query/form/plan',$.param(data)).success(function(response) {
             if (response.status == 'ok') {
                 submitted(response);
+            } else if (response.status == 'redirect') {
+                var win = $window.open(response.redirect,'_blank');
+                if (angular.isDefined(win)) {
+                    win.focus();
+                } else {
+                    errors['plan_mail'] = ['Opening the window was blocked, please allow popups for this site.'];
+                }
             } else if (response.status == 'error') {
                 console.log(response);
                 angular.forEach(response.errors, function(error, key) {
@@ -690,8 +704,8 @@ app.controller('SubmitController',['$scope','SubmitService',function($scope,Subm
         event.preventDefault()
     };
 
-    $scope.submitPlan = function() {
-        SubmitService.submitPlan();
+    $scope.submitPlan = function(mail) {
+        SubmitService.submitPlan(mail);
     }
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {

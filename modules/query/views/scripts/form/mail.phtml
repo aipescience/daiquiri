@@ -29,7 +29,7 @@
             'prepend' => '<p>',
             'append' => '</p>'));
         ?>
-    <?php elseif ($this->status === 'form'): ?>
+    <?php else: ?>
         <h4>Your message to the Daiquiri developers</h4>
         <?php echo $this->form; ?>
     <?php endif; ?>
