@@ -307,7 +307,12 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 // cast functions
                 case 'binary':
                 case 'cast':
-                case 'convert':                
+                case 'convert': 
+                case 'year': 
+                case 'month':
+                case 'day':
+                case 'datediff':
+                case 'curdate':
                     return true;
                     break;
             }
