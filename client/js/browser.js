@@ -81,7 +81,7 @@ angular.module('browser',[])
     };
 
     function initBrowser(name) {
-        // with of one column of the browser
+        // width of one column of the browser
         var width;
         var display;
         if (browser[name].colnames.length == 1) {

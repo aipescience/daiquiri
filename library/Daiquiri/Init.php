@@ -234,7 +234,7 @@ class Daiquiri_Init {
         if (!isset($this->input['database'])) {
             $this->_error("No database options provided.");
         } else if (!is_array($this->input['database'])) {
-            $this->_error('Database options needs to be an array.');
+            $this->_error('Database options need to be an array.');
         } else {
             $input = $this->input['database'];
         }
