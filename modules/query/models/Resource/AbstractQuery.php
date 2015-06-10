@@ -188,6 +188,15 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     }
 
     /**
+     * Returns $hasQueues for this class.
+     * @return bool $hasQueues
+     */
+    public function hasQueues() {
+        $classname = get_class($this);
+        return $classname::$hasQueues;
+    }
+
+    /**
      * Return job status.
      * @param type $input job id
      */

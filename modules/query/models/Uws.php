@@ -21,7 +21,15 @@
 class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
     // status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED');
-    private static $statusQueue = array('queued' => 1, 'running' => 2, 'removed' => 6, 'error' => 4, 'success' => 3, 'timeout' => 5, 'killed' => 5);
+    private static $statusQueue = array(
+        'queued' => 1,
+        'running' => 2,
+        'removed' => 6,
+        'error' => 4,
+        'success' => 3,
+        'timeout' => 5,
+        'killed' => 5
+    );
 
     public function __construct() {
         parent::__construct();
@@ -47,8 +55,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $jobs = new Uws_Model_Resource_Jobs();
 
         foreach ($rows as $job) {
-            $href = Daiquiri_Config::getInstance()->getSiteUrl() .
-                    "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
+            $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
             $status = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
             $jobs->addJob($job['table'], $href, array($status));
         }
@@ -58,8 +65,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $pendingJobList = $resUWSJobs->fetchRows();
 
         foreach ($pendingJobList as $job) {
-            $href = Daiquiri_Config::getInstance()->getSiteUrl() .
-                    "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
+            $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
             $status = $job['phase'];
             $jobs->addJob($job['jobId'], $href, array($status));
         }
@@ -73,7 +79,6 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // set resource
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
-        $resourceClass = get_class($this->getResource());
 
         // get the job
         $row = $this->getResource()->fetchRow($id);
@@ -84,46 +89,33 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             throw new Daiquiri_Exception_Forbidden();
         }
 
-        // fetch table statistics
-        $stat = $this->getResource()->fetchTableStats($row['database'],$row['table']);
-        $job = array_merge($row, $stat);
-
         // fill UWS object with information
         $jobUWS = new Uws_Model_Resource_JobSummaryType("job");
-        $jobUWS->jobId = $job['id'];
+        $jobUWS->jobId = $row['id'];
         $jobUWS->ownerId = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $jobUWS->phase = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
+        $jobUWS->phase = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$row['status']]];
 
         // convert timestamps to ISO 8601
-        if ($resourceClass == 'Query_Model_Resource_QQueueQuery') {
-            if ($job['timeExecute'] !== "0000-00-00 00:00:00") {
-                $datetimeStart = new DateTime($job['timeExecute']);
+        if (get_class($this->getResource()) == 'Query_Model_Resource_QQueueQuery') {
+            if ($row['timeExecute'] !== "0000-00-00 00:00:00") {
+                $datetimeStart = new DateTime($row['timeExecute']);
                 $jobUWS->startTime = $datetimeStart->format('c');
             }
 
-            if ($job['timeFinish'] !== "0000-00-00 00:00:00") {
-                $datetimeEnd = new DateTime($job['timeFinish']);
+            if ($row['timeFinish'] !== "0000-00-00 00:00:00") {
+                $datetimeEnd = new DateTime($row['timeFinish']);
                 $jobUWS->endTime = $datetimeEnd->format('c');
             }
         } else {
             // for simple queue
-            $datetime = new DateTime($job['time']);
+            $datetime = new DateTime($row['time']);
             $jobUWS->startTime = $datetime->format('c');
             $jobUWS->endTime = $datetime->format('c');
         }
 
-        // obtain queue information
-        $queues = array();
-        if ($resourceClass::$hasQueues === true) {
-            $queues = $this->getResource()->fetchQueues();
-
-            // find the queue
-            foreach ($queues as $queue) {
-                if ($queue['name'] === $job['queue']) {
-                    $jobUWS->executionDuration = $queue['timeout'];
-                    break;
-                }
-            }
+        if ($this->getResource()->hasQueues()) {
+            $config = $this->getResource()->fetchConfig();
+            $jobUWS->executionDuration = $config["userQueues"][$row['queue']]['timeout'];
         } else {
             // no queue information - execution infinite
             $jobUWS->executionDuration = 0;
@@ -134,7 +126,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $jobUWS->destruction = $datetime->format('c');
 
         // fill the parameter part of the UWS with the original information stored in the queue
-        foreach ($job as $key => $value) {
+        foreach ($row as $key => $value) {
             // allowed parameters
             switch ($key) {
                 case 'database':
@@ -154,12 +146,12 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             foreach (Daiquiri_Config::getInstance()->getQueryDownloadAdapter() as $adapter) {
 
                 $id = $adapter['suffix'];
-                $href = Daiquiri_Config::getInstance()->getSiteUrl() . '/query/download/stream/table/' .urlencode($job['table']) . '/format/' . $adapter['format'];
+                $href = Daiquiri_Config::getInstance()->getSiteUrl() . '/query/download/stream/table/' .urlencode($row['table']) . '/format/' . $adapter['format'];
 
                 $jobUWS->addResult($id, $href);
             }
         } else if ($jobUWS->phase === "ERROR") {
-            $jobUWS->addError($job['error']);
+            $jobUWS->addError($row['error']);
         }
 
         return $jobUWS;
@@ -225,61 +217,26 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
     public function runJob(Uws_Model_Resource_JobSummaryType &$job) {
         // obtain queue information
-        $resource = Query_Model_Resource_AbstractQuery::factory();
-        $queues = array();
-        if ($resource::$hasQueues === true && isset($job->parameters['queue'])) {
-            $queues = $resource->fetchQueues();
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
+        $config = $this->getResource()->fetchConfig();
 
-            // find the queue
-            foreach ($queues as $queue) {
-                if ($queue['name'] === $job->parameters['queue']->value) {
-                    $job->executionDuration = $queue['timeout'];
-                    break;
-                }
-            }
-        } else if ($resource::$hasQueues === true) {
-            // no queue has been specified, but we support queues - if executionDuration is 0, use default queue
-            // otherwise find the desired queue
-            $queues = $resource->fetchQueues();
+        if ($this->getResource()->hasQueues()) {
 
-            if ($job->executionDuration === 0) {
-                // use default queue here
-                $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
-
-                foreach ($queues as $currQueue) {
-                    if ($currQueue['name'] === $queue) {
-                        $job->executionDuration = $currQueue['timeout'];
-                        $job->addParameter("queue", $currQueue['name']);
-                        break;
-                    }
-                }
+            if (isset($job->parameters['queue'])) {
+                $jobUWS->executionDuration = $config["userQueues"][$job->parameters['queue']->value]['timeout'];
             } else {
-                // find a queue that matches the request (i.e. is nearest to the request)
-                $maxQueueTimeout = 0;
-                $maxQueue = false;
-                $deltaQueue = 9999999999999999999999999999999999;
-                $queue = false;
-                foreach ($queues as $currQueue) {
-                    if ($currQueue['timeout'] > $maxQueue) {
-                        $maxQueueTimeout = $currQueue['timeout'];
-                        $maxQueue = $currQueue;
-                    }
-
-                    if ($currQueue['timeout'] >= $job->executionDuration) {
-                        $currDelta = $currQueue['timeout'] - $job->executionDuration;
-                        if ($currDelta < $deltaQueue) {
-                            $queue = $currQueue;
-                            $deltaQueue = $currDelta;
-                        }
-                    }
+                // no queue has been specified, but we support queues - if executionDuration is 0, use default queue
+                // otherwise find the desired queue
+                if ($job->executionDuration === 0) {
+                    // use default queue here
+                    $queue = Daiquiri_Config::getInstance()->query->query->qqueue->defaultQueue;
+                } else {
+                    // find a queue that matches the request (i.e. is nearest to the request)
+                    $queue = $this->_findQueue($job->executionDuration,$config["userQueues"]);
                 }
 
-                if ($queue === false) {
-                    $queue = $maxQueue;
-                }
-
-                $job->addParameter("queue", $currQueue['name']);
-                $job->executionDuration = $currQueue['timeout'];
+                $jobUWS->executionDuration = $config["userQueues"][$queue]['timeout'];
+                $job->addParameter("queue", $queue);
             }
         }
 
@@ -289,7 +246,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $queue = null;
         $errors = array();
 
-        if (!isset($job->parameters['query']) || ($resource::$hasQueues === true && !isset($job->parameters['queue']))) {
+        if (!isset($job->parameters['query']) || ($this->getResource()->hasQueues() && !isset($job->parameters['queue']))) {
             // throw error
             $job->addError("Incomplete job");
             $resource = new Uws_Model_Resource_UWSJobs();
@@ -303,7 +260,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         $sql = $job->parameters['query']->value;
 
-        if ($resource::$hasQueues === true) {
+        if ($this->getResource()->hasQueues()) {
             $queue = $job->parameters['queue']->value;
         }
 
@@ -331,7 +288,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         }
 
         // submit query
-        if ($resource::$hasQueues === true) {
+        if ($this->getResource()->hasQueues()) {
             $response = $model->query($sql, false, $tablename, array("queue" => $queue, "jobId" => $job->jobId));
         } else {
             $response = $model->query($sql, false, $tablename, array("jobId" => $job->jobId));
@@ -353,4 +310,38 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $resource->deleteRow($job->jobId);
     }
 
-}        
+    /**
+     * Finds a queue that matches the requested execution time (i.e. is nearest to it)
+     * @param  int    $executionDuration requested execution time
+     * @param  array  $queues            user queues from config
+     * @return string $queue
+     */
+    private function _findQueue($executionDuration,$queues) {
+        $maxQueueTimeout = 0;
+        $maxQueueName = false;
+
+        $deltaQueue = PHP_INT_MAX;
+        $queue = false;
+
+        foreach ($queues as $currQueueName => $currQueue) {
+            if ($currQueue['timeout'] > $maxQueueTimeout) {
+                $maxQueueTimeout = $currQueue['timeout'];
+                $maxQueueName = $currQueueName;
+            }
+
+            if ($currQueue['timeout'] >= $executionDuration) {
+                $currDelta = $currQueue['timeout'] - $executionDuration;
+                if ($currDelta < $deltaQueue) {
+                    $queue = $currQueueName;
+                    $deltaQueue = $currDelta;
+                }
+            }
+        }
+
+        if ($queue === false) {
+            $queue = $maxQueueName;
+        }
+
+        return $queue;
+    }
+}

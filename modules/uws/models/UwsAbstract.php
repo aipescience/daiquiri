@@ -572,17 +572,9 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
     //can be overridden
     public function createJobId() {
-        //calculate unique (hopefully) id for this job
-        $id = microtime(true) * 1000;
-        $id = intval($id);
-
-        //shift by 8 bits to make some space for a random component
-        $id = $id << 8;
-
-        //add the last 8 bits of a random number to the id
-        $id += mt_rand() & 0x000000ff;
-
-        return $id;
+        $now = gettimeofday();
+        $jobId = $now['sec'] * 1000000000 + $now['usec'] * 1000 + mt_rand(0,999);
+        return $jobId;
     }
 
     //optains a (pending) job in the UWS job list
