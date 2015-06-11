@@ -38,17 +38,14 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * Array for the status flags user in the jobs table.
      * @var array $status
      */
-    protected static $_status = array('success' => 1, 'error' => 2);
+    protected static $_status = array('success' => 1, 'error' => 2, 'removed' => 3);
 
     /**
      * Translateion table to convert the database columns of the job table into something readable.
+     * Only these additional keys will be shown to the user. Empty for the direct query.
      * @var array $translations
      */
-    protected static $_translations = array(
-        'id' => 'Job id',
-        'user_id' => 'Internal user id',
-        'status_id' => 'Internal job status id',
-    );
+    protected static $_translations = array();
 
     /**
      * Construtor. Sets adapter to the user adapter and the users database.
@@ -160,7 +157,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
 
         // set other fields in job object
         $job['time'] = date("Y-m-d\TH:i:s");
-        $job['finished'] = '1';
+        $job['complete'] = true;
 
         // insert job into jobs table
         $this->getJobResource()->insertRow($job);
@@ -203,7 +200,10 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         $this->_dropTable($job['database'], $job['table']);
 
         // remove job from job table
-        $this->getJobResource()->deleteRow($id);
+        $this->getJobResource()->updateRow($id, array(
+            'prev_status_id' => $job['status_id'],
+            'status_id' => $this->getStatusId('removed')
+        ));
     }
 
     /**
@@ -256,6 +256,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         $row = $this->getJobResource()->fetchRow($id);
         if (!empty($row)) {
             $row['status'] = $this->getStatus($row['status_id']);
+            $row['prev_status'] = $this->getStatus($row['prev_status_id']);
         }
         return $row;
     }

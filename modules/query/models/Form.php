@@ -43,14 +43,12 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
         $resource = Query_Model_Resource_AbstractQuery::factory();
         $config = $resource->fetchConfig();
 
-        if ($resource::$hasQueues === true) {
-            if ($role === 'guest') {
-                $queues = false;
-                $defaultQueue = false;
-            } else {
-                $queues = $config['userQueues'];
-                $defaultQueue = $config['defaultQueue'];
-            }
+        if ($resource->hasQueues() && $role !== 'guest') {
+            $queues = $config['userQueues'];
+            $defaultQueue = $config['defaultQueue'];
+        } else {
+            $queues = false;
+            $defaultQueue = false;
         }
 
         // get the form

@@ -112,7 +112,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'additional' => array()
         );
 
-        foreach(array('id','database','table','status','error','username','time','timeQueue','timeQuery','nrows','size','finished','removed') as $key) {
+        foreach(array('id','database','table','status','error','username','time','timeQueue','timeQuery','nrows','size') as $key) {
             if (isset($dbRow[$key])) {
                 $job[$key] = $dbRow[$key];
             }
@@ -141,11 +141,13 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // create additional array
         $translations = $this->getResource()->getTranslations();
         foreach ($dbRow as $key => $value) {
-            $job['additional'][] = array(
-                'key' => $key,
-                'name' => $translations[$key],
-                'value' => $value
-            );
+            if (isset($translations[$key])) {
+                $job['additional'][] = array(
+                    'key' => $key,
+                    'name' => $translations[$key],
+                    'value' => $value
+                );
+            }
         }
 
         // add columns if the job was a success

@@ -50,16 +50,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
     /**
      * Translateion table to convert the database columns of the job table into something readable.
+     * Only these additional keys will be shown to the user.
      * @var array $_translations
      */
-    protected static $_translations = array('id' => 'Job id',
-        'user_id' => 'Internal user id',
+    protected static $_translations = array(
         'timeSubmit' => 'Job submitted at',
         'timeExecute' => 'Job started at',
         'timeFinish' => 'Job finished at',
-        'queue' => 'Queue',
-        'status_id' => 'Internal job status id',
-        'queue_id' => 'Internal queue id'
+        'queue' => 'Queue'
     );
 
     /**
@@ -230,9 +228,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         if ($this->isStatusKillable($job['status'])) {
             try {
                 $this->getAdapter()->fetchAll("SELECT qqueue_killJob({$job['id']});");
-                $this->getJobResource()->updateRow($id, array(
-                    'status_id' => Query_Model_Resource_QQueueQuery::$_status['killed']
-                ));
             } catch (Exception $e) {
                 // ignore errors here
             }
@@ -262,7 +257,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
     /**
      * Fetches a set of rows from Query_Jobs specified by $sqloptions.
-     * Checks the current status for non finished jobs and updates accordingly.
+     * Checks the current status for non completed jobs and updates accordingly.
      * @param array $sqloptions array of sqloptions (start,limit,order,where)
      * @return array $rows
      */
@@ -270,7 +265,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         $rows = $this->getJobResource()->fetchRows($sqloptions);
 
         foreach ($rows as &$row) {
-            if ($row['finished'] !== '1') {
+            if ($row['complete'] !== '1') {
                 $this->_updateJob($row);
             }
 
@@ -303,10 +298,16 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         $select = $this->select()->union(array($selectPending, $selectHistory));
 
-        // get the rowset and return
+        // get the rowset
         $row = $this->fetchOne($select);
         if (empty($row)) {
             return false;
+        }
+
+        // get the values from the Query_Jobs table
+        $jobRow = $this->getJobResource()->fetchRow($id);
+        foreach (array('time','prev_status_id','nrows','size','complete') as $key) {
+            $row[$key] = $jobRow[$key];
         }
 
         // get queue
@@ -315,6 +316,9 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // get status from status string array
         $row['status'] = $this->getStatus($row['status_id']);
+        if (isset($row['prev_status_id'])) {
+            $row['prev_status'] = $this->getStatus($row['prev_status_id']);
+        }
 
         // calculate queue and query times
         if ($row['timeSubmit'] != '0000-00-00 00:00:00' && $row['timeExecute'] != '0000-00-00 00:00:00') {
@@ -329,13 +333,6 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         // information that nobody should know...
         if (isset($row['actualQuery']) && strpos($row['actualQuery'], "spider_bg_direct_sql") !== false) {
             unset($row['actualQuery']);
-        }
-
-        // get the values from the Query_Jobs table
-        $jobRow = $this->getJobResource()->fetchRow($id);
-
-        foreach (array('time','finished','removed','nrows','size') as $key) {
-            $row[$key] = $jobRow[$key];
         }
 
         return $row;
@@ -482,6 +479,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
     /**
      * Update job
+     * @param array $job object that hold information about the query
      */
     private function _updateJob(&$job) {
         // get adapter config
@@ -509,34 +507,39 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // check if the status has changed
         if ($job['status_id'] != $row['status']) {
+            $job['prev_status_id'] = $job['status_id'];
             $job['status_id'] = $row['status'];
-            $this->getJobResource()->updateRow($job['id'], array('status_id' => $job['status_id']));
+            $this->getJobResource()->updateRow($job['id'], array(
+                'status_id' => $job['status_id'],
+                'prev_status_id' => $job['prev_status_id']
+            ));
         }
 
-        // try to get the table stats
-        if ($this->getStatus($job['status_id']) === 'success') {
+        $status = $this->getStatus($job['status_id']);
+        if ($status === 'success') {
+            // try to get the table stats
             $stats = $this->_tableStats($job['database'],$job['table']);
 
             if (!empty($stats)) {
                 $job['nrows'] = $stats['nrows'];
                 $job['size'] = $stats['size'];
 
-                // set the values and the finished flag
+                // set the values and the complete flag
                 $this->getJobResource()->updateRow($job['id'], array(
                     'nrows' => $job['nrows'],
                     'size' => $job['size'],
-                    'finished' => true
+                    'complete' => true
                 ));
             }
-        } else if (in_array($this->getStatus($row['status']), array('removed','error','timeout','killed'))) {
+        } else if (in_array($status, array('removed','error','timeout','killed'))) {
             $job['nrows'] = 0;
             $job['size'] = 0;
 
-            // set the finished flag
+            // set the values and the complete flag
             $this->getJobResource()->updateRow($job['id'], array(
                 'nrows' => 0,
                 'size' => 0,
-                'finished' => true
+                'complete' => true
             ));
         }
     }

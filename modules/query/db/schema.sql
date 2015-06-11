@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
   `actualQuery` TEXT NOT NULL,
   `user_id` INTEGER,
   `status_id` INTEGER NOT NULL,
+  `prev_status_id` INTEGER NOT NULL,
   `type_id` INTEGER NOT NULL,
   `group_id` INTEGER,
   `order` INTEGER,
@@ -14,9 +15,7 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
   `ip` VARCHAR(45),
   `nrows` BIGINT,
   `size` BIGINT,
-  `comment` TEXT,
-  `finished` BOOL NOT NULL,
-  `removed` BOOL NOT NULL
+  `complete` BOOL NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Query_Groups` (
