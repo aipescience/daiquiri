@@ -270,6 +270,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             }
 
             $row['status'] = $this->getStatus($row['status_id']);
+            $row['type'] = $this->getJobResource()->getType($row['type_id']);
         }
 
         return $rows;
@@ -306,7 +307,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // get the values from the Query_Jobs table
         $jobRow = $this->getJobResource()->fetchRow($id);
-        foreach (array('time','prev_status_id','nrows','size','complete') as $key) {
+        foreach (array('time','prev_status_id','type_id','nrows','size','complete') as $key) {
             $row[$key] = $jobRow[$key];
         }
 
@@ -319,6 +320,9 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
         if (isset($row['prev_status_id'])) {
             $row['prev_status'] = $this->getStatus($row['prev_status_id']);
         }
+
+        // get type
+        $row['type'] = $this->getJobResource()->getType($row['type_id']);
 
         // calculate queue and query times
         if ($row['timeSubmit'] != '0000-00-00 00:00:00' && $row['timeExecute'] != '0000-00-00 00:00:00') {

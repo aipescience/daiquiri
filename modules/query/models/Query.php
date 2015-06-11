@@ -109,9 +109,10 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
      * @param bool $plan flag for plan creation
      * @param string $table result table
      * @param array $options for further options that are handeled by the queue
+     * @param string $jobType job type of the new job
      * @return array $response
      */
-    public function query($sql, $plan = false, $table, $options = array()) {
+    public function query($sql, $plan = false, $table, $options = array(), $jobType = 'web') {
         // init error array
         $errors = array();
 
@@ -166,6 +167,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
         // get some more infomation about the job
         $job['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
         $job['ip'] = Daiquiri_Auth::getInstance()->getRemoteAddr();
+        $job['type_id'] = $this->_queue->getJobResource()->getTypeId($jobType);
 
         // submit job
         $this->_queue->submitJob($job, $errors, $options);
@@ -176,6 +178,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
         // get username and status
         $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $job['status'] = $this->_queue->getStatus($job['status_id']);
+        $job['type'] = $jobType;
 
         // return with success
         return array(

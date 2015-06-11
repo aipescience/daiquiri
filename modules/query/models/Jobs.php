@@ -26,7 +26,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
     public function __construct() {
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
-        $this->_cols = array('id','database','table','time','status');
+        $this->_cols = array('id','database','table','time','status','type');
         $resourceClass = get_class($this->getResource());
     }
 
@@ -42,9 +42,11 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
                 'name' => $colname,
                 'sortable' => true
             );
-            if (in_array($colname, array('id','database','table','timeSubmit'))) {
-                $col['width'] = 160;
-            } else if (in_array($colname, array('queue', 'status'))) {
+            if ($colname === 'id') {
+                $col['width'] = 50;
+            } else if (in_array($colname, array('database','table','time'))) {
+                $col['width'] = 170;
+            } else if (in_array($colname, array('queue','status','type'))) {
                 $col['width'] = 70;
                 $col['sortable'] = false;
             } else {

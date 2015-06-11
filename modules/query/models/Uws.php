@@ -289,9 +289,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // submit query
         if ($this->getResource()->hasQueues()) {
-            $response = $model->query($sql, false, $tablename, array("queue" => $queue, "jobId" => $job->jobId));
+            $response = $model->query($sql, false, $tablename, array("queue" => $queue, "jobId" => $job->jobId),'uws');
         } else {
-            $response = $model->query($sql, false, $tablename, array("jobId" => $job->jobId));
+            $response = $model->query($sql, false, $tablename, array("jobId" => $job->jobId),'uws');
         }
 
         if ($response['status'] !== 'ok') {

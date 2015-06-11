@@ -242,6 +242,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
 
         foreach ($rows as &$row) {
             $row['status'] = $this->getStatus($row['status_id']);
+            $row['type'] = $this->getJobResource()->getType($row['type_id']);
         }
 
         return $rows;
