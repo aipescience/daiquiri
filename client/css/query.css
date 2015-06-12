@@ -50,9 +50,15 @@ form#sql .CodeMirror {
 }
 
 /* jobs */
+.daiquiri-query-groups-toggle {
+    float: right;
+}
+
+.daiquiri-query-groups-item,
 .daiquiri-query-jobs-item {
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-right: 20px;
 }
 
 /* SAMP tab */

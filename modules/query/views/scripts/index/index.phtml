@@ -85,10 +85,18 @@
 
                 <li class="nav-item" ng-repeat="group in account.groups">
                     <ul class="nav nav-list">
-                        <li class="nav-header" ng-hide="account.groups.length <= 1">{{group.name}}</li>
+                        <li class="nav-header" ng-hide="account.groups.length <= 1">
+                            <div class="daiquiri-query-groups-toggle">
+                                <a href="" ng-click="group.hide = !group.hide">
+                                    <i class="icon-chevron-up" rel="tooltip" ng-hide="group.hide"></i>
+                                    <i class="icon-chevron-down" rel="tooltip" ng-show="group.hide"></i>
+                                </a>
+                            </div>
+                            <div class="daiquiri-query-groups-item">{{group.name}}</div>
+                        </li>
 
                         <li class="nav-item {{job.id == account.active.job ? 'active' : ''}}"
-                            ng-repeat="job in account.jobs | filter:{group_id: group.id}">
+                            ng-repeat="job in account.jobs | filter:{group_id: group.id}" ng-hide="group.hide">
 
                             <a href="" ng-click="activateJob(job.id)" >
                                 <i class="icon-ok pull-right" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
