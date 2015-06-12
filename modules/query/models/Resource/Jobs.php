@@ -44,7 +44,7 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
     public function fetchRows(array $sqloptions = array()) {
         // get select object
         $select = $this->select($sqloptions);
-        $select->from($this->getTablename(), array('id','database','table','time','status_id','type_id','complete'));
+        $select->from($this->getTablename(), array('id','database','table','time','status_id','type_id','group_id','order','complete'));
 
         // query database and return
         return $this->fetchAll($select);

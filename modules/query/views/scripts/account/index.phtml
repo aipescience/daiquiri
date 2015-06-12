@@ -50,6 +50,46 @@
         <?php endif; ?>
     </p>
 
+    <h4>Job groups</h4>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($this->groups as $group): ?>
+            <tr>
+                <?php foreach (array('id','name') as $key): ?>
+                <td>
+                    <?php echo $this->escape($group[$key]); ?>
+                </td>
+                <td>
+                    <?php echo $this->internalLink(array(
+                        'text' => 'Update',
+                        'href' => '/query/account/update-group/id/' . $group['id']));
+                    ?>
+                    <?php echo $this->internalLink(array(
+                        'text' => 'Delete',
+                        'href' => '/query/account/delete-group/id/' . $group['id']));
+                    ?>
+                </td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <?php echo $this->internalLink(array(
+        'text' => 'Create group',
+        'href' => '/query/account/create-group/',
+        'prepend' => '<p>',
+        'append' => '</p>'
+    ));?>
+
     <h4>Job list</h4>
 
     <table class="table">
@@ -59,6 +99,7 @@
                 <th>Table</th>
                 <th>Status</th>
                 <th>Timestamp</th>
+                <th>Group Id</th>
             </tr>
         </thead>
         <tbody>
@@ -70,7 +111,7 @@
                         'text' => $job['id']
                     )); ?>
                 </td>
-                <?php foreach (array('table','status','time') as $key): ?>
+                <?php foreach (array('table','status','time','group_id') as $key): ?>
                 <td>
                     <?php echo $this->escape($job[$key]); ?>
                 </td>

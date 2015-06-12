@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
   `host` VARCHAR(256) NOT NULL,
   `query` TEXT NOT NULL,
   `actualQuery` TEXT NOT NULL,
-  `user_id` INTEGER,
+  `user_id` INTEGER NOT NULL,
   `status_id` INTEGER NOT NULL,
   `prev_status_id` INTEGER NOT NULL,
   `type_id` INTEGER NOT NULL,
@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
 
 CREATE TABLE IF NOT EXISTS `Query_Groups` (
   `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `user_id` INTEGER NOT NULL,
   `order` INTEGER,
   `name` VARCHAR(256) NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';

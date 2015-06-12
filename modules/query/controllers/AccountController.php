@@ -52,6 +52,20 @@ class Query_AccountController extends Daiquiri_Controller_Abstract {
         $this->getControllerHelper('form',array('redirect' => '/query'))->killJob($id);
     }
 
+    public function createGroupAction() {
+        $this->getControllerHelper('form',array('redirect' => '/query/account'))->createGroup();
+    }
+
+    public function updateGroupAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form',array('redirect' => '/query/account'))->updateGroup($id);
+    }
+
+    public function deleteGroupAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form',array('redirect' => '/query/account'))->deleteGroup($id);
+    }
+
     public function databasesAction() {
         $response = $this->_model->databases();
         $this->view->assign($response);
