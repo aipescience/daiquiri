@@ -67,6 +67,7 @@
                 <td>
                     <?php echo $this->escape($group[$key]); ?>
                 </td>
+                <?php endforeach; ?>
                 <td>
                     <?php echo $this->internalLink(array(
                         'text' => 'Update',
@@ -77,14 +78,13 @@
                         'href' => '/query/account/delete-group/id/' . $group['id']));
                     ?>
                 </td>
-                <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>
         </tbody>
     </table>
 
     <?php echo $this->internalLink(array(
-        'text' => 'Create group',
+        'text' => 'Create new group',
         'href' => '/query/account/create-group/',
         'prepend' => '<p>',
         'append' => '</p>'

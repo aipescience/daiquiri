@@ -116,6 +116,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             form: false,
             job: false
         },
+        groups: [],
         database: {},
         job: {},
         jobs: []
@@ -141,6 +142,10 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             .success(function(response) {
                 // update database information (top left)
                 account.database = response.database;
+
+                // order and update job group information
+                account.groups = response.groups.sort(function(a,b) {return parseInt(a.order) - parseInt(b.order)});
+                account.groups.push({id: null, name: 'unassigned'});
 
                 // update job list and database browser if something has changed
                 if (!angular.equals(account.jobs,response.jobs)) {

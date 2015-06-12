@@ -171,6 +171,15 @@ dl.dl-horizontal dd {
     margin-bottom: 5px;
     font-size: small;
 }
+.daiquiri-widget.nav-list .nav-header {
+    margin-left: 0;
+    margin-right: 0;
+}
+.daiquiri-widget.nav-list ul.nav-list .nav-header {
+    padding-left: 0;
+    padding-right: 0;
+    border-bottom: none;
+}
 
 /* helper */
 

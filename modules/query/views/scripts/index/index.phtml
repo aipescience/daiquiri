@@ -80,20 +80,29 @@
 
             <!-- jobs -->
 
-            <ul id="jobs" class="daiquiri-widget nav nav-pills nav-stacked">
+            <ul id="jobs" class="daiquiri-widget nav nav-list nav-stacked">
                 <li class="nav-header">Job list</li>
-                <li class="nav-item {{job.id == account.active.job ? 'active' : ''}}"
-                    ng-repeat="job in account.jobs  | orderBy:'-time'">
-                    <a href="" ng-click="activateJob(job.id)" >
-                        <i class="icon-ok pull-right" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
-                        <i class="icon-warning-sign pull-right" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
-                        <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
-                        <i class="icon-remove pull-right" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
-                        <i class="icon-trash pull-right" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
-                        <i class="icon-pause pull-right" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
-                        <i class="icon-ban-circle pull-right" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
-                        <div class="daiquiri-query-jobs-item">{{job.table}}</div>
-                    </a>
+
+                <li class="nav-item" ng-repeat="group in account.groups">
+                    <ul class="nav nav-list">
+                        <li class="nav-header" ng-hide="account.groups.length <= 1">{{group.name}}</li>
+
+                        <li class="nav-item {{job.id == account.active.job ? 'active' : ''}}"
+                            ng-repeat="job in account.jobs | filter:{group_id: group.id}">
+
+                            <a href="" ng-click="activateJob(job.id)" >
+                                <i class="icon-ok pull-right" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
+                                <i class="icon-warning-sign pull-right" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
+                                <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
+                                <i class="icon-remove pull-right" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
+                                <i class="icon-trash pull-right" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
+                                <i class="icon-pause pull-right" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
+                                <i class="icon-ban-circle pull-right" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
+
+                                <div class="daiquiri-query-jobs-item">{{job.table}}</div>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
 
