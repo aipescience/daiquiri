@@ -26,4 +26,22 @@ class Query_Model_Resource_Groups extends Daiquiri_Model_Resource_Table {
     public function __construct() {
         $this->setTablename('Query_Groups');
     }
+
+    /**
+     * Deletes a query job group and removes the foreign keys of the jobs in this group.
+     * @param int $id primary key of the row
+     * @throws Exception
+     */
+    public function deleteRow($id) {
+        if (empty($id)) {
+            throw new Exception('$id not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        // remove the foreign keys of the affected jobs
+        $this->getAdapter()->update('Query_Jobs', array('group_id' => null), array('group_id = ?' => $id));
+
+        // remove the group
+        $this->getAdapter()->delete($this->getTablename(), array('id = ?' => $id));
+    }
+
 }
