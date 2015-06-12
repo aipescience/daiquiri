@@ -18,7 +18,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Query_Form_Group extends Data_Form_Abstract {
+class Query_Form_Job extends Data_Form_Abstract {
+
+    /**
+     * List of query job groups
+     * @var array
+     */
+    protected $_groups = array();
+
+    /**
+     * Setter for $_groups
+     * @param array $groups list of query job groups
+     */
+    protected function setGroups($groups) {
+        $this->_groups[0] = 'unassigned';
+        foreach ($groups as $group) {
+            $this->_groups[$group['id']] = $group['name'];
+        }
+    }
 
     /**
      * Initializes the form.
@@ -27,14 +44,9 @@ class Query_Form_Group extends Data_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addTextElement('name', array(
-            'label' => 'Group name',
-            'required' => true,
-            'class' => 'span6 mono',
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-            )
+        $this->addSelectElement('group_id', array(
+            'label' => 'Group',
+            'multiOptions' => $this->_groups
         ));
         $this->addTextElement('order', array(
             'label' => 'Order in list',
@@ -48,11 +60,11 @@ class Query_Form_Group extends Data_Form_Abstract {
         $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('name','order'));
+        $this->addHorizontalGroup(array('group_id','order'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('name', 'order') as $element) {
+        foreach (array('group_id','order') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

@@ -57,13 +57,14 @@
             <tr>
                 <th>Id</th>
                 <th>Name</th>
+                <th>Order</th>
                 <th>Options</th>
             </tr>
         </thead>
         <tbody>
         <?php foreach ($this->groups as $group): ?>
             <tr>
-                <?php foreach (array('id','name') as $key): ?>
+                <?php foreach (array('id','name','order') as $key): ?>
                 <td>
                     <?php echo $this->escape($group[$key]); ?>
                 </td>
@@ -83,12 +84,14 @@
         </tbody>
     </table>
 
+    <div class="row">
     <?php echo $this->internalLink(array(
         'text' => 'Create new group',
         'href' => '/query/account/create-group/',
-        'prepend' => '<p>',
+        'prepend' => '<p class="daiquiri-widget span3">',
         'append' => '</p>'
     ));?>
+    </div>
 
     <h4>Job list</h4>
 
@@ -100,6 +103,8 @@
                 <th>Status</th>
                 <th>Timestamp</th>
                 <th>Group Id</th>
+                <th>Order</th>
+                <th>Options</th>
             </tr>
         </thead>
         <tbody>
@@ -111,11 +116,29 @@
                         'text' => $job['id']
                     )); ?>
                 </td>
-                <?php foreach (array('table','status','time','group_id') as $key): ?>
+                <?php foreach (array('table','status','time','group_id','order') as $key): ?>
                 <td>
                     <?php echo $this->escape($job[$key]); ?>
                 </td>
                 <?php endforeach; ?>
+                <td>
+                    <?php echo $this->internalLink(array(
+                        'text' => 'Update',
+                        'href' => '/query/account/update-job/id/' . $job['id']));
+                    ?>
+                    <?php echo $this->internalLink(array(
+                        'text' => 'Rename',
+                        'href' => '/query/account/rename-job/id/' . $job['id']));
+                    ?>
+                    <?php echo $this->internalLink(array(
+                        'text' => 'Remove',
+                        'href' => '/query/account/remove-job/id/' . $job['id']));
+                    ?>
+                    <?php echo $this->internalLink(array(
+                        'text' => 'Kill',
+                        'href' => '/query/account/kill-job/id/' . $job['id']));
+                    ?>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>

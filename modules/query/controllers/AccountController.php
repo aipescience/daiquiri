@@ -37,33 +37,38 @@ class Query_AccountController extends Daiquiri_Controller_Abstract {
         $this->view->assign($response);
     }
 
+    public function updateJobAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->updateJob($id);
+    }
+
     public function renameJobAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form',array('redirect' => '/query'))->renameJob($id);
+        $this->getControllerHelper('form')->renameJob($id);
     }
 
     public function removeJobAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form',array('redirect' => '/query'))->removeJob($id);
+        $this->getControllerHelper('form')->removeJob($id);
     }
 
     public function killJobAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form',array('redirect' => '/query'))->killJob($id);
+        $this->getControllerHelper('form')->killJob($id);
     }
 
     public function createGroupAction() {
-        $this->getControllerHelper('form',array('redirect' => '/query/account'))->createGroup();
+        $this->getControllerHelper('form')->createGroup();
     }
 
     public function updateGroupAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form',array('redirect' => '/query/account'))->updateGroup($id);
+        $this->getControllerHelper('form')->updateGroup($id);
     }
 
     public function deleteGroupAction() {
         $id = $this->_getParam('id');
-        $this->getControllerHelper('form',array('redirect' => '/query/account'))->deleteGroup($id);
+        $this->getControllerHelper('form')->deleteGroup($id);
     }
 
     public function databasesAction() {

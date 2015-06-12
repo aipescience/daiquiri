@@ -173,6 +173,64 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
     }
 
     /**
+     * Updates a query job.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function updateJob($id, array $formParams = array()) {
+        // set job resource
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
+
+        // get job and check permissions
+        $row = $this->getResource()->getJobResource()->fetchRow($id);
+        if (empty($row) || $row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        // get query job groups for this user
+        $groupsResource = new Query_Model_Resource_Groups();
+        $groups = $groupsResource->fetchRows(array(
+            'where' => array(
+                'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+            ),
+            'order' => array('order DESC')
+        ));
+
+        // create the form object
+        $form = new Query_Form_Job(array(
+            'groups' => $groups,
+            'entry' => $row,
+            'submit' => 'Update query job'
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                // check if the group_id needs to be set to NULL
+                if ($values['group_id'] === '0') {
+                    $values['group_id'] = NULL;
+                }
+
+                // check if the order needs to be set to NULL
+                if ($values['order'] === '') {
+                    $values['order'] = NULL;
+                }
+
+                $this->getResource()->getJobResource()->updateRow($id, $values);
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
      * Renames a job.
      * @param type $id job id
      * @param array $formParams
