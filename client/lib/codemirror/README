@@ -1,0 +1,11 @@
+Currently we use Version 5.3 of codemirror from
+
+    http://codemirror.net/codemirror.zip
+
+codemirror.min.js is created with:
+
+    uglifyjs codemirror.js runmode.js sql.js --compress --mangle
+
+codemirror.min.css is created with:
+
+    uglifycss --ugly-comments codemirror.css
