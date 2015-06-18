@@ -1,0 +1,3 @@
+samp.min.js is created with:
+
+    uglifyjs samp.js --compress --mangle
