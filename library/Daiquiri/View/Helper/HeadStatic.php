@@ -28,8 +28,8 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         // jquery
         'jquery.js' => 'daiquiri/lib/jquery-2.1.1.min.js',
         // bootstrap
-        'bootstrap.css' => 'daiquiri/lib/bootstrap/css/bootstrap.css',
-        'bootstrap.js' => 'daiquiri/lib/bootstrap/js/bootstrap.js',
+        'bootstrap.css' => 'daiquiri/lib/bootstrap/css/bootstrap.min.css',
+        'bootstrap.js' => 'daiquiri/lib/bootstrap/js/bootstrap.min.js',
         // angular
         'angular.js' => 'daiquiri/lib/angular/angular.min.js',
         'angular-sanitize.js' => 'daiquiri/lib/angular/angular-sanitize.min.js',
@@ -39,10 +39,8 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         // flot
         'jquery.flot.js' => 'daiquiri/lib/jquery.flot.min.js',
         // code mirror
-        'codemirror.css' => 'daiquiri/lib/codemirror/css/codemirror.css',
-        'codemirror.js' => 'daiquiri/lib/codemirror/js/codemirror.js',
-        'codemirror.runmode.js' => 'daiquiri/lib/codemirror/js/runmode.js',
-        'codemirror.sql.js' => 'daiquiri/lib/codemirror/js/sql.js',
+        'codemirror.css' => 'daiquiri/lib/codemirror/css/codemirror.min.css',
+        'codemirror.js' => 'daiquiri/lib/codemirror/js/codemirror.min.js',
         // bootstrap-datepicker
         'bootstrap-datepicker.css' => 'daiquiri/lib/bootstrap-datepicker/css/datepicker.css',
         'bootstrap-datepicker.js' => 'daiquiri/lib/bootstrap-datepicker/js/bootstrap-datepicker.js',

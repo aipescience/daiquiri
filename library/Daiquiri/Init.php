@@ -521,6 +521,10 @@ class Daiquiri_Init {
 
         // minify files
         switch ($this->options['config']['core']['minify']['method']) {
+            case 'cat':
+                exec("cat " . implode(' ',$js) . " >> public/min/js/daiquiri.js");
+                exec("cat " . implode(' ',$css) . " >> public/min/css/daiquiri.css");
+                break;
             case 'yui':
                 foreach($js as $file) {
                     exec("yui-compressor " . $file . " >> public/min/js/daiquiri.js");
@@ -530,8 +534,20 @@ class Daiquiri_Init {
                 }
                 break;
             case 'uglify':
-                exec("uglifyjs " . implode(' ',$js) . " --compress --mangle >> public/min/js/daiquiri.js");
-                exec("uglifycss --ugly-comments " . implode(' ',$css) . " >> public/min/css/daiquiri.css");
+                foreach($js as $file) {
+                    if (strpos($file,'.min.js') === false) {
+                        exec("uglifyjs " . $file . " --compress --mangle >> public/min/js/daiquiri.js");
+                    } else {
+                        exec("cat " . $file . " >> public/min/js/daiquiri.js");
+                    }
+                }
+                foreach($css as $file) {
+                    if (strpos($file,'min.css') === false) {
+                        exec("uglifycss --ugly-comments " . $file . " >> public/min/css/daiquiri.css");
+                    } else {
+                        exec("cat " . $file . " >> public/min/css/daiquiri.css");
+                    }
+                }
                 break;
             default:
                 $this->_error("Unknown value in \$options['config']['core']['minify']['method'].");

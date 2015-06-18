@@ -27,7 +27,7 @@ angular.module('codemirror', [])
                 var id = angular.element(element).attr('id');
 
                 CodemirrorService.elements[id] = CodeMirror.fromTextArea(element, {
-                    mode: 'text/x-mysql',
+                    mode: 'text/x-mariadb',
                     indentWithTabs: false,
                     smartIndent: true,
                     matchBrackets : true,
