@@ -345,7 +345,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
         switch ($action) {
             case 'parameters':
-                // this is another path that might be foreseeable to set parameters 
+                // this is another path that might be foreseeable to set parameters
                 // (as mentioned in the standard)
                 $newParam = array();
                 $newParam[$putParams['wild2']] = $rawBody;
@@ -434,7 +434,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
     //run this job - set it to QUEUED and let the magic happen
     abstract public function runJob(Uws_Model_Resource_JobSummaryType &$job);
 
-    //this function handles the switch between the pending temporary job and the one used by the 
+    //this function handles the switch between the pending temporary job and the one used by the
     //implementation (if the job was retrieved by the implementation). If it does, override
     //this function with whatever the implementation needs
     public function setDestructTime(Uws_Model_Resource_JobSummaryType &$job, $newDestructTime) {
@@ -446,7 +446,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         }
     }
 
-    //this function handles the switch between the pending temporary job and the one used by the 
+    //this function handles the switch between the pending temporary job and the one used by the
     //implementation (if the job was retrieved by the implementation). If it does, override
     //this function with whatever the implementation needs
     public function setExecutionDuration(Uws_Model_Resource_JobSummaryType &$job, $newExecutionDuration) {
@@ -491,8 +491,8 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         $jobUWS->ownerId = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $jobUWS->phase = "PENDING";
 
-        $jobUWS->startTime = false;
-        $jobUWS->endTime = false;
+        $jobUWS->startTime = NULL;
+        $jobUWS->endTime = NULL;
 
         $jobUWS->quote = $this->getQuote();
 
@@ -504,16 +504,22 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         if (isset($postParams['destruction'])) {
             $jobUWS->destruction = $postParams['destruction'];
             unset($postParams['destruction']);
+        } else {
+            $jobUWS->destruction = NULL;
         }
 
         if (isset($postParams['executionduration'])) {
             $jobUWS->executionDuration = $postParams['executionduration'];
             unset($postParams['executionduration']);
+        } else {
+            $jobUWS->executionDuration = NULL;
         }
 
         if (isset($postParams['runid'])) {
             $jobUWS->runId = $postParams['runid'];
             unset($postParams['runid']);
+        } else {
+            $jobUWS->runId = NULL;
         }
 
         //fill the parameter part of the UWS with the original information stored in the queue
