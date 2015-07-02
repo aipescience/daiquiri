@@ -117,7 +117,7 @@ class Contact_Model_Messages extends Daiquiri_Model_Table {
 
         // create the form object
         $form = new Contact_Form_Respond(array(
-            'subject' => "Re: {$message['subject']}",
+            'subject' => "{$message['subject']}",
             'body' => "Dear {$message['firstname']} {$message['lastname']},\n\n\n\nBest Regards"
         ));
 
