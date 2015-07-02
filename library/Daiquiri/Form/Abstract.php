@@ -85,6 +85,17 @@ abstract class Daiquiri_Form_Abstract extends Zend_Form {
     }
 
     /**
+     * Adds a form element for a date field.
+     * @param  string $name  name of the element
+     * @param  array $options options for the element
+     * @return string $name  name of the element
+     */
+    public function addDateElement($name, $options) {
+        $this->addElement(new Daiquiri_Form_Element_Date($name, $options));
+        return $name;
+    }
+
+    /**
      * Adds a form element for a textarea field.
      * @param  string $name  name of the element
      * @param  array $options options for the element

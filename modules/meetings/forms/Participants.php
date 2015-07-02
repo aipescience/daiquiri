@@ -81,21 +81,13 @@ class Meetings_Form_Participants extends Meetings_Form_Abstract {
         }
 
         // arrival and departure
-        $this->addTextElement('arrival', array(
+        $this->addDateElement('arrival', array(
             'label' => 'Arrival',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-            )
+            'required' => true
         ));
-        $this->addTextElement('departure', array(
+        $this->addDateElement('departure', array(
             'label' => 'Departure',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-            )
+            'required' => true
         ));
 
         // contributions

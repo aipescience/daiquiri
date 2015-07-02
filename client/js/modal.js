@@ -133,6 +133,9 @@ angular.module('modal', ['ngSanitize'])
                         var element = $compile(dom)(scope);
                         angular.element('.daiquiri-modal-body').children().remove();
                         angular.element('.daiquiri-modal-body').append(element);
+
+                        // event for hideing datepicker on scroll
+                        $('[data-provide="datepicker"]').attr('data-date-container','.daiquiri-modal-dialog');
                     }
                 }, true);
             }

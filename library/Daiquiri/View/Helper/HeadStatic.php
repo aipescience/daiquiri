@@ -42,8 +42,8 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         'codemirror.css' => 'daiquiri/lib/codemirror/css/codemirror.min.css',
         'codemirror.js' => 'daiquiri/lib/codemirror/js/codemirror.min.js',
         // bootstrap-datepicker
-        'bootstrap-datepicker.css' => 'daiquiri/lib/bootstrap-datepicker/css/datepicker.css',
-        'bootstrap-datepicker.js' => 'daiquiri/lib/bootstrap-datepicker/js/bootstrap-datepicker.js',
+        'bootstrap-datepicker.css' => 'daiquiri/lib/bootstrap-datepicker/css/bootstrap-datepicker.min.css',
+        'bootstrap-datepicker.js' => 'daiquiri/lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js',
         // other libs
         'samp.js' => 'daiquiri/lib/samp/samp.min.js',
         'wheelzoom.js' => 'daiquiri/lib/wheelzoom.js',

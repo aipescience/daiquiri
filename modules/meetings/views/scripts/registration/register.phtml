@@ -35,13 +35,6 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#arrival').datepicker({
-            format: 'yyyy-mm-dd'
-        });
-        $('#departure').datepicker({
-            format: 'yyyy-mm-dd'
-        });
-
         $('#fieldset-contributions input[type="checkbox"]').each(function () {
             if (!this.checked) {
                 var type = $(this).attr('id').match(/(\w+)_bool/)[1];

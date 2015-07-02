@@ -103,20 +103,13 @@ class Meetings_Form_Meetings extends Daiquiri_Form_Model {
             'rows' => 4,
             'filters' => array('StringTrim')
         ));
-        $this->addTextElement('begin', array(
+        $this->addDateElement('begin', array(
             'label' => 'First day of the meeting',
-            'required' => true,
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-            )
+            'required' => true
         ));
-        $this->addTextElement('end', array(
+        $this->addDateElement('end', array(
             'label' => 'Last day of the meeting',
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
-            )
+            'required' => true
         ));
         $this->addTextareaElement('registration_message', array(
             'label' => 'Registration messsage',
