@@ -160,7 +160,7 @@ function PHPSQLqueryPlanWriter($shard_query, $resultTable, $addRowNumber = false
 
         $hostTableCreateQuery = "CREATE DATABASE IF NOT EXISTS spider_tmp_shard; USE spider_tmp_shard; CREATE TABLE spider_tmp_shard." . $key . " ENGINE=MyISAM " . $limitFreeQuery . " LIMIT 0";
 
-        $shardActualQuery = "USE spider_tmp_shard; INSERT INTO spider_tmp_shard." . $key . " ". $query[0]  . ";";
+        $shardActualQuery = "USE spider_tmp_shard; INSERT INTO spider_tmp_shard." . $key . " ". $query[0];
 
         $linkTableHead = "CALL paquLinkTmp('" . $key . "')";
 
