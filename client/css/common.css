@@ -180,6 +180,20 @@ dl.dl-horizontal dd {
     padding-right: 0;
     border-bottom: none;
 }
+.daiquiri-widget.nav-list ul.nav-list > li > a {
+    line-height: 14px;
+}
+.daiquiri-widget.nav-list li.nav-footer {
+    padding: 5px 15px 0 15px;
+    border-top: 1px solid #ccc;
+    font-size: small;
+    line-height: 14px;
+}
+.daiquiri-widget.nav-list li.nav-footer button {
+    display: block;
+    padding-bottom: 5px;
+}
+
 
 /* helper */
 

@@ -142,10 +142,21 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             .success(function(response) {
                 // update database information (top left)
                 account.database = response.database;
+                account.groups = response.groups;
 
-                // order and update job group information
-                account.groups = response.groups.sort(function(a,b) {return parseInt(a.order) - parseInt(b.order)});
-                account.groups.push({id: null, name: 'unassigned'});
+                // create group object
+                var groupIndex = {};
+                angular.forEach(account.groups, function(group, key) {
+                    group.jobs = [];
+                    groupIndex[group.id] = key;
+                });
+                account.groups.push({id: null, name: 'unassigned', jobs: []});
+                groupIndex[null] = account.groups.length - 1;
+
+                // sort jobs into groups
+                angular.forEach(response.jobs, function(job) {
+                    account.groups[groupIndex[job.group_id]].jobs.push(job);
+                });
 
                 // update job list and database browser if something has changed
                 if (!angular.equals(account.jobs,response.jobs)) {
@@ -230,11 +241,14 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             'tablename': dialog.values.tablename
         };
 
-        $http.post(base + '/query/account/rename-job/id/' + account.job.id,$.param(data))
+        $http.post(base + '/query/account/rename-job/id/' + dialog.obj.id,$.param(data))
             .success(function(response) {
                 dialogSuccess(response, function() {
-                    account.job.table = data.tablename;
-                    PlotService.values.table = data.tablename;
+                    // check if the job was selected
+                    if (dialog.obj.id == account.job.id) {
+                        account.job.table = data.tablename;
+                        PlotService.values.table = data.tablename;
+                    }
                     fetchAccount();
                 });
             })
@@ -244,21 +258,24 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     }
 
     function killJob () {
-        $http.post(base + '/query/account/kill-job/id/' + account.job.id,$.param({'csrf': options.csrf}))
+        $http.post(base + '/query/account/kill-job/id/' + dialog.obj.id,$.param({'csrf': options.csrf}))
             .success(function(response) {
                 dialogSuccess(response, function() {
                     // get the index of the job in the jobs array (by magic)
-                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': account.job.id})[0]);
+                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': dialog.obj.id})[0]);
 
-                    if (account.jobs.length == 1) {
-                        // no jobs left, jump to form
-                        activateForm();
-                    } else if (i == account.jobs.length - 1) {
-                        // this was the last job, jump to the previous job
-                        activateJob(account.jobs[i-1].id)
-                    } else {
-                        // jump to the next job in array
-                        activateJob(account.jobs[i+1].id)
+                    // check if the job was selected
+                    if (dialog.obj.id == account.job.id) {
+                        if (account.jobs.length == 1) {
+                            // no jobs left, jump to form
+                            activateForm();
+                        } else if (i == account.jobs.length - 1) {
+                            // this was the last job, jump to the previous job
+                            activateJob(account.jobs[i-1].id)
+                        } else {
+                            // jump to the next job in array
+                            activateJob(account.jobs[i+1].id)
+                        }
                     }
                 });
             })
@@ -268,23 +285,56 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     }
 
     function removeJob() {
-        $http.post(base + '/query/account/remove-job/id/' + account.job.id,$.param({'csrf': options.csrf}))
+        $http.post(base + '/query/account/remove-job/id/' + dialog.obj.id,$.param({'csrf': options.csrf}))
             .success(function(response) {
                 dialogSuccess(response, function() {
                     // get the index of the job in the jobs array (by magic)
-                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': account.job.id})[0]);
+                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': dialog.obj.id})[0]);
 
-                    if (account.jobs.length == 1) {
-                        // no jobs left, jump to form
-                        activateForm();
-                    } else if (i == account.jobs.length - 1) {
-                        // this was the last job, jump to the previous job
-                        activateJob(account.jobs[i-1].id)
-                    } else {
-                        // jump to the next job in array
-                        activateJob(account.jobs[i+1].id)
+                    // check if the job was selected
+                    if (dialog.obj.id == account.job.id) {
+                        if (account.jobs.length == 1) {
+                            // no jobs left, jump to form
+                            activateForm();
+                        } else if (i == account.jobs.length - 1) {
+                            // this was the last job, jump to the previous job
+                            activateJob(account.jobs[i-1].id)
+                        } else {
+                            // jump to the next job in array
+                            activateJob(account.jobs[i+1].id)
+                        }
                     }
                 });
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function createGroup() {
+        $http.post(base + '/query/account/create-group/',$.param({'csrf': options.csrf, 'name': dialog.values.name}))
+            .success(function(response) {
+                dialogSuccess(response);
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function renameGroup() {
+        $http.post(base + '/query/account/update-group/id/' + dialog.obj.id,$.param({'csrf': options.csrf, 'name': dialog.values.name}))
+            .success(function(response) {
+                dialogSuccess(response);
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function removeGroup() {
+        $http.post(base + '/query/account/delete-group/id/' + dialog.obj.id,$.param({'csrf': options.csrf, 'name': dialog.values.name}))
+            .success(function(response) {
+                dialogSuccess(response);
             })
             .error(function (response,status) {
                 dialogError(response,status);
@@ -313,13 +363,24 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         }
     };
 
-    function showDialog(key) {
+    function showDialog(key, obj) {
         for (var value in dialog.values) delete dialog.values[value];
         for (var error in dialog.errors) delete dialog.errors[error];
 
-        if (key === 'rename') {
-            dialog.values.tablename = account.job.table;
+        if (angular.isDefined(obj)) {
+            dialog.obj = obj;
+        } else {
+            // if no obj is given, this concerns the active job
+            dialog.obj = account.job;
         }
+
+        if (key === 'rename-job') {
+            dialog.values.tablename = dialog.obj.table;
+        }
+        if (key === 'rename-group') {
+            dialog.values.name = dialog.obj.name;
+        }
+
         dialog.enabled = key;
         ModalService.open();
     }
@@ -340,6 +401,9 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         renameJob: renameJob,
         killJob: killJob,
         removeJob: removeJob,
+        createGroup: createGroup,
+        renameGroup: renameGroup,
+        removeGroup: removeGroup,
         showDialog: showDialog,
         hideDialog: hideDialog
     };
@@ -664,16 +728,20 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
     $scope.account = QueryService.account;
     $scope.dialog  = QueryService.dialog;
 
+    $scope.edit = false;
+
     $scope.activateForm = function(formName) {
         QueryService.activateForm(formName);
     };
 
-    $scope.activateJob = function(jobId) {
-        QueryService.activateJob(jobId);
+    $scope.activateJob = function(jobId, $event) {
+        if (angular.isUndefined($event) || !angular.element($event.target).hasClass('daiquiri-query-jobs-option')) {
+            QueryService.activateJob(jobId);
+        }
     };
 
-    $scope.showDialog = function(key) {
-        QueryService.showDialog(key);
+    $scope.showDialog = function(key, obj) {
+        QueryService.showDialog(key, obj);
     }
 
     $scope.hideDialog = function() {
@@ -690,6 +758,18 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
 
     $scope.removeJob = function() {
         QueryService.removeJob();
+    }
+
+    $scope.createGroup = function() {
+        QueryService.createGroup();
+    }
+
+    $scope.renameGroup = function() {
+        QueryService.renameGroup();
+    }
+
+    $scope.removeGroup = function() {
+        QueryService.removeGroup();
     }
 
     $scope.pasteQuery = function() {
