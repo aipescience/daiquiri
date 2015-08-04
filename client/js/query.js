@@ -142,25 +142,45 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             .success(function(response) {
                 // update database information (top left)
                 account.database = response.database;
-                account.groups = response.groups;
 
-                // create group object
+                // create object to store the indexes of the groups and
+                // find the first group (whithout prev_id)
+                // (if there are more than one, find the last one)
                 var groupIndex = {};
-                angular.forEach(account.groups, function(group, key) {
+                var currentGroup = null;
+                angular.forEach(response.groups, function(group, key) {
                     group.jobs = [];
-                    groupIndex[group.id] = key;
+                    groupIndex[group.id] = group;
+                    if (group.prev_id === null) currentGroup = group;
                 });
-                account.groups.push({id: null, name: 'unassigned', jobs: []});
-                groupIndex[null] = account.groups.length - 1;
+
+                // loop over groups and append to array
+                var groups = [];
+                var run = true;
+                while (run) {
+                    groups.push(currentGroup);
+
+                    if (currentGroup.next_id === null) {
+                        run = false;
+                    } else {
+                        currentGroup = groupIndex[currentGroup.next_id];
+                    }
+                }
 
                 // sort jobs into groups
+                var unassigned = [];
                 angular.forEach(response.jobs, function(job) {
-                    account.groups[groupIndex[job.group_id]].jobs.push(job);
+                    if (job.group_id == null) {
+                        unassigned.push(job)
+                    } else {
+                        groupIndex[job.group_id].jobs.push(job);
+                    }
                 });
 
-                // update job list and database browser if something has changed
-                if (!angular.equals(account.jobs,response.jobs)) {
-                    account.jobs = response.jobs;
+                // update if something has changed
+                if (account.groups != groups || account.unassigned != unassigned) {
+                    account.groups = groups;
+                    account.unassigned = unassigned;
                     BrowserService.initBrowser('databases');
                 }
 

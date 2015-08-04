@@ -50,6 +50,11 @@ form#sql .CodeMirror {
 }
 
 /* jobs */
+
+.daiquiri-query-groups {
+    border-bottom: 1px solid #ccc;
+}
+
 .daiquiri-query-groups-toggle,
 .daiquiri-query-groups-options,
 .daiquiri-query-jobs-options {
@@ -64,7 +69,6 @@ form#sql .CodeMirror {
     float: left;
     cursor: pointer;
 }
-
 
 .daiquiri-query-groups-item,
 .daiquiri-query-jobs-item {

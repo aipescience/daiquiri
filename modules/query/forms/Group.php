@@ -36,8 +36,16 @@ class Query_Form_Group extends Data_Form_Abstract {
                 array('validator' => new Daiquiri_Form_Validator_Text()),
             )
         ));
-        $this->addTextElement('order', array(
-            'label' => 'Order in list',
+        $this->addTextElement('prev_id', array(
+            'label' => 'Id of previous group',
+            'class' => 'span1 mono',
+            'filters' => array('StringTrim'),
+            'validators' => array(
+                array('validator' => 'int'),
+            )
+        ));
+        $this->addTextElement('next_id', array(
+            'label' => 'Id of next group',
             'class' => 'span1 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
@@ -48,11 +56,11 @@ class Query_Form_Group extends Data_Form_Abstract {
         $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('name','order'));
+        $this->addHorizontalGroup(array('name','prev_id','next_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('name', 'order') as $element) {
+        foreach (array('name','prev_id','next_id') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

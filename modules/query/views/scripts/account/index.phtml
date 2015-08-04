@@ -57,14 +57,15 @@
             <tr>
                 <th>Id</th>
                 <th>Name</th>
-                <th>Order</th>
+                <th>Prev</th>
+                <th>Next</th>
                 <th>Options</th>
             </tr>
         </thead>
         <tbody>
         <?php foreach ($this->groups as $group): ?>
             <tr>
-                <?php foreach (array('id','name','order') as $key): ?>
+                <?php foreach (array('id','name','prev_id','next_id') as $key): ?>
                 <td>
                     <?php echo $this->escape($group[$key]); ?>
                 </td>
@@ -103,7 +104,8 @@
                 <th>Status</th>
                 <th>Timestamp</th>
                 <th>Group Id</th>
-                <th>Order</th>
+                <th>Prev</th>
+                <th>Next</th>
                 <th>Options</th>
             </tr>
         </thead>
@@ -116,7 +118,7 @@
                         'text' => $job['id']
                     )); ?>
                 </td>
-                <?php foreach (array('table','status','time','group_id','order') as $key): ?>
+                <?php foreach (array('table','status','time','group_id','prev_id','next_id') as $key): ?>
                 <td>
                     <?php echo $this->escape($job[$key]); ?>
                 </td>

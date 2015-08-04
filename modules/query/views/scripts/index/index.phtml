@@ -83,7 +83,7 @@
             <ul id="jobs" class="daiquiri-widget nav nav-list nav-stacked">
                 <li class="nav-header">Job list</li>
 
-                <li class="nav-item" ng-repeat="group in account.groups | orderBy:'order'">
+                <li class="nav-item daiquiri-query-groups" ng-repeat="group in account.groups">
                     <ul class="nav nav-list">
                         <li class="nav-header" ng-hide="account.groups.length == 1">
                             <div class="daiquiri-query-groups-toggle" ng-click="group.hide = !group.hide">
@@ -98,7 +98,7 @@
                         </li>
 
                         <li class="nav-item {{job.id == account.active.job ? 'active' : ''}}"
-                            ng-repeat="job in group.jobs | orderBy:'order'" ng-hide="group.hide">
+                            ng-repeat="job in group.jobs" ng-hide="group.hide">
 
                             <a href="" ng-click="activateJob(job.id, $event)" >
                                 <div class="daiquiri-query-jobs-status pull-right" ng-hide="edit">
@@ -119,6 +119,27 @@
                             </a>
                         </li>
                     </ul>
+                </li>
+
+                <li class="nav-item daiquiri-query-unassigned {{job.id == account.active.job ? 'active' : ''}}"
+                    ng-repeat="job in account.unassigned">
+                    <a href="" ng-click="activateJob(job.id, $event)" >
+                        <div class="daiquiri-query-jobs-status pull-right" ng-hide="edit">
+                            <i class="icon-ok" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
+                            <i class="icon-warning-sign" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
+                            <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
+                            <i class="icon-remove" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
+                            <i class="icon-trash" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
+                            <i class="icon-pause" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
+                            <i class="icon-ban-circle" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
+                        </div>
+                        <div class="daiquiri-query-jobs-options" ng-show="edit">
+                            <i class="daiquiri-query-jobs-option icon-pencil" ng-click="showDialog('rename-job', job)"></i>
+                            <i class="daiquiri-query-jobs-option icon-trash" ng-click="showDialog('remove-job', job)"></i>
+                        </div>
+
+                        <div class="daiquiri-query-jobs-item" ng-class="{'edit': edit}">{{job.table}}</div>
+                    </a>
                 </li>
 
                 <li class="nav-footer">

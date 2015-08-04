@@ -171,6 +171,7 @@ dl.dl-horizontal dd {
     margin-bottom: 5px;
     font-size: small;
 }
+.daiquiri-widget.nav-list > li.nav-item > a,
 .daiquiri-widget.nav-list .nav-header {
     margin-left: 0;
     margin-right: 0;

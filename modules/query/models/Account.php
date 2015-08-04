@@ -46,8 +46,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         $groups = $groupsResource->fetchRows(array(
             'where' => array(
                 'user_id = ?' => $userId,
-            ),
-            'order' => array('order DESC')
+            )
         ));
 
         // get rows
@@ -57,7 +56,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                     'user_id = ?' => $userId,
                     'status_id != ?' => $this->getResource()->getStatusId('removed'),
                 ),
-                'order' => array('order DESC'),
                 'limit' => 1000
             ));
         } catch (Exception $e) {
@@ -194,7 +192,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'where' => array(
                 'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
             ),
-            'order' => array('order DESC')
         ));
 
         // create the form object
@@ -215,10 +212,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                     $values['group_id'] = NULL;
                 }
 
-                // check if the order needs to be set to NULL
-                if ($values['order'] === '') {
-                    $values['order'] = NULL;
-                }
+                // check if the order ids  needs to be set to NULL
+                if ($values['prev_id'] === '') $values['prev_id'] = NULL;
+                if ($values['next_id'] === '') $values['next_id'] = NULL;
 
                 $this->getResource()->getJobResource()->updateRow($id, $values);
                 return array('status' => 'ok');
@@ -376,10 +372,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 // get the current user id
                 $values['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
 
-                // check if the order needs to be set to NULL
-                if ($values['order'] === '') {
-                    $values['order'] = NULL;
-                }
+                // check if the order ids  needs to be set to NULL
+                if ($values['prev_id'] === '') $values['prev_id'] = NULL;
+                if ($values['next_id'] === '') $values['next_id'] = NULL;
 
                 // store the values in the database
                 $this->getResource()->insertRow($values);
@@ -423,10 +418,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 // get the form values
                 $values = $form->getValues();
 
-                // check if the order needs to be set to NULL
-                if ($values['order'] === '') {
-                    $values['order'] = NULL;
-                }
+                // check if the order ids  needs to be set to NULL
+                if ($values['prev_id'] === '') $values['prev_id'] = NULL;
+                if ($values['next_id'] === '') $values['next_id'] = NULL;
 
                 $this->getResource()->updateRow($id, $values);
                 return array('status' => 'ok');
