@@ -57,6 +57,11 @@ class Query_AccountController extends Daiquiri_Controller_Abstract {
         $this->getControllerHelper('form')->killJob($id);
     }
 
+    public function moveJobAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->moveJob($id);
+    }
+
     public function createGroupAction() {
         $this->getControllerHelper('form')->createGroup();
     }
@@ -64,6 +69,11 @@ class Query_AccountController extends Daiquiri_Controller_Abstract {
     public function updateGroupAction() {
         $id = $this->_getParam('id');
         $this->getControllerHelper('form')->updateGroup($id);
+    }
+
+    public function moveGroupAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->moveGroup($id);
     }
 
     public function deleteGroupAction() {

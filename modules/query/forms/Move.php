@@ -18,7 +18,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Query_Form_Group extends Data_Form_Abstract {
+class Query_Form_Move extends Data_Form_Abstract {
+
+    /**
+     * The default entry for the prev_id field.
+     * @var array
+     */
+    private $_prevId;
+
+    /**
+     * Sets $_prevId.
+     * @param int $prevId the default entry for the prev_id field
+     */
+    public function setPrevId($prevId) {
+        $this->_prevId = $prevId;
+    }
 
     /**
      * Initializes the form.
@@ -27,27 +41,24 @@ class Query_Form_Group extends Data_Form_Abstract {
         $this->addCsrfElement();
 
         // add elements
-        $this->addTextElement('name', array(
-            'label' => 'Group name',
-            'required' => true,
-            'class' => 'span6 mono',
+        $this->addTextElement('prev_id', array(
+            'label' => 'Id of previous item',
+            'class' => 'span1 mono',
             'filters' => array('StringTrim'),
             'validators' => array(
-                array('validator' => new Daiquiri_Form_Validator_Text()),
+                array('validator' => 'int'),
             )
         ));
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('name'));
+        $this->addHorizontalGroup(array('prev_id','next_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('name') as $element) {
-            if (isset($this->_entry[$element])) {
-                $this->setDefault('name', $this->_entry[$element]);
-            }
+        if (isset($this->_prevId)) {
+            $this->setDefault('prev_id', $this->_prevId);
         }
     }
 

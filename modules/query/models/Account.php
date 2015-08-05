@@ -372,12 +372,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 // get the current user id
                 $values['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
 
-                // check if the order ids  needs to be set to NULL
-                if ($values['prev_id'] === '') $values['prev_id'] = NULL;
-                if ($values['next_id'] === '') $values['next_id'] = NULL;
-
                 // store the values in the database
-                $this->getResource()->insertRow($values);
+                $id = $this->getResource()->insertRow($values);
+
                 return array('status' => 'ok');
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
@@ -418,12 +415,54 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 // get the form values
                 $values = $form->getValues();
 
-                // check if the order ids  needs to be set to NULL
-                if ($values['prev_id'] === '') $values['prev_id'] = NULL;
-                if ($values['next_id'] === '') $values['next_id'] = NULL;
-
                 $this->getResource()->updateRow($id, $values);
                 return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
+     * Moves a query job group whithin the linked list.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function moveGroup($id, array $formParams = array()) {
+        // set group resource
+        $this->setResource(new Query_Model_Resource_Groups());
+
+        // get the entry from the database
+        $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+        if ($entry['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
+        }
+
+        // create the form object
+        $form = new Query_Form_Move(array(
+            'prevId' => $entry['prev_id']
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                $errors = array();
+                $this->getResource()->moveRow($id, $entry['prev_id'], $entry['next_id'], $values['prev_id'], $errors);
+
+                if (empty($errors)) {
+                    return array('status' => 'ok');
+                } else {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form, $errors);
+                }
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }

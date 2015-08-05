@@ -71,13 +71,21 @@
                 </td>
                 <?php endforeach; ?>
                 <td>
-                    <?php echo $this->internalLink(array(
+                    <?php
+                    echo $this->internalLink(array(
                         'text' => 'Update',
-                        'href' => '/query/account/update-group/id/' . $group['id']));
-                    ?>
-                    <?php echo $this->internalLink(array(
+                        'href' => '/query/account/update-group/id/' . $group['id'],
+                        'append' => '&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'Move',
+                        'href' => '/query/account/move-group/id/' . $group['id'],
+                        'append' => '&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
                         'text' => 'Delete',
-                        'href' => '/query/account/delete-group/id/' . $group['id']));
+                        'href' => '/query/account/delete-group/id/' . $group['id']
+                    ));
                     ?>
                 </td>
             </tr>
