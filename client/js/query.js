@@ -143,21 +143,31 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 // update database information (top left)
                 account.database = response.database;
 
-                // create object to store the indexes of the groups and
+                // create object to store the indexes of the jobs and groups
+                var jobIndex = {};
+                var groupIndex = {};
+
+                // create object to hold the groups and their jobs as well as the unassigned jobs
+                var groups = [];
+                var unassigned = [];
+
+                // create variable for the while loops
+                var run = false;
+
                 // find the first group (whithout prev_id)
                 // (if there are more than one, find the last one)
-                var groupIndex = {};
                 var currentGroup = null;
                 angular.forEach(response.groups, function(group, key) {
                     group.jobs = [];
                     groupIndex[group.id] = group;
+
                     if (group.prev_id === null) currentGroup = group;
                 });
 
                 // loop over groups and append to array
                 var groups = [];
                 if (currentGroup !== null) {
-                    var run = true;
+                    run = true;
                     while (run) {
                         groups.push(currentGroup);
 
@@ -169,15 +179,49 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     }
                 }
 
-                // sort jobs into groups
-                var unassigned = [];
+                // loop over jobs to create index array
+                // and find first job in every group
                 angular.forEach(response.jobs, function(job) {
-                    if (job.group_id == null) {
-                        unassigned.push(job)
-                    } else {
-                        groupIndex[job.group_id].jobs.push(job);
+                    jobIndex[job.id] = job;
+
+                    if (job.prev_id === null) {
+                        if (job.group_id === null) {
+                            unassigned.push(job);
+                        } else {
+                            groupIndex[job.group_id].jobs.push(job);
+                        }
+                    };
+                });
+
+                // sort jobs into groups
+                var currentJob;
+                angular.forEach(groups, function(group) {
+                    currentJob = group.jobs[0];
+
+                    if (angular.isDefined(currentJob)) {
+                        run = true;
+                        while (run) {
+                            if (currentJob.next_id !== null) {
+                                currentJob = jobIndex[currentJob.next_id];
+                                group.jobs.push(currentJob);
+                            } else {
+                                run = false;
+                            }
+                        }
                     }
                 });
+                currentJob = unassigned[0];
+                if (angular.isDefined(currentJob)) {
+                    run = true;
+                    while (run) {
+                        if (currentJob.next_id !== null) {
+                            currentJob = jobIndex[currentJob.next_id];
+                            unassigned.push(currentJob);
+                        } else {
+                            run = false;
+                        }
+                    }
+                }
 
                 // update if something has changed
                 if (account.groups != groups || account.unassigned != unassigned) {
