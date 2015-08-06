@@ -132,19 +132,20 @@
                 </td>
                 <?php endforeach; ?>
                 <td>
-                    <?php echo $this->internalLink(array(
-                        'text' => 'Update',
-                        'href' => '/query/account/update-job/id/' . $job['id']));
-                    ?>
-                    <?php echo $this->internalLink(array(
+                    <?php
+                    echo $this->internalLink(array(
                         'text' => 'Rename',
-                        'href' => '/query/account/rename-job/id/' . $job['id']));
-                    ?>
-                    <?php echo $this->internalLink(array(
+                        'href' => '/query/account/rename-job/id/' . $job['id'],
+                        'append' => '&nbsp;'));
+                    echo $this->internalLink(array(
+                        'text' => 'Move',
+                        'href' => '/query/account/move-job/id/' . $job['id'],
+                        'append' => '&nbsp;'));
+                    echo $this->internalLink(array(
                         'text' => 'Remove',
-                        'href' => '/query/account/remove-job/id/' . $job['id']));
-                    ?>
-                    <?php echo $this->internalLink(array(
+                        'href' => '/query/account/remove-job/id/' . $job['id'],
+                        'append' => '&nbsp;'));
+                    echo $this->internalLink(array(
                         'text' => 'Kill',
                         'href' => '/query/account/kill-job/id/' . $job['id']));
                     ?>

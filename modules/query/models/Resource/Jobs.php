@@ -62,7 +62,7 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
             throw new Exception('$id or $sqloptions not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        $fields = array('id','database','table','time','status_id','prev_status_id','type_id','group_id','prev_id','next_id','complete','user_id','query','actualQuery','nrows','size','ip');
+        $fields = array('id','database','table','time','status_id','prev_status_id','type_id','group_id','prev_id','next_id','complete','removed','user_id','query','actualQuery','nrows','size','ip');
 
         if (is_array($input)) {
             $select = $this->select($input);
@@ -163,6 +163,132 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
      */
     public function moveRow($id, $prevId, $nextId, $newPrevId, $groupId, $newGroupId, &$errors) {
 
+        // set proper NULL for $newGroupId
+        if (empty($newGroupId)) $newGroupId = NULL;
+
+        if ($newPrevId === $id) {
+            // set error message
+            $errors = array('Can not asign the id of the current job as previous job');
+
+        } else if ($newGroupId === $groupId) {
+            // the group has not changed
+
+            if ($newPrevId === $prevId) {
+                // nothing changed, do nothing
+
+            } else if (empty($newPrevId)) {
+                // it is the new first job
+
+                // update previous and next rows at the old position
+                $this->getAdapter()->update('Query_Jobs', array('next_id' => $nextId), array('id = ?' => $prevId));
+                $this->getAdapter()->update('Query_Jobs', array('prev_id' => $prevId), array('id = ?' => $nextId));
+
+                // update the previously first job
+                $oldFirstId = $this->fetchFirstId($groupId);
+                $this->getAdapter()->update('Query_Jobs', array('prev_id' => $id), array('id = ?' => $oldFirstId));
+
+                // update current row
+                $this->getAdapter()->update('Query_Jobs', array('prev_id' => NULL, 'next_id' => $oldFirstId), array('id = ?' => $id));
+            } else {
+                // a new previous job was set
+
+                // fetch the new previous job
+                $prev = $this->fetchRow(array(
+                    'where' => array(
+                        'id = ?' => $newPrevId,
+                        'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                        'group_id = ?' => $groupId,
+                        'removed = 0'
+                    )
+                ));
+
+                if ($prev === false) {
+                    // set error message
+                    $errors = array('Job not found or not in the current group');
+                } else {
+                    // update the old previous and next group
+                    $this->getAdapter()->update('Query_Jobs', array('next_id' => $nextId), array('id = ?' => $prevId));
+                    $this->getAdapter()->update('Query_Jobs', array('prev_id' => $prevId), array('id = ?' => $nextId));
+
+                    // update the new previous and next group
+                    $this->getAdapter()->update('Query_Jobs', array('next_id' => $id), array('id = ?' => $prev['id']));
+                    $this->getAdapter()->update('Query_Jobs', array('prev_id' => $id), array('id = ?' => $prev['next_id']));
+
+                    // update current row
+                    $this->getAdapter()->update('Query_Jobs', array('prev_id' => $prev['id'], 'next_id' => $prev['next_id']), array('id = ?' => $id));
+                }
+            }
+        } else {
+            // the group has changed
+
+            // fetch the new group
+            $select = $this->select(array(
+                'where' => array(
+                    'id = ?' => $newGroupId,
+                    'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId()
+                )
+            ));
+            $select->from('Query_Groups', array('id'));
+            $group = $this->fetchOne($select);
+
+            if ($group === false) {
+                // set error message
+                $errors = array('Group not found');
+
+            } else {
+                if (empty($newPrevId)) {
+                    // it is the new first job of the group
+
+                    // update previous and next rows at the old position
+                    $this->getAdapter()->update('Query_Jobs', array('next_id' => $nextId), array('id = ?' => $prevId));
+                    $this->getAdapter()->update('Query_Jobs', array('prev_id' => $prevId), array('id = ?' => $nextId));
+
+                    // update the previously first job
+                    $oldFirstId = $this->fetchFirstId($newGroupId);
+                    $this->getAdapter()->update('Query_Jobs', array('prev_id' => $id), array('id = ?' => $oldFirstId));
+
+                    // update current row
+                    $this->getAdapter()->update('Query_Jobs', array(
+                        'group_id' => $newGroupId,
+                        'prev_id' => NULL,
+                        'next_id' => $oldFirstId
+                    ), array('id = ?' => $id));
+                } else {
+                    // a new previous job was also set
+
+                    // fetch the new previous job
+                    $prev = $this->fetchRow(array(
+                        'where' => array(
+                            'id = ?' => $newPrevId,
+                            'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                            'group_id = ?' => $newGroupId,
+                            'removed = 0'
+                        )
+                    ));
+
+                    if ($prev === false) {
+                        // set error message
+                        $errors = array('Job not found or not in the new group');
+
+                    } else {
+                        // update the old previous and next group
+                        $this->getAdapter()->update('Query_Jobs', array('next_id' => $nextId), array('id = ?' => $prevId));
+                        $this->getAdapter()->update('Query_Jobs', array('prev_id' => $prevId), array('id = ?' => $nextId));
+
+                        // update the new previous and next group
+                        $this->getAdapter()->update('Query_Jobs', array('next_id' => $id), array('id = ?' => $prev['id']));
+                        $this->getAdapter()->update('Query_Jobs', array('prev_id' => $id), array('id = ?' => $prev['next_id']));
+
+                        // update current row
+                        $this->getAdapter()->update('Query_Jobs', array(
+                            'group_id' => $newGroupId,
+                            'prev_id' => $prev['id'],
+                            'next_id' => $prev['next_id']
+                        ), array('id = ?' => $id));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -203,7 +329,8 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
                 'where' => array(
                     'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
                     'group_id IS NULL',
-                    'next_id IS NULL'
+                    'prev_id IS NULL',
+                    'removed = 0'
                 )
             ));
         } else {
@@ -211,7 +338,8 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
                 'where' => array(
                     'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
                     'group_id = ?' => $group_id,
-                    'next_id IS NULL'
+                    'prev_id IS NULL',
+                    'removed = 0'
                 )
             ));
         }

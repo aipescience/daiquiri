@@ -68,7 +68,7 @@ class Query_Model_Resource_Groups extends Daiquiri_Model_Resource_Table {
         // check the provided prev_id
         if ($newPrevId === $id) {
             // set error message
-            $errors = array('Can not asign id of group as previous group');
+            $errors = array('Can not asign the id of the current group as previous group');
 
         } else if ($newPrevId === $prevId) {
             // noting changed, do nothing
