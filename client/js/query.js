@@ -144,56 +144,60 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 account.database = response.database;
 
                 // create object to store the indexes of the jobs and groups
-                var jobIndex = {};
-                var groupIndex = {};
+                var jobs = {};
+                var groups = {};
 
                 // create object to hold the groups and their jobs as well as the unassigned jobs
-                var groups = [];
+                var assigned = [];
                 var unassigned = [];
 
                 // create variable for the while loops
                 var run = false;
 
-                // find the first group (whithout prev_id)
-                // (if there are more than one, find the last one)
-                var currentGroup = null;
+                // loop over groups to create group index and find the fist group
                 angular.forEach(response.groups, function(group, key) {
+                    // create jobs array
                     group.jobs = [];
-                    groupIndex[group.id] = group;
 
-                    if (group.prev_id === null) currentGroup = group;
+                    // add to group object
+                    groups[group.id] = group;
+
+                    // check if this is the first group
+                    if (group.prev_id === null) assigned.push(group);
                 });
 
                 // loop over groups and append to array
-                var groups = [];
-                if (currentGroup !== null) {
+                var currentGroup = assigned[0];
+                if (angular.isDefined(currentGroup)) {
                     run = true;
                     while (run) {
-                        groups.push(currentGroup);
-
                         if (currentGroup.next_id === null) {
                             run = false;
                         } else {
-                            currentGroup = groupIndex[currentGroup.next_id];
+                            currentGroup = groups[currentGroup.next_id];
+                            assigned.push(currentGroup);
                         }
                     }
                 }
 
-                // loop over jobs to create index array
-                // and find first job in every group
+                // loop over jobs to create job index and find first job in every group
                 angular.forEach(response.jobs, function(job) {
-                    jobIndex[job.id] = job;
+                    // add to group object
+                    jobs[job.id] = job;
 
+                    // check if this is the first job in a group
                     if (job.prev_id === null) {
                         if (job.group_id === null) {
+                            // this is the first unassigned job
                             unassigned.push(job);
                         } else {
-                            groupIndex[job.group_id].jobs.push(job);
+                            // this is the first job in a group
+                            groups[job.group_id].jobs.push(job);
                         }
                     };
                 });
 
-                // sort jobs into groups
+                // loop over groups to sort jobs into groups
                 var currentJob;
                 angular.forEach(groups, function(group) {
                     currentJob = group.jobs[0];
@@ -201,43 +205,44 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     if (angular.isDefined(currentJob)) {
                         run = true;
                         while (run) {
-                            if (currentJob.next_id !== null) {
-                                currentJob = jobIndex[currentJob.next_id];
-                                group.jobs.push(currentJob);
-                            } else {
+                            if (currentJob.next_id === null) {
                                 run = false;
+                            } else {
+                                currentJob = jobs[currentJob.next_id];
+                                group.jobs.push(currentJob);
                             }
                         }
                     }
                 });
+
+                // sort jobs into unassigned array
                 currentJob = unassigned[0];
                 if (angular.isDefined(currentJob)) {
                     run = true;
                     while (run) {
-                        if (currentJob.next_id !== null) {
-                            currentJob = jobIndex[currentJob.next_id];
-                            unassigned.push(currentJob);
-                        } else {
+                        if (currentJob.next_id === null) {
                             run = false;
+                        } else {
+                            currentJob = jobs[currentJob.next_id];
+                            unassigned.push(currentJob);
                         }
                     }
                 }
 
                 // update if something has changed
-                if (account.groups != groups || account.unassigned != unassigned) {
-                    account.groups = groups;
+                if (account.assigned != assigned || account.unassigned != unassigned) {
+                    account.assigned = assigned;
                     account.unassigned = unassigned;
                     BrowserService.initBrowser('databases');
-                }
 
-                // activate the current job again, if its status has changed
-                if (account.active.job != false && account.job.status != 'success') {
-                    // get the index of the job in the jobs array (by magic)
-                    var id = account.job.id;
-                    // get the index of the job in the jobs array (by magic)
-                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': id})[0]);
-                    if (account.jobs[i].status != account.job.status || account.jobs[i].finished != account.job.finished) {
-                        account.job.status = activateJob(id);
+                    // activate the current job again, if its status has changed
+                    if (account.active.job != false && account.job.status != 'success') {
+                        if (jobs[account.job.id].status != account.job.status ||
+                            jobs[account.job.id].complete != account.job.complete) {
+
+                            // activate the job again
+                            account.job.status = activateJob(id);
+                        }
                     }
                 }
             })

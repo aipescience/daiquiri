@@ -83,9 +83,9 @@
             <ul id="jobs" class="daiquiri-widget nav nav-list nav-stacked">
                 <li class="nav-header">Job list</li>
 
-                <li class="nav-item daiquiri-query-groups" ng-repeat="group in account.groups">
+                <li class="nav-item daiquiri-query-groups" ng-repeat="group in account.assigned">
                     <ul class="nav nav-list">
-                        <li class="nav-header" ng-hide="account.groups.length == 0">
+                        <li class="nav-header">
                             <div class="daiquiri-query-groups-toggle" ng-click="group.hide = !group.hide">
                                 <i class="icon-eye-close" rel="tooltip" ng-hide="group.hide"></i>
                                 <i class="icon-eye-open" rel="tooltip" ng-show="group.hide"></i>
