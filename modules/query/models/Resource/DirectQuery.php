@@ -160,10 +160,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         $job['complete'] = true;
 
         // insert job into jobs table
-        $this->getJobResource()->insertRow($job);
-
-        // get job id from database
-        $job['id'] = $this->getJobResource()->getAdapter()->lastInsertId();
+        $job['id'] = $this->getJobResource()->insertRow($job);
     }
 
     /**
@@ -200,10 +197,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         $this->_dropTable($job['database'], $job['table']);
 
         // remove job from job table
-        $this->getJobResource()->updateRow($id, array(
-            'prev_status_id' => $job['status_id'],
-            'status_id' => $this->getStatusId('removed')
-        ));
+        $this->getJobResource()->removeRow($id, $this->getStatusId('removed'));
     }
 
     /**

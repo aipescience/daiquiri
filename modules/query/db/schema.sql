@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
   `ip` VARCHAR(45),
   `nrows` BIGINT,
   `size` BIGINT,
-  `complete` BOOL NOT NULL
+  `complete` BOOL NOT NULL,
+  `removed` BOOL NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Query_Groups` (

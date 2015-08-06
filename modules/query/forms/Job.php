@@ -48,31 +48,15 @@ class Query_Form_Job extends Data_Form_Abstract {
             'label' => 'Group',
             'multiOptions' => $this->_groups
         ));
-        $this->addTextElement('prev_id', array(
-            'label' => 'Id of previous job',
-            'class' => 'span5 mono',
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => 'int'),
-            )
-        ));
-        $this->addTextElement('next_id', array(
-            'label' => 'Id of next job',
-            'class' => 'span5 mono',
-            'filters' => array('StringTrim'),
-            'validators' => array(
-                array('validator' => 'int'),
-            )
-        ));
         $this->addSubmitButtonElement('submit', $this->_submit);
         $this->addCancelButtonElement('cancel', 'Cancel');
 
         // add groups
-        $this->addHorizontalGroup(array('group_id','prev_id','next_id'));
+        $this->addHorizontalGroup(array('group_id'));
         $this->addActionGroup(array('submit', 'cancel'));
 
         // set fields
-        foreach (array('group_id','prev_id','next_id') as $element) {
+        foreach (array('group_id') as $element) {
             if (isset($this->_entry[$element])) {
                 $this->setDefault($element, $this->_entry[$element]);
             }

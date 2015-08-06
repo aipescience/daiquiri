@@ -156,14 +156,16 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
 
                 // loop over groups and append to array
                 var groups = [];
-                var run = true;
-                while (run) {
-                    groups.push(currentGroup);
+                if (currentGroup !== null) {
+                    var run = true;
+                    while (run) {
+                        groups.push(currentGroup);
 
-                    if (currentGroup.next_id === null) {
-                        run = false;
-                    } else {
-                        currentGroup = groupIndex[currentGroup.next_id];
+                        if (currentGroup.next_id === null) {
+                            run = false;
+                        } else {
+                            currentGroup = groupIndex[currentGroup.next_id];
+                        }
                     }
                 }
 

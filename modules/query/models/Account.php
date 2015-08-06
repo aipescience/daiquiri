@@ -54,9 +54,8 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $rows = $this->getResource()->fetchRows(array(
                 'where' => array(
                     'user_id = ?' => $userId,
-                    'status_id != ?' => $this->getResource()->getStatusId('removed'),
-                ),
-                'limit' => 1000
+                    'removed = ?' => 0
+                )
             ));
         } catch (Exception $e) {
             $rows = array();
@@ -211,10 +210,6 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 if ($values['group_id'] === '0') {
                     $values['group_id'] = NULL;
                 }
-
-                // check if the order ids  needs to be set to NULL
-                if ($values['prev_id'] === '') $values['prev_id'] = NULL;
-                if ($values['next_id'] === '') $values['next_id'] = NULL;
 
                 $this->getResource()->getJobResource()->updateRow($id, $values);
                 return array('status' => 'ok');

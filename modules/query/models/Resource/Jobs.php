@@ -118,4 +118,145 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         $classname = get_class($this);
         return array_search($typeId, $classname::$_types);
     }
+
+    /**
+     * Inserts a new job appends it to the end of the linked list
+     * @param array $data row data
+     * @return int
+     * @throws Exception
+     */
+    public function insertRow(array $data = array()) {
+        if (empty($data)) {
+            throw new Exception('$data not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
+        }
+
+        // set group_id to NULL
+        $data['next_id'] = NULL;
+
+        // set prev_id to last group
+        $data['prev_id'] = $this->fetchLastId();
+
+        // set next_id to NULL
+        $data['next_id'] = NULL;
+
+        // store the values in the database
+        $this->getAdapter()->insert('Query_Jobs', $data);
+
+        // get the id of the new row
+        $id = $this->getAdapter()->lastInsertId();
+
+        // store this group as next for previously last group
+        $this->getAdapter()->update('Query_Jobs', array('next_id' => $id), array('`id` = ?' => $data['prev_id']));
+
+        return $id;
+    }
+
+    /**
+     * Moves a query job to a new position in the linked list and/or to a new group.
+     * @param int   $id         primary key of the job
+     * @param int   $prevId     primary key of the previous job
+     * @param int   $nextId     primary key of the next job
+     * @param int   $newPrevId  primary key of the new previous job
+     * @param int   $groupId    primary key of the job's group
+     * @param int   $newGroupId primary key of the job's new group
+     * @param array $errors     array for the errors
+     */
+    public function moveRow($id, $prevId, $nextId, $newPrevId, $groupId, $newGroupId, &$errors) {
+
+    }
+
+    /**
+     * Sets a job to the removed state
+     * @param int $id              primary key of the job
+     * @param int $removedStatusId id of the removed status of the query adapter
+     */
+    public function removeRow($id, $removedStatusId) {
+        // get row
+        $row = $this->fetchRow($id);
+
+        // update previous and next rows
+        $this->getAdapter()->update('Query_Jobs', array('next_id' => $row['next_id']), array('id = ?' => $row['prev_id']));
+        $this->getAdapter()->update('Query_Jobs', array('prev_id' => $row['prev_id']), array('id = ?' => $row['next_id']));
+
+        // remove the group
+        $this->getAdapter()->update('Query_Jobs', array(
+            'status_id' => $removedStatusId,
+            'prev_status_id' => $row['status_id'],
+            'group_id' => NULL,
+            'prev_id' => NULL,
+            'next_id' => NULL,
+            'nrows' => 0,
+            'size' => 0,
+            'complete' => true,
+            'removed' => true
+        ), array('id = ?' => $id));
+    }
+
+    /**
+     * Returns the id of the first job in a particular group
+     * @param  int $groupId primary key of the group
+     * @return int $id      primary key of the first job
+     */
+    public function fetchFirstId($group_id = NULL) {
+        if (empty($group_id)) {
+            $select = $this->select(array(
+                'where' => array(
+                    'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                    'group_id IS NULL',
+                    'next_id IS NULL'
+                )
+            ));
+        } else {
+            $select = $this->select(array(
+                'where' => array(
+                    'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                    'group_id = ?' => $group_id,
+                    'next_id IS NULL'
+                )
+            ));
+        }
+        $select->from('Query_Jobs', array('id'));
+
+        $row = $this->fetchOne($select);
+        if ($row === false) {
+            return NULL;
+        } else {
+            return $row['id'];
+        }
+    }
+
+    /**
+     * Returns the id of the last job in a particular group
+     * @param  int $groupId primary key of the group
+     * @return int $id primary key of the last job
+     */
+    public function fetchLastId($group_id = NULL) {
+        if (empty($group_id)) {
+            $select = $this->select(array(
+                'where' => array(
+                    'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                    'group_id IS NULL',
+                    'next_id IS NULL',
+                    'removed = 0'
+                )
+            ));
+        } else {
+            $select = $this->select(array(
+                'where' => array(
+                    'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                    'group_id = ?' => $group_id,
+                    'next_id IS NULL',
+                    'removed = 0'
+                )
+            ));
+        }
+        $select->from('Query_Jobs', array('id'));
+
+        $row = $this->fetchOne($select);
+        if ($row === false) {
+            return NULL;
+        } else {
+            return $row['id'];
+        }
+    }
 }

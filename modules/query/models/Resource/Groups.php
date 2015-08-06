@@ -137,9 +137,13 @@ class Query_Model_Resource_Groups extends Daiquiri_Model_Resource_Table {
      * @return int $id primary key of the first group
      */
     public function fetchFirstId() {
-        $select = $this->select();
+        $select = $this->select(array(
+            'where' => array(
+                'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                'prev_id IS NULL'
+            )
+        ));
         $select->from('Query_Groups', array('id'));
-        $select->where('`prev_id` IS NULL');
 
         $row = $this->fetchOne($select);
         if ($row === false) {
@@ -154,9 +158,13 @@ class Query_Model_Resource_Groups extends Daiquiri_Model_Resource_Table {
      * @return int $id primary key of the last group
      */
     public function fetchLastId() {
-        $select = $this->select();
+        $select = $this->select(array(
+            'where' => array(
+                'user_id = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                'next_id IS NULL'
+            )
+        ));
         $select->from('Query_Groups', array('id'));
-        $select->where('`next_id` IS NULL');
 
         $row = $this->fetchOne($select);
         if ($row === false) {
