@@ -440,7 +440,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         }
 
         // create the form object
-        $form = new Query_Form_Move(array(
+        $form = new Query_Form_MoveGroup(array(
             'prevId' => $entry['prev_id']
         ));
 
