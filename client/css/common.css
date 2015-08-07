@@ -181,8 +181,13 @@ dl.dl-horizontal dd {
     padding-right: 0;
     border-bottom: none;
 }
+.daiquiri-widget.nav-list > li > a,
 .daiquiri-widget.nav-list ul.nav-list > li > a {
     line-height: 14px;
+
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    user-drag: none;
 }
 .daiquiri-widget.nav-list li.nav-footer {
     padding: 5px 15px 0 15px;

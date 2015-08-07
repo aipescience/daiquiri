@@ -51,7 +51,7 @@ form#sql .CodeMirror {
 
 /* jobs */
 
-.daiquiri-query-groups {
+.daiquiri-query-group {
     border-bottom: 1px solid #ccc;
 }
 
@@ -86,6 +86,28 @@ form#sql .CodeMirror {
 .daiquiri-query-jobs-item.edit {
     width: 115px;
 }
+
+/* jobs drag and drop */
+
+.daiquiri-query-job.drag > a,
+.daiquiri-query-job.drag > a:focus {
+    background-color: #ccc !important;
+}
+
+.daiquiri-query-job {
+    position: relative;
+}
+.daiquiri-query-job-drag-area {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.daiquiri-query-job-drag-area.target {
+    border-bottom: 2px solid #ccc;
+}
+
 
 /* SAMP tab */
 
