@@ -171,19 +171,31 @@ dl.dl-horizontal dd {
     margin-bottom: 5px;
     font-size: small;
 }
+
+/* nav-list */
+
 .daiquiri-widget.nav-list > li.nav-item > a,
 .daiquiri-widget.nav-list .nav-header {
     margin-left: 0;
     margin-right: 0;
 }
-.daiquiri-widget.nav-list ul.nav-list .nav-header {
+.daiquiri-widget.nav-list ul.nav-list {
     padding-left: 0;
     padding-right: 0;
+}
+.daiquiri-widget.nav-list ul.nav-list .nav-header {
+    padding: 0;
     border-bottom: none;
+}
+.daiquiri-widget.nav-list ul.nav-list h6 {
+    margin: 0;
+    padding: 5px 15px 5px 15px;
 }
 .daiquiri-widget.nav-list > li > a,
 .daiquiri-widget.nav-list ul.nav-list > li > a {
     line-height: 14px;
+    margin-right: 0;
+    margin-left: 0;
 
     -webkit-user-drag: none;
     -moz-user-drag: none;

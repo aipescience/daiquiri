@@ -83,18 +83,21 @@
             <ul id="jobs" class="daiquiri-widget nav nav-list nav-stacked" ng-controller="JobsController">
                 <li class="nav-header">Job list</li>
 
-                <li class="nav-item daiquiri-query-group" ng-repeat="group in jobs.assigned" draggable="{{ edit ? 'true' : 'false'}}">
+                <li class="nav-item daiquiri-query-group-container" ng-repeat="group in jobs.assigned" draggable="{{ edit ? 'true' : 'false'}}">
                     <ul class="nav nav-list">
-                        <li class="nav-header">
-                            <div class="daiquiri-query-groups-toggle" ng-click="group.hide = !group.hide">
-                                <i class="icon-eye-close" rel="tooltip" ng-hide="group.hide"></i>
-                                <i class="icon-eye-open" rel="tooltip" ng-show="group.hide"></i>
-                            </div>
-                            <div class="daiquiri-query-groups-options" ng-show="edit && group.id != null">
-                                <i class="icon-pencil" ng-click="showDialog('rename-group', group)"></i>
-                                <i class="icon-trash" ng-click="showDialog('remove-group', group)"></i>
-                            </div>
-                            <div class="daiquiri-query-groups-item" ng-class="{'edit': edit}">{{group.name}}</div>
+                        <li class="nav-header daiquiri-query-group">
+                            <h6>
+                                <div class="daiquiri-query-groups-toggle" ng-click="group.hide = !group.hide">
+                                    <i class="icon-eye-close" rel="tooltip" ng-hide="group.hide"></i>
+                                    <i class="icon-eye-open" rel="tooltip" ng-show="group.hide"></i>
+                                </div>
+                                <div class="daiquiri-query-groups-options" ng-show="edit && group.id != null">
+                                    <i class="icon-pencil" ng-click="showDialog('rename-group', group)"></i>
+                                    <i class="icon-trash" ng-click="showDialog('remove-group', group)"></i>
+                                </div>
+                                <div class="daiquiri-query-groups-item" ng-class="{'edit': edit}">{{group.name}}</div>
+                            </h6>
+                            <div class="daiquiri-query-group-drag-area" ng-show="drag"></div>
                         </li>
 
                         <li class="daiquiri-query-job nav-item {{job.id == account.active.job ? 'active' : ''}}"

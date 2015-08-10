@@ -889,7 +889,7 @@ app.controller('JobsController',['$scope','$timeout','QueryService',function($sc
         });
     }
     function handleDragEnter(event) {
-        $(event.target).addClass('target')
+        $(event.target).addClass('target');
         event.preventDefault();
     }
     function handleDragOver(event) {
@@ -897,7 +897,7 @@ app.controller('JobsController',['$scope','$timeout','QueryService',function($sc
         // return false;
     }
     function handleDragLeave(event) {
-        $(event.target).removeClass('target')
+        $(event.target).removeClass('target');
         event.preventDefault();
     }
 
@@ -906,7 +906,7 @@ app.controller('JobsController',['$scope','$timeout','QueryService',function($sc
     }, function(newValue, oldValue) {
         if (newValue !== oldValue) {
             $timeout(function() {
-                $('.daiquiri-query-job')
+                $('#jobs')
                     .on('dragstart', handleDragStart)
                     .on('dragend', handleDragEnd)
                     .on('dragenter', handleDragEnter)
