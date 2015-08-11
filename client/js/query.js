@@ -122,7 +122,11 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     };
 
     // jobs object for the jobs list, will be filled via ajax as well
+    var jobslist = {};
+
+    // lookup object to get the job/group for a given id
     var jobs = {};
+    var groups = {};
 
     // dialog state, use for the different modal which will be displayed to the user
     var dialog = {
@@ -146,8 +150,8 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 account.database = response.database;
 
                 // create object to store the indexes of the jobs and groups
-                var jobIdx = {};
-                var groupIdx = {};
+                jobs = {};
+                groups = {};
 
                 // create object to hold the groups and their jobs as well as the unassigned jobs
                 var assigned = [];
@@ -162,7 +166,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     group.jobs = [];
 
                     // add to group object
-                    groupIdx[group.id] = group;
+                    groups[group.id] = group;
 
                     // check if this is the first group
                     if (group.prev_id === null) assigned.push(group);
@@ -176,7 +180,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                         if (currentGroup.next_id === null) {
                             run = false;
                         } else {
-                            currentGroup = groupIdx[currentGroup.next_id];
+                            currentGroup = groups[currentGroup.next_id];
                             assigned.push(currentGroup);
                         }
                     }
@@ -185,7 +189,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 // loop over jobs to create job index and find first job in every group
                 angular.forEach(response.jobs, function(job) {
                     // add to group object
-                    jobIdx[job.id] = job;
+                    jobs[job.id] = job;
 
                     // check if this is the first job in a group
                     if (job.prev_id === null) {
@@ -194,7 +198,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                             unassigned.push(job);
                         } else {
                             // this is the first job in a group
-                            groupIdx[job.group_id].jobs.push(job);
+                            groups[job.group_id].jobs.push(job);
                         }
                     };
                 });
@@ -210,7 +214,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                             if (currentJob.next_id === null) {
                                 run = false;
                             } else {
-                                currentJob = jobIdx[currentJob.next_id];
+                                currentJob = jobs[currentJob.next_id];
                                 group.jobs.push(currentJob);
                             }
                         }
@@ -225,16 +229,16 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                         if (currentJob.next_id === null) {
                             run = false;
                         } else {
-                            currentJob = jobIdx[currentJob.next_id];
+                            currentJob = jobs[currentJob.next_id];
                             unassigned.push(currentJob);
                         }
                     }
                 }
 
                 // update if something has changed
-                if (jobs.assigned != assigned || jobs.unassigned != unassigned) {
-                    jobs.assigned = assigned;
-                    jobs.unassigned = unassigned;
+                if (jobslist.assigned != assigned || jobslist.unassigned != unassigned) {
+                    jobslist.assigned = assigned;
+                    jobslist.unassigned = unassigned;
                     BrowserService.initBrowser('databases');
 
                     // activate the current job again, if its status has changed
@@ -384,6 +388,25 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             });
     }
 
+    function moveJob(jobId, newPrevId) {
+        if (jobId !== newPrevId && jobs[jobId].prev_id !== newPrevId) {
+
+            var data = {
+                'csrf': options.csrf,
+                'group_id': jobs[newPrevId].group_id,
+                'prev_id': newPrevId
+            }
+
+            $http.post(base + '/query/account/move-job/id/' + jobId,$.param(data))
+                .success(function(response) {
+                    fetchAccount();
+                })
+                .error(function (response,status) {
+                    dialogError(response,status);
+                });
+        }
+    }
+
     function createGroup() {
         $http.post(base + '/query/account/create-group/',$.param({'csrf': options.csrf, 'name': dialog.values.name}))
             .success(function(response) {
@@ -466,7 +489,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     return {
         options: options,
         account: account,
-        jobs: jobs,
+        jobslist: jobslist,
         dialog: dialog,
         init: init,
         fetchAccount: fetchAccount,
@@ -475,6 +498,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         renameJob: renameJob,
         killJob: killJob,
         removeJob: removeJob,
+        moveJob: moveJob,
         createGroup: createGroup,
         renameGroup: renameGroup,
         removeGroup: removeGroup,
@@ -867,22 +891,33 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
 
 }]);
 
-app.controller('JobsController',['$scope','$timeout','QueryService',function($scope,$timeout,QueryService) {
+app.controller('JobsController',['$scope','$timeout','$document','QueryService',function($scope,$timeout,$document,QueryService) {
 
     $scope.edit = true;
     $scope.drag = false;
 
-    $scope.jobs = QueryService.jobs;
+    $scope.jobslist = QueryService.jobslist;
 
     function handleDragStart(event) {
-        $(this).addClass('drag');
+        // get the dragged element
+        var element = $(event.target);
+
+        // add the drag class
+        element.addClass('drag');
+
+        // store data about job in event
+        event.dataTransfer.setData('job_id',element.attr('data-job-id'));
 
         $timeout(function() {
             $scope.drag = true;
         });
     }
     function handleDragEnd(event) {
-        $(this).removeClass('drag');
+        // get the dragged element
+        var element = $(event.target);
+
+        // remove the drag class
+        element.removeClass('drag');
 
         $timeout(function() {
             $scope.drag = false;
@@ -893,25 +928,36 @@ app.controller('JobsController',['$scope','$timeout','QueryService',function($sc
         event.preventDefault();
     }
     function handleDragOver(event) {
-        // event.preventDefault();
-        // return false;
+        event.preventDefault();
     }
     function handleDragLeave(event) {
         $(event.target).removeClass('target');
         event.preventDefault();
     }
+    function handleDrop(event) {
+        $(event.target).removeClass('target');
+
+        var jobId = event.dataTransfer.getData('job_id');
+        var newPrevId = $(event.target).parent().attr('data-job-id');
+
+        QueryService.moveJob(jobId, newPrevId);
+
+        event.preventDefault();
+    }
 
     $scope.$watch(function () {
-        return $scope.jobs;
+        return $scope.jobslist;
     }, function(newValue, oldValue) {
         if (newValue !== oldValue) {
             $timeout(function() {
-                $('#jobs')
-                    .on('dragstart', handleDragStart)
-                    .on('dragend', handleDragEnd)
-                    .on('dragenter', handleDragEnter)
-                    .on('dragover', handleDragOver)
-                    .on('dragleave', handleDragLeave);
+                angular.element('.daiquiri-query-job').each(function (key, node) {
+                    node.addEventListener('dragstart', handleDragStart, false);
+                    node.addEventListener('dragend', handleDragEnd, false);
+                    node.addEventListener('dragenter', handleDragEnter, false);
+                    node.addEventListener('dragover', handleDragEnter, false);
+                    node.addEventListener('dragleave', handleDragLeave, false);
+                    node.addEventListener('drop', handleDrop, false);
+                });
             });
         }
     }, true);

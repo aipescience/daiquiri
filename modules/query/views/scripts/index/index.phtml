@@ -83,9 +83,10 @@
             <ul id="jobs" class="daiquiri-widget nav nav-list nav-stacked" ng-controller="JobsController">
                 <li class="nav-header">Job list</li>
 
-                <li class="nav-item daiquiri-query-group-container" ng-repeat="group in jobs.assigned" draggable="{{ edit ? 'true' : 'false'}}">
+                <li class="nav-item daiquiri-query-group" ng-repeat="group in jobslist.assigned" >
+                    <!-- draggable="{{ edit ? 'true' : 'false'}}" data-group-id="{{group.id}}"  data-prev-id="{{group.prev_id}}" -->
                     <ul class="nav nav-list">
-                        <li class="nav-header daiquiri-query-group">
+                        <li class="nav-header">
                             <h6>
                                 <div class="daiquiri-query-groups-toggle" ng-click="group.hide = !group.hide">
                                     <i class="icon-eye-close" rel="tooltip" ng-hide="group.hide"></i>
@@ -97,11 +98,12 @@
                                 </div>
                                 <div class="daiquiri-query-groups-item" ng-class="{'edit': edit}">{{group.name}}</div>
                             </h6>
-                            <div class="daiquiri-query-group-drag-area" ng-show="drag"></div>
+                            <div class="daiquiri-query-group-drag-area" ng-show="drag" data-group-id="{{group.id}}"></div>
                         </li>
 
                         <li class="daiquiri-query-job nav-item {{job.id == account.active.job ? 'active' : ''}}"
-                            ng-repeat="job in group.jobs" ng-hide="group.hide" draggable="{{ edit ? 'true' : 'false'}}">
+                            ng-repeat="job in group.jobs" ng-hide="group.hide" draggable="{{ edit ? 'true' : 'false'}}"
+                           data-job-id="{{job.id}}">
 
                             <a href="" ng-click="activateJob(job.id, $event)" >
                                 <div class="daiquiri-query-jobs-status pull-right" ng-hide="edit">
@@ -127,7 +129,8 @@
                 </li>
 
                 <li class="nav-item daiquiri-query-job daiquiri-query-unassigned {{job.id == account.active.job ? 'active' : ''}}"
-                    ng-repeat="job in jobs.unassigned" draggable="{{ edit ? 'true' : 'false'}}">
+                    ng-repeat="job in jobslist.unassigned" draggable="{{ edit ? 'true' : 'false'}}"
+                    data-job-id="{{job.id}}">
 
                     <a href="" ng-click="activateJob(job.id, $event)" >
                         <div class="daiquiri-query-jobs-status pull-right" ng-hide="edit">
