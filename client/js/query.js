@@ -388,23 +388,36 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             });
     }
 
-    function moveJob(jobId, newPrevId) {
-        if (jobId !== newPrevId && jobs[jobId].prev_id !== newPrevId) {
+    function moveJob(id, newPrevJobId, newPrevGroupId) {
+        if (
+            id === newPrevJobId ||                                                       // moved on itself
+            (angular.isUndefined(newPrevGroupId) && jobs[id].prev_id == newPrevJobId) || // same prev_id and same group
+            (jobs[id].group_id === newPrevGroupId && jobs[id].prev_id === null)          // prev_id null and same group
+        ) return;
 
-            var data = {
+        var data;
+
+        if (angular.isDefined(newPrevJobId)) {
+            data = {
                 'csrf': options.csrf,
-                'group_id': jobs[newPrevId].group_id,
-                'prev_id': newPrevId
+                'group_id': jobs[newPrevJobId].group_id,
+                'prev_id': newPrevJobId
             }
-
-            $http.post(base + '/query/account/move-job/id/' + jobId,$.param(data))
-                .success(function(response) {
-                    fetchAccount();
-                })
-                .error(function (response,status) {
-                    dialogError(response,status);
-                });
+        } else {
+            // this will be the new job of the specified group
+            data = {
+                'csrf': options.csrf,
+                'group_id': newPrevGroupId
+            }
         }
+
+        $http.post(base + '/query/account/move-job/id/' + id,$.param(data))
+            .success(function(response) {
+                fetchAccount();
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
     }
 
     function createGroup() {
@@ -435,6 +448,24 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             .error(function (response,status) {
                 dialogError(response,status);
             });
+    }
+
+    function moveGroup(id, newPrevId) {
+        if (id !== newPrevId && groups[id].prev_id !== newPrevId) {
+
+            var data = {
+                'csrf': options.csrf,
+                'prev_id': newPrevId
+            }
+
+            $http.post(base + '/query/account/move-group/id/' + id,$.param(data))
+                .success(function(response) {
+                    fetchAccount();
+                })
+                .error(function (response,status) {
+                    dialogError(response,status);
+                });
+        }
     }
 
     function dialogSuccess(response, callback) {
@@ -502,6 +533,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         createGroup: createGroup,
         renameGroup: renameGroup,
         removeGroup: removeGroup,
+        moveGroup: moveGroup,
         showDialog: showDialog,
         hideDialog: hideDialog
     };
@@ -905,11 +937,18 @@ app.controller('JobsController',['$scope','$timeout','$document','QueryService',
         // add the drag class
         element.addClass('drag');
 
-        // store data about job in event
-        event.dataTransfer.setData('job_id',element.attr('data-job-id'));
+        // store data about group/job in event
+        var drag = {};
+        if (angular.isDefined(element.attr('data-group-id'))) {
+            drag.type = 'group';
+            drag.id = element.attr('data-group-id');
+        } else if (angular.isDefined(element.attr('data-job-id'))) {
+            drag.type = 'job';
+            drag.id = element.attr('data-job-id');
+        }
 
         $timeout(function() {
-            $scope.drag = true;
+            $scope.drag = drag;
         });
     }
     function handleDragEnd(event) {
@@ -935,14 +974,17 @@ app.controller('JobsController',['$scope','$timeout','$document','QueryService',
         event.preventDefault();
     }
     function handleDrop(event) {
-        $(event.target).removeClass('target');
+        var target = $(event.target);
+        target.removeClass('target');
 
-        var jobId = event.dataTransfer.getData('job_id');
-        var newPrevId = $(event.target).parent().attr('data-job-id');
-
-        QueryService.moveJob(jobId, newPrevId);
+        if ($scope.drag.type === 'group') {
+            QueryService.moveGroup($scope.drag.id, target.attr('data-group-id'));
+        } else if ($scope.drag.type === 'job') {
+            QueryService.moveJob($scope.drag.id, target.attr('data-job-id'), target.attr('data-group-id'));
+        }
 
         event.preventDefault();
+        event.stopPropagation();
     }
 
     $scope.$watch(function () {
@@ -950,7 +992,7 @@ app.controller('JobsController',['$scope','$timeout','$document','QueryService',
     }, function(newValue, oldValue) {
         if (newValue !== oldValue) {
             $timeout(function() {
-                angular.element('.daiquiri-query-job').each(function (key, node) {
+                angular.element('.daiquiri-query-job, .daiquiri-query-group, .daiquiri-query-group-dropzone, .daiquiri-query-job-dropzone').each(function (key, node) {
                     node.addEventListener('dragstart', handleDragStart, false);
                     node.addEventListener('dragend', handleDragEnd, false);
                     node.addEventListener('dragenter', handleDragEnter, false);

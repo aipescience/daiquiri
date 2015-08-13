@@ -86,27 +86,34 @@ form#sql .CodeMirror {
 
 /* jobs drag and drop */
 
+.daiquiri-query-group.drag,
 .daiquiri-query-job.drag > a,
 .daiquiri-query-job.drag > a:focus {
     background-color: #ccc !important;
 }
 
 .daiquiri-query-group,
+.daiquiri-query-group-header,
 .daiquiri-query-job {
     position: relative;
 }
-.daiquiri-query-group-drag-area,
-.daiquiri-query-job-drag-area {
+.daiquiri-query-group-dropzone,
+.daiquiri-query-job-dropzone {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
 }
-.daiquiri-query-group-drag-area.target,
-.daiquiri-query-job-drag-area.target {
-    border-bottom: 3px solid #aaa;
+.daiquiri-query-group-dropzone.target,
+.daiquiri-query-job-dropzone.target {
+    border-bottom: 3px solid #08c;
 }
+.daiquiri-query-group .daiquiri-query-group-dropzone.target,
+.daiquiri-query-job .daiquiri-query-job-dropzone.target {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
 
 /* SAMP tab */
 
