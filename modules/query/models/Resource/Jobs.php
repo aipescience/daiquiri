@@ -162,7 +162,7 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
      * @param array $errors     array for the errors
      */
     public function moveRow($id, $prevId, $nextId, $newPrevId, $groupId, $newGroupId, &$errors) {
-        
+
         // set proper NULL
         if (empty($newPrevId)) $newPrevId = NULL;
         if (empty($newGroupId)) $newGroupId = NULL;

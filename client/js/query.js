@@ -326,20 +326,20 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         $http.post(base + '/query/account/kill-job/id/' + dialog.obj.id,$.param({'csrf': options.csrf}))
             .success(function(response) {
                 dialogSuccess(response, function() {
-                    // get the index of the job in the jobs array (by magic)
-                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': dialog.obj.id})[0]);
-
                     // check if the job was selected
                     if (dialog.obj.id == account.job.id) {
-                        if (account.jobs.length == 1) {
-                            // no jobs left, jump to form
-                            activateForm();
-                        } else if (i == account.jobs.length - 1) {
-                            // this was the last job, jump to the previous job
-                            activateJob(account.jobs[i-1].id)
+                        // decide what job to activate next
+                        if (dialog.obj.next_id === null) {
+                            if (dialog.obj.prev_id === null) {
+                                // no jobs left in this group, lets jump to the form
+                                activateForm();
+                            } else {
+                                // this was the last job, jump to the previous job
+                                activateJob(dialog.obj.prev_id);
+                            }
                         } else {
                             // jump to the next job in array
-                            activateJob(account.jobs[i+1].id)
+                            activateJob(dialog.obj.next_id);
                         }
                     }
                 });
@@ -353,20 +353,20 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         $http.post(base + '/query/account/remove-job/id/' + dialog.obj.id,$.param({'csrf': options.csrf}))
             .success(function(response) {
                 dialogSuccess(response, function() {
-                    // get the index of the job in the jobs array (by magic)
-                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': dialog.obj.id})[0]);
-
                     // check if the job was selected
                     if (dialog.obj.id == account.job.id) {
-                        if (account.jobs.length == 1) {
-                            // no jobs left, jump to form
-                            activateForm();
-                        } else if (i == account.jobs.length - 1) {
-                            // this was the last job, jump to the previous job
-                            activateJob(account.jobs[i-1].id)
+                        // decide what job to activate next
+                        if (dialog.obj.next_id === null) {
+                            if (dialog.obj.prev_id === null) {
+                                // no jobs left in this group, lets jump to the form
+                                activateForm();
+                            } else {
+                                // this was the last job, jump to the previous job
+                                activateJob(dialog.obj.prev_id);
+                            }
                         } else {
                             // jump to the next job in array
-                            activateJob(account.jobs[i+1].id)
+                            activateJob(dialog.obj.next_id);
                         }
                     }
                 });
