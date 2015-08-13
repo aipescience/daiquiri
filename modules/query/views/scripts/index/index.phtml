@@ -83,13 +83,14 @@
             <ul id="jobs" class="daiquiri-widget nav nav-list nav-stacked" ng-controller="JobsController">
                 <li class="nav-header daiquiri-query-group-header">
                     <div>Job list</div>
-                    <div class="daiquiri-query-group-dropzone" ng-show="drag.type === 'group'" data-group-id=""></div>
+                    <div class="daiquiri-query-group-dropzone" ng-show="drag.type === 'group' && jobslist.hasGroups" data-group-id=""></div>
+                    <div class="daiquiri-query-job-dropzone" ng-show="drag.type === 'job' && !jobslist.hasGroups" data-group-id=""></div>
                 </li>
 
-                <li class="nav-item daiquiri-query-group" ng-repeat="group in jobslist.assigned"
-                    draggable="{{ edit ? 'true' : 'false'}}" data-group-id="{{group.id}}">
+                <li class="nav-item daiquiri-query-group" ng-repeat="group in jobslist.data"
+                    draggable="{{ (edit && group.id) ? 'true' : 'false'}}" data-group-id="{{group.id}}">
                     <ul class="nav nav-list">
-                        <li class="nav-header daiquiri-query-group-header">
+                        <li class="nav-header daiquiri-query-group-header" ng-show="jobslist.hasGroups">
                             <h6>
                                 <div class="daiquiri-query-groups-toggle" ng-click="group.hide = !group.hide">
                                     <i class="icon-eye-close" rel="tooltip" ng-hide="group.hide"></i>
@@ -128,33 +129,8 @@
 
                             <div class="daiquiri-query-job-dropzone" ng-show="drag.type === 'job'" data-job-id="{{job.id}}"></div>
                         </li>
-                        <div class="daiquiri-query-group-dropzone" ng-show="drag.type === 'group'" data-group-id="{{group.id}}"></div>
+                        <div class="daiquiri-query-group-dropzone" ng-show="drag.type === 'group' && group.id" data-group-id="{{group.id}}"></div>
                     </ul>
-                </li>
-
-                <li class="nav-item daiquiri-query-job daiquiri-query-unassigned {{job.id == account.active.job ? 'active' : ''}}"
-                    ng-repeat="job in jobslist.unassigned" draggable="{{ edit ? 'true' : 'false'}}"
-                    data-job-id="{{job.id}}">
-
-                    <a href="" ng-click="activateJob(job.id, $event)" >
-                        <div class="daiquiri-query-jobs-status pull-right" ng-hide="edit">
-                            <i class="icon-ok" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
-                            <i class="icon-warning-sign" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
-                            <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
-                            <i class="icon-remove" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
-                            <i class="icon-trash" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
-                            <i class="icon-pause" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
-                            <i class="icon-ban-circle" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
-                        </div>
-                        <div class="daiquiri-query-jobs-options" ng-show="edit">
-                            <i class="daiquiri-query-jobs-option icon-pencil" ng-click="showDialog('rename-job', job)"></i>
-                            <i class="daiquiri-query-jobs-option icon-trash" ng-click="showDialog('remove-job', job)"></i>
-                        </div>
-
-                        <div class="daiquiri-query-jobs-item" ng-class="{'edit': edit}">{{job.table}}</div>
-                    </a>
-
-                    <div class="daiquiri-query-job-dropzone" ng-show="drag.type === 'job'" data-job-id="{{job.id}}"></div>
                 </li>
 
                 <li class="nav-footer">

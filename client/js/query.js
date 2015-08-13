@@ -122,7 +122,10 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     };
 
     // jobs object for the jobs list, will be filled via ajax as well
-    var jobslist = {};
+    var jobslist = {
+        data: [],
+        hasGroups: false
+    };
 
     // lookup object to get the job/group for a given id
     var jobs = {};
@@ -153,9 +156,8 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 jobs = {};
                 groups = {};
 
-                // create object to hold the groups and their jobs as well as the unassigned jobs
-                var assigned = [];
-                var unassigned = [];
+                // create a temporary object to hold the groups and their jobs as well as the unassigned jobs
+                var data = [];
 
                 // create variable for the while loops
                 var run = false;
@@ -169,11 +171,11 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     groups[group.id] = group;
 
                     // check if this is the first group
-                    if (group.prev_id === null) assigned.push(group);
+                    if (group.prev_id === null) data.push(group);
                 });
 
                 // loop over groups and append to array
-                var currentGroup = assigned[0];
+                var currentGroup = data[0];
                 if (angular.isDefined(currentGroup)) {
                     run = true;
                     while (run) {
@@ -181,10 +183,14 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                             run = false;
                         } else {
                             currentGroup = groups[currentGroup.next_id];
-                            assigned.push(currentGroup);
+                            data.push(currentGroup);
                         }
                     }
                 }
+
+                // add a group for the unassigned jobs and push it to the array
+                groups[null] = {'name': 'unassigned', 'jobs': []};
+                data.push(groups[null]);
 
                 // loop over jobs to create job index and find first job in every group
                 angular.forEach(response.jobs, function(job) {
@@ -193,19 +199,13 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
 
                     // check if this is the first job in a group
                     if (job.prev_id === null) {
-                        if (job.group_id === null) {
-                            // this is the first unassigned job
-                            unassigned.push(job);
-                        } else {
-                            // this is the first job in a group
-                            groups[job.group_id].jobs.push(job);
-                        }
+                        groups[job.group_id].jobs.push(job);
                     };
                 });
 
                 // loop over groups to sort jobs into groups
                 var currentJob;
-                angular.forEach(assigned, function(group) {
+                angular.forEach(data, function(group) {
                     currentJob = group.jobs[0];
 
                     if (angular.isDefined(currentJob)) {
@@ -221,24 +221,12 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     }
                 });
 
-                // sort jobs into unassigned array
-                currentJob = unassigned[0];
-                if (angular.isDefined(currentJob)) {
-                    run = true;
-                    while (run) {
-                        if (currentJob.next_id === null) {
-                            run = false;
-                        } else {
-                            currentJob = jobs[currentJob.next_id];
-                            unassigned.push(currentJob);
-                        }
-                    }
-                }
-
                 // update if something has changed
-                if (jobslist.assigned != assigned || jobslist.unassigned != unassigned) {
-                    jobslist.assigned = assigned;
-                    jobslist.unassigned = unassigned;
+                if (!angular.equals(jobslist.data, data)) {
+                    jobslist.data = data;
+                    jobslist.hasGroups = data.length > 1;
+
+                    // refresh databases browser
                     BrowserService.initBrowser('databases');
 
                     // activate the current job again, if its status has changed
@@ -390,7 +378,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
 
     function moveJob(id, newPrevJobId, newPrevGroupId) {
         if (
-            id === newPrevJobId ||                                                       // moved on itself
+            id === newPrevJobId ||                                                       // dragded on itself
             (angular.isUndefined(newPrevGroupId) && jobs[id].prev_id == newPrevJobId) || // same prev_id and same group
             (jobs[id].group_id === newPrevGroupId && jobs[id].prev_id === null)          // prev_id null and same group
         ) return;
@@ -451,21 +439,24 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     }
 
     function moveGroup(id, newPrevId) {
-        if (id !== newPrevId && groups[id].prev_id !== newPrevId) {
+        if (
+            id === newPrevId ||                 // dragded on itself
+            groups[id].prev_id === newPrevId || // same prev_id
+            angular.isUndefined(newPrevId)      // dragged on the unassigned group
+        ) return;
 
-            var data = {
-                'csrf': options.csrf,
-                'prev_id': newPrevId
-            }
-
-            $http.post(base + '/query/account/move-group/id/' + id,$.param(data))
-                .success(function(response) {
-                    fetchAccount();
-                })
-                .error(function (response,status) {
-                    dialogError(response,status);
-                });
+        var data = {
+            'csrf': options.csrf,
+            'prev_id': newPrevId
         }
+
+        $http.post(base + '/query/account/move-group/id/' + id,$.param(data))
+            .success(function(response) {
+                fetchAccount();
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
     }
 
     function dialogSuccess(response, callback) {
