@@ -916,7 +916,7 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
 
 app.controller('JobsController',['$scope','$timeout','$document','QueryService',function($scope,$timeout,$document,QueryService) {
 
-    $scope.edit = true;
+    $scope.edit = false;
     $scope.drag = false;
 
     $scope.jobslist = QueryService.jobslist;

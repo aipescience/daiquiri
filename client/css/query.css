@@ -79,9 +79,11 @@ form#sql .CodeMirror {
     height: 14px;
     line-height: 14px;
 }
-.daiquiri-query-groups-item.edit,
+.daiquiri-query-groups-item.edit {
+    width: 140px;
+}
 .daiquiri-query-jobs-item.edit {
-    width: 115px;
+    width: 155px;
 }
 
 /* jobs drag and drop */
