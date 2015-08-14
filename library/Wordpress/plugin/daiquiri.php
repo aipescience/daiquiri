@@ -36,11 +36,11 @@ $show_admin_bar = false;
 
 /*
  * Automatiacally login the user which is logged in into daiquiri right now.
- */ 
+ */
 
 add_action('init', 'daiquiri_auto_login');
 
-function daiquiri_auto_login() 
+function daiquiri_auto_login()
 {
     if (!is_user_logged_in()) {
         // check which user is logged in into daiquiri right now
@@ -151,7 +151,7 @@ function daiquiri_auto_login()
             do_action('wp_login', $user->user_login);
         } else {
             echo '<h1>Error with auth</h1><p>HTTP request status != 200.</p>';
-            die(0); 
+            die(0);
         }
     }
 }
@@ -167,13 +167,13 @@ function daiquiri_authenticate($username, $password) {
 
     if (!is_user_logged_in()) {
         if ($_GET["no_redirect"] !== 'true') {
-            wp_redirect(DAIQUIRI_URL . '/auth/login');
+            wp_redirect(get_site_url() . '/../auth/login');
             exit;
         }
     } else {
         // check if there is a redirect
         if (empty($_GET['redirect_to'])) {
-            wp_redirect(DAIQUIRI_URL . '/auth/login');
+            wp_redirect(get_site_url() . '/../auth/login');
             exit;
         } else {
             // just do the redirect
@@ -206,9 +206,6 @@ function daiquiri_hide_end() {
 add_action('wp_logout', 'daiquiri_logout');
 
 function daiquiri_logout() {
-    require_once('HTTP/Request2.php');
-    $req = new HTTP_Request2(DAIQUIRI_URL . '/auth/login/logout?cms_logout=false');
-    $req->setMethod('GET');
-    $req->addCookie("PHPSESSID", $_COOKIE["PHPSESSID"]);
-    $response = $req->send();
+    wp_redirect(get_site_url() . '/../auth/login/logout?cms_logout=false');
+    exit();
 }
