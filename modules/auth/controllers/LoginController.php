@@ -74,10 +74,7 @@ class Auth_LoginController extends Daiquiri_Controller_Abstract {
         // set cookies
         foreach ($this->_request->getCookie() as $cookie => $value) {
             if (strpos($cookie, 'wordpress_') === 0 || strpos($cookie, 'wp-settings') === 0) {
-                $cookiePath = Daiquiri_Config::getInstance()->getBaseUrl();
-                if (empty($cookiePath)) {
-                    $cookiePath = '/';
-                }
+                $cookiePath = Daiquiri_Config::getInstance()->getBaseUrl() . '/';
                 setcookie($cookie, ' ', time() - 31536000, $cookiePath);
             }
         }
