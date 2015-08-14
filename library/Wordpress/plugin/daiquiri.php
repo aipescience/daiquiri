@@ -103,10 +103,15 @@ function daiquiri_auto_login()
                 $wpUser['role'] = 'administrator';
             } else if ($daiquiriUser['role'] === 'manager') {
                 $wpUser['role'] = 'editor';
+            } else if (!empty(DAIQUIRI_AUTHOR_ROLE) && $daiquiriUser['role'] === DAIQUIRI_AUTHOR_ROLE) {
+                $wpUser['role'] = 'author';
+            } else if (!empty(DAIQUIRI_CONTRIBUTOR_ROLE) && $daiquiriUser['role'] === DAIQUIRI_CONTRIBUTOR_ROLE) {
+                $wpUser['role'] = 'contributor';
             } else {
                 $wpUser['role'] = 'subscriber';
             }
 
+            // get the name and the other credentials
             if (isset($daiquiriUser['firstname'])) {
                 $wpUser['first_name'] = $daiquiriUser['firstname'];
             }
