@@ -68,9 +68,20 @@ class Data_Model_Resource_Viewer extends Daiquiri_Model_Resource_Table {
      * @return  array   $rows
      */
     public function fetchPlot($x, $y, $nrows) {
-        // get select object
+        // quote x and y
+        $cols = array(
+            $this->getAdapter()->quoteIdentifier($x),
+            $this->getAdapter()->quoteIdentifier($y)
+        );
+
+        // remove `.` from zend quoting, these are columns!
+        $cols = str_replace('`.`','.',$cols);
+
         $select = $this->select(array('limit' => $nrows));
-        $select->from($this->getTablename(), array($x,$y));
+        $select->from($this->getTablename(), array(
+            new Zend_Db_Expr($cols[0]),
+            new Zend_Db_Expr($cols[1])
+        ));
 
         // set fetch mode
         $this->getAdapter()->setFetchMode(Zend_Db::FETCH_NUM);
