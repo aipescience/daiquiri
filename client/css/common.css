@@ -201,16 +201,16 @@ dl.dl-horizontal dd {
     -moz-user-drag: none;
     user-drag: none;
 }
-.daiquiri-widget.nav-list li.nav-footer {
+.daiquiri-widget.nav-list li.nav-note {
     padding: 5px 15px 0 15px;
     font-size: small;
     line-height: 14px;
 }
-.daiquiri-widget.nav-list li.nav-footer button {
+.daiquiri-widget.nav-list li.nav-note p,
+.daiquiri-widget.nav-list li.nav-note button {
     display: block;
-    padding-bottom: 5px;
+    margin-bottom: 5px;
 }
-
 
 /* helper */
 

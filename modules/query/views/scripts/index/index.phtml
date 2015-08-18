@@ -87,6 +87,8 @@
                     <div class="daiquiri-query-job-dropzone" ng-show="drag.type === 'job' && !jobslist.hasGroups" data-group-id=""></div>
                 </li>
 
+                <li class="nav-note" ng-show="jobslist.isEmpty"><p>No jobs found</p></li>
+
                 <li class="nav-item daiquiri-query-group" ng-repeat="group in jobslist.data"
                     draggable="{{ (edit && group.id) ? 'true' : 'false'}}" data-group-id="{{group.id}}">
                     <ul class="nav nav-list">
@@ -133,7 +135,7 @@
                     </ul>
                 </li>
 
-                <li class="nav-footer">
+                <li class="nav-note">
                     <button class="linkbutton" ng-click="edit = true" ng-hide="edit">Edit jobs and groups</button>
                     <button class="linkbutton" ng-click="showDialog('create-group')" ng-show="edit">Create new group</button>
                     <button class="linkbutton" ng-click="edit = false" ng-show="edit">Stop editing</button>

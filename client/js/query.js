@@ -124,6 +124,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     // jobs object for the jobs list, will be filled via ajax as well
     var jobslist = {
         data: [],
+        isEmpty: true,
         hasGroups: false
     };
 
@@ -224,19 +225,22 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 // update if something has changed
                 if (!angular.equals(jobslist.data, data)) {
                     jobslist.data = data;
+                    jobslist.isEmpty = data.length == 1 && data[0].jobs.length == 0;
                     jobslist.hasGroups = data.length > 1;
 
                     // refresh databases browser
-                    BrowserService.initBrowser('databases');
+                    if (angular.isDefined(BrowserService.browser.databases)) {
+                        BrowserService.initBrowser('databases');
+                    }
+                }
 
-                    // activate the current job again, if its status has changed
-                    if (account.active.job != false && account.job.status != 'success') {
-                        if (jobs[account.job.id].status != account.job.status ||
-                            jobs[account.job.id].complete != account.job.complete) {
+                // activate the current job again, if its status has changed
+                if (account.active.job != false && account.job.status != 'success') {
+                    if (jobs[account.job.id].status != account.job.status ||
+                        jobs[account.job.id].complete != account.job.complete) {
 
-                            // activate the job again
-                            account.job.status = activateJob(id);
-                        }
+                        // activate the job again
+                        account.job.status = activateJob(account.job.id);
                     }
                 }
             })
