@@ -930,14 +930,21 @@ app.controller('JobsController',['$scope','$timeout','$document','QueryService',
         if (angular.isDefined(element.attr('data-group-id'))) {
             drag.type = 'group';
             drag.id = element.attr('data-group-id');
+            drag.name = element.attr('data-group-name');
         } else if (angular.isDefined(element.attr('data-job-id'))) {
             drag.type = 'job';
             drag.id = element.attr('data-job-id');
+            drag.name = element.attr('data-job-name');
         }
+
+        // set dataTransfer or drag and drop with gecko will not work
+        event.dataTransfer.setData('text/plain', drag.name);
 
         $timeout(function() {
             $scope.drag = drag;
         });
+
+        event.stopPropagation();
     }
     function handleDragEnd(event) {
         // get the dragged element
@@ -949,6 +956,8 @@ app.controller('JobsController',['$scope','$timeout','$document','QueryService',
         $timeout(function() {
             $scope.drag = false;
         });
+
+        event.stopPropagation();
     }
     function handleDragEnter(event) {
         $(event.target).addClass('target');
