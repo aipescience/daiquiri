@@ -308,7 +308,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
 
         // get the values from the Query_Jobs table
         $jobRow = $this->getJobResource()->fetchRow($id);
-        foreach (array('time','prev_status_id','type_id','nrows','size','complete') as $key) {
+        foreach (array('time','prev_status_id','type_id','group_id','prev_id','next_id','nrows','size','complete','removed') as $key) {
             $row[$key] = $jobRow[$key];
         }
 

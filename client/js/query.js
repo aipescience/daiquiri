@@ -304,6 +304,23 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             });
     }
 
+    function activateNextJob() {
+        var job = jobs[account.job.id];
+
+        if (job.next_id === null) {
+            if (job.prev_id === null) {
+                // no jobs left in this group, lets jump to the form
+                activateForm();
+            } else {
+                // this was the last job, jump to the previous job
+                activateJob(job.prev_id);
+            }
+        } else {
+            // jump to the next job in array
+            activateJob(job.next_id);
+        }
+    }
+
     function renameJob () {
         var data = {
             'csrf': options.csrf,
@@ -332,19 +349,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 dialogSuccess(response, function() {
                     // check if the job was selected
                     if (dialog.obj.id == account.job.id) {
-                        // decide what job to activate next
-                        if (dialog.obj.next_id === null) {
-                            if (dialog.obj.prev_id === null) {
-                                // no jobs left in this group, lets jump to the form
-                                activateForm();
-                            } else {
-                                // this was the last job, jump to the previous job
-                                activateJob(dialog.obj.prev_id);
-                            }
-                        } else {
-                            // jump to the next job in array
-                            activateJob(dialog.obj.next_id);
-                        }
+                        activateNextJob();
                     }
                 });
             })
@@ -359,19 +364,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 dialogSuccess(response, function() {
                     // check if the job was selected
                     if (dialog.obj.id == account.job.id) {
-                        // decide what job to activate next
-                        if (dialog.obj.next_id === null) {
-                            if (dialog.obj.prev_id === null) {
-                                // no jobs left in this group, lets jump to the form
-                                activateForm();
-                            } else {
-                                // this was the last job, jump to the previous job
-                                activateJob(dialog.obj.prev_id);
-                            }
-                        } else {
-                            // jump to the next job in array
-                            activateJob(dialog.obj.next_id);
-                        }
+                        activateNextJob();
                     }
                 });
             })
