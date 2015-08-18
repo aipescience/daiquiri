@@ -204,6 +204,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             // just kill the job
             $this->killJob($id);
         } else {
+
             // drop result table for job
             $this->_dropTable($job['database'], $job['table']);
 
@@ -536,7 +537,7 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                 ));
             }
         } else if (in_array($status, array('removed','error','timeout','killed'))) {
-            $this->getJobResource()->removeRow($id, $this->getStatusId('removed'));
+            $this->getJobResource()->removeRow($job['id'], $this->getStatusId('removed'));
         }
     }
 }
