@@ -75,7 +75,7 @@ form#sql .CodeMirror {
     overflow: hidden;
     text-overflow: ellipsis;
     margin-right: 20px;
-    width: 170px;
+    width: 168px;
     height: 14px;
     line-height: 14px;
 }
@@ -83,7 +83,7 @@ form#sql .CodeMirror {
     width: 140px;
 }
 .daiquiri-query-jobs-item.edit {
-    width: 155px;
+    width: 154px;
 }
 
 /* jobs drag and drop */
