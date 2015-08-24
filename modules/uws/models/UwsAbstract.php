@@ -244,6 +244,9 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
                     unset($postParams['action']);
                 }
 
+                // NOTE: Actually, run and abort should be set below, requiring
+                // '/phase' appended to the /{jobs}/(job-id) URI, according to
+                // IVOA UWS standard. But we support it without '/phase' as well.
                 if (strtolower($phase) === "run") {
                     $this->runJob($job);
                 } else if (strtolower($phase) === "abort") {
@@ -303,6 +306,23 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
                         $this->setParameters($job, $postParams);
                         break;
+
+                    case 'phase':
+                        // this is the standard for starting/aborting jobs,
+                        // a phase change is required as well
+                        $phase = false;
+                        if (isset($postParams['phase'])) {
+                            $phase = $postParams['phase'];
+                            unset($postParams['phase']);
+                        }
+                        // catch else?
+                        if (strtolower($phase) === "run") {
+                            $this->runJob($job);
+                        } else if (strtolower($phase) === "abort") {
+                            $this->abortJob($job);
+                        }
+                        break;
+                        // if anything else is provided, nothing happens
 
                     default:
                         throw new Daiquiri_Exception_BadRequest();
@@ -396,7 +416,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
     public function options() {
         return array(
-            'stautus' => 'ok',
+            'status' => 'ok',
             'headers' => array('Allow' => 'OPTIONS, INDEX, GET, POST, PUT, DELETE')
         );
     }
