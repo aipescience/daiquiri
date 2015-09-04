@@ -94,7 +94,6 @@ function daiquiri_auto_login()
             $wpUser = array(
                 'user_login' => $daiquiriUser['id'],
                 'user_nicename' => $daiquiriUser['username'],
-                'user_pass' => 'foo',
                 'user_email' => $daiquiriUser['email']
             );
 
@@ -139,9 +138,9 @@ function daiquiri_auto_login()
             if (is_int($status)) {
                 $userId = $status;
             } else {
-	        echo '<h1>Error with auth</h1>';
+                echo '<h1>Error with auth</h1>';
                 var_dump($status);
-		exit();
+                exit();
             }
 
             // log in the newly created or updated user
