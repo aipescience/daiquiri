@@ -93,19 +93,19 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
         $jobUWS->phase = $row['phase'];
         $jobUWS->quote = $row['quote'];
 
-        if ($row['startTime'] !== "0000-00-00 00:00:00") {
+        if ($row['startTime'] !== "0000-00-00 00:00:00" && $row['startTime'] != NULL) {
             $datetime = new DateTime($row['startTime']);
             $jobUWS->startTime = $datetime->format('c');
         }
 
-        if ($row['endTime'] !== "0000-00-00 00:00:00") {
+        if ($row['endTime'] !== "0000-00-00 00:00:00" && $row['endTime'] != NULL) {
             $datetime = new DateTime($row['endTime']);
             $jobUWS->endTime = $datetime->format('c');
         }
 
         $jobUWS->executionDuration = intval($row['executionDuration']);
 
-        if ($row['destruction'] !== "0000-00-00 00:00:00") {
+        if ($row['destruction'] !== "0000-00-00 00:00:00" && $row['destruction'] != NULL) {
             $datetime = new DateTime($row['destruction']);
             $jobUWS->destruction = $datetime->format('c');
         }
