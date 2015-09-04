@@ -127,6 +127,9 @@ function daiquiri_auto_login()
             // update or create the user in the wordpress db
             $storedUser = get_user_by('login', $wpUser['user_login']);
             if ($storedUser === false) {
+                // fake a random password
+                $wpUser['user_pass'] = uniqid();
+
                 // create a new user in the wordpress db
                 $status = wp_insert_user($wpUser);
             } else {
