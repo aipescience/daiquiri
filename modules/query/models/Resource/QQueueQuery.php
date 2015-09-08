@@ -536,7 +536,14 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
                     'complete' => true
                 ));
             }
-        } else if (in_array($status, array('removed','error','timeout','killed'))) {
+        } else if (in_array($status, array('error','timeout','killed'))) {
+            // set the values and the complete flag
+            $this->getJobResource()->updateRow($job['id'], array(
+                'nrows' => 0,
+                'size' => 0,
+                'complete' => true
+            ));
+        } else if ($status === 'removed') {
             $this->getJobResource()->removeRow($job['id'], $this->getStatusId('removed'));
         }
     }
