@@ -139,6 +139,10 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         // set next_id to NULL
         $data['next_id'] = NULL;
 
+        // set complete and removed to 0
+        $data['complete'] = 0;
+        $data['removed'] = 0;
+
         // store the values in the database
         $this->getAdapter()->insert('Query_Jobs', $data);
 
