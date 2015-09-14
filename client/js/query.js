@@ -456,6 +456,16 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             });
     }
 
+    function toggleGroup(id) {
+        $http.post(base + '/query/account/toggle-group/id/' + id,$.param({'csrf': options.csrf}))
+            .success(function(response) {
+                fetchAccount();
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
     function dialogSuccess(response, callback) {
         if (response.status == 'ok') {
             if (angular.isFunction(callback)) callback(response);
@@ -522,6 +532,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         renameGroup: renameGroup,
         removeGroup: removeGroup,
         moveGroup: moveGroup,
+        toggleGroup: toggleGroup,
         showDialog: showDialog,
         hideDialog: hideDialog
     };
@@ -882,6 +893,10 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
 
     $scope.renameGroup = function() {
         QueryService.renameGroup();
+    }
+
+    $scope.toggleGroup = function(id) {
+        QueryService.toggleGroup(id);
     }
 
     $scope.removeGroup = function() {

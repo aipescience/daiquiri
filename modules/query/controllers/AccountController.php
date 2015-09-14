@@ -76,6 +76,11 @@ class Query_AccountController extends Daiquiri_Controller_Abstract {
         $this->getControllerHelper('form')->moveGroup($id);
     }
 
+    public function toggleGroupAction() {
+        $id = $this->_getParam('id');
+        $this->getControllerHelper('form')->toggleGroup($id);
+    }
+
     public function deleteGroupAction() {
         $id = $this->_getParam('id');
         $this->getControllerHelper('form')->deleteGroup($id);

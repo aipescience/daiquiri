@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS `Query_Groups` (
   `user_id` INTEGER NOT NULL,
   `prev_id` INTEGER,
   `next_id` INTEGER,
-  `name` VARCHAR(256) NOT NULL
+  `name` VARCHAR(256) NOT NULL,
+  `hidden` BOOL NOT NULL
 ) ENGINE InnoDB COLLATE 'utf8_unicode_ci';
 
 CREATE TABLE IF NOT EXISTS `Query_Examples` (

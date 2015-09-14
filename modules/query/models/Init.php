@@ -47,7 +47,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             $rules['guest'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
-                    'index','showJob','killJob','removeJob','renameJob','moveJob','createGroup','updateGroup','moveGroup','deleteGroup','databases','keywords','nativeFunctions','customFunctions','examples'
+                    'index','showJob','killJob','removeJob','renameJob','moveJob','createGroup','updateGroup','moveGroup','toggleGroup','deleteGroup','databases','keywords','nativeFunctions','customFunctions','examples'
                 ),
                 'Query_Model_Database' => array('download','regenerate','file','stream'),
                 'Query_Model_Examples' => array('index', 'show')

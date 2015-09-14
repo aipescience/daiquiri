@@ -459,6 +459,51 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
     }
 
     /**
+     * Toggle the visibility of a query job group.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function toggleGroup($id, array $formParams = array()) {
+        // set group resource
+        $this->setResource(new Query_Model_Resource_Groups());
+
+        // get the entry from the database
+        $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+        if ($entry['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
+        }
+
+        // create the form object
+        $form = new Daiquiri_Form_Confirm(array(
+            'submit' => 'Toggle'
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                if ($entry['hidden'] === '0') {
+                    $this->getResource()->updateRow($id, array('hidden' => '1'));
+                } else {
+                    $this->getResource()->updateRow($id, array('hidden' => '0'));
+                }
+
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
      * Deletes a query job group.
      * @param int $id id of the query job group
      * @param array $formParams

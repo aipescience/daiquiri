@@ -50,7 +50,7 @@
                     <p ng-show="account.database.nactive > 1">
                         There are {{account.database.nactive}} jobs in the queue.
                     </p>
-                    <p ng-show="account.database.guest == true">
+                    <p ng-show="account.database.guest === true">
                         You are using the guest user. For a personal account, please sign up <a href="/auth/registration/register">here</a>.
                     </p>
                     <p ng-show="account.database.guest === true">
@@ -94,9 +94,9 @@
                     <ul class="nav nav-list">
                         <li class="nav-header daiquiri-query-group-header" ng-show="jobslist.hasGroups">
                             <h6>
-                                <div class="daiquiri-query-groups-toggle" ng-click="group.hide = !group.hide">
-                                    <i class="icon-eye-close" rel="tooltip" ng-hide="group.hide"></i>
-                                    <i class="icon-eye-open" rel="tooltip" ng-show="group.hide"></i>
+                                <div class="daiquiri-query-groups-toggle" ng-click="toggleGroup(group.id)" ng-show="group.id != null">
+                                    <i class="icon-eye-close" rel="tooltip" ng-hide="group.hidden == 1"></i>
+                                    <i class="icon-eye-open" rel="tooltip" ng-show="group.hidden == 1"></i>
                                 </div>
                                 <div class="daiquiri-query-groups-options" ng-show="edit && group.id != null">
                                     <i class="icon-pencil" ng-click="showDialog('rename-group', group)"></i>
@@ -108,7 +108,7 @@
                         </li>
 
                         <li class="daiquiri-query-job nav-item {{job.id == account.active.job ? 'active' : ''}}"
-                            ng-repeat="job in group.jobs" ng-hide="group.hide" draggable="{{ edit ? 'true' : 'false'}}"
+                            ng-repeat="job in group.jobs" ng-hide="group.hidden == 1" draggable="{{ edit ? 'true' : 'false'}}"
                             data-job-id="{{job.id}}" data-job-name="{{job.database}}.{{job.table}}">
 
                             <a href="" ng-click="activateJob(job.id, $event)" draggable="false">

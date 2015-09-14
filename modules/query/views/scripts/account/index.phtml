@@ -59,13 +59,14 @@
                 <th>Name</th>
                 <th>Prev</th>
                 <th>Next</th>
+                <th>Hidden</th>
                 <th>Options</th>
             </tr>
         </thead>
         <tbody>
         <?php foreach ($this->groups as $group): ?>
             <tr>
-                <?php foreach (array('id','name','prev_id','next_id') as $key): ?>
+                <?php foreach (array('id','name','prev_id','next_id','hidden') as $key): ?>
                 <td>
                     <?php echo $this->escape($group[$key]); ?>
                 </td>
@@ -80,6 +81,11 @@
                     echo $this->internalLink(array(
                         'text' => 'Move',
                         'href' => '/query/account/move-group/id/' . $group['id'],
+                        'append' => '&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'Toggle',
+                        'href' => '/query/account/toggle-group/id/' . $group['id'],
                         'append' => '&nbsp;'
                     ));
                     echo $this->internalLink(array(
