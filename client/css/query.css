@@ -61,6 +61,8 @@ form#sql .CodeMirror {
     display: block;
     float: right;
     opacity: 0.5;
+
+    font-size: 14px;
 }
 .daiquiri-query-groups-toggle i,
 .daiquiri-query-groups-options i,
@@ -68,8 +70,13 @@ form#sql .CodeMirror {
     display: block;
     float: left;
     cursor: pointer;
-}
 
+    margin-right: 3px;
+}
+.daiquiri-query-groups-toggle i {
+    width: 16px;
+    margin-right: 0;
+}
 .daiquiri-query-groups-item,
 .daiquiri-query-jobs-item {
     overflow: hidden;
@@ -85,6 +92,8 @@ form#sql .CodeMirror {
 .daiquiri-query-jobs-item.edit {
     width: 154px;
 }
+
+
 
 /* jobs drag and drop */
 

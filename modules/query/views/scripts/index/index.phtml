@@ -95,12 +95,12 @@
                         <li class="nav-header daiquiri-query-group-header" ng-show="jobslist.hasGroups">
                             <h6>
                                 <div class="daiquiri-query-groups-toggle" ng-click="toggleGroup(group.id)" ng-show="group.id != null">
-                                    <i class="icon-eye-close" rel="tooltip" ng-hide="group.hidden == 1"></i>
-                                    <i class="icon-eye-open" rel="tooltip" ng-show="group.hidden == 1"></i>
+                                    <i class="fa fa-folder" rel="tooltip" ng-hide="group.hidden == 1"></i>
+                                    <i class="fa fa-folder-open" rel="tooltip" ng-show="group.hidden == 1"></i>
                                 </div>
                                 <div class="daiquiri-query-groups-options" ng-show="edit && group.id != null">
-                                    <i class="icon-pencil" ng-click="showDialog('rename-group', group)"></i>
-                                    <i class="icon-trash" ng-click="showDialog('remove-group', group)"></i>
+                                    <i class="fa fa-pencil" ng-click="showDialog('rename-group', group)"></i>
+                                    <i class="fa fa-trash" ng-click="showDialog('remove-group', group)"></i>
                                 </div>
                                 <div class="daiquiri-query-groups-item" ng-class="{'edit': edit}">{{group.name}}</div>
                             </h6>
@@ -122,8 +122,8 @@
                                     <i class="icon-ban-circle" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
                                 </div>
                                 <div class="daiquiri-query-jobs-options" ng-show="edit">
-                                    <i class="daiquiri-query-jobs-option icon-pencil" ng-click="showDialog('rename-job', job)"></i>
-                                    <i class="daiquiri-query-jobs-option icon-trash" ng-click="showDialog('remove-job', job)"></i>
+                                    <i class="daiquiri-query-jobs-option fa fa-pencil" ng-click="showDialog('rename-job', job)"></i>
+                                    <i class="daiquiri-query-jobs-option fa fa-trash" ng-click="showDialog('remove-job', job)"></i>
                                 </div>
 
                                 <div class="daiquiri-query-jobs-item" ng-class="{'edit': edit}">{{job.table}}</div>
