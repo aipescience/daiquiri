@@ -131,13 +131,13 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         }
 
         // set group_id to NULL
-        $data['next_id'] = NULL;
+        $data['group_id'] = NULL;
 
         // set prev_id to last group
-        $data['prev_id'] = $this->fetchLastId();
+        $data['prev_id'] = NULL;
 
         // set next_id to NULL
-        $data['next_id'] = NULL;
+        $data['next_id'] = $this->fetchFirstId();
 
         // set complete and removed to 0
         $data['complete'] = 0;
@@ -149,8 +149,8 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         // get the id of the new row
         $id = $this->getAdapter()->lastInsertId();
 
-        // store this group as next for previously last group
-        $this->getAdapter()->update('Query_Jobs', array('next_id' => $id), array('`id` = ?' => $data['prev_id']));
+        // update the previously first job
+        $this->getAdapter()->update('Query_Jobs', array('prev_id' => $id), array('`id` = ?' => $data['next_id']));
 
         return $id;
     }
