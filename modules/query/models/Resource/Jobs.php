@@ -140,8 +140,8 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         $data['next_id'] = $this->fetchFirstId();
 
         // set complete and removed to 0
-        $data['complete'] = 0;
-        $data['removed'] = 0;
+        if (!isset($data['complete'])) $data['complete'] = 0;
+        if (!isset($data['removed'])) $data['removed'] = 0;
 
         // store the values in the database
         $this->getAdapter()->insert('Query_Jobs', $data);
