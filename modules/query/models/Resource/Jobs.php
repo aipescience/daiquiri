@@ -411,4 +411,33 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
             return $row['id'];
         }
     }
+
+    /**
+     * Returns the jobs of a given year and month for the export function.
+     * @param  int $year year of the requested period
+     * @param  int $month month of the requested period
+     * @return array $export
+     */
+    public function fetchExport($year, $month) {
+
+        // define some cols
+        $cols = array('time','status_id','prev_status_id','type_id','ip');
+
+        // fetch the rows
+        $select = $this->select(array(
+            'where' => array(
+                '`complete` = 1',
+                '`ip` NOT LIKE "127.%"',
+                '`ip` NOT LIKE "10.%"',
+                '`ip` NOT LIKE "192.168.%"',
+                '`ip` != "::1"',
+                'YEAR(`time`)=?' => $year,
+                'MONTH(`time`)=?' => $month
+            )
+        ));
+        $select->from('Query_Jobs', $cols);
+        $rows = $this->fetchAll($select);
+
+        return array('cols' => $cols, 'rows' => $rows);
+    }
 }

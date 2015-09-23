@@ -84,7 +84,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
         );
 
         $rules['admin'] = array(
-            'Query_Model_Jobs' => array('rows','cols','show','kill','remove','rename'),
+            'Query_Model_Jobs' => array('rows','cols','show','kill','remove','rename','export'),
             'Query_Model_Examples' => array('index','create','update','delete','export')
         );
 

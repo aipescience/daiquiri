@@ -178,4 +178,36 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
         return array('form' => $form, 'status' => 'form');
     }
 
+    /**
+     * Show the query statistics for a given month.
+     * @return array $response
+     */
+    public function export(array $formParams = array()) {
+        // create the form object
+        $form = new Query_Form_Export();
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                // fetch the data from the database
+                $export = $this->getResource()->getJobResource()->fetchExport($values['year'], $values['month']);
+
+                return array(
+                    'status' => 'ok',
+                    'cols' => $export['cols'],
+                    'rows' => $export['rows'],
+                    'year' => $values['year'],
+                    'month' => $values['month']
+                );
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
 }
