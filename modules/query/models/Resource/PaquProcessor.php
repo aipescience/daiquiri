@@ -171,10 +171,11 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
      * @param string $sql query string
      * @param string $table name of the job's table
      * @param array $errors array holding any errors that occur
+     * @param array $sources array holding the databases and tables this query is based on
      * @param array $options any options that a specific implementation of validateQuery needs to get
      * @return bool $success
      */
-    public function validateQuery($sql, $table, array &$errors, $options = false) {
+    public function validateQuery($sql, $table, array &$errors, array &$sources, $options = false) {
         $errors = array();
 
         // preprocess string
@@ -212,7 +213,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         }
 
         //check ACLs
-        if ($this->_permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
+        if ($this->_permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors, $sources) === false) {
             return false;
         }
 
@@ -248,10 +249,11 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
      * @param array $plan $query plan
      * @param string $table name of the job's table
      * @param array $errors array holding any errors that occur
+     * @param array $sources array holding the databases and tables this query is based on
      * @param array $options any options that a specific implementation of validateQuery needs to get
      * @return bool $success
      */
-    public function validatePlan(&$plan, $table, array &$errors, $options = false) {
+    public function validatePlan(&$plan, $table, array &$errors, array &$sources, $options = false) {
         $errors = array();
 
         // preprocess string
@@ -287,7 +289,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
             return false;
         }
 
-        if (!$this->_checkPaquPermissionsAndSyntax($multiLineParseTrees, $multiLines, $errors)) {
+        if (!$this->_checkPaquPermissionsAndSyntax($multiLineParseTrees, $multiLines, $errors, $sources)) {
             return false;
         }
 
@@ -493,7 +495,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         return true;
     }
 
-    private function _checkPaquPermissionsAndSyntax($parseTrees, $sql, array &$errors) {
+    private function _checkPaquPermissionsAndSyntax($parseTrees, $sql, array &$errors, array &$sources) {
         //build array for further processing. getting rid of all paqu commands to check
         //permissions and stuff
 
@@ -525,7 +527,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
         $multiLineUsedDBs = $this->_processing->multilineUsedDB($queryArray, $this->_userDb);
 
         //check ACLs
-        if ($this->_permissions->check($queryArray, $multiLineUsedDBs, $errors) === false) {
+        if ($this->_permissions->check($queryArray, $multiLineUsedDBs, $errors, $sources) === false) {
             return false;
         }
 

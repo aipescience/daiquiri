@@ -75,9 +75,12 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                 // get queue
                 $queue = $form->getQueue();
 
+                // prepare sources array
+                $sources = array();
+
                 // validate query
                 $model = new Query_Model_Query();
-                if ($model->validate($sql, false, $tablename, $errors) !== true) {
+                if ($model->validate($sql, false, $tablename, $errors, $sources) !== true) {
                     // set description for form
                     $form->setDescription(implode('; ',$errors));
 

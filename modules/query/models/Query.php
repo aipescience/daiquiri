@@ -75,9 +75,10 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
      * @param bool $plan flag for plan creation
      * @param string $table result table
      * @param array &$errors buffer array for errors
+     * @param array &$errors buffer array for sources
      * @return bool
      */
-    public function validate($sql, $plan = false, $table, array &$errors) {
+    public function validate($sql, $plan = false, $table, array &$errors, array &$sources) {
         // init error array
         $errors = array();
 
@@ -89,7 +90,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
 
         // process sql string
         if ($plan === false) {
-            if ($this->_processor->validateQuery($sql, $table, $errors) !== true) {
+            if ($this->_processor->validateQuery($sql, $table, $errors, $sources) !== true) {
                 return false;
             }
         }
