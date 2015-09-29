@@ -113,7 +113,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
      * @param string $jobType job type of the new job
      * @return array $response
      */
-    public function query($sql, $plan = false, $table, $options = array(), $jobType = 'web') {
+    public function query($sql, $plan = false, $table, $sources, $options = array(), $jobType = 'web') {
         // init error array
         $errors = array();
 
@@ -169,6 +169,13 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
         $job['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
         $job['ip'] = Daiquiri_Auth::getInstance()->getRemoteAddr();
         $job['type_id'] = $this->_queue->getJobResource()->getTypeId($jobType);
+
+        // store the sources of the job
+        $tmp = array();
+        foreach($sources as $source) {
+            $tmp[] = $this->_queue->quoteIdentifier($source['database'],$source['table']);
+        }
+        $job['sources'] = implode(',',$tmp);
 
         // submit job
         $this->_queue->submitJob($job, $errors, $options);

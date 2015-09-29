@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `Query_Jobs` (
   `host` VARCHAR(256) NOT NULL,
   `query` TEXT NOT NULL,
   `actualQuery` TEXT NOT NULL,
+  `sources` TEXT NOT NULL,
   `user_id` INTEGER NOT NULL,
   `status_id` INTEGER NOT NULL,
   `prev_status_id` INTEGER,

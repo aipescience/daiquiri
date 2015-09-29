@@ -62,7 +62,7 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
             throw new Exception('$id or $sqloptions not provided in ' . get_class($this) . '::' . __FUNCTION__ . '()');
         }
 
-        $fields = array('id','database','table','time','status_id','prev_status_id','type_id','group_id','prev_id','next_id','complete','removed','user_id','query','actualQuery','nrows','size','ip');
+        $fields = array('id','database','table','time','sources','status_id','prev_status_id','type_id','group_id','prev_id','next_id','complete','removed','user_id','query','actualQuery','nrows','size','ip');
 
         if (is_array($input)) {
             $select = $this->select($input);
@@ -421,16 +421,12 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
     public function fetchExport($year, $month) {
 
         // define some cols
-        $cols = array('time','status_id','prev_status_id','type_id','ip');
+        $cols = array('time','status_id','prev_status_id','type_id','ip','sources');
 
         // fetch the rows
         $select = $this->select(array(
             'where' => array(
                 '`complete` = 1',
-                '`ip` NOT LIKE "127.%"',
-                '`ip` NOT LIKE "10.%"',
-                '`ip` NOT LIKE "192.168.%"',
-                '`ip` != "::1"',
                 'YEAR(`time`)=?' => $year,
                 'MONTH(`time`)=?' => $month
             )

@@ -129,7 +129,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                     }
 
                     // submit query
-                    $response = $model->query($sql, false, $tablename, $options);
+                    $response = $model->query($sql, false, $tablename, $sources, $options);
 
                     if ($response['status'] === 'ok') {
                         // submitting the query was successful
@@ -221,7 +221,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
                 if (empty($mail)) {
                     // submit query
-                    $response = $model->query($ns->sql, $plan, $ns->tablename, array("queue" => $ns->queue));
+                    $response = $model->query($ns->sql, $plan, $ns->tablename, $sources, array("queue" => $ns->queue));
                     if ($response['status'] === 'ok') {
                         return $response;
                     } else {
