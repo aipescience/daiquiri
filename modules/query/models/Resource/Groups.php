@@ -45,7 +45,7 @@ class Query_Model_Resource_Groups extends Daiquiri_Model_Resource_Table {
         $data['next_id'] = NULL;
 
         // set hidden to false
-        $data['next_id'] = false;
+        $data['hidden'] = false;
 
         // store the values in the database
         $this->getAdapter()->insert($this->getTablename(), $data);
