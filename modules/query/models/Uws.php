@@ -265,11 +265,15 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         }
 
         // submit job
+
+        // prepare sources array
+        $sources = array();
+
         // validate query
         $job->resetErrors();
         $model = new Query_Model_Query();
         try {
-            if ($model->validate($sql, false, $tablename, $errors) !== true) {
+            if ($model->validate($sql, false, $tablename, $errors, $sources) !== true) {
                 //throw error
                 foreach ($errors as $error) {
                     $job->addError($error);
@@ -289,9 +293,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // submit query
         if ($this->getResource()->hasQueues()) {
-            $response = $model->query($sql, false, $tablename, array("queue" => $queue, "jobId" => $job->jobId),'uws');
+            $response = $model->query($sql, false, $tablename, $sources, array("queue" => $queue, "jobId" => $job->jobId),'uws');
         } else {
-            $response = $model->query($sql, false, $tablename, array("jobId" => $job->jobId),'uws');
+            $response = $model->query($sql, false, $tablename, $sources, array("jobId" => $job->jobId),'uws');
         }
 
         if ($response['status'] !== 'ok') {
