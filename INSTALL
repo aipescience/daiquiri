@@ -21,7 +21,7 @@ $ yum install httpd mysql git php php-devel php-mysql php-gd php-pear
 # debian/Ubuntu
 $ apt-get install apache2 mysql-server git php5 php5-dev php5-mysql php5-gd
 
-On debian/Ubuntu mod rewrite needs to enabled manually.
+On debian/Ubuntu mod rewrite needs to be enabled manually.
 
 $ a2enmod rewrite
 
@@ -50,7 +50,7 @@ Change to the daiquiri-app directory and copy default.init.php to init.php
 (which is ignored by git).
 
 Then edit init.php for your individual setup. The different options are covered in the HTML 
-documentation (see https://escience.aip.de/daiquiri/cms/init-file/).
+documentation (see https://escience.aip.de/daiquiri/setup/init/).
 
 Create captcha and download directory
 -------------------------------------
