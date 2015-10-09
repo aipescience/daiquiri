@@ -39,35 +39,105 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // get jobs
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
+        // Filter job list, introduced with UWS version 1.1
+        // parse here and now for LAST parameter and status (= phase)!
+
+        // map uws phase names to internal status names:
+        $status_uws = array(
+            'QUEUED' => 'queued',
+            'EXECUTING' => 'running',
+            'ARCHIVED' => 'removed',
+            'ERROR' => 'error',
+            'COMPLETED' => 'success',
+            'ABORTED' => 'killed' // or 'timeout'
+        );
+        // NOTE: held, suspended and unknown-filter should return nothing for daiquiri,
+        // for DirectQuery, only 'success', 'error' and 'removed' exist + pending
+
+        $statuslist = array();
+        $phase = '';
+        if (array_key_exists('PHASE', $params)) {
+            // NOTE: UWS1.1 allows to give more than one PHASE!
+            /* foreach ($phases as $phase) {
+                if (array_key_exists($phase, $uws_status)) {
+                    $statuslist[] = $uws_status[$phase];
+                }
+            }
+
+            $statusfilter = ' AND (';
+            foreach ($statuslist as $status_id) {
+                $statusfilter .=  ' status_id = ' . $status_id . ' OR';
+            }
+            $statusfilter = substr($statusfilter, 0, -2) . ')';
+            */
+
+            // just use the last PHASE for the moment
+            $phase = $params['PHASE'];
+            if (array_key_exists($phase, $status_uws)) {
+                $statuslist[] = $status_uws[$phase];
+                $statusf = array('status_id = ?' => $this->getResource()->getStatusId($status_uws[$phase]));
+            }
+
+
+        }
+        if (empty($statuslist) && ($phase != "PENDING")) {
+            //$statusfilter = ' AND status_id != ' . $this->getResource()->getStatusId('removed');
+            $statusf = array('status_id != ?' => $this->getResource()->getStatusId('removed'));
+        }
+
+        $limit = 1000; // max. limit of returned rows
+        if (array_key_exists('LAST', $params)) {
+            $limit  = $params['LAST'];
+            // check if string contains only digits (positive integer!),
+            // if so, convert to integer
+            if (isset($limit) && ctype_digit($limit)) {
+                $limit = intval($limit);
+            }
+        }
+
         // get the userid
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
 
-        // get rows for this user
-        $rows = $this->getResource()->fetchRows(array(
-            'where' => array(
-                'user_id = ?' => $userId,
-                'status_id != ?' => $this->getResource()->getStatusId('removed'),
-            ),
-            'limit' => 1000,
-            'order' => array('time DESC'),
-        ));
-
         $jobs = new Uws_Model_Resource_Jobs();
 
-        foreach ($rows as $job) {
-            $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
-            $status = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
-            $jobs->addJob($job['table'], $href, array($status));
+        // If PENDING jobs are requested, do not query this db table.
+        // Pending jobs are stored in the db table queried below.
+        if ($phase != "PENDING") {
+            // cannot use statusfilter yet, because need to tweak sql-statement below to allow more than one phase-condition,
+            // thus use statusf for now.
+            $wherelist = array('user_id = ?' => $userId);
+            $wherelist = array_merge($wherelist, $statusf);
+
+            // get rows for this user
+            $rows = $this->getResource()->fetchRows(array(
+                'where' => $wherelist,
+                'limit' => $limit,
+                'order' => array('time DESC'),
+            ));
+
+
+            foreach ($rows as $job) {
+                $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
+                $status = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
+                $jobs->addJob($job['table'], $href, array($status));
+            }
         }
 
-        $resUWSJobs = new Uws_Model_Resource_UWSJobs();
+        // add pending/error jobs, but only if no PHASE-filter was given or phase-filter was PENDING or ERROR
+        // NOTE: This list also contains jobs in following phases: PENDING, ERROR, ABORTED
+        // NOTE: Not sure about SUSPENDED, HELD or UNKNOWN
+        if (empty($phase) || $phase == 'ERROR' || $phase == 'PENDING' || $phase == 'ABORTED') {
+            $resUWSJobs = new Uws_Model_Resource_UWSJobs();
 
-        $pendingJobList = $resUWSJobs->fetchRows();
+            $pendingJobList = $resUWSJobs->fetchRows(); //where is the check for the userId??
 
-        foreach ($pendingJobList as $job) {
-            $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
-            $status = $job['phase'];
-            $jobs->addJob($job['jobId'], $href, array($status));
+            foreach ($pendingJobList as $job) {
+                $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
+                $status = $job['phase'];
+                if (empty($phase) || $phase === $status) {
+                    $jobs->addJob($job['jobId'], $href, array($status));
+                }
+            }
         }
 
         return $jobs;
