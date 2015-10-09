@@ -139,6 +139,20 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         // set next_id to NULL
         $data['next_id'] = $this->fetchFirstId();
 
+        // mask parts of the ip for privacy
+        if (in_array(Daiquiri_Config::getInstance()->query->ipMask, array('1','2','3','4'))) {
+            $ipArray = explode('.', $data['ip']);
+
+            $mask = (int) Daiquiri_Config::getInstance()->query->ipMask;
+            $last = count($ipArray) - 1;
+
+            for ($i = $last; $i > $last - $mask; $i--) {
+                $ipArray[$i] = '0';
+            }
+
+            $data['ip'] = implode('.',$ipArray);
+        }
+
         // set complete and removed to 0
         if (!isset($data['complete'])) $data['complete'] = 0;
         if (!isset($data['removed'])) $data['removed'] = 0;
