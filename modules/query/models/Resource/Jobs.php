@@ -421,7 +421,7 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
     public function fetchExport($year, $month) {
 
         // define some cols
-        $cols = array('time','status_id','prev_status_id','type_id','ip','sources');
+        $cols = array('time','status_id','prev_status_id','type_id','ip','sources','user_id');
 
         // fetch the rows
         $select = $this->select(array(
