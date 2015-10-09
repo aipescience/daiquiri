@@ -143,14 +143,15 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         if (in_array(Daiquiri_Config::getInstance()->query->ipMask, array('1','2','3','4'))) {
             $ipArray = explode('.', $data['ip']);
 
-            $mask = (int) Daiquiri_Config::getInstance()->query->ipMask;
-            $last = count($ipArray) - 1;
+            if (count($ipArray) === 4) {
+                $mask = (int) Daiquiri_Config::getInstance()->query->ipMask;
 
-            for ($i = $last; $i > $last - $mask; $i--) {
-                $ipArray[$i] = '0';
+                for ($i = 3; $i > 3 - $mask; $i--) {
+                    $ipArray[$i] = '0';
+                }
+
+                $data['ip'] = implode('.',$ipArray);
             }
-
-            $data['ip'] = implode('.',$ipArray);
         }
 
         // set complete and removed to 0
