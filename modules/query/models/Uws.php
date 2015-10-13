@@ -77,12 +77,12 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 $statuslist[] = $status_uws[$phase];
                 $statusf = array('status_id = ?' => $this->getResource()->getStatusId($status_uws[$phase]));
             }
-
-
         }
+
+        $wherestatus = array();
         if (empty($statuslist) && ($phase != "PENDING")) {
             //$statusfilter = ' AND status_id != ' . $this->getResource()->getStatusId('removed');
-            $statusf = array('status_id != ?' => $this->getResource()->getStatusId('removed'));
+            $wherestatus = array('status_id != ?' => $this->getResource()->getStatusId('removed'));
         }
 
         $limit = 1000; // max. limit of returned rows
@@ -96,6 +96,15 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
         }
 
+        $whereafter = array();
+        if (array_key_exists('AFTER', $params)) {
+            $after = $params['AFTER'];
+            $after = strtotime($after);
+            // TODO: check, if it is a timestamp, in Iso 8601 format (UTC)
+            $whereafter = array('time >= ?' => date('Y-m-d H:i:s', $after));
+        }
+
+
         // get the userid
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
 
@@ -104,10 +113,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // If PENDING jobs are requested, do not need to query this db table,
         // pending jobs are stored only in the db table queried below.
         if ($phase != "PENDING") {
-            // cannot use statusfilter yet, because need to tweak sql-statement below to allow more than one phase-condition,
-            // thus use statusf for now.
+            // cannot use statusfilter yet, because need to tweak sql-statement below to allow more than one phase-condition
             $wherelist = array('user_id = ?' => $userId);
-            $wherelist = array_merge($wherelist, $statusf);
+            $wherelist = array_merge($wherelist, $wherestatus, $whereafter);
 
             // get rows for this user
             $rows = $this->getResource()->fetchRows(array(
@@ -143,14 +151,20 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
         }
 
+
         // Now append pending jobs or sort the jobs by their time
         // and apply a final cut to given $limit if it was required.
-        // (Could also do this sorting even if LAST was not given ...)
-        if (array_key_exists('LAST', $params)) {
-            // If LAST parameter had been used, then ordering requested by
+        // (Could also do this sorting even if LAST/AFTER was not given ...)
+        if (array_key_exists('LAST', $params) || array_key_exists('AFTER', $params)) {
+            // If LAST or AFTER parameter had been used, then ordering requested by
             // standard is by *ascending* startTimes:
             $jobs->jobref = array_reverse($jobs->jobref);
             $jobs2->jobref = array_reverse($jobs2->jobref);
+
+            // save first job of $jobs for AFTER-requests:
+            if (count($jobs->jobref) > 0) {
+                $firstjob = $jobs->jobref[0];
+            }
 
             // Either append pending and error jobs
             // (which may have NULL startTimes) just at the end ...
@@ -165,9 +179,31 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 $sortcolumn[$key] = $row->reference->href;
             }
             array_multisort($sortcolumn, SORT_ASC, $jobs->jobref);
+
+            // Special treatment for AFTER:
+            // there is no time information for pendingJobs, i.e. jobs2-jobs,
+            // so use the times from filtered jobs-list (which contains timestamp), 
+            // and ignore all those jobs from jobs2-list that are listed
+            // before the first job from jobs-list in our merged-filtered list.
+            // This is quite ugly, but it kind of works.
+            if (isset($firstjob)) {
+                $sortid = $firstjob->reference->href;
+                $firstjob_index = 0;
+                foreach ($jobs->jobref as $index => $row) {
+                    if ($row->reference->href === $sortid) {
+                        $firstjob_index = $index;
+                        break;
+                    }
+                }
+                $jobs->jobref = array_slice($jobs->jobref, $firstjob_index);
+            }
+            // If $firstjob is not set, then just ignore this and do not cut.
+
             // Cut, only keep number of jobs required by LAST
             $jobs->jobref = array_slice($jobs->jobref, -$limit, $limit);
 
+        } else {
+            $jobs->jobref = array_merge($jobs->jobref, $jobs2->jobref);
         }
 
         return $jobs;
