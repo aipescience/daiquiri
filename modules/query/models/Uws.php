@@ -86,6 +86,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         }
 
         $limit = 1000; // max. limit of returned rows
+        // check LAST keyword and set $limit accordingly
         if (array_key_exists('LAST', $params)) {
             $limit  = $params['LAST'];
             // check if string contains only digits (positive integer!),
@@ -100,11 +101,11 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         $jobs = new Uws_Model_Resource_Jobs();
 
-        // If PENDING jobs are requested, do not need to query this db table.
-        // Pending jobs are stored only in the db table queried below.
+        // If PENDING jobs are requested, do not need to query this db table,
+        // pending jobs are stored only in the db table queried below.
         if ($phase != "PENDING") {
             // cannot use statusfilter yet, because need to tweak sql-statement below to allow more than one phase-condition,
-            // thus use status for now.
+            // thus use statusf for now.
             $wherelist = array('user_id = ?' => $userId);
             $wherelist = array_merge($wherelist, $statusf);
 
@@ -121,12 +122,6 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 $status = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
                 $jobs->addJob($job['table'], $href, array($status));
             }
-
-            // If LAST parameter had been used, then ordering requested by standard is by *ascending* startTimes:
-            if (array_key_exists('LAST', $params)) {
-                $jobs->jobref = array_reverse($jobs->jobref);
-            }
-
         }
 
         // add pending/error jobs, but only if no PHASE-filter was given or phase-filter was PENDING, ERROR or ABORTED
@@ -152,13 +147,16 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // and apply a final cut to given $limit if it was required.
         // (Could also do this sorting even if LAST was not given ...)
         if (array_key_exists('LAST', $params)) {
+            // If LAST parameter had been used, then ordering requested by
+            // standard is by *ascending* startTimes:
+            $jobs->jobref = array_reverse($jobs->jobref);
             $jobs2->jobref = array_reverse($jobs2->jobref);
 
-            // Either just append pending and error jobs
+            // Either append pending and error jobs
             // (which may have NULL startTimes) just at the end ...
             $jobs->jobref = array_merge($jobs->jobref, $jobs2->jobref);
 
-            // Or assume that creation time is correlated to the jobIds
+            // or assume that creation time is correlated to the jobIds
             // (the ones appended at href), so sort by href.
             // This may not be the best approach, but it works with the current
             // setup.
