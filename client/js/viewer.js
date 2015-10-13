@@ -25,7 +25,7 @@ app.config(['$httpProvider', function($httpProvider) {
 }]);
 
 app.controller('ViewerController', ['$scope','tableService',function($scope,tableService) {
-    
+
     tableService.url.cols = '/data/viewer/cols?db=daiquiri_user_admin&table=100';
     tableService.url.rows = '/data/viewer/rows?db=daiquiri_user_admin&table=100';
 
