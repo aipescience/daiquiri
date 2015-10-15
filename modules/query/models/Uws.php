@@ -55,6 +55,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // for DirectQuery, only 'success', 'error' and 'removed' exist + pending
 
         $statuslist = array();
+        $wherestatus = array();
         $phase = '';
         if (array_key_exists('PHASE', $params)) {
             // NOTE: UWS1.1 allows to give more than one PHASE!
@@ -75,11 +76,10 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $phase = $params['PHASE'];
             if (array_key_exists($phase, $status_uws)) {
                 $statuslist[] = $status_uws[$phase];
-                $statusf = array('status_id = ?' => $this->getResource()->getStatusId($status_uws[$phase]));
+                $wherestatus = array('status_id = ?' => $this->getResource()->getStatusId($status_uws[$phase]));
             }
         }
 
-        $wherestatus = array();
         if (empty($statuslist) && ($phase != "PENDING")) {
             //$statusfilter = ' AND status_id != ' . $this->getResource()->getStatusId('removed');
             $wherestatus = array('status_id != ?' => $this->getResource()->getStatusId('removed'));
