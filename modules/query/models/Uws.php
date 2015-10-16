@@ -40,8 +40,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
         // Filter job list, introduced with UWS version 1.1
-        // parse here and now for LAST parameter and status (= phase)!
-
+        // parse here and now for LAST/AFTER parameter and status (= phase)!
         // map uws phase names to internal status names:
         $status_uws = array(
             'QUEUED' => 'queued',
@@ -54,38 +53,42 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // NOTE: held, suspended and unknown-filter should return nothing for daiquiri,
         // for DirectQuery, only 'success', 'error' and 'removed' exist + pending
 
+        // NOTE: request query string may contain repeated PHASE key,
+        // which is not recognized as PHASE-array by standard Zend-functions,
+        // thus parse manually:
+        $queryparams = Daiquiri_Config::getInstance()->getMultiQuery();
+
         $statuslist = array();
         $wherestatus = array();
-        $phase = '';
-        if (array_key_exists('PHASE', $params)) {
+        $phases = array();
+        if (array_key_exists('PHASE', $queryparams)) {
             // NOTE: UWS1.1 allows to give more than one PHASE!
-            /* foreach ($phases as $phase) {
-                if (array_key_exists($phase, $uws_status)) {
-                    $statuslist[] = $uws_status[$phase];
+            $phases = $queryparams['PHASE'];
+
+            // store internal status_ids for possible uws-phases
+            if (!is_array($phases)) {
+                $phases = array($phases);
+            }
+
+            foreach ($phases as $phase) {
+                if (array_key_exists($phase, $status_uws)) {
+                    $statuslist[] = $this->getResource()->getStatusId($status_uws[$phase]);
                 }
             }
 
-            $statusfilter = ' AND (';
+            $wherestatus = '';
             foreach ($statuslist as $status_id) {
-                $statusfilter .=  ' status_id = ' . $status_id . ' OR';
+                $wherestatus .=  ' status_id = ' . $status_id . ' OR';
             }
-            $statusfilter = substr($statusfilter, 0, -2) . ')';
-            */
-
-            // just use the last PHASE for the moment
-            $phase = $params['PHASE'];
-            if (array_key_exists($phase, $status_uws)) {
-                $statuslist[] = $status_uws[$phase];
-                $wherestatus = array('status_id = ?' => $this->getResource()->getStatusId($status_uws[$phase]));
-            }
+            // remove trailing OR
+            $wherestatus = array(substr($wherestatus, 0, -2));
         }
 
-        if (empty($statuslist) && ($phase != "PENDING")) {
-            //$statusfilter = ' AND status_id != ' . $this->getResource()->getStatusId('removed');
+        if (empty($statuslist)) {
             $wherestatus = array('status_id != ?' => $this->getResource()->getStatusId('removed'));
         }
 
-        $limit = 1000; // max. limit of returned rows
+        $limit = ''; // default limit of returned rows, '' = no limit
         // check LAST keyword and set $limit accordingly
         if (array_key_exists('LAST', $params)) {
             $limit  = $params['LAST'];
@@ -104,26 +107,23 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $whereafter = array('time >= ?' => date('Y-m-d H:i:s', $after));
         }
 
-
         // get the userid
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
 
         $jobs = new Uws_Model_Resource_Jobs();
-
-        // If PENDING jobs are requested, do not need to query this db table,
+        // If only PENDING jobs are requested, do not need to query this db table,
         // pending jobs are stored only in the db table queried below.
-        if ($phase != "PENDING") {
-            // cannot use statusfilter yet, because need to tweak sql-statement below to allow more than one phase-condition
-            $wherelist = array('user_id = ?' => $userId);
-            $wherelist = array_merge($wherelist, $wherestatus, $whereafter);
+        // NOTE: use here $phases, or only "valid" phases (those in $statuslist)?
+        if ( ! (count($phases) == 1 && $phases[0] == "PENDING") ) {
+            $whereuser = array('user_id = ?' => $userId);
+            $wherelist = array_merge($whereuser, $wherestatus, $whereafter);
 
             // get rows for this user
             $rows = $this->getResource()->fetchRows(array(
                 'where' => $wherelist,
                 'limit' => $limit,
-                'order' => array('time DESC'),
+                'order' => array('timexx DESC'),
             ));
-
 
             foreach ($rows as $job) {
                 $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
@@ -132,12 +132,12 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
         }
 
-        // add pending/error jobs, but only if no PHASE-filter was given or phase-filter was PENDING, ERROR or ABORTED
-        // NOTE: This list also contains jobs in following phases: PENDING, ERROR, ABORTED
+        // add pending/error jobs, but only if no PHASE-filter was given
+        // or phase-filter was PENDING, ERROR or ABORTED
         // NOTE: Not sure about SUSPENDED, HELD or UNKNOWN
         $jobs2 = new Uws_Model_Resource_Jobs();
 
-        if (empty($phase) || $phase == 'ERROR' || $phase == 'PENDING' || $phase == 'ABORTED') {
+        if ( empty($phases) || in_array("PENDING", $phases) || in_array("ERROR", $phases) || in_array("ABORTED", $phases) ) {
             $resUWSJobs = new Uws_Model_Resource_UWSJobs();
 
             $pendingJobList = $resUWSJobs->fetchRows(); //where is the check for the userId?? --> inside UWSJobs
@@ -145,12 +145,11 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             foreach ($pendingJobList as $job) {
                 $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
                 $status = $job['phase'];
-                if (empty($phase) || $phase === $status) {
+                if ( empty($phase) || in_array($status, $phases) ) {
                     $jobs2->addJob($job['jobId'], $href, array($status));
                 }
             }
         }
-
 
         // Now append pending jobs or sort the jobs by their time
         // and apply a final cut to given $limit if it was required.
