@@ -23,7 +23,7 @@
 
 abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
-    protected static $status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED');
+    protected static $status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED', 'ARCHIVED');
 
     public function __construct() {
         parent::__construct();
@@ -591,7 +591,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         }
     }
 
-    //deletes the job - if this is job is handled by the abstract class, just delete
+    //deletes the job - if this job is handled by the abstract class, just delete
     //it, otherwise pass the request down to the implementation
     public function deleteJob(Uws_Model_Resource_JobSummaryType &$job) {
         if (isset($job->handledByAbstract)) {

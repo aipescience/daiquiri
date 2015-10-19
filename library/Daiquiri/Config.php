@@ -165,32 +165,34 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
     /** Returns query parameters correctly for repeated keys with missing [],
      * multiple occurence of one key results in array of its values
      * Example: /uws/query&PHASE=a&PHASE=b will give array('PHASE'=>array('a','b')),
-     * Normally, PHP would overwrite values for repeated keys with the last value,
-     * and would require square brackets to indicate an array, e.g. PHASE[]=a&PHASE[]=b.
+     * (Normally, PHP would overwrite values for repeated keys with the last value,
+     * and would require square brackets to indicate an array, e.g. PHASE[]=a&PHASE[]=b.)
      * @return array
      */
     public function getMultiQuery() {
         $front = Zend_Controller_Front::getInstance();
         $requestUri = $front->getRequest()->getRequestUri();
+
+        $queryparams = array();
+
         // strip path information, get query-part from Uri
         if (false !== ($pos = strpos($requestUri, '?'))) {
             $query = substr($requestUri, $pos + 1);
-        }
 
-        // parse values and add to array, if key is repeated
-        $queryparams = array();
-        foreach (explode('&', $query) as $param) {
-            $keyvalue = explode('=', $param);
-            $key = urldecode($keyvalue[0]);
-            $value = urldecode($keyvalue[1]);
+            // parse values and add to array, if key is repeated
+            foreach (explode('&', $query) as $param) {
+                $keyvalue = explode('=', $param);
+                $key = urldecode($keyvalue[0]);
+                $value = urldecode($keyvalue[1]);
 
-            if (array_key_exists($key, $queryparams)) {
-                if (!is_array($queryparams[$key])) {
-                    $queryparams[$key] = array($queryparams[$key]);
+                if (array_key_exists($key, $queryparams)) {
+                    if (!is_array($queryparams[$key])) {
+                        $queryparams[$key] = array($queryparams[$key]);
+                    }
+                    $queryparams[$key][] = $value;
+                } else {
+                    $queryparams[$key] = $value;
                 }
-                $queryparams[$key][] = $value;
-            } else {
-                $queryparams[$key] = $value;
             }
         }
         return $queryparams;

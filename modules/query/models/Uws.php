@@ -20,11 +20,11 @@
 
 class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
-    // status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED');
+    // status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED', 'ARCHIVED');
     private static $statusQueue = array(
         'queued' => 1,
         'running' => 2,
-        'removed' => 6,
+        'removed' => 9,
         'error' => 4,
         'success' => 3,
         'timeout' => 5,
@@ -72,7 +72,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
             foreach ($phases as $phase) {
                 if (array_key_exists($phase, $status_uws)) {
-                    $statuslist[] = $this->getResource()->getStatusId($status_uws[$phase]);
+                    if ($status_id = $this->getResource()->getStatusId($status_uws[$phase])) {
+                        $statuslist[] = $status_id;
+                    }
                 }
             }
 
@@ -122,7 +124,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $rows = $this->getResource()->fetchRows(array(
                 'where' => $wherelist,
                 'limit' => $limit,
-                'order' => array('timexx DESC'),
+                'order' => array('time DESC'),
             ));
 
             foreach ($rows as $job) {
@@ -326,6 +328,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // get job and check permissions
         $row = $this->getResource()->fetchRow($job->jobId);
+
         if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
             throw new Daiquiri_Exception_Forbidden();
         }
@@ -404,6 +407,14 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // prepare sources array
         $sources = array();
 
+        // set startTime here, since job starts now
+        // (validation is part of the job)
+        $now = new DateTime('now'); // should actually use UTC time!!
+        $job->startTime = $now->format('Y-m-d H:i:s');
+        $resource = new Uws_Model_Resource_UWSJobs();
+        $resource->updateRow($job->jobId, array("startTime" => $job->startTime));
+
+
         // validate query
         $job->resetErrors();
         $model = new Query_Model_Query();
@@ -416,6 +427,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
                 $resource = new Uws_Model_Resource_UWSJobs();
                 $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
+                $resource->updateRow($job->jobId, array("endTime" => $job->startTime));
                 return;
             }
         } catch (Exception $e) {
@@ -423,6 +435,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $job->addError($e->getMessage());
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
+            $resource->updateRow($job->jobId, array("endTime" => $job->startTime));
             return;
         }
 
