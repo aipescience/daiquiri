@@ -52,11 +52,10 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
      * @return array $rows
      */
     public function fetchRows(array $sqloptions = array()) {
-        $select = $this->select();
+        $select = $this->select($sqloptions);
         $select->from('Uws_Jobs');
         $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
-        //$select->order("startTime DESC");  // startTimes are always Null in pending job table, so not useful ...
-        $select->order("jobId DESC");       // assuming that this results in the same time-sorting as order by a creation time
+        // query database and return
         return $this->fetchAll($select);
     }
 

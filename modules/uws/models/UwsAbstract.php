@@ -602,12 +602,18 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         }
     }
 
-    //aborts the job - if this is job is handled by the abstract class, just aborts
+    //aborts the job - if this job is handled by the abstract class, just abort
     //it, otherwise pass the request down to the implementation
     public function abortJob(Uws_Model_Resource_JobSummaryType &$job) {
         if (isset($job->handledByAbstract)) {
             $resource = new Uws_Model_Resource_UWSJobs();
-            $resource->updateRow($job->jobId, array("phase" => "ABORTED"));
+
+            // job is put into final state; set endTime, if not existing yet
+            if (!$job->endTime) {
+                $datetimeEnd = new DateTime('now');
+                $job->endTime = $datetimeEnd->format('c');
+            }
+            $resource->updateRow($job->jobId, array("phase" => "ABORTED", "endTime" => $job->endTime));
         } else {
             $this->abortJobImpl($job);
         }
