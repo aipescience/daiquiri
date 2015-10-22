@@ -49,7 +49,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             'ARCHIVED' => 'removed',
             'ERROR' => 'error',
             'COMPLETED' => 'success',
-            'ABORTED' => 'killed' // or 'timeout'
+            'ABORTED' => 'timeout' // 'killed' or 'timeout'
         );
         // NOTE: held, suspended and unknown-filter should return nothing for daiquiri,
         // for DirectQuery, only 'success', 'error' and 'removed' exist + pending
@@ -157,6 +157,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $pendingRows = $resUWSJobs->fetchRows(array(
                 'where' => $whereafter,
                 'order' => array('startTime DESC'),
+                'order' => array('jobId DESC'), // add this here for useful ordering if startTime=NULL (PENDING jobs)
                 'limit' => $limit,
             )); // the check for the userId is inside UWSJobs
 
@@ -170,12 +171,13 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
         }
 
+        // reverse job sort order, since standard requires for LAST/AFTER keywords
+        // *ascending* startTimes (but needed initial DESC order in queries for most recent limit)
+        $joblist = array_reverse($joblist);
+        $pendingJoblist = array_reverse($pendingJoblist);
+
         // Merge the job lists, sort by time and apply final cut, if required
         if (array_key_exists('LAST', $params) || array_key_exists('AFTER', $params)) {
-            // if LAST or AFTER parameter had been used, then ordering requested by
-            // standard is by *ascending* startTimes:
-            $joblist = array_reverse($joblist);
-            $pendingJoblist = array_reverse($pendingJoblist);
 
             // merge both lists ...
             $joblist = array_merge($joblist, $pendingJoblist);
