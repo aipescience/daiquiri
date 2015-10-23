@@ -183,7 +183,12 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
             foreach (explode('&', $query) as $param) {
                 $keyvalue = explode('=', $param);
                 $key = urldecode($keyvalue[0]);
-                $value = urldecode($keyvalue[1]);
+
+                if (isset($keyvalue[1])) {
+                    $value = urldecode($keyvalue[1]);
+                } else {
+                    $value = "";
+                }
 
                 if (array_key_exists($key, $queryparams)) {
                     if (!is_array($queryparams[$key])) {
