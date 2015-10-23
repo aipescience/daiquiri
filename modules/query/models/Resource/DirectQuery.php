@@ -38,7 +38,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      * Array for the status flags user in the jobs table.
      * @var array $status
      */
-    protected static $_status = array('success' => 1, 'error' => 2, 'removed' => 3, 'timeout' => 4);
+    protected static $_status = array('success' => 1, 'error' => 2, 'removed' => 3);
 
     /**
      * Translation table to convert the database columns of the job table into something readable.
