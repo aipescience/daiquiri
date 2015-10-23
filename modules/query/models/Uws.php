@@ -21,6 +21,8 @@
 class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
     // status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED', 'ARCHIVED');
+    // map between internal status names for different queues and
+    // official UWS phase names as stored in Uws_Model_UwsAbstract
     private static $statusQueue = array(
         'queued' => 1,
         'running' => 2,
@@ -35,27 +37,29 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         parent::__construct();
     }
 
+    private function getQueryStatusNames($uwsphase) {
+        // get the internal query status name defined by $statusQueue for
+        // a given official UWS phase name as defined in Uws_Model_UwsAbstract;
+        // also take disambiguity with ABORTED into account,
+        // return array of matching status names
+        $uwsphase_id = array_search($uwsphase, Uws_Model_UwsAbstract::$status);
+        $status_names = array();
+        if ($uwsphase_id) {
+            // find all matching internal names
+            $status_names = array_keys(self::$statusQueue, $uwsphase_id);
+        }
+        return $status_names;
+    }
+
     public function getJobList($params) {
         // get jobs
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
         // Filter job list, introduced with UWS version 1.1
-        // parse here and now for LAST/AFTER parameter and status (= phase)!
-
-        // map uws phase names to internal status names:
-        $status_uws = array(
-            'QUEUED' => 'queued',
-            'EXECUTING' => 'running',
-            'ARCHIVED' => 'removed',
-            'ERROR' => 'error',
-            'COMPLETED' => 'success',
-            'ABORTED' => 'timeout' // 'killed' or 'timeout'
-        );
-        // NOTE: held, suspended and unknown-filter should return nothing for daiquiri,
-        // for DirectQuery, only 'success', 'error' and 'removed' exist + pending
+        // parse here and now for LAST/AFTER and PHASE filter parameters
 
         // Request query string may contain repeated PHASE key,
-        // which is not recognized as PHASE-array by standard Zend-functions,
+        // which is not recognized as PHASE-array by standard PHP/Zend-functions,
         // thus parse manually:
         $queryparams = Daiquiri_Config::getInstance()->getMultiQuery();
 
@@ -65,28 +69,40 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         if (array_key_exists('PHASE', $queryparams)) {
             $phases = $queryparams['PHASE'];
 
-            // store internal status_ids for possible uws-phases
+            // collect internal status_ids for requested uws-phases
             if (!is_array($phases)) {
                 $phases = array($phases);
             }
             foreach ($phases as $phase) {
-                if (array_key_exists($phase, $status_uws)) {
-                    if ($status_id = $this->getResource()->getStatusId($status_uws[$phase])) {
+                if ( !in_array($phase, Uws_Model_UwsAbstract::$status) ) {
+                    throw new Daiquiri_Exception_BadRequest("Supplied PHASE value '".$phase."' is not a valid UWS phase.");
+                }
+                $status_names = $this->getQueryStatusNames($phase);
+                foreach ($status_names as $status_name) {
+                    if ($status_id = $this->getResource()->getStatusId($status_name)) {
                         $statuslist[] = $status_id;
                     }
                 }
             }
-            // TODO: if there are additional invalid phases (and not PENDING), return with Bad Request
+        }
 
+        // construct where condition based on PHASE-filters
+        if (!empty($statuslist)) {
             $wherestatus = '';
             foreach ($statuslist as $status_id) {
                 $wherestatus .= ' status_id = ' . $status_id . ' OR';
             }
             // remove trailing OR
             $wherestatus = array(substr($wherestatus, 0, -2));
-        }
-
-        if (empty($statuslist)) {
+        } else if ($phases) {
+            // there are valid UWS phases supplied as query parameters
+            // (otherwise there would have been an error beforehand), but
+            // they are not in the statuslist, so the resource (queue)
+            // does not support them (or it's the PENDING jobs)
+            // => no need to return anything from this job list
+            $wherestatus = NULL;
+        } else {
+            // statuslist is empty and no phase-filter was given
             $wherestatus = array('status_id != ?' => $this->getResource()->getStatusId('removed'));
         }
 
@@ -95,13 +111,15 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // check LAST keyword and set $limit accordingly
         if (array_key_exists('LAST', $params)) {
-            $value = $params['LAST'];
+            $last = $params['LAST'];
             // check if string contains only digits (positive integer!),
             // if so, convert to integer
-            if (isset($value) && ctype_digit($value)) {
-                $last = intval($value);
+            if (isset($last) && ctype_digit($last)) {
+                $last = intval($last);
                 // set limit (maybe restrict to max. limit here?)
                 $limit = $last;
+            } else {
+                throw new Daiquiri_Exception_BadRequest("Supplied LAST value '".$last."' is not a positive integer.");
             }
         }
 
@@ -109,8 +127,14 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         if (array_key_exists('AFTER', $params)) {
             $after = $params['AFTER'];
             $after = strtotime($after);
-            // TODO: check, if it is a timestamp, in Iso 8601 format (UTC)
-            $whereafter = array('time > ?' => date('Y-m-d H:i:s', $after));
+            if (!$after) {
+                throw new Daiquiri_Exception_BadRequest("Cannot parse the timestamp given with AFTER keyword (".$params['AFTER']."), need a UTC-timestamp in ISO 8601 format without timezone-information.");
+            }
+            // convert provided UTC time to local time, which is used for timestamp in DB in our case
+            //$timezone = date_default_timezone_get();
+            $utc_offset = intval(date('Z')); // depends on set timezone
+            $dbtime = $after-$utc_offset;
+            $whereafter = array('time > ?' => date('Y-m-d H:i:s', $dbtime));
         }
 
         // get the userid
@@ -119,8 +143,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $joblist = array();
         // If only PENDING jobs are requested, do not need to query this db table,
         // pending jobs are stored only in the db table queried below.
-        // NOTE: use here $phases, or only "valid" phases (those in $statuslist)?
-        if ( ! (count($phases) == 1 && $phases[0] == "PENDING") ) {
+        if ( ! (count($phases) == 1 && $phases[0] == "PENDING") && !is_null($wherestatus) ) {
             $whereuser = array('user_id = ?' => $userId);
             $wherelist = array_merge($whereuser, $wherestatus, $whereafter);
 
@@ -176,16 +199,15 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $joblist = array_reverse($joblist);
         $pendingJoblist = array_reverse($pendingJoblist);
 
-        // Merge the job lists, sort by time and apply final cut, if required
-        if (array_key_exists('LAST', $params) || array_key_exists('AFTER', $params)) {
+        // merge both lists ...
+        $joblist = array_merge($joblist, $pendingJoblist);
 
-            // merge both lists ...
-            $joblist = array_merge($joblist, $pendingJoblist);
+        // and sort by startTime (< 10 ms for 10,000 jobs, so it's fast enough to do it always)
+        $sortcolumn = array_column($joblist, 'time');
+        array_multisort($sortcolumn, SORT_ASC, $joblist);
 
-            // and sort by startTime
-            $sortcolumn = array_column($joblist, 'time');
-            array_multisort($sortcolumn, SORT_ASC, $joblist);
-
+        // apply final cut, if required
+        if (array_key_exists('LAST', $params)) {
             // cut the list, only keep number of jobs required by LAST or given by limit
             if (!is_null($limit)) {
                 $joblist = array_slice($joblist, -$limit, $limit);
