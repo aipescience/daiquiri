@@ -23,13 +23,13 @@ class Daiquiri_Controller_Helper_Pagination extends Daiquiri_Controller_Helper_A
     public function cols() {
         // get query parameters
         $queryParams = $this->getRequest()->getQuery();
-        
+
         // call model functions
         $response = $this->getModel()->cols($queryParams);
 
         // assign to view
         $this->getView()->assign($response);
-    }    
+    }
 
     public function rows() {
         // get query parameters
@@ -40,6 +40,6 @@ class Daiquiri_Controller_Helper_Pagination extends Daiquiri_Controller_Helper_A
 
         // assign to view
         $this->getView()->assign($response);
-    }    
+    }
 
 }

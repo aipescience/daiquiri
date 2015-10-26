@@ -32,7 +32,7 @@ class Auth_AccountController extends Daiquiri_Controller_Abstract {
     }
 
     public function updateAction() {
-        $this->getControllerHelper('form',array('redirect' => '/'))->update();
+        $this->getControllerHelper('form', array('redirect' => '/'))->update();
     }
 
 }
