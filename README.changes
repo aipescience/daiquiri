@@ -19,7 +19,7 @@ Query_Jobs needs to be dropped (should be empty) and ./init.php -s needs to be r
 
 In addition
 
-    moveJob,createGroup,updateGroup,moveGroup,deleteGroup
+    moveJob,createGroup,updateGroup,moveGroup,toggleGroup,deleteGroup
 
 have to be added to the permissions for Query_Model_Account guest or user in Auth_Rules.
 

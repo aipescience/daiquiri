@@ -57,6 +57,9 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             'defaultQueue' => $defaultQueue
         ));
 
+        // init sources array
+        $sources = array();
+
         // init errors array
         $errors = array();
 
@@ -74,9 +77,6 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
                 // get queue
                 $queue = $form->getQueue();
-
-                // prepare sources array
-                $sources = array();
 
                 // validate query
                 $model = new Query_Model_Query();
@@ -196,6 +196,9 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             'mail' => Daiquiri_Config::getInstance()->query->processor->mail->enabled
         ));
 
+        // init sources array
+        $sources = array();
+
         // init errors array
         $errors = array();
 
@@ -210,7 +213,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                     $plan = $values['plan_query'];
 
                     // validate query plus plan
-                    if ($model->validate($ns->sql, $plan, $ns->tablename, $errors) !== true) {
+                    if ($model->validate($ns->sql, $plan, $ns->tablename, $sources, $errors) !== true) {
                         if (!empty($errors)) {
                             return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
                         }

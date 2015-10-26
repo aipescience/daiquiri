@@ -402,7 +402,7 @@ class Query_Model_Resource_PaquProcessor extends Query_Model_Resource_AbstractPr
      * @param array $plan
      * @return $string $plan formatted plan
      */
-    private function _formatPlan(&$plan) {
+    private function _formatPlan($plan) {
         $result = array();
         foreach ($plan as $key => $row) {
             $result[] = $row . ";";

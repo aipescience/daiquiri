@@ -49,11 +49,18 @@ class Daiquiri_Db_Select extends Zend_Db_Select {
         if (!empty($sqloptions['where'])) {
             foreach ($sqloptions['where'] as $key => $value) {
                 if (is_string($key)) {
-                    $where = $this->getAdapter()->quoteInto($key, $value);
+                    if (is_array($value)) {
+                        $where = array();
+                        foreach ($value as $k => $v) {
+                            $where[] = $this->getAdapter()->quoteInto($key, $v);
+                        }
+                        $this->where(implode(' OR ', $where));
+                    } else {
+                        $this->where($key, $value);
+                    }
                 } else {
-                    $where = $value;
+                    $this->where($value);
                 }
-                $this->where($where);
             }
         }
     }
@@ -62,11 +69,10 @@ class Daiquiri_Db_Select extends Zend_Db_Select {
         if (!empty($sqloptions['orWhere'])) {
             foreach ($sqloptions['orWhere'] as $key => $value) {
                 if (is_string($key)) {
-                    $where = $this->getAdapter()->quoteInto($key, $value);
+                    $this->orWhere($key, $value);
                 } else {
-                    $where = $value;
+                    $this->orWhere($value);
                 }
-                $this->orWhere($where);
             }
         }
     }

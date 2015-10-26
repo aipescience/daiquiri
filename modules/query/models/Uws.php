@@ -201,7 +201,10 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $joblist = array_merge($joblist, $pendingJoblist);
 
         // and sort by startTime (< 10 ms for 10,000 jobs, so it's fast enough to do it always)
-        $sortcolumn = array_column($joblist, 'time');
+        $sortcolumn = array();
+        foreach ($joblist as $job) {
+            $sortcolumn[] = $job['time'];
+        }
         array_multisort($sortcolumn, SORT_ASC, $joblist);
 
         // apply final cut, if required

@@ -65,7 +65,7 @@ class Meetings_ContributionsController extends Daiquiri_Controller_Abstract {
 
     public function createAction() {
         $slug = $this->_getParam('slug');
-        $this->getControllerHelper('form',array('redirect' => '/meetings/' . $slug . '/contributions/'))->create($slug);
+        $this->getControllerHelper('form', array('redirect' => '/meetings/' . $slug . '/contributions/'))->create($slug);
     }
 
     public function updateAction() {

@@ -139,6 +139,21 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
         // set next_id to NULL
         $data['next_id'] = $this->fetchFirstId();
 
+        // mask parts of the ip for privacy
+        if (in_array(Daiquiri_Config::getInstance()->query->ipMask, array('1','2','3','4'))) {
+            $ipArray = explode('.', $data['ip']);
+
+            if (count($ipArray) === 4) {
+                $mask = (int) Daiquiri_Config::getInstance()->query->ipMask;
+
+                for ($i = 3; $i > 3 - $mask; $i--) {
+                    $ipArray[$i] = '0';
+                }
+
+                $data['ip'] = implode('.',$ipArray);
+            }
+        }
+
         // set complete and removed to 0
         if (!isset($data['complete'])) $data['complete'] = 0;
         if (!isset($data['removed'])) $data['removed'] = 0;
@@ -421,7 +436,7 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
     public function fetchExport($year, $month) {
 
         // define some cols
-        $cols = array('time','status_id','prev_status_id','type_id','ip','sources');
+        $cols = array('time','status_id','prev_status_id','type_id','ip','sources','user_id');
 
         // fetch the rows
         $select = $this->select(array(
