@@ -45,6 +45,10 @@ class Uws_Model_Resource_Jobs extends Uws_Model_Resource_Abstract {
     public function toXML(&$xmlDoc, &$node = false) {
         $root = $xmlDoc->createElementNS($this->nsUws, "uws:jobs");
         $xmlDoc->appendChild($root);
+        // add version attribute (required by UWS 1.1)
+        $version = $xmlDoc->createAttribute('version');
+        $version->value = $this->version;
+        $root->appendChild($version);
 
         foreach ($this->jobref as $job) {
             $job->toXML($xmlDoc, $root);
