@@ -57,6 +57,9 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             'defaultQueue' => $defaultQueue
         ));
 
+        // init sources array
+        $sources = array();
+
         // init errors array
         $errors = array();
 
@@ -74,9 +77,6 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
 
                 // get queue
                 $queue = $form->getQueue();
-
-                // prepare sources array
-                $sources = array();
 
                 // validate query
                 $model = new Query_Model_Query();
@@ -195,6 +195,9 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
             'editable' => $model->canAlterPlan(),
             'mail' => Daiquiri_Config::getInstance()->query->processor->mail->enabled
         ));
+
+        // init sources array
+        $sources = array();
 
         // init errors array
         $errors = array();
