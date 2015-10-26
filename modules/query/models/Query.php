@@ -96,7 +96,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
         }
 
         if ($plan !== false and $this->_processor->supportsPlanType("QPROC_ALTERPLAN") === true) {
-            if ($this->_processor->validatePlan($plan, $table, $errors) !== true) {
+            if ($this->_processor->validatePlan($plan, $table, $errors, $sources) !== true) {
                 return false;
             }
         }
