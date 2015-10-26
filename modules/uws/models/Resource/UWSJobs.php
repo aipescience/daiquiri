@@ -52,10 +52,10 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
      * @return array $rows
      */
     public function fetchRows(array $sqloptions = array()) {
-        $select = $this->select();
+        $select = $this->select($sqloptions);
         $select->from('Uws_Jobs');
         $select->where("ownerId = ?", Daiquiri_Auth::getInstance()->getCurrentUsername());
-
+        // query database and return
         return $this->fetchAll($select);
     }
 

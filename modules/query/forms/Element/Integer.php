@@ -18,21 +18,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * XSD class reference
- */
-abstract class Uws_Model_Resource_Abstract extends Daiquiri_Model_Resource_Abstract {
+class Query_Form_Element_Integer extends Daiquiri_Form_Element_Text {
 
     /**
-     * Constructor.
+     * Initializes the form element.
      */
-    public function __construct() {
-        $this->nsUws = "http://www.ivoa.net/xml/UWS/v1.0";
-        $this->nsXLink = "http://www.w3.org/1999/xlink";
-        $this->nsXsi = "http://www.w3.org/2001/XMLSchema-instance";
-        $this->validateSchema = false;
-        $this->version = '1.1';
-    }
+    function init() {
+        // set required
+        $this->setRequired(true);
 
-    abstract public function toXML(&$xmlDoc, &$node = false);
+        // add validator for max string length
+        $this->addValidator('Int');
+
+        // add class
+        $this->setAttrib('class', 'span1');
+    }
 }

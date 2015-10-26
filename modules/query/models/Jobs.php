@@ -26,11 +26,8 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
     public function __construct() {
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
-        $this->_cols = array('id','database','table',$this->getResource()->getTimeField(),'status');
+        $this->_cols = array('id','database','table','time','status','type');
         $resourceClass = get_class($this->getResource());
-        if ($resourceClass::$hasQueues) {
-            $this->_cols[] = 'queue';
-        } 
     }
 
     /**
@@ -45,9 +42,11 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
                 'name' => $colname,
                 'sortable' => true
             );
-            if (in_array($colname, array('id','database','table','timeSubmit'))) {
-                $col['width'] = 160;
-            } else if (in_array($colname, array('queue', 'status'))) {
+            if ($colname === 'id') {
+                $col['width'] = 50;
+            } else if (in_array($colname, array('database','table','time'))) {
+                $col['width'] = 170;
+            } else if (in_array($colname, array('queue','status','type'))) {
                 $col['width'] = 70;
                 $col['sortable'] = false;
             } else {
@@ -74,7 +73,7 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
     public function rows(array $params = array()) {
         // parse params
         if (!isset($params['sort'])) {
-            $params['sort'] = $this->getResource()->getTimeField() . ' DESC';
+            $params['sort'] = 'time DESC';
         }
         $sqloptions = $this->getModelHelper('pagination')->sqloptions($params);
 
@@ -171,6 +170,38 @@ class Query_Model_Jobs extends Daiquiri_Model_Table {
             if ($form->isValid($formParams)) {
                 $this->getResource()->removeJob($id);
                 return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
+     * Show the query statistics for a given month.
+     * @return array $response
+     */
+    public function export(array $formParams = array()) {
+        // create the form object
+        $form = new Query_Form_Export();
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                // fetch the data from the database
+                $export = $this->getResource()->getJobResource()->fetchExport($values['year'], $values['month']);
+
+                return array(
+                    'status' => 'ok',
+                    'cols' => $export['cols'],
+                    'rows' => $export['rows'],
+                    'year' => $values['year'],
+                    'month' => $values['month']
+                );
             } else {
                 return $this->getModelHelper('CRUD')->validationErrorResponse($form);
             }

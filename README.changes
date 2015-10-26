@@ -1,3 +1,28 @@
+2015/09/08
+==========
+
+New job management!
+
+New configuration key need to be added.
+
+query.query.qqueue.userQueues.long.priority  10
+query.query.qqueue.userQueues.long.timeout   2400
+query.query.qqueue.userQueues.short.priority 20
+query.query.qqueue.userQueues.short.timeout  30
+
+If running direct queries:
+
+
+If running qqueue queries:
+
+Query_Jobs needs to be dropped (should be empty) and ./init.php -s needs to be run.
+
+In addition
+
+    moveJob,createGroup,updateGroup,moveGroup,toggleGroup,deleteGroup
+
+have to be added to the permissions for Query_Model_Account guest or user in Auth_Rules.
+
 2015/04/21
 ==========
 

@@ -172,6 +172,45 @@ dl.dl-horizontal dd {
     font-size: small;
 }
 
+/* nav-list */
+
+.daiquiri-widget.nav-list > li.nav-item > a,
+.daiquiri-widget.nav-list .nav-header {
+    margin-left: 0;
+    margin-right: 0;
+}
+.daiquiri-widget.nav-list ul.nav-list {
+    padding-left: 0;
+    padding-right: 0;
+}
+.daiquiri-widget.nav-list ul.nav-list .nav-header {
+    padding: 0;
+    border-bottom: none;
+}
+.daiquiri-widget.nav-list ul.nav-list h6 {
+    margin: 0;
+    padding: 5px 15px 5px 15px;
+}
+.daiquiri-widget.nav-list > li > a,
+.daiquiri-widget.nav-list ul.nav-list > li > a {
+    line-height: 14px;
+    margin-right: 0;
+    margin-left: 0;
+
+    -webkit-user-drag: none;
+    user-drag: none;
+}
+.daiquiri-widget.nav-list li.nav-note {
+    padding: 5px 15px 0 15px;
+    font-size: small;
+    line-height: 14px;
+}
+.daiquiri-widget.nav-list li.nav-note p,
+.daiquiri-widget.nav-list li.nav-note button {
+    display: block;
+    margin-bottom: 5px;
+}
+
 /* helper */
 
 .no-transition {

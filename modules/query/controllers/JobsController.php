@@ -58,4 +58,34 @@ class Query_JobsController extends Daiquiri_Controller_Abstract {
         $this->getControllerHelper('form')->remove($id);
     }
 
+    public function exportAction() {
+        // get params
+        $redirect = $this->getParam('redirect', '/query/jobs');
+
+        // check if POST or GET
+        if ($this->getRequest()->isPost()) {
+            if ($this->getParam('cancel')) {
+                // user clicked cancel
+                $this->getController()->redirect($redirect);
+            } else {
+                // validate form and do stuff
+                $response = $this->_model->export($this->getRequest()->getPost());
+
+                if ($response['status'] === 'ok') {
+                    $filename = sprintf('jobs-%04d-%02d.csv', (int) $response['year'], (int) $response['month']);
+                    $this->_helper->layout()->disableLayout();
+                    $this->getResponse()->setHeader('Content-Type', 'text/csv');
+                    $this->getResponse()->setHeader('Content-Disposition', "attachement; filename={$filename}");
+                }
+            }
+        } else {
+            // just display the form
+            $response = $this->_model->export();
+        }
+
+        // assign to view
+        $this->view->redirect = $redirect;
+        $this->view->assign($response);
+    }
+
 }

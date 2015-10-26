@@ -47,7 +47,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             $rules['guest'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
-                    'index','showJob','killJob','removeJob','renameJob','databases','keywords','nativeFunctions','customFunctions','examples'
+                    'index','showJob','killJob','removeJob','renameJob','moveJob','createGroup','updateGroup','moveGroup','toggleGroup','deleteGroup','databases','keywords','nativeFunctions','customFunctions','examples'
                 ),
                 'Query_Model_Database' => array('download','regenerate','file','stream'),
                 'Query_Model_Examples' => array('index', 'show')
@@ -63,7 +63,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             $rules['user'] = array(
                 'Query_Model_Form' => array('submit'),
                 'Query_Model_Account' => array(
-                    'index','showJob','killJob','removeJob','renameJob','databases','keywords','nativeFunctions','customFunctions','examples'
+                    'index','showJob','updateJob','killJob','removeJob','renameJob','createGroup','updateGroup','deleteGroup','databases','keywords','nativeFunctions','customFunctions','examples'
                 ),
                 'Query_Model_Database' => array('download','regenerate','file','stream'),
                 'Query_Model_Examples' => array('index', 'show')
@@ -84,7 +84,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
         );
 
         $rules['admin'] = array(
-            'Query_Model_Jobs' => array('rows','cols','show','kill','remove','rename'),
+            'Query_Model_Jobs' => array('rows','cols','show','kill','remove','rename','export'),
             'Query_Model_Examples' => array('index','create','update','delete','export')
         );
 
@@ -129,7 +129,18 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'type' => 'direct', // or qqueue
                 'qqueue' => array(
                     'defaultUsrGrp' => 'user',
-                    'defaultQueue' => 'short'
+                    'defaultQueue' => 'long',
+                    'guestQueue' => 'guest',
+                    'userQueues' => array(
+                        'short' => array(
+                            'priority' => '20',
+                            'timeout' => '30'
+                        ),
+                        'long' => array(
+                            'priority' => '10',
+                            'timeout' => '2400'
+                        )
+                    )
                 )
             ),
             'scratchdb' => '',
@@ -262,7 +273,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
         } else {
             $this->_error("Unknown value '{$output['download']['type']}' in query.download.queue.type");
         }
-        
+
         // check download adapters
         if (!empty($output['download']['adapter']['enabled'])) {
             foreach ($output['download']['adapter']['enabled'] as $key => $adapter) {

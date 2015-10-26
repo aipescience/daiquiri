@@ -73,7 +73,7 @@ class Core_Model_Config extends Daiquiri_Model_Table {
                     return array(
                         'form' => $form,
                         'status' => 'error',
-                        'error' => 'Key already stored'
+                        'errors' => array('form' => array('Key already stored'))
                     );
                 }
             } else {
