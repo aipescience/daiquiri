@@ -363,7 +363,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // job is put into final state; could set endTime here, if not existing yet
 
         // kill job
-        $this->getResource()->killJob($id);
+        $this->getResource()->killJob($job->jobId);
         return true;
     }
 
@@ -403,6 +403,11 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $job->addError("Incomplete job");
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
+
+            // job is in final state now, add startTime and endTime
+            $now = date('Y-m-d\TH:i:s');
+            $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
+
             return;
         }
 
@@ -439,9 +444,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
                 // job is in final state now, add startTime and endTime
-                $now = new DateTime('now');
-                $now = $now->format('c');
+                $now = date('Y-m-d\TH:i:s');
                 $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
+
                 return;
             }
         } catch (Exception $e) {
@@ -451,9 +456,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
             // job is in final state now, add startTime and endTime
-            $now = new DateTime('now');
-            $now = $now->format('c');
+            $now = date('Y-m-d\TH:i:s');
             $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
+
             return;
         }
 
@@ -473,9 +478,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
             // job is in final state now, add startTime and endTime
-            $now = new DateTime('now');
-            $now = $now->format('c');
+            $now = date('Y-m-d\TH:i:s');
             $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
+
             return;
         }
 

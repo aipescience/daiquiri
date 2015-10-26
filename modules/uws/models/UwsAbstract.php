@@ -662,10 +662,11 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
             // job is put into final state; set endTime, if not existing yet
             if (!$job->endTime) {
-                $datetimeEnd = new DateTime('now');
-                $job->endTime = $datetimeEnd->format('c');
+                $datetimeEnd = date('Y-m-d\TH:i:s');
+                $job->endTime = $datetimeEnd;
+                $resource->updateRow($job->jobId, array("endTime" => $job->endTime));
             }
-            $resource->updateRow($job->jobId, array("phase" => "ABORTED", "endTime" => $job->endTime));
+            $resource->updateRow($job->jobId, array("phase" => "ABORTED"));
         } else {
             $this->abortJobImpl($job);
         }
