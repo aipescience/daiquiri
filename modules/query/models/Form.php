@@ -210,7 +210,7 @@ class Query_Model_Form extends Daiquiri_Model_Abstract {
                     $plan = $values['plan_query'];
 
                     // validate query plus plan
-                    if ($model->validate($ns->sql, $plan, $ns->tablename, $errors) !== true) {
+                    if ($model->validate($ns->sql, $plan, $ns->tablename, $sources, $errors) !== true) {
                         if (!empty($errors)) {
                             return $this->getModelHelper('CRUD')->validationErrorResponse($form,$errors);
                         }
