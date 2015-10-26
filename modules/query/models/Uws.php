@@ -130,11 +130,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             if (!$after) {
                 throw new Daiquiri_Exception_BadRequest("Cannot parse the timestamp given with AFTER keyword (".$params['AFTER']."), need a UTC-timestamp in ISO 8601 format without timezone-information.");
             }
-            // convert provided UTC time to local time, which is used for timestamp in DB in our case
-            //$timezone = date_default_timezone_get();
-            $utc_offset = intval(date('Z')); // depends on set timezone
-            $dbtime = $after-$utc_offset;
-            $whereafter = array('time > ?' => date('Y-m-d H:i:s', $dbtime));
+            // provided time is UTC, must convert system time on DB correctly to UTC before comparing,
+            // CONVERT_TZ also takes day saving time correctly into account
+            $whereafter = array("CONVERT_TZ(time, 'SYSTEM', '+0:00') > ?" => date('Y-m-d H:i:s', $after));
         }
 
         // get the userid
@@ -171,7 +169,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             // add AFTER condition and/or ignore startTime=NULL in case of AFTER/LAST
             $whereafter = array();
             if (isset($after)) {
-                $whereafter = array('startTime > ?' => date('Y-m-d H:i:s', $after));
+                $whereafter = array("CONVERT_TZ(startTime, 'SYSTEM', '+0:00') > ?" => date('Y-m-d H:i:s', $after));
             }
             else if (isset($last)) {
                 $whereafter = array('startTime IS NOT NULL');
