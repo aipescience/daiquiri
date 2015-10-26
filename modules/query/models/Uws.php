@@ -212,8 +212,6 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             if (!is_null($limit)) {
                 $joblist = array_slice($joblist, -$limit, $limit);
             }
-        } else {
-            $joblist = array_merge($joblist, $pendingJoblist);
         }
 
         // copy jobs into jobs-object
