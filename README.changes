@@ -12,6 +12,18 @@ query.query.qqueue.userQueues.short.timeout  30
 
 If running direct queries:
 
+ALTER TABLE `Query_Jobs` ADD COLUMN `sources` TEXT NOT NULL;
+ALTER TABLE `Query_Jobs` ADD COLUMN `prev_status_id` INTEGER;
+ALTER TABLE `Query_Jobs` ADD COLUMN `type_id` INTEGER;
+ALTER TABLE `Query_Jobs` ADD COLUMN `group_id` INTEGER;
+ALTER TABLE `Query_Jobs` ADD COLUMN `prev_id` BIGINT;
+ALTER TABLE `Query_Jobs` ADD COLUMN `next_id` BIGINT;
+ALTER TABLE `Query_Jobs` ADD COLUMN `ip` VARCHAR(45);
+ALTER TABLE `Query_Jobs` ADD COLUMN `nrows` BIGINT;
+ALTER TABLE `Query_Jobs` ADD COLUMN `size` BIGINT;
+ALTER TABLE `Query_Jobs` ADD COLUMN `complete` BOOL NOT NULL;
+ALTER TABLE `Query_Jobs` ADD COLUMN `removed` BOOL NOT NULL;
+ALTER TABLE `Query_Jobs` DROP `comment`;
 
 If running qqueue queries:
 
