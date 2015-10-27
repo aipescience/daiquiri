@@ -86,7 +86,7 @@ class Contact_Model_Init extends Daiquiri_Model_Init {
                 $output[$key] = $value;
             }
         }
-        
+
         $this->_init->options['init']['contact'] = $output;
     }
 
@@ -97,6 +97,7 @@ class Contact_Model_Init extends Daiquiri_Model_Init {
         // create status entries for the contact module
         $contactStatusModel = new Contact_Model_Status();
         if ($contactStatusModel->getResource()->countRows() == 0) {
+            echo '    Initialising Contact_Status' . PHP_EOL;
             foreach ($this->_init->options['init']['contact']['status'] as $status) {
                 $a = array('status' => $status);
                 $r = $contactStatusModel->create($a);
@@ -107,6 +108,7 @@ class Contact_Model_Init extends Daiquiri_Model_Init {
         // create category entries for the contact module
         $contactCategoriesModel = new Contact_Model_Categories();
         if ($contactCategoriesModel->getResource()->countRows() == 0) {
+            echo '    Initialising Contact_Categories' . PHP_EOL;
             foreach ($this->_init->options['init']['contact']['categories'] as $category) {
                 $a = array('category' => $category);
                 $r = $contactCategoriesModel->create($a);

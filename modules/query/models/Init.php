@@ -332,6 +332,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
         // create config entries
         $queryExamplesModel = new Query_Model_Examples();
         if ($queryExamplesModel->getResource()->countRows() == 0) {
+            echo '    Initialising Query_Examples' . PHP_EOL;
             foreach ($this->_init->options['init']['query']['examples'] as $a) {
                 $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
                 unset($a['publication_role']);

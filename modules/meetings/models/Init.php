@@ -137,6 +137,7 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
         // create contribution types
         $meetingsContributionTypeModel = new Meetings_Model_ContributionTypes();
         if ($meetingsContributionTypeModel->getResource()->countRows() == 0) {
+            echo '    Initialising Meetings_ContributionTypes' . PHP_EOL;
             foreach ($this->_init->options['init']['meetings']['contributionTypes'] as $contributionType) {
                 $a = array('contribution_type' => $contributionType);
                 $r = $meetingsContributionTypeModel->create($a);
@@ -147,6 +148,7 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
         // create participant detail keys
         $meetingsParticipantDetailKeyModel = new Meetings_Model_ParticipantDetailKeys();
         if ($meetingsParticipantDetailKeyModel->getResource()->countRows() == 0) {
+            echo '    Initialising Meetings_ParticipantDetailKeys' . PHP_EOL;
             foreach ($this->_init->options['init']['meetings']['participantDetailKeys'] as $a) {
                 $a['type_id'] = array_search($a['type'],Meetings_Model_ParticipantDetailKeys::$types);
                 unset($a['type']);
@@ -159,6 +161,7 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
         // create participant status
         $meetingsParticipantStatusModel = new Meetings_Model_ParticipantStatus();
         if ($meetingsParticipantStatusModel->getResource()->countRows() == 0) {
+            echo '    Initialising Meetings_ParticipantStatus' . PHP_EOL;
             foreach ($this->_init->options['init']['meetings']['participantStatus'] as $participantStatus) {
                 $a = array('status' => $participantStatus);
                 $r = $meetingsParticipantStatusModel->create($a);
@@ -169,6 +172,7 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
         // create meetings
         $meetingsMeetingModel = new Meetings_Model_Meetings();
         if ($meetingsMeetingModel->getResource()->countRows() == 0) {
+            echo '    Initialising Meetings_Meetings' . PHP_EOL;
             foreach ($this->_init->options['init']['meetings']['meetings'] as $a) {
                 $a['contribution_type_id'] = array();
                 foreach($a['contribution_types'] as $contribution_type) {
@@ -196,6 +200,7 @@ class Meetings_Model_Init extends Daiquiri_Model_Init {
         // create participants
         $meetingsParticipantsModel = new Meetings_Model_Participants();
         if ($meetingsParticipantsModel->getResource()->countRows() == 0) {
+            echo '    Initialising Meetings_Participants' . PHP_EOL;
             $participantStatusIds = array_flip($meetingsParticipantStatusModel->getResource()->fetchValues('status'));
 
             foreach ($this->_init->options['init']['meetings']['participants'] as $a) {
