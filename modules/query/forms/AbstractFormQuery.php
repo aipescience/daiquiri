@@ -49,12 +49,16 @@ abstract class Query_Form_AbstractFormQuery extends Daiquiri_Form_Abstract {
      * @param array $queues the set of queues to be used with this query form
      */
     public function setQueues($queues) {
-        $sortarray = array();
-        foreach($queues as $queue) {
-            $sortarray[] = $queue['timeout'];
+        if (empty($queues)) {
+            $this->_queues = $queues;
+        } else {
+            $sortarray = array();
+            foreach($queues as $queue) {
+                $sortarray[] = $queue['timeout'];
+            }
+            array_multisort($sortarray, SORT_ASC, $queues);
+            $this->_queues = $queues;
         }
-        array_multisort($sortarray, SORT_ASC, $queues);
-        $this->_queues = $queues;
     }
 
     /**
