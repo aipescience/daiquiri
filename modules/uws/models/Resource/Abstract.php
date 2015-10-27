@@ -31,6 +31,7 @@ abstract class Uws_Model_Resource_Abstract extends Daiquiri_Model_Resource_Abstr
         $this->nsXLink = "http://www.w3.org/1999/xlink";
         $this->nsXsi = "http://www.w3.org/2001/XMLSchema-instance";
         $this->validateSchema = false;
+        $this->version = '1.1';
     }
 
     abstract public function toXML(&$xmlDoc, &$node = false);

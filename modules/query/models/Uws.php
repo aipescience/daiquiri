@@ -20,11 +20,13 @@
 
 class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
-    // status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED');
+    // status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED', 'ARCHIVED');
+    // map between internal status names for different queues and
+    // official UWS phase names as stored in Uws_Model_UwsAbstract
     private static $statusQueue = array(
         'queued' => 1,
         'running' => 2,
-        'removed' => 6,
+        'removed' => 9,
         'error' => 4,
         'success' => 3,
         'timeout' => 5,
@@ -35,39 +37,188 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         parent::__construct();
     }
 
+    private function getQueryStatusNames($uwsphase) {
+        // get the internal query status name defined by $statusQueue for
+        // a given official UWS phase name as defined in Uws_Model_UwsAbstract;
+        // also take disambiguity with ABORTED into account,
+        // return array of matching status names
+        $uwsphase_id = array_search($uwsphase, Uws_Model_UwsAbstract::$status);
+        $status_names = array();
+        if ($uwsphase_id) {
+            // find all matching internal names
+            $status_names = array_keys(self::$statusQueue, $uwsphase_id);
+        }
+        return $status_names;
+    }
+
     public function getJobList($params) {
         // get jobs
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
+        // Filter job list, introduced with UWS version 1.1
+        // parse here and now for LAST/AFTER and PHASE filter parameters
+
+        // Request query string may contain repeated PHASE key,
+        // which is not recognized as PHASE-array by standard PHP/Zend-functions,
+        // thus parse manually:
+        $queryparams = Daiquiri_Config::getInstance()->getMultiQuery();
+
+        $statuslist = array();
+        $wherestatus = array();
+        $phases = array();
+        if (array_key_exists('PHASE', $queryparams)) {
+            $phases = $queryparams['PHASE'];
+
+            // collect internal status_ids for requested uws-phases
+            if (!is_array($phases)) {
+                $phases = array($phases);
+            }
+            foreach ($phases as $phase) {
+                if ( !in_array($phase, Uws_Model_UwsAbstract::$status) ) {
+                    throw new Daiquiri_Exception_BadRequest("Supplied PHASE value '".$phase."' is not a valid UWS phase.");
+                }
+                $status_names = $this->getQueryStatusNames($phase);
+                foreach ($status_names as $status_name) {
+                    if ($status_id = $this->getResource()->getStatusId($status_name)) {
+                        $statuslist[] = $status_id;
+                    }
+                }
+            }
+        }
+
+        // construct where condition based on PHASE-filters
+        if (!empty($statuslist)) {
+            $wherestatus = '';
+            foreach ($statuslist as $status_id) {
+                $wherestatus .= ' status_id = ' . $status_id . ' OR';
+            }
+            // remove trailing OR
+            $wherestatus = array(substr($wherestatus, 0, -2));
+        } else if ($phases) {
+            // there are valid UWS phases supplied as query parameters
+            // (otherwise there would have been an error beforehand), but
+            // they are not in the statuslist, so the resource (queue)
+            // does not support them (or it's the PENDING jobs)
+            // => no need to return anything from this job list
+            $wherestatus = NULL;
+        } else {
+            // statuslist is empty and no phase-filter was given
+            $wherestatus = array('status_id != ?' => $this->getResource()->getStatusId('removed'));
+        }
+
+        $limit = 1000; // default limit of returned rows, NULL = no limit
+        // should actually redirect to {url}?LAST=10000 or so, if there is a limit!
+
+        // check LAST keyword and set $limit accordingly
+        if (array_key_exists('LAST', $params)) {
+            $last = $params['LAST'];
+            // check if string contains only digits (positive integer!),
+            // if so, convert to integer
+            if (isset($last) && ctype_digit($last)) {
+                $last = intval($last);
+                // set limit (maybe restrict to max. limit here?)
+                $limit = $last;
+            } else {
+                throw new Daiquiri_Exception_BadRequest("Supplied LAST value '".$last."' is not a positive integer.");
+            }
+        }
+
+        $whereafter = array();
+        if (array_key_exists('AFTER', $params)) {
+            $after = $params['AFTER'];
+            $after = strtotime($after);
+            if (!$after) {
+                throw new Daiquiri_Exception_BadRequest("Cannot parse the timestamp given with AFTER keyword (".$params['AFTER']."), need a UTC-timestamp in ISO 8601 format without timezone-information.");
+            }
+            // provided time is UTC, must convert system time on DB correctly to UTC before comparing,
+            // CONVERT_TZ also takes day saving time correctly into account
+            $whereafter = array("CONVERT_TZ(time, 'SYSTEM', '+0:00') > ?" => date('Y-m-d H:i:s', $after));
+        }
+
         // get the userid
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
 
-        // get rows for this user
-        $rows = $this->getResource()->fetchRows(array(
-            'where' => array(
-                'user_id = ?' => $userId,
-                'status_id != ?' => $this->getResource()->getStatusId('removed'),
-            ),
-            'limit' => 1000,
-            'order' => array('time DESC'),
-        ));
+        $joblist = array();
+        // If only PENDING jobs are requested, do not need to query this db table,
+        // pending jobs are stored only in the db table queried below.
+        if ( ! (count($phases) == 1 && $phases[0] == "PENDING") && !is_null($wherestatus) ) {
+            $whereuser = array('user_id = ?' => $userId);
+            $wherelist = array_merge($whereuser, $wherestatus, $whereafter);
 
-        $jobs = new Uws_Model_Resource_Jobs();
+            // get rows for this user
+            $rows = $this->getResource()->fetchRows(array(
+                'where' => $wherelist,
+                'order' => array('time DESC'),
+                'limit' => $limit,
+            ));
 
-        foreach ($rows as $job) {
-            $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
-            $status = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
-            $jobs->addJob($job['table'], $href, array($status));
+            foreach ($rows as $job) {
+                $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
+                $status = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
+                $joblist[] = array('id' => $job['table'], 'href' => $href, 'status' => $status, 'time' => $job['time']);
+            }
         }
 
-        $resUWSJobs = new Uws_Model_Resource_UWSJobs();
+        // add pending/error jobs, but only if no PHASE-filter was given
+        // or phase-filter was PENDING, ERROR or ABORTED
+        // NOTE: Not sure about SUSPENDED, HELD or UNKNOWN
+        $pendingJoblist = array();
+        if ( empty($phases) || in_array("PENDING", $phases) || in_array("ERROR", $phases) || in_array("ABORTED", $phases) ) {
+            $resUWSJobs = new Uws_Model_Resource_UWSJobs();
 
-        $pendingJobList = $resUWSJobs->fetchRows();
+            // add AFTER condition and/or ignore startTime=NULL in case of AFTER/LAST
+            $whereafter = array();
+            if (isset($after)) {
+                $whereafter = array("CONVERT_TZ(startTime, 'SYSTEM', '+0:00') > ?" => date('Y-m-d H:i:s', $after));
+            }
+            else if (isset($last)) {
+                $whereafter = array('startTime IS NOT NULL');
+            }
 
-        foreach ($pendingJobList as $job) {
-            $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
-            $status = $job['phase'];
-            $jobs->addJob($job['jobId'], $href, array($status));
+            $pendingRows = $resUWSJobs->fetchRows(array(
+                'where' => $whereafter,
+                'order' => array('startTime DESC'),
+                'order' => array('jobId DESC'), // add this here for useful ordering if startTime=NULL (PENDING jobs)
+                'limit' => $limit,
+            )); // the check for the userId is inside UWSJobs
+
+            foreach ($pendingRows as $job) {
+                $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
+                $status = $job['phase'];
+
+                if ( empty($phase) || in_array($status, $phases) ) {
+                    $pendingJoblist[] = array('id' => $job['jobId'], 'href' => $href, 'status' => $status, 'time' => $job['startTime']);
+                }
+            }
+        }
+
+        // reverse job sort order, since standard requires for LAST/AFTER keywords
+        // *ascending* startTimes (but needed initial DESC order in queries for most recent limit)
+        $joblist = array_reverse($joblist);
+        $pendingJoblist = array_reverse($pendingJoblist);
+
+        // merge both lists ...
+        $joblist = array_merge($joblist, $pendingJoblist);
+
+        // and sort by startTime (< 10 ms for 10,000 jobs, so it's fast enough to do it always)
+        $sortcolumn = array();
+        foreach ($joblist as $job) {
+            $sortcolumn[] = $job['time'];
+        }
+        array_multisort($sortcolumn, SORT_ASC, $joblist);
+
+        // apply final cut, if required
+        if (array_key_exists('LAST', $params)) {
+            // cut the list, only keep number of jobs required by LAST or given by limit
+            if (!is_null($limit)) {
+                $joblist = array_slice($joblist, -$limit, $limit);
+            }
+        }
+
+        // copy jobs into jobs-object
+        $jobs = new Uws_Model_Resource_Jobs();
+        foreach ($joblist as $job) {
+            $jobs->addJob($job['id'], $job['href'], array($job['status']));
         }
 
         return $jobs;
@@ -191,6 +342,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // get job and check permissions
         $row = $this->getResource()->fetchRow($job->jobId);
+
         if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
             throw new Daiquiri_Exception_Forbidden();
         }
@@ -206,12 +358,15 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // get job and check permissions
         $row = $this->getResource()->fetchRow($job->jobId);
+
         if ($row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
             throw new Daiquiri_Exception_Forbidden();
         }
 
+        // job is put into final state; could set endTime here, if not existing yet
+
         // kill job
-        $this->getResource()->killJob($id);
+        $this->getResource()->killJob($job->jobId);
         return true;
     }
 
@@ -251,6 +406,11 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $job->addError("Incomplete job");
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
+
+            // job is in final state now, add startTime and endTime
+            $now = date('Y-m-d\TH:i:s');
+            $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
+
             return;
         }
 
@@ -270,6 +430,10 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $sources = array();
 
         // validate query
+        // We will set a startTime here only if the validation results in an
+        // error; otherwise the startTime will be set once execution of the
+        // job starts. This is the behaviour expected by a client as discussed
+        // on the IVOA mailing list.
         $job->resetErrors();
         $model = new Query_Model_Query();
         try {
@@ -281,6 +445,11 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
                 $resource = new Uws_Model_Resource_UWSJobs();
                 $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
+
+                // job is in final state now, add startTime and endTime
+                $now = date('Y-m-d\TH:i:s');
+                $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
+
                 return;
             }
         } catch (Exception $e) {
@@ -288,6 +457,11 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $job->addError($e->getMessage());
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
+
+            // job is in final state now, add startTime and endTime
+            $now = date('Y-m-d\TH:i:s');
+            $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
+
             return;
         }
 
@@ -305,11 +479,16 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
+
+            // job is in final state now, add startTime and endTime
+            $now = date('Y-m-d\TH:i:s');
+            $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
+
             return;
         }
 
         // clean up stuff (basically just remove the job in the temorary UWS job store - if we are here
-        // everything has been handeled by the queue)
+        // everything has been handled by the queue)
         $resource = new Uws_Model_Resource_UWSJobs();
         $resource->deleteRow($job->jobId);
     }

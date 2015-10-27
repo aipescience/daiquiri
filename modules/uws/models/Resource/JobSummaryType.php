@@ -93,6 +93,11 @@ class Uws_Model_Resource_JobSummaryType extends Uws_Model_Resource_Abstract {
         $job = $xmlDoc->createElementNS($this->nsUws, "uws:{$this->name}");
         $xmlDoc->appendChild($job);
 
+        // add version attribute (required by UWS 1.1)
+        $version = $xmlDoc->createAttribute('version');
+        $version->value = $this->version;
+        $job->appendChild($version);
+
         $this->_writeXMLElement($xmlDoc, $job, "jobId");
         $this->_writeXMLElement($xmlDoc, $job, "runId", true);
         $this->_writeXMLElement($xmlDoc, $job, "ownerId");

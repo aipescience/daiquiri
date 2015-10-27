@@ -23,7 +23,8 @@
 
 abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
-    protected static $status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED');
+    protected static $status = array('PENDING', 'QUEUED', 'EXECUTING', 'COMPLETED', 'ERROR', 'ABORTED', 'UNKNOWN', 'HELD', 'SUSPENDED', 'ARCHIVED');
+    private static $status_active = array('PENDING', 'QUEUED', 'EXECUTING');
 
     public function __construct() {
         parent::__construct();
@@ -49,6 +50,9 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
     }
 
     public function get($requestParams) {
+        $waittime_max = 60; // maximum time the server will wait before continuing
+        $sleeptime = 1; // time interval between repeated queries to the database
+
         // is this job pending?
         $job = $this->getPendingJob($requestParams['wild0']);
 
@@ -61,16 +65,64 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
             throw new Daiquiri_Exception_NotFound();
         }
 
-        // get the wildcard parameters
+        // get the wildcard parameters and possible WAIT-parameters
         $params = array();
+        $waittime = 0;
+        $waitphase = NULL;
         foreach ($requestParams as $key => $value) {
             if (strstr($key, "wild") !== false) {
                 $params[$key] = $value;
+            }
+            if ($key == "WAIT") {
+                $waittime = $requestParams["WAIT"];
+                // validate that it is an integer
+                if (isset($waittime) && ctype_digit($waittime)) {
+                    $waittime = intval($waittime);
+                } else if ($waittime === '-1') {
+                    $waittime = $waittime_max;
+                } else {
+                    // create error or just ignore
+                    $waittime = 0;
+                }
+            }
+            if ($key == "PHASE") {
+                $waitphase = $requestParams["PHASE"];
             }
         }
 
         if (count($params) == 1) {
             //this is just a get on the object
+
+            // take care of WAIT
+            // if no wait-phase is given, then set it to the current phase of the job
+            if (is_null($waitphase)) {
+                $waitphase = $job->phase;
+            }
+            // check if it's an active phase, otherwise don't wait at all
+            // e.g. {url/jobid}?WAIT=-1 on aborted job should return immediately
+            if ( !in_array($waitphase, self::$status_active) ) {
+                $waittime = 0;
+            }
+
+            // wait until phase-change of job or waittime is over
+            $start = microtime(true);
+            $end = $start;
+            while ($job->phase == $waitphase && $end-$start < $waittime) {
+                $job = $this->getPendingJob($requestParams['wild0']);
+
+                if ($job === false) {
+                    // get job information for this id
+                    $job = $this->getJob($requestParams);
+                }
+                if ($job === false) {
+                    // should never happen, but who knows
+                    throw new Daiquiri_Exception_NotFound();
+                }
+
+                sleep($sleeptime);
+                $end = microtime(true);
+            }
+
             $xmlDoc = new DOMDocument('1.0', "UTF-8");
             $xmlDoc->formatOutput = true;
 
@@ -591,7 +643,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         }
     }
 
-    //deletes the job - if this is job is handled by the abstract class, just delete
+    //deletes the job - if this job is handled by the abstract class, just delete
     //it, otherwise pass the request down to the implementation
     public function deleteJob(Uws_Model_Resource_JobSummaryType &$job) {
         if (isset($job->handledByAbstract)) {
@@ -602,11 +654,18 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         }
     }
 
-    //aborts the job - if this is job is handled by the abstract class, just aborts
+    //aborts the job - if this job is handled by the abstract class, just abort
     //it, otherwise pass the request down to the implementation
     public function abortJob(Uws_Model_Resource_JobSummaryType &$job) {
         if (isset($job->handledByAbstract)) {
             $resource = new Uws_Model_Resource_UWSJobs();
+
+            // job is put into final state; set endTime, if not existing yet
+            if (!$job->endTime) {
+                $datetimeEnd = date('Y-m-d\TH:i:s');
+                $job->endTime = $datetimeEnd;
+                $resource->updateRow($job->jobId, array("endTime" => $job->endTime));
+            }
             $resource->updateRow($job->jobId, array("phase" => "ABORTED"));
         } else {
             $this->abortJobImpl($job);

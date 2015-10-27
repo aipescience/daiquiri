@@ -41,7 +41,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     protected static $_status = array('success' => 1, 'error' => 2, 'removed' => 3);
 
     /**
-     * Translateion table to convert the database columns of the job table into something readable.
+     * Translation table to convert the database columns of the job table into something readable.
      * Only these additional keys will be shown to the user. Empty for the direct query.
      * @var array $translations
      */
@@ -57,7 +57,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
     /**
      * Creates a new table in the database with the given sql query.
      * SIDE EFFECT: changes $job array and fills in the missing data
-     * @param array $job object that hold information about the query
+     * @param array $job object that holds information about the query
      * @param array $errors holding any error that occurs
      * @param array $options any options that a specific implementation of submitJob needs to get
      * @return int $status
@@ -206,6 +206,8 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
      */
     public function killJob($id) {
         // kill is not supported by this queue... thus do nothing
+        // we should set here the job phase to ABORTED (e.g. on timeout)
+        // and (if not existing) the endTime to the current time
     }
 
     /**
