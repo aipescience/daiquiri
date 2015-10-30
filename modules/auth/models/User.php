@@ -401,14 +401,35 @@ class Auth_Model_User extends Daiquiri_Model_Table {
 
                     // send a notification mail
                     if (Daiquiri_Config::getInstance()->auth->notification->updateUser) {
-                        $user = $this->getResource()->fetchRow($id);
-                        $this->getModelHelper('mail')->send('auth.updateUser', array(
-                            'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
-                            'id' => $user['id'],
-                            'username' => $user['username'],
-                            'firstname' => $user['details']['firstname'],
-                            'lastname' => $user['details']['lastname']
-                        ));
+                        $newUser = $this->getResource()->fetchRow($id);
+
+
+                        if (Daiquiri_Config::getInstance()->auth->notification->updateUser->mail) {
+                            $this->getModelHelper('mail')->send('auth.updateUser', array(
+                                'to' => Daiquiri_Config::getInstance()->auth->notification->updateUser->mail->toArray(),
+                                'id' => $newUser['id'],
+                                'username' => $newUser['username'],
+                                'firstname' => $newUser['details']['firstname'],
+                                'lastname' => $newUser['details']['lastname']
+                            ));
+                        }
+
+                        $url = Daiquiri_Config::getInstance()->auth->notification->updateUser->url;
+                        if ($url) {
+                            $json = Zend_JSON::encode(array(
+                                'action' => 'auth.updateUser',
+                                'data' => array(
+                                    'oldUser' => $user,
+                                    'newUser' => $newUser
+                                )
+                            ));
+                            $client = new Zend_Http_Client($url, array(
+                                'adapter'   => 'Zend_Http_Client_Adapter_Curl'
+                            ));
+                            $client->setMethod(Zend_Http_Client::POST);
+                            $client->setRawData($json, 'application/json');
+                            $response = $client->request();
+                        }
                     }
                 }
 
