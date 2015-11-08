@@ -30,10 +30,6 @@ class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
         // create a new mail
         $mail = new Zend_Mail('UTF-8');
 
-        // get the template
-        $templateModel = new Core_Model_Templates();
-        $data = $templateModel->show($template, $values);
-
         if (isset($values['to'])) {
             if (is_array($values['to'])) {
                 foreach ($values['to'] as $address) {
@@ -42,6 +38,7 @@ class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
             } else {
                 $mail->addTo($values['to']);
             }
+            unset($values['to']);
         } else {
             throw new Exception('to not send in $values');
         }
@@ -55,6 +52,7 @@ class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
             } else {
                 $mail->addCc($values['cc']);
             }
+            unset($values['cc']);
         }
 
         // set bcc
@@ -66,7 +64,12 @@ class Daiquiri_Model_Helper_Mail extends Daiquiri_Model_Helper_Abstract {
             } else {
                 $mail->addBcc($values['bcc']);
             }
+            unset($values['bcc']);
         }
+
+        // get the template
+        $templateModel = new Core_Model_Templates();
+        $data = $templateModel->show($template, $values);
 
         // set subject and body
         $mail->setSubject($data['subject']);
