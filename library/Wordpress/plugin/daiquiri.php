@@ -211,3 +211,9 @@ function daiquiri_logout() {
     wp_redirect(get_site_url() . '/../auth/login/logout?cms_logout=false');
     exit();
 }
+
+/*
+ * Disable emails send on email address change
+ */
+
+add_filter( 'send_password_change_email', '__return_false');
