@@ -223,6 +223,12 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                         'manager' => Daiquiri_Auth::getInstance()->getCurrentUsername()
                     ));
 
+                    // send a notification
+                    if (Daiquiri_Config::getInstance()->core->notification->updateUser) {
+                        $newUser = $this->getResource()->fetchRow($userId);
+                        $this->getModelHelper('notification')->updateUser($user, $newUser);
+                    }
+
                     return array('status' => 'ok');
                 }
             } else {
@@ -334,6 +340,12 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                         'username' => $user['username']
                     ));
 
+                    // send a notification
+                    if (Daiquiri_Config::getInstance()->core->notification->updateUser) {
+                        $newUser = $this->getResource()->fetchRow($userId);
+                        $this->getModelHelper('notification')->updateUser($user, $newUser);
+                    }
+
                     return array('status' => 'ok');
                 }
             } else {
@@ -382,16 +394,10 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                         $sessionResource->deleteRow($session);
                     };
 
-                    // send a notification mail
-                    if (Daiquiri_Config::getInstance()->auth->notification->updateUser) {
-                        $user = $this->getResource()->fetchRow($userId);
-                        $this->getModelHelper('mail')->send('auth.updateUser', array(
-                            'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
-                            'id' => $user['id'],
-                            'username' => $user['username'],
-                            'firstname' => $user['details']['firstname'],
-                            'lastname' => $user['details']['lastname']
-                        ));
+                    // send a notification
+                    if (Daiquiri_Config::getInstance()->core->notification->updateUser) {
+                        $newUser = $this->getResource()->fetchRow($userId);
+                        $this->getModelHelper('notification')->updateUser($user, $newUser);
                     }
 
                     // log the event amd return
@@ -435,16 +441,10 @@ class Auth_Model_Registration extends Daiquiri_Model_Abstract {
                     // activate user in database
                     $this->getResource()->updateRow($userId, array('status_id' => $statusId));
 
-                    // send a notification mail
-                    if (Daiquiri_Config::getInstance()->auth->notification->updateUser) {
-                        $user = $this->getResource()->fetchRow($userId);
-                        $this->getModelHelper('mail')->send('auth.updateUser', array(
-                            'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
-                            'id' => $user['id'],
-                            'username' => $user['username'],
-                            'firstname' => $user['details']['firstname'],
-                            'lastname' => $user['details']['lastname']
-                        ));
+                    // send a notification
+                    if (Daiquiri_Config::getInstance()->core->notification->updateUser) {
+                        $newUser = $this->getResource()->fetchRow($userId);
+                        $this->getModelHelper('notification')->updateUser($user, $newUser);
                     }
 
                     // log the event and return

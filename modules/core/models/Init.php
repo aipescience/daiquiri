@@ -94,7 +94,11 @@ class Core_Model_Init extends Daiquiri_Model_Init {
                 'enabled' => true,
                 'loglevel' => 'notice',
                 'logfile' => '/srv/log/daiquiri.log'
-            )
+            ),
+            'notification' => array(
+                'updateUser' => false,
+                'changePassword' => false
+            ),
         );
 
         // create config array
@@ -154,7 +158,7 @@ Best Regards'
                 'subject' => '[Daiquiri] New User registered',
                 'body' => 'Dear Daiquiri manager,
 
-_firstname_ _lastname_ has just validated his/her registration. 
+_firstname_ _lastname_ has just validated his/her registration.
 
 Please login to the admin interface and confirm the user.
 
@@ -186,7 +190,7 @@ your account has been created and you should be able to log in.
 
 Best Regards'
             ),
-            'auth.changePassword' => array(
+            'notification.changePassword' => array(
                 'subject' => '[Daiquiri] User password changed',
                 'body' => 'Dear Daiquiri admin,
 
@@ -194,7 +198,7 @@ the password of _firstname_ _lastname_ (username: _username_) has just been chan
 
 Best Regards'
             ),
-            'auth.updateUser' => array(
+            'notification.updateUser' => array(
                 'subject' => '[Daiquiri] User credentials changed',
                 'body' => 'Dear Daiquiri admin,
 
@@ -269,7 +273,7 @@ Best Regards'
                 'subject' => '_meeting_',
                 'body' => 'Dear _firstname_ _lastname_,
 
-Thank you for registering for the meeting. 
+Thank you for registering for the meeting.
 
 Please click on the following link to validate your registration:
 
@@ -281,7 +285,7 @@ Best Regards'
                 'subject' => '_meeting_',
                 'body' => 'Dear _firstname_ _lastname_,
 
-Thank you for registering for the meeting. 
+Thank you for registering for the meeting.
 
 We have stored the following information about your registration:
 

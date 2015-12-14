@@ -399,16 +399,10 @@ class Auth_Model_User extends Daiquiri_Model_Table {
                     // log the event and return
                     Daiquiri_Log::getInstance()->notice("user '{$user['username']}' updated");
 
-                    // send a notification mail
-                    if (Daiquiri_Config::getInstance()->auth->notification->updateUser) {
-                        $user = $this->getResource()->fetchRow($id);
-                        $this->getModelHelper('mail')->send('auth.updateUser', array(
-                            'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
-                            'id' => $user['id'],
-                            'username' => $user['username'],
-                            'firstname' => $user['details']['firstname'],
-                            'lastname' => $user['details']['lastname']
-                        ));
+                    // send a notification
+                    if (Daiquiri_Config::getInstance()->core->notification->updateUser) {
+                        $newUser = $this->getResource()->fetchRow($id);
+                        $this->getModelHelper('notification')->updateUser($user, $newUser);
                     }
                 }
 

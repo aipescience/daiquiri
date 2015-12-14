@@ -126,15 +126,10 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                         // log the event
                         Daiquiri_Log::getInstance()->notice("password reset by user '{$user['username']}'");
 
-                        // send a notification mail to the admins
-                        if (Daiquiri_Config::getInstance()->auth->notification->changePassword) {
-                            $this->getModelHelper('mail')->send('auth.changePassword', array(
-                                'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
-                                'id' => $user['id'],
-                                'username' => $user['username'],
-                                'firstname' => $user['details']['firstname'],
-                                'lastname' => $user['details']['lastname']
-                            ));
+                        // send a notification
+                        if (Daiquiri_Config::getInstance()->core->notification->changePassword) {
+                            $user = $this->getResource()->fetchRow($userId);
+                            $this->getModelHelper('notification')->changePassword($user);
                         }
 
                         return array('status' => 'ok');
@@ -178,16 +173,10 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                 // log the event
                 Daiquiri_Log::getInstance()->notice("password set by admin (user_id: {$userId})");
 
-                // send a notification mail
-                if (Daiquiri_Config::getInstance()->auth->notification->changePassword) {
+                // send a notification
+                if (Daiquiri_Config::getInstance()->core->notification->changePassword) {
                     $user = $this->getResource()->fetchRow($userId);
-                    $this->getModelHelper('mail')->send('auth.changePassword', array(
-                        'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
-                        'id' => $user['id'],
-                        'username' => $user['username'],
-                        'firstname' => $user['details']['firstname'],
-                        'lastname' => $user['details']['lastname']
-                    ));
+                    $this->getModelHelper('notification')->changePassword($user);
                 }
 
                 return array('status' => 'ok');
@@ -231,15 +220,10 @@ class Auth_Model_Password extends Daiquiri_Model_Abstract {
                     // log the event
                     Daiquiri_Log::getInstance()->notice('password changed by user');
 
-                    // send a notification mail
-                    if (Daiquiri_Config::getInstance()->auth->notification->changePassword) {
-                        $this->getModelHelper('mail')->send('auth.changePassword', array(
-                            'to' => Daiquiri_Config::getInstance()->auth->notification->mail->toArray(),
-                            'id' => $user['id'],
-                            'username' => $user['username'],
-                            'firstname' => $user['details']['firstname'],
-                            'lastname' => $user['details']['lastname']
-                        ));
+                    // send a notification
+                    if (Daiquiri_Config::getInstance()->core->notification->changePassword) {
+                        $user = $this->getResource()->fetchRow($userId);
+                        $this->getModelHelper('notification')->changePassword($user);
                     }
 
                     return array('status' => 'ok');
