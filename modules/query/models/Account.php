@@ -119,7 +119,7 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             'additional' => array()
         );
 
-        foreach(array('id','database','table','status','error','username','time','timeQueue','timeQuery','nrows','size','complete','removed') as $key) {
+        foreach(array('id','database','table','status','error','time','timeQueue','timeQuery','nrows','size','complete','removed') as $key) {
             if (isset($dbRow[$key])) {
                 $job[$key] = $dbRow[$key];
             }
@@ -165,6 +165,9 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
             $job['cols'] = $tableMeta['columns'];
         }
+
+        // add the username of the current user
+        $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
 
         return array('job' => $job, 'status' => 'ok');
     }
