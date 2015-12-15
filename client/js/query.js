@@ -222,7 +222,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     }
                 });
 
-                // update if something has changed
+                // update the jobslist and the database browser if the jobslist changed
                 if (!angular.equals(jobslist.data, data)) {
                     jobslist.data = data;
                     jobslist.isEmpty = data.length == 1 && data[0].jobs.length == 0;
@@ -235,12 +235,13 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 }
 
                 // activate the current job again, if its status has changed
+                // this will update the job overview
                 if (account.active.job != false && account.job.status != 'success') {
                     if (jobs[account.job.id].status != account.job.status ||
                         jobs[account.job.id].complete != account.job.complete) {
 
                         // activate the job again
-                        account.job.status = activateJob(account.job.id);
+                        activateJob(account.job.id);
                     }
                 }
             })
