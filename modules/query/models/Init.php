@@ -173,6 +173,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             'plot' => array(
                 'enabled' => true,
             ),
+            'ipMask' => 1,
             'download' => array(
                 'type' => 'direct', // or gearman
                 'dir' => "/srv/download",
