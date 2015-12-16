@@ -249,7 +249,7 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
         ));
         $participants = array();
         foreach($dbRows as $dbRow) {
-            $participants[] = "{$dbRow['lastname']}, {$dbRow['firstname']} <{$dbRow['email']}>";
+            $participants[$dbRow['id']] = "{$dbRow['lastname']}, {$dbRow['firstname']} <{$dbRow['email']}>";
         }
 
         // create the form object
@@ -259,11 +259,18 @@ class Meetings_Model_Contributions extends Daiquiri_Model_Table {
             'participants' => $participants
         ));
 
-        // valiadate the form if POST
+        // validate the form if POST
         if (!empty($formParams)) {
             if ($form->isValid($formParams)) {
                 // get the form values
                 $values = $form->getValues();
+
+                // set default accepted value to 0, if it was not set in the form
+                // Note: This is needed, since there is no default value
+                // in the SQL database. Could also adjust the form properly instead.
+                if (!array_key_exists("accepted", $values)) {
+                    $values["accepted"] = 0;
+                }
 
                 // store the values in the database
                 $this->getResource()->insertRow($values);

@@ -111,11 +111,6 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
                 )
             ),
             'timeout' => 0,
-            'notification' => array(
-                'updateUser' => false,
-                'changePassword' => false,
-                'mail' => array()
-            ),
             'changeUsername' => false,
             'changeEmail' => true,
             'lowerCaseUsernames' => false,
