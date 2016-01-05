@@ -22,77 +22,74 @@ angular.module('simbadResolver',['browser'])
 
 // Factory for Simbad queries
 .factory('SimbadParser',['$http',function ($http) {
- 
-  // Search on Simbad and parse the data
-  function simbadSearch(query,callBack) {
 
-    // Correct the query
-    query = query.replace(" ","+");
-    
-    /* 
-     * Simbad query URL
-     * more information and settings at:
-     * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-url
-     * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-fscript#VotableFields
-     */
-    var url = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident="+query+"&output.format=votable&output.params=main_id,coo(d),otype(V)"
-    
-    // get and parse the XML VOTable
-    $http({
-       method: 'GET',
-       url: url
-    }).then(function successCallback(response) {
-       xmlDoc = $.parseXML(response.data);
-       $xml = $(xmlDoc);
-       rows = $xml.find('TABLEDATA TR')
-       data = []
-       rows.each(function(i){
-         cols = $(this).find('TD');
-         data[i] = {
-           object: cols.eq(0).text(),
-           type: cols.eq(6).text(),
-           coord1: cols.eq(1).text(),
-           coord2: cols.eq(2).text(),
-         }
-       });
-       callBack(data);
-    }, function errorCallback(response) {
-       alert(response.data);
-    });
+    // Search on Simbad and parse the data
+    function simbadSearch(query,callBack) {
 
-  }
- 
-  return {
-    simbadSearch: simbadSearch,
-  };
+        // Correct the query
+        query = query.replace(" ","+");
 
+        /*
+         * Simbad query URL
+         * more information and settings at:
+         * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-url
+         * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-fscript#VotableFields
+         */
+        var url = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident="+query+"&output.format=votable&output.params=main_id,coo(d),otype(V)";
+
+        // get and parse the XML VOTable
+        $http({
+           method: 'GET',
+           url: url
+        }).then(function successCallback(response) {
+            xmlDoc = $.parseXML(response.data);
+            $xml = $(xmlDoc);
+            rows = $xml.find('TABLEDATA TR');
+            data = [];
+            rows.each(function(i) {
+                cols = $(this).find('TD');
+                data[i] = {
+                    object: cols.eq(0).text(),
+                    type: cols.eq(6).text(),
+                    coord1: cols.eq(1).text(),
+                    coord2: cols.eq(2).text(),
+                };
+            });
+            callBack(data);
+        }, function errorCallback(response) {
+            alert(response.data);
+        });
+    }
+
+    return {
+        simbadSearch: simbadSearch
+    };
 }])
 
 //Controller for a Simbad search form
 .controller('simbadForm', ['$scope','SimbadParser',function ($scope,SimbadParser) {
 
-  $scope.query = ''; // contains a input field string
-  $scope.result = {cols:"",show:false}; // contains results from simbad
+    $scope.query = ''; // contains a input field string
+    $scope.result = {cols:"",show:false}; // contains results from simbad
 
-  // Perform a Simbad search and get the data
-  $scope.simbadSearch = function () {  
-    if ($scope.query!="") {
-      SimbadParser.simbadSearch($scope.query,function(data){
-        $scope.result.data = data;
-        $scope.result.query = $scope.query;
-        $scope.result.show = true;
-      });
-    }
-  }
+    // Perform a Simbad search and get the data
+    $scope.simbadSearch = function () {
+        if ($scope.query !== "") {
+            SimbadParser.simbadSearch($scope.query,function(data){
+                $scope.result.data = data;
+                $scope.result.query = $scope.query;
+                $scope.result.show = true;
+            });
+        }
+    };
 
-  // Insert coordinates into the query text field
-  // event is handled in 'query.js' file
-  $scope.browserItemDblClicked = function(browsername,coord1,coord2) {
-    if (coord1!="")
-      $scope.$emit('browserItemDblClicked',browsername,coord1+' '+coord2);
-    else
-      alert('No coordinates available.')
-  };
-
+    // Insert coordinates into the query text field
+    // event is handled in 'query.js' file
+    $scope.browserItemDblClicked = function(browsername,coord1,coord2) {
+        if (coord1 !== "") {
+            $scope.$emit('browserItemDblClicked',browsername,coord1+' '+coord2);
+        } else {
+            alert('No coordinates available.');
+        }
+    };
 }]);
-
