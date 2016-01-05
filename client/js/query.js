@@ -699,14 +699,14 @@ app.controller('SubmitController',['$scope','SubmitService',function($scope,Subm
     $scope.values = SubmitService.values;
     $scope.errors = SubmitService.errors;
 
-    $scope.submitQuery = function(formName,event) {
+    $scope.submitQuery = function(formName, event) {
         SubmitService.submitQuery(formName);
-        event.preventDefault()
+        event.preventDefault();
     };
 
     $scope.submitPlan = function(mail) {
         SubmitService.submitPlan(mail);
-    }
+    };
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
         SubmitService.insertIntoQuery(browsername,value);

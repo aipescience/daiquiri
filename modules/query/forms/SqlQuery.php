@@ -115,24 +115,23 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             <div ng-show="visible === \'simbad\'">
                 <div id="simbad-resolver" ng-controller="simbadForm">
                     <div id="simbad-form">
-                        <input type="text" name="simbad-identifier" id="simbad-input" ng-model="query" />
+                        <input type="text" name="simbad-identifier" id="simbad-input" ng-model="query" 
+                               ng-keydown="simbadInput($event);" />
                         <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-submit" ng-click="simbadSearch()" />
                     </div>
 
-
-                    <div id="simbad-results">
-                        <table width="100%" ng-show="result.show" class="ng-hide">
-                            <tr ng-repeat="item in result.data" class="item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1,item.coord2)">
-                                <td class="object">{{item.object}}</td>
-                                <td class="type">{{item.type}}</td>
-                                <td class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</td>
-                                <td width="100%"></td>
-                            </tr>
-                            <tr ng-show="result.data.length==0" class="ng-hide">
-                                <td>No results for "{{result.query}}"</td>
-                            </tr>
-                        </table>
-                    </div>
+                    <ul id="simbad-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                        <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1,item.coord2)">
+                              <a href="">
+                                  <div class="object">{{item.object}}</div>
+                                  <div class="type">{{item.type}}</div>
+                                  <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
+                              </a>
+                        </li>
+                        <li ng-show="result.data.length==0" class="simbad-results-empty">
+                            No results for "{{result.query}}"
+                        </li>
+                    </ul>
                 </div>
                 <div class="daiquiri-query-bar-hint">
                     A double click on an item will copy the corresponding coordinates into the query.

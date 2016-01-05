@@ -6,7 +6,7 @@
 }
 
 #simbad-resolver {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 #simbad-input {
@@ -15,34 +15,31 @@
 }
 
 #simbad-results {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-
     overflow: auto;
     height: 97px;
 }
 
-#simbad-results .item:hover {
-    background-color: #efefef;
-    cursor: pointer;
+#simbad-results li a {
+    line-height: 14px;
+    height: 14px;
 }
 
-#simbad-results .item td {
-    padding: 3px;
-    white-space: nowrap;
-    color: #08c;
+#simbad-results .object {
+    float: left;
+    width: 30%;
 }
 
-#simbad-results .item td.object {
-    font-weight:normal;
-    vertical-align:top;
-    padding-right: 20px;
+#simbad-results .type {
+    float: left;
+    width: 30%;
 }
 
-#simbad-results .item td.type {
-    padding-right: 20px;
+#simbad-results .coords {
+    float: left;
+    width: 40%;
 }
 
-#simbad-results .item td.coords {
-    vertical-align:top;
+#simbad-results .simbad-results-empty {
+    padding: 5px 12px;
+    font-size: small;
 }

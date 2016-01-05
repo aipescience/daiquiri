@@ -72,6 +72,15 @@ angular.module('simbadResolver',['browser'])
     $scope.query = ''; // contains a input field string
     $scope.result = {cols:"",show:false}; // contains results from simbad
 
+    // Overide an enter/return stoke in the input field
+    $scope.simbadInput = function (event) {
+        if (event.keyCode === 13) {
+            $scope.simbadSearch();
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    };
+
     // Perform a Simbad search and get the data
     $scope.simbadSearch = function () {
         if ($scope.query !== "") {
