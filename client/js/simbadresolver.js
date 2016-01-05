@@ -74,7 +74,7 @@ app.factory('SimbadParser',['$http',function ($http) {
 
 app.controller('simbadForm', ['$scope','SimbadParser',function ($scope,SimbadParser) {
 
-  $scope.query = 'cancer';
+  $scope.query = '';
   $scope.result = {cols:"",
                    show:false
                   };
