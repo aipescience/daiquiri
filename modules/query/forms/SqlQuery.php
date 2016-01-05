@@ -74,6 +74,9 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                     <li ng-class="{\'active\': visible === \'functions\'}">
                         <a href="" ng-click="toogleFunctions()">Function browser</a>
                     </li>
+                    <li ng-class="{\'active\': visible === \'simbad\'}">
+                        <a href="" ng-click="toogleSimbad()">Simbad object search</a>
+                    </li>
                 </ul>
                 <ul class="nav-pills pull-right">
                     <li ng-class="{\'active\': visible === \'examples\'}">
@@ -107,6 +110,31 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                 </div>
                 <div class="daiquiri-query-bar-hint">
                     A double click will replace the content of the query field with the example query.
+                </div>
+            </div>
+            <div ng-show="visible === \'simbad\'">
+   
+                <div id="simbad-resolver" ng-controller="simbadForm">
+                  <table>
+                    <tr>
+                      <td><input type="text" name="simbad-identifier" id="simbad-input" ng-model="query" /></td>
+                      <td><input type="button" value="Search on Simbad" class="btn btn-primary" id="simbad-submit" ng-click="simbadSearch()" /></td>
+                    </tr>
+                  </table>
+                  <div id="simbad-results">
+                     <table width="100%" ng-show="result.show" class="ng-hide">
+                     <tr ng-repeat="item in result.data" class="item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1+\' \'+item.coord2)">
+                        <td class="object">{{item.object}}</td>
+                        <td class="type">{{item.type}}</td>
+                        <td class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</td>
+                        <td width="100%"> </td>
+                     </tr>
+                     <tr ng-show="result.data.length==0" class="ng-hide"><td>No results for "{{result.query}}"</td></tr>
+                     </table>
+                  </div>                      
+                </div>  
+                <div class="daiquiri-query-bar-hint">
+                    A double click on an item will copy the corresponding coordinates into the query.
                 </div>
             </div>
         </div>');
