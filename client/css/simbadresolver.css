@@ -1,0 +1,47 @@
+
+/* Simbad resolver style */
+
+#simbad-resolver {
+  margin-bottom:10px;
+  height: 149px;
+}
+
+#simbad-input {
+  margin-bottom: 0px;
+  width:300px;
+}
+
+#simbad-results {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+
+  overflow: auto;
+  height: 103px;
+  margin-top:2px;
+}
+
+#simbad-results .item:hover {
+  background-color: #efefef;
+  cursor: pointer;
+}
+
+#simbad-results .item td {
+  padding: 3px;
+  white-space: nowrap;
+  color: #08c;
+}
+
+#simbad-results .item td.object {
+  font-weight:normal;
+  vertical-align:top;
+  padding-right: 20px;
+}
+
+#simbad-results .item td.type {
+  padding-right: 20px;
+}
+
+#simbad-results .item td.coords {
+  vertical-align:top;
+}
