@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies']);
+var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies','simbadResolver']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -735,6 +735,13 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
             $scope.visible = false;
         } else {
             $scope.visible = 'functions';
+        }
+    };
+    $scope.toogleSimbad = function() {
+        if ($scope.visible === 'simbad') {
+            $scope.visible = false;
+        } else {
+            $scope.visible = 'simbad';
         }
     };
     $scope.toogleExamples = function() {
