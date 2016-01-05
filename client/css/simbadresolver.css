@@ -1,47 +1,48 @@
 
 /* Simbad resolver style */
 
+#simbad-form {
+    margin-bottom: 10px;
+}
+
 #simbad-resolver {
-  margin-bottom:10px;
-  height: 149px;
+  margin-bottom: 10px;
 }
 
 #simbad-input {
-  margin-bottom: 0px;
-  width:300px;
+    margin: 0;
+    width: 534px;
 }
 
 #simbad-results {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 
-  overflow: auto;
-  height: 103px;
-  margin-top:2px;
+    overflow: auto;
+    height: 97px;
 }
 
 #simbad-results .item:hover {
-  background-color: #efefef;
-  cursor: pointer;
+    background-color: #efefef;
+    cursor: pointer;
 }
 
 #simbad-results .item td {
-  padding: 3px;
-  white-space: nowrap;
-  color: #08c;
+    padding: 3px;
+    white-space: nowrap;
+    color: #08c;
 }
 
 #simbad-results .item td.object {
-  font-weight:normal;
-  vertical-align:top;
-  padding-right: 20px;
+    font-weight:normal;
+    vertical-align:top;
+    padding-right: 20px;
 }
 
 #simbad-results .item td.type {
-  padding-right: 20px;
+    padding-right: 20px;
 }
 
 #simbad-results .item td.coords {
-  vertical-align:top;
+    vertical-align:top;
 }
