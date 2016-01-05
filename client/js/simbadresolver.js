@@ -1,6 +1,7 @@
 /*
  *  Copyright (c) 2012-2015  Jochen S. Klar <jklar@aip.de>,
  *                           Adrian M. Partl <apartl@aip.de>,
+ *                           Ondrej Jaura <ojaura@aip.de>,
  *                           AIP E-Science (www.aip.de)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,31 +18,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app= angular.module('simbadResolver',['browser']);
+angular.module('simbadResolver',['browser'])
 
-/*
-app.config(['$httpProvider', function($httpProvider) {
-    $httpProvider.defaults.headers.common['Accept'] = 'application/json';
-    $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-}]);
-
-app.controller('ViewerController', ['$scope','tableService',function($scope,tableService) {
-    
-    tableService.url.cols = '/data/viewer/cols?db=daiquiri_user_admin&table=100';
-    tableService.url.rows = '/data/viewer/rows?db=daiquiri_user_admin&table=100';
-
-    tableService.init();
-}]);
-*/
-
-app.factory('SimbadParser',['$http',function ($http) {
+// Factory for Simbad queries
+.factory('SimbadParser',['$http',function ($http) {
  
+  // Search on Simbad and parse the data
   function simbadSearch(query,callBack) {
 
+    // Correct the query
     query = query.replace(" ","+");
     
+    /* 
+     * Simbad query URL
+     * more information and settings at:
+     * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-url
+     * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-fscript#VotableFields
+     */
     var url = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident="+query+"&output.format=votable&output.params=main_id,coo(d),otype(V)"
     
+    // get and parse the XML VOTable
     $http({
        method: 'GET',
        url: url
@@ -70,25 +66,32 @@ app.factory('SimbadParser',['$http',function ($http) {
     simbadSearch: simbadSearch,
   };
 
-}]);
+}])
 
-app.controller('simbadForm', ['$scope','SimbadParser',function ($scope,SimbadParser) {
+//Controller for a Simbad search form
+.controller('simbadForm', ['$scope','SimbadParser',function ($scope,SimbadParser) {
 
-  $scope.query = '';
-  $scope.result = {cols:"",
-                   show:false
-                  };
+  $scope.query = ''; // contains a input field string
+  $scope.result = {cols:"",show:false}; // contains results from simbad
 
+  // Perform a Simbad search and get the data
   $scope.simbadSearch = function () {  
-    SimbadParser.simbadSearch($scope.query,function(data){
-      $scope.result.data = data;
-      $scope.result.query = $scope.query;
-      $scope.result.show = true;
-    });
+    if ($scope.query!="") {
+      SimbadParser.simbadSearch($scope.query,function(data){
+        $scope.result.data = data;
+        $scope.result.query = $scope.query;
+        $scope.result.show = true;
+      });
+    }
   }
 
-  $scope.browserItemDblClicked = function(browsername,coords) {
-      $scope.$emit('browserItemDblClicked',browsername,coords);
+  // Insert coordinates into the query text field
+  // event is handled in 'query.js' file
+  $scope.browserItemDblClicked = function(browsername,coord1,coord2) {
+    if (coord1!="")
+      $scope.$emit('browserItemDblClicked',browsername,coord1+' '+coord2);
+    else
+      alert('No coordinates available.')
   };
 
 }]);

@@ -123,7 +123,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                   </table>
                   <div id="simbad-results">
                      <table width="100%" ng-show="result.show" class="ng-hide">
-                     <tr ng-repeat="item in result.data" class="item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1+\' \'+item.coord2)">
+                     <tr ng-repeat="item in result.data" class="item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1,item.coord2)">
                         <td class="object">{{item.object}}</td>
                         <td class="type">{{item.type}}</td>
                         <td class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</td>
