@@ -16,32 +16,32 @@
 
 #simbad-results {
     overflow: auto;
-    height: 97px;
+    height: 107px;
 }
-
-
 
 #simbad-results li a {
     line-height: 14px;
     height: 14px;
 }
 
-#simbad-results .object {
+
+#simbad-results .object,
+#simbad-results .type,
+#simbad-results .coords {
     float: left;
-    width: 40%;
     overflow: hidden;
     white-space: nowrap;
+}
+
+#simbad-results .object {
+    width: 40%;
 }
 
 #simbad-results .type {
-    float: left;
     width: 30%;
-    overflow: hidden;
-    white-space: nowrap;
 }
 
 #simbad-results .coords {
-    float: left;
     width: 30%;
 }
 
