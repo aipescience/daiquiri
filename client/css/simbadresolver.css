@@ -19,6 +19,8 @@
     height: 97px;
 }
 
+
+
 #simbad-results li a {
     line-height: 14px;
     height: 14px;
@@ -26,17 +28,21 @@
 
 #simbad-results .object {
     float: left;
-    width: 30%;
+    width: 40%;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 #simbad-results .type {
     float: left;
     width: 30%;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 #simbad-results .coords {
     float: left;
-    width: 40%;
+    width: 30%;
 }
 
 #simbad-results .simbad-results-empty {
