@@ -24,8 +24,10 @@
 
 <div class="main" ng-app="query" ng-controller="QueryController"
     ng-init='options = <?php echo Zend_Json::encode($this->options); ?>'>
-
+    
     <h2>Query interface</h2>
+
+    <div class="ng-hide" id="loadingIcon" data-loading> </div>
 
     <div class="row">
 
