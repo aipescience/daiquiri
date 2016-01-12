@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies']);
+var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies','simbadResolver']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -1023,14 +1023,14 @@ app.controller('SubmitController',['$scope','SubmitService',function($scope,Subm
     $scope.values = SubmitService.values;
     $scope.errors = SubmitService.errors;
 
-    $scope.submitQuery = function(formName,event) {
+    $scope.submitQuery = function(formName, event) {
         SubmitService.submitQuery(formName);
-        event.preventDefault()
+        event.preventDefault();
     };
 
     $scope.submitPlan = function(mail) {
         SubmitService.submitPlan(mail);
-    }
+    };
 
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
         SubmitService.insertIntoQuery(browsername,value);
@@ -1059,6 +1059,13 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
             $scope.visible = false;
         } else {
             $scope.visible = 'functions';
+        }
+    };
+    $scope.toogleSimbad = function() {
+        if ($scope.visible === 'simbad') {
+            $scope.visible = false;
+        } else {
+            $scope.visible = 'simbad';
         }
     };
     $scope.toogleExamples = function() {

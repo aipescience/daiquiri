@@ -129,7 +129,7 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'type' => 'direct', // or qqueue
                 'qqueue' => array(
                     'defaultUsrGrp' => 'user',
-                    'defaultQueue' => 'long',
+                    'defaultQueue' => 'short',
                     'guestQueue' => 'guest',
                     'userQueues' => array(
                         'short' => array(
@@ -174,6 +174,9 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'enabled' => true,
             ),
             'ipMask' => 1,
+            'simbad' => array(
+                'enabled' => true,
+            ),
             'download' => array(
                 'type' => 'direct', // or gearman
                 'dir' => "/srv/download",

@@ -65,7 +65,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         // add form elements
         $this->addCsrfElement('sql_csrf');
 
-        $this->addNoteElement('sql_bar', '<div ng-controller="BarController">
+        $html = '<div ng-controller="BarController">
             <div class="daiquiri-query-bar">
                 <ul class="nav-pills pull-left">
                     <li ng-class="{\'active\': visible === \'databases\'}">
@@ -73,7 +73,16 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                     </li>
                     <li ng-class="{\'active\': visible === \'functions\'}">
                         <a href="" ng-click="toogleFunctions()">Function browser</a>
-                    </li>
+                    </li>';
+
+        if (Daiquiri_Config::getInstance()->query->simbad->enabled) {
+            $html .= '
+                    <li ng-class="{\'active\': visible === \'simbad\'}">
+                        <a href="" ng-click="toogleSimbad()">Simbad object search</a>
+                    </li>';
+        }
+
+        $html .= '
                 </ul>
                 <ul class="nav-pills pull-right">
                     <li ng-class="{\'active\': visible === \'examples\'}">
@@ -108,8 +117,41 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                 <div class="daiquiri-query-bar-hint">
                     A double click will replace the content of the query field with the example query.
                 </div>
-            </div>
-        </div>');
+            </div>';
+
+        if (Daiquiri_Config::getInstance()->query->simbad->enabled) {
+            $html .= '
+            <div ng-show="visible === \'simbad\'">
+                <div id="simbad-resolver" ng-controller="simbadForm">
+                    <div id="simbad-form">
+                        <input type="text" name="simbad-identifier" id="simbad-input" ng-model="query"
+                               ng-keydown="simbadInput($event);" />
+                        <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-submit" ng-click="simbadSearch()" />
+                    </div>
+
+                    <ul id="simbad-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                        <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1,item.coord2)">
+                              <a href="">
+                                  <div class="object">{{item.object}}</div>
+                                  <div class="type">{{item.type}}</div>
+                                  <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
+                              </a>
+                        </li>
+                        <li ng-show="result.data.length==0" class="simbad-results-empty">
+                            No results for "{{result.query}}"
+                        </li>
+                    </ul>
+                </div>
+                <div class="daiquiri-query-bar-hint">
+                    A double click on an item will copy the corresponding coordinates into the query.
+                </div>
+            </div>';
+        }
+
+        $html .= '
+        </div>';
+
+        $this->addNoteElement('sql_bar', $html);
 
         $this->addTextareaElement('sql_query', array(
             'filters' => array('StringTrim'),
