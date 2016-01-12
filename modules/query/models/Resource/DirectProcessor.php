@@ -125,10 +125,11 @@ class Query_Model_Resource_DirectProcessor extends Query_Model_Resource_Abstract
      * @param string $sql query string
      * @param string $table name of the job's table
      * @param array $errors array holding any errors that occur
+     * @param array $sources array holding the databases and tables this query is based on
      * @param array $options any options that a specific implementation of validateQuery needs to get
      * @return bool $success
      */
-    public function validateQuery($sql, $table, array &$errors, $options = false) {
+    public function validateQuery($sql, $table, array &$errors, array &$sources, $options = false) {
         $errors = array();
 
         // preprocess string
@@ -154,7 +155,7 @@ class Query_Model_Resource_DirectProcessor extends Query_Model_Resource_Abstract
         }
 
         // check ACLs
-        if ($this->_permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors) === false) {
+        if ($this->_permissions->check($multiLineParseTrees, $multiLineUsedDBs, $errors, $sources) === false) {
             return false;
         }
 
@@ -182,10 +183,11 @@ class Query_Model_Resource_DirectProcessor extends Query_Model_Resource_Abstract
      * @param array $plan $query plan
      * @param string $table name of the job's table
      * @param array $errors array holding any errors that occur
+     * @param array $sources array holding the databases and tables this query is based on
      * @param array $options any options that a specific implementation of validateQuery needs to get
      * @return bool $success
      */
-    public function validatePlan(&$plan, $table, array &$errors, $options = false) {
+    public function validatePlan(&$plan, $table, array &$errors, array &$sources, $options = false) {
         return true;
     }
 
@@ -257,7 +259,6 @@ class Query_Model_Resource_DirectProcessor extends Query_Model_Resource_Abstract
         $job = array(
             'table' => $resultTableName,
             'database' => $this->_userDb,
-            'host' => false,
             'query' => $sql,
             'actualQuery' => $combinedQuery,
             'fullActualQuery' => $combinedQuery, // this is set, if we want to use a query we don't want to show the user

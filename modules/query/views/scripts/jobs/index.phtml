@@ -30,6 +30,14 @@
                 <?php echo $this->adminLink(); ?>
             </div>
         </div>
+        <div class="span3 pull-right">
+            <div class="daiquiri-widget">
+                <?php echo $this->internalLink(array(
+                    'text' => 'Export jobs',
+                    'href' => '/query/jobs/export'));
+                ?>
+            </div>
+        </div>
     </div>
 
     <div daiquiri-modal></div>

@@ -20,7 +20,7 @@
 
 class Daiquiri_Controller_Helper_Form extends Daiquiri_Controller_Helper_Abstract {
 
-    private $_options = array();
+    private $_redirect;
 
     public function __construct($controller, array $options = array()) {
         parent::__construct($controller);
@@ -29,20 +29,18 @@ class Daiquiri_Controller_Helper_Form extends Daiquiri_Controller_Helper_Abstrac
         $request = $this->getRequest();
         $module  = $request->module;
         $controller = $request->controller;
-        $action = $request->action;
 
         // construct default options
-        $defaults = array(
-            'title' => ucfirst($action) . ' ' . substr(str_replace('-',' ', $controller), 0, -1),
-            'redirect' => '/' . $module . '/' . $controller . '/'
-        );
-
-        $this->_options = array_merge($defaults, $options);
+        if (isset($options['redirect'])) {
+            $this->_redirect = $options['redirect'];
+        } else {
+            $this->_redirect = '/' . $module . '/' . $controller . '/';
+        }
     }
 
     public function __call($methodname, array $arguments) {
         // get params
-        $redirect = $this->getParam('redirect', $this->_options['redirect']);
+        $redirect = $this->getParam('redirect', $this->_redirect);
 
         // check if POST or GET
         if ($this->getRequest()->isPost()) {
@@ -61,11 +59,7 @@ class Daiquiri_Controller_Helper_Form extends Daiquiri_Controller_Helper_Abstrac
             $response = call_user_func_array(array($this->getModel(),$methodname),$arguments);
         }
 
-        // set action for form
-        //$this->getController()->setFormAction($response);
-
         // assign to view
-        $this->getView()->title = $this->_options['title'];
         $this->getView()->redirect = $redirect;
         $this->getView()->assign($response);
     }

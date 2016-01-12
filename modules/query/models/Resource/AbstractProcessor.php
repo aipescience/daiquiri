@@ -95,10 +95,11 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
      * @param string $sql query string
      * @param string $table name of the job's table
      * @param array $errors array holding any errors that occur
+     * @param array $sources array holding the databases and tables this query is based on
      * @param array $options any options that a specific implementation of validateQuery needs to get
      * @return bool $success
      */
-    abstract public function validateQuery($sql, $table, array &$errors, $options = false);
+    abstract public function validateQuery($sql, $table, array &$errors, array &$sources, $options = false);
 
     /**
      * Validates a query plan (if alterable) before submission of the query. If no alteration of the
@@ -107,10 +108,11 @@ abstract class Query_Model_Resource_AbstractProcessor extends Daiquiri_Model_Res
      * @param array $plan $query plan
      * @param string $table name of the job's table
      * @param array $errors array holding any errors that occur
+     * @param array $sources array holding the databases and tables this query is based on
      * @param array $options any options that a specific implementation of validateQuery needs to get
      * @return bool $success
      */
-    abstract public function validatePlan(&$plan, $table, array &$errors, $options = false);
+    abstract public function validatePlan(&$plan, $table, array &$errors, array &$sources, $options = false);
 
     /**
      * Prepares a job object according to the query plan (if supported), otherwise just prepares a job

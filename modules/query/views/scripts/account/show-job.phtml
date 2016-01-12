@@ -56,8 +56,13 @@
         <?php endif; ?>
 
         <?php if (isset($this->job['nrows'])): ?>
-        <dt>Number of rows (approx.)</dt>
+        <dt>Number of rows</dt>
         <dd><?php echo $this->escape($this->job['nrows']); ?></dd>
+        <?php endif; ?>
+
+        <?php if (isset($this->job['size'])): ?>
+        <dt>Size of the table in bytes</dt>
+        <dd><?php echo $this->escape($this->job['size']); ?></dd>
         <?php endif; ?>
     </dl>
 

@@ -341,6 +341,7 @@ Best Regards'
         // create config entries
         $configModel = new Core_Model_Config();
         if ($configModel->getResource()->countRows() == 0) {
+            echo '    Initialising Core_Config' . PHP_EOL;
             $entries = array();
             $this->_buildConfigEntries_r($entries, $this->_init->options['config'], array());
             foreach ($entries as $key => $value) {
@@ -356,6 +357,7 @@ Best Regards'
         // create templates
         $templatesModel = new Core_Model_Templates();
         if ($templatesModel->getResource()->countRows() == 0) {
+            echo '    Initialising Core_Templates' . PHP_EOL;
             foreach ($this->_init->options['init']['templates'] as $key => $value) {
                 $a = array(
                     'template' => $key,
@@ -370,6 +372,7 @@ Best Regards'
         // create messages
         $messagesModel = new Core_Model_Messages();
         if ($messagesModel->getResource()->countRows() == 0) {
+            echo '    Initialising Core_Messages' . PHP_EOL;
             foreach ($this->_init->options['init']['messages'] as $key => $value) {
                 $a = array(
                     'key' => $key,

@@ -814,8 +814,6 @@ EOT;
             $model = $this->models[$module];
             $model->init($this->options);
         }
-
-        echo '    done!' . PHP_EOL;
     }
 
     /**

@@ -270,6 +270,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create status entries
         $authStatusModel = new Auth_Model_Status();
         if ($authStatusModel->getResource()->countRows() === 0) {
+            echo '    Initialising Auth_Status' . PHP_EOL;
             foreach ($this->_init->options['init']['auth']['status'] as $status) {
                 $a = array('status' => $status);
                 $r = $authStatusModel->create($a);
@@ -280,6 +281,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create roles entries
         $authRoleModel = new Auth_Model_Roles();
         if ($authRoleModel->getResource()->countRows() === 0) {
+            echo '    Initialising Auth_Roles' . PHP_EOL;
             foreach ($this->_init->options['init']['auth']['roles'] as $role) {
                 $a = array('role' => $role);
                 $r = $authRoleModel->create($a);
@@ -290,6 +292,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create detail keys entries
         $authDetailKeysModel = new Auth_Model_DetailKeys();
         if ($authDetailKeysModel->getResource()->countRows() === 0) {
+            echo '    Initialising Auth_DetailKeys' . PHP_EOL;
             foreach ($this->_init->options['init']['auth']['detailKeys'] as &$a) {
                 if (!isset($a['type'])) {
                     $a['type_id'] = 0;
@@ -305,6 +308,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create users
         $authUserModel = new Auth_Model_User();
         if ($authUserModel->getResource()->countRows() === 0) {
+            echo '    Initialising Auth_User' . PHP_EOL;
             foreach ($this->_init->options['init']['auth']['user'] as $credentials) {
                 // get the corresponding role_id and status_id
                 $credentials['role_id'] = Daiquiri_Auth::getInstance()->getRoleId($credentials['role']);
@@ -351,6 +355,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create apps
         $authAppsModel = new Auth_Model_Apps();
         if ($authAppsModel->getResource()->countRows() === 0) {
+            echo '    Initialising Auth_Apps' . PHP_EOL;
             foreach ($this->_init->options['init']['auth']['apps'] as $credentials) {
                 // pre-process password first
                 $credentials['new_password'] = $credentials['password'];
@@ -373,6 +378,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create acl ressources
         $authResourcesModel = new Auth_Model_Resources();
         if ($authResourcesModel->getResource()->countRows() === 0) {
+            echo '    Initialising Auth_Resources' . PHP_EOL;
             foreach ($this->_init->options['init']['auth']['resources'] as $resource) {
                 $a = array(
                     'resource' => $resource,
@@ -385,6 +391,7 @@ class Auth_Model_Init extends Daiquiri_Model_Init {
         // create acl rules, needs to be after create apps
         $authRulesModel = new Auth_Model_Rules();
         if ($authRulesModel->getResource()->countRows() === 0) {
+            echo '    Initialising Auth_Rules' . PHP_EOL;
             foreach ($this->_init->options['init']['auth']['rules'] as $role => $rule) {
                 foreach ($rule as $resource => $permissions) {
                     $a = array(
