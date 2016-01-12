@@ -149,13 +149,3 @@ form#plan .CodeMirror {
 .daiquiri-file-download {
     margin-bottom: 20px;
 }
-
-/* loader icon */
-#loadingIcon {
-  width: 31px;
-  height: 31px;
-  background-image: url('/daiquiri/css/ajax-loader.gif');
-  margin-top: -31px;
-  position:relative;
-  left: 900px;
-}

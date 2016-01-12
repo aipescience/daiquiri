@@ -62,30 +62,6 @@ app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function(
     };
 }])
 
-app.directive('loading', ['$http','$timeout', function ($http,$timeout) {
-    return {
-      restrict: 'A',
-      link: function (scope, element, attrs) {
-        scope.isLoading = function () {
-          return $http.pendingRequests.length > 0;
-        };
-        scope.$watch(scope.isLoading, function (value) {
-          if (value) {
-            if (!scope.loadPromise) {
-              scope.loadPromise = $timeout(function(){
-                element.removeClass('ng-hide');
-              },1000);
-            }
-          } else {
-            $timeout.cancel(scope.loadPromise)
-            element.addClass('ng-hide');
-          }
-        });
-      }
-    };
-}]);
-
-
 /* services */
 
 app.factory('PollingService', ['$timeout','QueryService','DownloadService',function($timeout,QueryService,DownloadService) {
@@ -457,7 +433,7 @@ app.factory('SubmitService', ['$http','$timeout','$window','QueryService','Codem
 
     function submitPlan(mail) {
         if (angular.element('#plan_query.codemirror').length !== 0) {
-            CodemirrorService$.save('plan_query');
+            CodemirrorService.save('plan_query');
         }
 
         var data = {
