@@ -127,7 +127,7 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
 
     /**
      * Returns the site url
-     * @return string 
+     * @return string
      */
     public function getSiteUrl() {
         return $this->getHost() . Zend_Controller_Front::getInstance()->getBaseUrl();
@@ -146,11 +146,14 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         } else {
             $host = 'http://';
         }
-        $host .= $server["SERVER_NAME"];
+        if (isset($server['HTTP_X_FORWARDED_SERVER'])) {
+            $host .= $server['HTTP_X_FORWARDED_SERVER'];
+        } else {
+            $host .= $server["SERVER_NAME"];
+        }
         if ($server["SERVER_PORT"] != "80") {
             $host .= ':' . $server["SERVER_PORT"];
         }
-
         return $host;
     }
 
