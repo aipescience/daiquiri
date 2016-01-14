@@ -866,11 +866,17 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
     $scope.dialog  = QueryService.dialog;
 
     $scope.activateForm = function(formName) {
+        // reset errors for QueryService
+        QueryService.account.error = null;
+
         QueryService.activateForm(formName);
     };
 
     $scope.activateJob = function(jobId, $event) {
         if (angular.isUndefined($event) || !angular.element($event.target).hasClass('daiquiri-query-jobs-option')) {
+            // reset errors for SubmitService
+            for (var error in SubmitService.errors) delete SubmitService.errors[error];
+
             QueryService.activateJob(jobId);
         }
     };
