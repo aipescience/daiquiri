@@ -245,6 +245,11 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             )
         );
 
+        // override query.query.qqueue.userQueues
+        if (!empty($input['query']['qqueue']['userQueues'])) {
+            $defaults['query']['qqueue']['userQueues'] = array();
+        }
+
         // create config array
         $output = array();
         $this->_buildConfig_r($input, $output, $defaults);
