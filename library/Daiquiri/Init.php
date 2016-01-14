@@ -707,8 +707,7 @@ EOT;
     <Directory "{$this->application_path}/public">
         Options FollowSymLinks -Indexes -MultiViews
         AllowOverride All
-        Order allow,deny
-        Allow from all
+        Require all granted
     </Directory>
 
 EOT;
