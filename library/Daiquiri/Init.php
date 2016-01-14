@@ -626,7 +626,32 @@ EOT;
             $db = $this->options['database']['user'];
 
             if (!in_array($db['host'], array('localhost','127.0.0.1','::1'))) {
-                $host  = trim(`ip addr | awk '/inet/ && /eth0/{sub(/\/.*$/,"",$2); print $2}'`);
+                $hostIpSplit = explode('.', $db['host']);
+
+                if (count($hostIpSplit) == 4) {
+                    # get all ipv4 addresses of this machine
+                    $ips = preg_split('/\R/', trim(`ip addr | awk '/inet /{sub(/\/.*$/,"",$2); print $2}'`));
+
+                    # guess which is the proper subnet
+                    $host = False;
+                    $iMax = 0;
+                    foreach ($ips as $ip) {
+                        $ipSplit = explode('.', $ip);
+
+                        $iCur = 0;
+                        for ($i=0; $i<4; $i++) {
+                            if ($hostIpSplit[$i] == $ipSplit[$i]) {
+                                $iCur += 1;
+                            } else {
+                                if ($iCur >= $iMax) {
+                                    $iMax = $iCur;
+                                    $host = $ip;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
             } else {
                 $host = $db['host'];
             }
