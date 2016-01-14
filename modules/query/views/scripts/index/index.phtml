@@ -141,6 +141,10 @@
                     <button class="linkbutton" ng-click="edit = false" ng-show="edit">Stop editing</button>
                 </li>
             </ul>
+
+            <p class="text-error" ng-show="account.error">
+                {{account.error}}
+            </p>
         </div>
 
         <!-- main content  -->

@@ -161,7 +161,15 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         if ($job['status'] == 'success') {
             $descResource = new Data_Model_Resource_Description();
             $descResource->init($job['database']);
-            $tableMeta = $descResource->describeTable($job['table']);
+
+            try {
+                $tableMeta = $descResource->describeTable($job['table']);
+            } catch (Zend_Db_Statement_Exception $e) {
+                return array(
+                    'status' => 'error',
+                    'error' => 'The table could not be found on the server, please contact support.'
+                );
+            }
 
             $job['cols'] = $tableMeta['columns'];
         }
