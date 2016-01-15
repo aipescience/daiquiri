@@ -17,22 +17,20 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+?>
 
-/**
- * XSD class reference
- */
-abstract class Uws_Model_Resource_Abstract extends Daiquiri_Model_Resource_Abstract {
-
-    /**
-     * Constructor.
-     */
-    public function __construct() {
-        $this->nsUws = "http://www.ivoa.net/xml/UWS/v1.0";
-        $this->nsXLink = "http://www.w3.org/1999/xlink";
-        $this->nsXsi = "http://www.w3.org/2001/XMLSchema-instance";
-        $this->validateSchema = false;
-        $this->version = '1.1';
-    }
-
-    abstract public function toXML(&$xmlDoc, &$node = false);
-}
+<div class="main">
+    <?php if ($this->status === 'ok'): ?>
+        <p>Visibility changed.</p>
+        <?php
+        echo $this->internalLink(array(
+            'text' => 'Back',
+            'href' => $this->redirect,
+            'prepend' => '<p>',
+            'append' => '</p>'));
+        ?>
+    <?php else: ?>
+        <h2>Toggle visibility of query job group</h2>
+        <?php echo $this->form; ?>
+    <?php endif; ?>
+</div>

@@ -111,8 +111,9 @@ class Data_Model_Init extends Daiquiri_Model_Init {
             && is_array($this->_init->options['init']['data']['databases'])) {
             $dataDatabasesModel = new Data_Model_Databases();
             if ($dataDatabasesModel->getResource()->countRows() == 0) {
+                echo '    Initialising Data_Databases' . PHP_EOL;
                 foreach ($this->_init->options['init']['data']['databases'] as $a) {
-                    echo '    Generating metadata for database: ' . $a['name'] . PHP_EOL;
+                    echo '        Generating metadata for database: ' . $a['name'] . PHP_EOL;
 
                     $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
                     unset($a['publication_role']);
@@ -135,8 +136,9 @@ class Data_Model_Init extends Daiquiri_Model_Init {
 
                 $dataTablesModel = new Data_Model_Tables();
                 if ($dataTablesModel->getResource()->countRows() == 0) {
+                    echo '    Initialising Data_Tables' . PHP_EOL;
                     foreach ($this->_init->options['init']['data']['tables'] as $a) {
-                        echo '    Generating metadata for table: ' . $a['name'] . PHP_EOL;
+                        echo '        Generating metadata for table: ' . $a['name'] . PHP_EOL;
 
                         $a['database_id'] = $database_ids[$a['database']];
                         unset($a['database']);
@@ -161,6 +163,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
 
                     $dataColumnsModel = new Data_Model_Columns();
                     if ($dataColumnsModel->getResource()->countRows() == 0) {
+                        echo '    Initialising Data_Columns' . PHP_EOL;
                         foreach ($this->_init->options['init']['data']['columns'] as $a) {
 
                             $a['table_id'] = $table_ids[$a['table']];
@@ -186,6 +189,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
             && is_array($this->_init->options['init']['data']['functions'])) {
             $dataFunctionsModel = new Data_Model_Functions();
             if ($dataFunctionsModel->getResource()->countRows() == 0) {
+                echo '    Initialising Data_Functions' . PHP_EOL;
                 foreach ($this->_init->options['init']['data']['functions'] as $a) {
 
                     $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);
@@ -206,6 +210,7 @@ class Data_Model_Init extends Daiquiri_Model_Init {
             && is_array($this->_init->options['init']['data']['static'])) {
             $dataStaticModel = new Data_Model_Static();
             if ($dataStaticModel->getResource()->countRows() == 0) {
+                echo '    Initialising Data_Static' . PHP_EOL;
                 foreach ($this->_init->options['init']['data']['static'] as $a) {
 
                     $a['publication_role_id'] = Daiquiri_Auth::getInstance()->getRoleId($a['publication_role']);

@@ -45,11 +45,12 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
      * Validates the sql string.
      * @param array $sqlParseTrees array of SQL parse trees
      * @param array $multiLineUsedDBs array with used database for each multiline query
-     * @param array &$erros output for errors
+     * @param array $erros output for errors
+     * @param array $sources array holding the databases and tables this query is based on
      * @return TRUE if ok, otherwise FALSE
      */
-    public function check(&$sqlParseTrees, &$multiLineUsedDBs, array &$errors) {
-        return $this->_aclSQLCommands($sqlParseTrees, $multiLineUsedDBs, $errors);
+    public function check(&$sqlParseTrees, &$multiLineUsedDBs, array &$errors, array &$sources) {
+        return $this->_aclSQLCommands($sqlParseTrees, $multiLineUsedDBs, $errors, $sources);
     }
 
     /**
@@ -57,10 +58,11 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
      * a SQL command he should not.
      * @param array of PHPSQLParser objects $sqlParseTrees
      * @param array $multiLineUsedDBs array with used database for each multiline query
-     * @param error array $error or array of NULLs if OK
+     * @param array $error or array of NULLs if OK
+     * @param array $sources array holding the databases and tables this query is based on
      * @return TRUE if ok, FALSE if not
      */
-    private function _aclSQLCommands(&$sqlParseTrees, &$multiLineUsedDBs, array &$error) {
+    private function _aclSQLCommands(&$sqlParseTrees, &$multiLineUsedDBs, array &$error, array &$sources) {
         $auth = Daiquiri_Auth::getInstance();
         $sum = 0;
 
@@ -76,9 +78,9 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 return false;
             }
 
-            $errorStr = array();
-            if ($this->_checkACLSQLCommands_r($currQuery, $auth, $errorStr, $multiLineUsedDBs[$key]) !== true) {
-                $error['aclError'] = "Error in line " . ($key + 1) . ": " . $errorStr[0];
+            $aclErrors = array();
+            if ($this->_checkACLSQLCommands_r($currQuery, $auth, $aclErrors, $sources, $multiLineUsedDBs[$key]) !== true) {
+                $error['aclError'] = "Error in line " . ($key + 1) . ": " . $aclErrors[0];
                 return false;
             }
         }
@@ -90,11 +92,12 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
      * Recursive check on one SQL parse node
      * @param array of PHPSQLParser objects $parseNode
      * @param array for returning errors $error
+     * @param array $sources array holding the databases and tables this query is based on
      * @param current DB defined by any USE SQL statement
      * @param current SQL tag that is beeing parsed
      * @return TRUE if no errors, FALSE if errors
      */
-    private function _checkACLSQLCommands_r(array $parseNode, &$auth, array &$error, $currDB = false, $currTag = false) {
+    private function _checkACLSQLCommands_r(array $parseNode, &$auth, array &$error, array &$sources, $currDB = false, $currTag = false) {
         //this holds the type of query (i.e. SELECT, DROP, ....) assuming that the first entry
         //in the parse tree is always the determining type - this information needs to be
         //safed for ACL checking in DB and table access
@@ -139,7 +142,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                 // only do some checking if this is a subquery
                 if (array_key_exists('sub_tree', $currNode)) {
                     if (!empty($currNode['sub_tree'])) {
-                        if ($this->_checkACLSQLCommands_r($currNode['sub_tree'], $auth, $error, $currDB) !== true) {
+                        if ($this->_checkACLSQLCommands_r($currNode['sub_tree'], $auth, $error, $sources, $currDB) !== true) {
                             return false;
                         }
                     }
@@ -157,12 +160,18 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                     $table = "";
                     $this->_parseDBTableName($currNode['table'], $db, $table, $currDB);
 
+                    // add the table to the sources array
+                    $sources[] = array(
+                        'database' => $db,
+                        'table' => $table
+                    );
+
                     if ($db === false) {
                         $error[] = "error in SQL: Did not specify DB for table " . $table;
                         return false;
                     }
 
-                    //checking access to database
+                    // checking access to database
                     if ($this->_checkTableDBACL($currTag, $db, $table, $auth, $error) !== true) {
                         return false;
                     }
@@ -195,7 +204,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                         strtolower($key) == "limit") {
                     //default enabling these SQL commands
 
-                    if ($this->_checkACLSQLCommands_r($currNode, $auth, $error, $currDB, $queryType) !== true) {
+                    if ($this->_checkACLSQLCommands_r($currNode, $auth, $error, $sources, $currDB, $queryType) !== true) {
                         return false;
                     }
 
@@ -205,7 +214,7 @@ class Query_Model_Resource_Permissions extends Daiquiri_Model_Resource_Abstract 
                         $queryType = $key;
                     }
 
-                    if ($this->_checkACLSQLCommands_r($currNode, $auth, $error, $currDB, $queryType) !== true) {
+                    if ($this->_checkACLSQLCommands_r($currNode, $auth, $error, $sources, $currDB, $queryType) !== true) {
                         return false;
                     }
                 }

@@ -24,6 +24,20 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 }]);
 
+/* filter */
+
+app.filter('bytes', function() {
+    return function(bytes) {
+        if (angular.isUndefined(bytes) || isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '';
+        if (bytes === 0 || bytes === '0' ) return '0 bytes';
+
+        var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'];
+        var number = Math.floor(Math.log(bytes) / Math.log(1024));
+
+        return (bytes / Math.pow(1024, Math.floor(number))).toFixed(1) +  ' ' + units[number];
+    };
+});
+
 /* directives */
 
 app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function($timeout,SubmitService) {
@@ -37,20 +51,21 @@ app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function(
                 var id = element.attr('id');
                 var buttons = [];
 
-                var select = angular.element('select',element)
+                var select = angular.element('select',element);
                 var model = select.attr('ng-model').replace('values.','');
                 var option = angular.element('option',select);
 
                 if (option.length <= 3) {
                     angular.element('option',element).each(function(i, option) {
                         var e = angular.element(option);
+                        var queue = e.attr('value');
                         buttons.push({
-                            value: e.attr('value'),
+                            value: queue,
                             label: e.text(),
                             selected: angular.isDefined(e.attr('selected')),
-                            tooltip: select.attr('data-original-title-' + (i+1))
+                            tooltip: select.attr('data-original-title-' + queue)
                         });
-                    })
+                    });
 
                     scope.buttons = buttons;
                     scope.changeQueue = function(value) {
@@ -60,31 +75,7 @@ app.directive('daiquiriQueryQueuesGroup', ['$timeout','SubmitService', function(
             }
         }
     };
-}])
-
-app.directive('loading', ['$http','$timeout', function ($http,$timeout) {
-    return {
-      restrict: 'A',
-      link: function (scope, element, attrs) {
-        scope.isLoading = function () {
-          return $http.pendingRequests.length > 0;
-        };
-        scope.$watch(scope.isLoading, function (value) {
-          if (value) {
-            if (!scope.loadPromise) {
-              scope.loadPromise = $timeout(function(){
-                element.removeClass('ng-hide');
-              },1000);
-            }
-          } else {
-            $timeout.cancel(scope.loadPromise)
-            element.addClass('ng-hide');
-          }
-        });
-      }
-    };
 }]);
-
 
 /* services */
 
@@ -104,7 +95,7 @@ app.factory('PollingService', ['$timeout','QueryService','DownloadService',funct
             DownloadService.downloadTable(QueryService.account.job.download.format);
         }
 
-        if (options.polling.enabled == true) {
+        if (options.polling.enabled === true) {
             $timeout(poll, options.polling.timeout);
         }
     }
@@ -125,10 +116,22 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             form: false,
             job: false
         },
+        groups: [],
         database: {},
         job: {},
-        jobs: []
+        error: null
     };
+
+    // jobs object for the jobs list, will be filled via ajax as well
+    var jobslist = {
+        data: [],
+        isEmpty: true,
+        hasGroups: false
+    };
+
+    // lookup object to get the job/group for a given id
+    var jobs = {};
+    var groups = {};
 
     // dialog state, use for the different modal which will be displayed to the user
     var dialog = {
@@ -151,20 +154,95 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                 // update database information (top left)
                 account.database = response.database;
 
-                // update job list and database browser if something has changed
-                if (!angular.equals(account.jobs,response.jobs)) {
-                    account.jobs = response.jobs;
-                    BrowserService.initBrowser('databases');
+                // create object to store the indexes of the jobs and groups
+                jobs = {};
+                groups = {};
+
+                // create a temporary object to hold the groups and their jobs as well as the unassigned jobs
+                var data = [];
+
+                // create variable for the while loops
+                var run = false;
+
+                // loop over groups to create group index and find the fist group
+                angular.forEach(response.groups, function(group, key) {
+                    // create jobs array
+                    group.jobs = [];
+
+                    // add to group object
+                    groups[group.id] = group;
+
+                    // check if this is the first group
+                    if (group.prev_id === null) data.push(group);
+                });
+
+                // loop over groups and append to array
+                var currentGroup = data[0];
+                if (angular.isDefined(currentGroup)) {
+                    run = true;
+                    while (run) {
+                        if (currentGroup.next_id === null) {
+                            run = false;
+                        } else {
+                            currentGroup = groups[currentGroup.next_id];
+                            data.push(currentGroup);
+                        }
+                    }
+                }
+
+                // add a group for the unassigned jobs and push it to the array
+                groups[null] = {'name': 'unassigned', 'jobs': []};
+                data.push(groups[null]);
+
+                // loop over jobs to create job index and find first job in every group
+                angular.forEach(response.jobs, function(job) {
+                    // add to group object
+                    jobs[job.id] = job;
+
+                    // check if this is the first job in a group
+                    if (job.prev_id === null) {
+                        groups[job.group_id].jobs.push(job);
+                    }
+                });
+
+                // loop over groups to sort jobs into groups
+                var currentJob;
+                angular.forEach(data, function(group) {
+                    currentJob = group.jobs[0];
+
+                    if (angular.isDefined(currentJob)) {
+                        run = true;
+                        while (run) {
+                            if (currentJob.next_id === null) {
+                                run = false;
+                            } else {
+                                currentJob = jobs[currentJob.next_id];
+                                group.jobs.push(currentJob);
+                            }
+                        }
+                    }
+                });
+
+                // update the jobslist and the database browser if the jobslist changed
+                if (!angular.equals(jobslist.data, data)) {
+                    jobslist.data = data;
+                    jobslist.isEmpty = data.length == 1 && data[0].jobs.length === 0;
+                    jobslist.hasGroups = data.length > 1;
+
+                    // refresh databases browser
+                    if (angular.isDefined(BrowserService.browser.databases)) {
+                        BrowserService.initBrowser('databases');
+                    }
                 }
 
                 // activate the current job again, if its status has changed
-                if (account.active.job != false && account.job.status != 'success') {
-                    // get the index of the job in the jobs array (by magic)
-                    var id = account.job.id;
-                    // get the index of the job in the jobs array (by magic)
-                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': id})[0]);
-                    if (account.jobs[i].status != account.job.status) {
-                        account.job.status = activateJob(id);
+                // this will update the job overview
+                if (account.active.job !== false && account.job.status !== 'success') {
+                    if (jobs[account.job.id].status != account.job.status ||
+                        jobs[account.job.id].complete != account.job.complete) {
+
+                        // activate the job again
+                        activateJob(account.job.id);
                     }
                 }
             })
@@ -179,7 +257,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
 
     function activateForm(formName) {
         if (angular.isUndefined(formName)) {
-            if (options.defaultForm == null) {
+            if (options.defaultForm === null) {
                 formName = options.forms[0].key;
             } else {
                 formName = options.defaultForm;
@@ -195,28 +273,34 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     function activateJob(id) {
         $http.get(base + '/query/account/show-job/id/' + id)
             .success(function(response) {
-                account.job = response.job;
+                if (response.status === 'ok') {
+                    account.error = null;
 
-                // codemirrorfy the query and the plan
-                CodeMirror.runMode(account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
-                if (angular.isDefined(account.job.plan)) {
-                    CodeMirror.runMode(account.job.plan,"text/x-mysql",angular.element('#overview-plan')[0]);
-                }
-                if (angular.isDefined(account.job.actualQuery)) {
-                    CodeMirror.runMode(account.job.actualQuery,"text/x-mysql",angular.element('#overview-actualQuery')[0]);
-                }
+                    account.job = response.job;
 
-                // if a form was active, the image tab was active or the job was not a success, switch to job overview tab
-                if (account.active.form != false || $('#images-tab-header').hasClass('active') || account.job.status != 'success') {
-                    $('#overview-tab-header a').tab('show');
-                }
+                    // codemirrorfy the query and the plan
+                    CodeMirror.runMode(account.job.query,"text/x-mysql",angular.element('#overview-query')[0]);
+                    if (angular.isDefined(account.job.plan)) {
+                        CodeMirror.runMode(account.job.plan,"text/x-mysql",angular.element('#overview-plan')[0]);
+                    }
+                    if (angular.isDefined(account.job.actualQuery)) {
+                        CodeMirror.runMode(account.job.actualQuery,"text/x-mysql",angular.element('#overview-actualQuery')[0]);
+                    }
 
-                account.active.form = false;
-                account.active.job = id;
+                    // if a form was active, the image tab was active or the job was not a success, switch to job overview tab
+                    if (account.active.form != false || $('#images-tab-header').hasClass('active') || account.job.status != 'success') {
+                        $('#overview-tab-header a').tab('show');
+                    }
 
-                // init plot
-                if (account.job.status == 'success') {
-                    PlotService.init(account);
+                    account.active.form = false;
+                    account.active.job = id;
+
+                    // init plot
+                    if (account.job.status == 'success') {
+                        PlotService.init(account);
+                    }
+                } else {
+                    account.error = response.error;
                 }
             })
             .error(function(response, status) {
@@ -228,17 +312,37 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
             });
     }
 
+    function activateNextJob() {
+        var job = jobs[account.job.id];
+
+        if (job.next_id === null) {
+            if (job.prev_id === null) {
+                // no jobs left in this group, lets jump to the form
+                activateForm();
+            } else {
+                // this was the last job, jump to the previous job
+                activateJob(job.prev_id);
+            }
+        } else {
+            // jump to the next job in array
+            activateJob(job.next_id);
+        }
+    }
+
     function renameJob () {
         var data = {
             'csrf': options.csrf,
             'tablename': dialog.values.tablename
         };
 
-        $http.post(base + '/query/account/rename-job/id/' + account.job.id,$.param(data))
+        $http.post(base + '/query/account/rename-job/id/' + dialog.obj.id,$.param(data))
             .success(function(response) {
                 dialogSuccess(response, function() {
-                    account.job.table = data.tablename;
-                    PlotService.values.table = data.tablename;
+                    // check if the job was selected
+                    if (dialog.obj.id == account.job.id) {
+                        account.job.table = data.tablename;
+                        PlotService.values.table = data.tablename;
+                    }
                     fetchAccount();
                 });
             })
@@ -248,21 +352,12 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     }
 
     function killJob () {
-        $http.post(base + '/query/account/kill-job/id/' + account.job.id,$.param({'csrf': options.csrf}))
+        $http.post(base + '/query/account/kill-job/id/' + dialog.obj.id,$.param({'csrf': options.csrf}))
             .success(function(response) {
                 dialogSuccess(response, function() {
-                    // get the index of the job in the jobs array (by magic)
-                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': account.job.id})[0]);
-
-                    if (account.jobs.length == 1) {
-                        // no jobs left, jump to form
-                        activateForm();
-                    } else if (i == account.jobs.length - 1) {
-                        // this was the last job, jump to the previous job
-                        activateJob(account.jobs[i-1].id)
-                    } else {
-                        // jump to the next job in array
-                        activateJob(account.jobs[i+1].id)
+                    // check if the job was selected
+                    if (dialog.obj.id == account.job.id) {
+                        activateNextJob();
                     }
                 });
             })
@@ -272,23 +367,107 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     }
 
     function removeJob() {
-        $http.post(base + '/query/account/remove-job/id/' + account.job.id,$.param({'csrf': options.csrf}))
+        $http.post(base + '/query/account/remove-job/id/' + dialog.obj.id,$.param({'csrf': options.csrf}))
             .success(function(response) {
                 dialogSuccess(response, function() {
-                    // get the index of the job in the jobs array (by magic)
-                    var i = account.jobs.indexOf(filterFilter(account.jobs,{'id': account.job.id})[0]);
-
-                    if (account.jobs.length == 1) {
-                        // no jobs left, jump to form
-                        activateForm();
-                    } else if (i == account.jobs.length - 1) {
-                        // this was the last job, jump to the previous job
-                        activateJob(account.jobs[i-1].id)
-                    } else {
-                        // jump to the next job in array
-                        activateJob(account.jobs[i+1].id)
+                    // check if the job was selected
+                    if (dialog.obj.id == account.job.id) {
+                        activateNextJob();
                     }
                 });
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function moveJob(id, newPrevJobId, newPrevGroupId) {
+        if (
+            id === newPrevJobId ||                                                       // dragded on itself
+            (angular.isUndefined(newPrevGroupId) && jobs[id].prev_id == newPrevJobId) || // same prev_id and same group
+            (jobs[id].group_id === newPrevGroupId && jobs[id].prev_id === null)          // prev_id null and same group
+        ) return;
+
+        var data;
+
+        if (angular.isDefined(newPrevJobId)) {
+            data = {
+                'csrf': options.csrf,
+                'group_id': jobs[newPrevJobId].group_id,
+                'prev_id': newPrevJobId
+            };
+        } else {
+            // this will be the new job of the specified group
+            data = {
+                'csrf': options.csrf,
+                'group_id': newPrevGroupId
+            };
+        }
+
+        $http.post(base + '/query/account/move-job/id/' + id,$.param(data))
+            .success(function(response) {
+                fetchAccount();
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function createGroup() {
+        $http.post(base + '/query/account/create-group/',$.param({'csrf': options.csrf, 'name': dialog.values.name}))
+            .success(function(response) {
+                dialogSuccess(response);
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function renameGroup() {
+        $http.post(base + '/query/account/update-group/id/' + dialog.obj.id,$.param({'csrf': options.csrf, 'name': dialog.values.name}))
+            .success(function(response) {
+                dialogSuccess(response);
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function removeGroup() {
+        $http.post(base + '/query/account/delete-group/id/' + dialog.obj.id,$.param({'csrf': options.csrf, 'name': dialog.values.name}))
+            .success(function(response) {
+                dialogSuccess(response);
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function moveGroup(id, newPrevId) {
+        if (
+            id === newPrevId ||                 // dragded on itself
+            groups[id].prev_id === newPrevId || // same prev_id
+            angular.isUndefined(newPrevId)      // dragged on the unassigned group
+        ) return;
+
+        var data = {
+            'csrf': options.csrf,
+            'prev_id': newPrevId
+        };
+
+        $http.post(base + '/query/account/move-group/id/' + id,$.param(data))
+            .success(function(response) {
+                fetchAccount();
+            })
+            .error(function (response,status) {
+                dialogError(response,status);
+            });
+    }
+
+    function toggleGroup(id) {
+        $http.post(base + '/query/account/toggle-group/id/' + id,$.param({'csrf': options.csrf}))
+            .success(function(response) {
+                fetchAccount();
             })
             .error(function (response,status) {
                 dialogError(response,status);
@@ -315,15 +494,26 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         } else {
             dialog.errors.form = 'An error occured (' + status + '). Please reload the page.';
         }
-    };
+    }
 
-    function showDialog(key) {
+    function showDialog(key, obj) {
         for (var value in dialog.values) delete dialog.values[value];
         for (var error in dialog.errors) delete dialog.errors[error];
 
-        if (key === 'rename') {
-            dialog.values.tablename = account.job.table;
+        if (angular.isDefined(obj)) {
+            dialog.obj = obj;
+        } else {
+            // if no obj is given, this concerns the active job
+            dialog.obj = account.job;
         }
+
+        if (key === 'rename-job') {
+            dialog.values.tablename = dialog.obj.table;
+        }
+        if (key === 'rename-group') {
+            dialog.values.name = dialog.obj.name;
+        }
+
         dialog.enabled = key;
         ModalService.open();
     }
@@ -336,6 +526,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
     return {
         options: options,
         account: account,
+        jobslist: jobslist,
         dialog: dialog,
         init: init,
         fetchAccount: fetchAccount,
@@ -344,6 +535,12 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
         renameJob: renameJob,
         killJob: killJob,
         removeJob: removeJob,
+        moveJob: moveJob,
+        createGroup: createGroup,
+        renameGroup: renameGroup,
+        removeGroup: removeGroup,
+        moveGroup: moveGroup,
+        toggleGroup: toggleGroup,
         showDialog: showDialog,
         hideDialog: hideDialog
     };
@@ -431,7 +628,7 @@ app.factory('SubmitService', ['$http','$timeout','$window','QueryService','Codem
             if (key.indexOf(formName + '_') === 0) {
                 data[key] = value;
             }
-        })
+        });
 
         // reset errors for all forms
         for (var error in errors) delete errors[error];
@@ -457,13 +654,13 @@ app.factory('SubmitService', ['$http','$timeout','$window','QueryService','Codem
 
     function submitPlan(mail) {
         if (angular.element('#plan_query.codemirror').length !== 0) {
-            CodemirrorService$.save('plan_query');
+            CodemirrorService.save('plan_query');
         }
 
         var data = {
             'plan_csrf': options.csrf,
             'plan_query': angular.element('#plan_query').val()
-        }
+        };
 
         if (mail === true) data['plan_mail'] = '1';
 
@@ -472,6 +669,7 @@ app.factory('SubmitService', ['$http','$timeout','$window','QueryService','Codem
 
         $http.post(base + '/query/form/plan',$.param(data)).success(function(response) {
             if (response.status == 'ok') {
+                QueryService.hideDialog();
                 submitted(response);
             } else if (response.status == 'redirect') {
                 var win = $window.open(response.redirect,'_blank');
@@ -601,12 +799,12 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                         'status': 'ok',
                         'link': response.link,
                         'format': response.format
-                    }
+                    };
                 } else if (response.status == 'pending') {
                     QueryService.account.job.download = {
                         'status': 'pending',
                         'format': response.format
-                    }
+                    };
                 } else if (response.status == 'error') {
                     console.log(response);
                     angular.forEach(response.errors, function(object, key) {
@@ -638,12 +836,12 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
                         'status': 'ok',
                         'link': response.link,
                         'format': response.format
-                    }
+                    };
                 } else if (response.status == 'pending') {
                     QueryService.account.job.download = {
                         'status': 'pending',
                         'format': response.format
-                    }
+                    };
                 } else if (response.status == 'error') {
                     console.log(response);
                     angular.forEach(response.status, function(object, key) {
@@ -668,32 +866,56 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
     $scope.dialog  = QueryService.dialog;
 
     $scope.activateForm = function(formName) {
+        // reset errors for QueryService
+        QueryService.account.error = null;
+
         QueryService.activateForm(formName);
     };
 
-    $scope.activateJob = function(jobId) {
-        QueryService.activateJob(jobId);
+    $scope.activateJob = function(jobId, $event) {
+        if (angular.isUndefined($event) || !angular.element($event.target).hasClass('daiquiri-query-jobs-option')) {
+            // reset errors for SubmitService
+            for (var error in SubmitService.errors) delete SubmitService.errors[error];
+
+            QueryService.activateJob(jobId);
+        }
     };
 
-    $scope.showDialog = function(key) {
-        QueryService.showDialog(key);
-    }
+    $scope.showDialog = function(key, obj) {
+        QueryService.showDialog(key, obj);
+    };
 
     $scope.hideDialog = function() {
         QueryService.hideDialog();
-    }
+    };
 
     $scope.renameJob = function() {
         QueryService.renameJob();
-    }
+    };
 
     $scope.killJob = function() {
         QueryService.killJob();
-    }
+    };
 
     $scope.removeJob = function() {
         QueryService.removeJob();
-    }
+    };
+
+    $scope.createGroup = function() {
+        QueryService.createGroup();
+    };
+
+    $scope.renameGroup = function() {
+        QueryService.renameGroup();
+    };
+
+    $scope.toggleGroup = function(id) {
+        QueryService.toggleGroup(id);
+    };
+
+    $scope.removeGroup = function() {
+        QueryService.removeGroup();
+    };
 
     $scope.pasteQuery = function() {
         SubmitService.pasteQuery();
@@ -701,12 +923,12 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
 
     $scope.clearInput = function() {
         SubmitService.clearInput();
-    }
+    };
 
     $scope.tabclick = function ($event) {
         // prevents the bootstrap tabs from changing the location
         $event.preventDefault();
-    }
+    };
 
     // init query interface
     $timeout(function() {
@@ -716,6 +938,97 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
         DownloadService.init($scope.options);
     });
 
+}]);
+
+app.controller('JobsController',['$scope','$timeout','$document','QueryService',function($scope,$timeout,$document,QueryService) {
+
+    $scope.edit = false;
+    $scope.drag = false;
+
+    $scope.jobslist = QueryService.jobslist;
+
+    function handleDragStart(event) {
+        // get the dragged element
+        var element = $(event.target);
+
+        // add the drag class
+        element.addClass('drag');
+
+        // store data about group/job in event
+        var drag = {};
+        if (angular.isDefined(element.attr('data-group-id'))) {
+            drag.type = 'group';
+            drag.id = element.attr('data-group-id');
+            drag.name = element.attr('data-group-name');
+        } else if (angular.isDefined(element.attr('data-job-id'))) {
+            drag.type = 'job';
+            drag.id = element.attr('data-job-id');
+            drag.name = element.attr('data-job-name');
+        }
+
+        // set dataTransfer or drag and drop with gecko will not work
+        event.dataTransfer.setData('text/plain', drag.name);
+
+        $timeout(function() {
+            $scope.drag = drag;
+        });
+
+        event.stopPropagation();
+    }
+    function handleDragEnd(event) {
+        // get the dragged element
+        var element = $(event.target);
+
+        // remove the drag class
+        element.removeClass('drag');
+
+        $timeout(function() {
+            $scope.drag = false;
+        });
+
+        event.stopPropagation();
+    }
+    function handleDragEnter(event) {
+        $(event.target).addClass('target');
+        event.preventDefault();
+    }
+    function handleDragOver(event) {
+        event.preventDefault();
+    }
+    function handleDragLeave(event) {
+        $(event.target).removeClass('target');
+        event.preventDefault();
+    }
+    function handleDrop(event) {
+        var target = $(event.target);
+        target.removeClass('target');
+
+        if ($scope.drag.type === 'group') {
+            QueryService.moveGroup($scope.drag.id, target.attr('data-group-id'));
+        } else if ($scope.drag.type === 'job') {
+            QueryService.moveJob($scope.drag.id, target.attr('data-job-id'), target.attr('data-group-id'));
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    $scope.$watch(function () {
+        return $scope.jobslist;
+    }, function(newValue, oldValue) {
+        if (newValue !== oldValue) {
+            $timeout(function() {
+                angular.element('.daiquiri-query-job, .daiquiri-query-group, .daiquiri-query-group-dropzone, .daiquiri-query-job-dropzone').each(function (key, node) {
+                    node.addEventListener('dragstart', handleDragStart, false);
+                    node.addEventListener('dragend', handleDragEnd, false);
+                    node.addEventListener('dragenter', handleDragEnter, false);
+                    node.addEventListener('dragover', handleDragEnter, false);
+                    node.addEventListener('dragleave', handleDragLeave, false);
+                    node.addEventListener('drop', handleDrop, false);
+                });
+            });
+        }
+    }, true);
 }]);
 
 app.controller('SubmitController',['$scope','SubmitService',function($scope,SubmitService) {
@@ -810,6 +1123,9 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
         var col = TableService.data.cols[iCol];
         var value = TableService.data.rows[iRow].cell[iCol];
 
+        var base;
+        var link;
+
         if (col.ucd.indexOf('meta.file') != -1) {
 
             extension = value.match(/(?:\.([^.]+))?$/)[1];
@@ -819,8 +1135,8 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
                 $('#images-tab-header a').tab('show');
             } else {
                 // a regular file to be downloaded
-                var base = angular.element('base').attr('href');
-                var link = base + '/data/files/single/name/' + value;
+                base = angular.element('base').attr('href');
+                link = base + '/data/files/single/name/' + value;
                 $('<iframe />', {
                     'style': 'visibility: hidden; height: 0; width: 0;',
                     'src': link
@@ -828,8 +1144,8 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
             }
         } else if (col.ucd.indexOf('meta.fits') != -1) {
             // a fits file
-            var base = angular.element('base').attr('href');
-            var link = base + '/data/files/single/name/' + value;
+            base = angular.element('base').attr('href');
+            link = base + '/data/files/single/name/' + value;
             $('<iframe />', {
                 'style': 'visibility: hidden; height: 0; width: 0;',
                 'src': link
@@ -855,7 +1171,7 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
              'style': 'visibility: hidden; height: 0; width: 0;',
              'src': link
         }).appendTo('body');
-    }
+    };
 
     $scope.downloadRows = function(iRows) {
         var base = angular.element('base').attr('href');
@@ -864,7 +1180,7 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
              'style': 'visibility: hidden; height: 0; width: 0;',
              'src': link
         }).appendTo('body');
-    }
+    };
 
     $scope.toggleColumn = function(iCol) {
         var col = QueryService.account.job.cols[iCol];
@@ -875,7 +1191,7 @@ app.controller('ResultsController',['$scope','$window','QueryService','ImagesSer
             col.hidden = false;
             TableService.showCol(iCol);
         }
-    }
+    };
 
 }]);
 

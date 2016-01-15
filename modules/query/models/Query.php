@@ -70,14 +70,15 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Validates a plain text query. TRUE if valid, FALSE if not. 
+     * Validates a plain text query. TRUE if valid, FALSE if not.
      * @param string $sql the sql string
      * @param bool $plan flag for plan creation
      * @param string $table result table
      * @param array &$errors buffer array for errors
-     * @return bool 
+     * @param array &$errors buffer array for sources
+     * @return bool
      */
-    public function validate($sql, $plan = false, $table, array &$errors) {
+    public function validate($sql, $plan = false, $table, array &$errors, array &$sources) {
         // init error array
         $errors = array();
 
@@ -87,15 +88,28 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             return false;
         }
 
+        // check if the table exists in the jobs table
+        $rows = $this->_queue->fetchRows(array(
+            'where' => array(
+                '`user_id` = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                '`table` = ?' => $table,
+                '`removed` = 0'
+            )
+        ));
+        if (!empty($rows)) {
+            $errors['submitError'] = "You already have a job with the table name '{$table}'";
+            return false;
+        }
+
         // process sql string
         if ($plan === false) {
-            if ($this->_processor->validateQuery($sql, $table, $errors) !== true) {
+            if ($this->_processor->validateQuery($sql, $table, $errors, $sources) !== true) {
                 return false;
             }
         }
 
         if ($plan !== false and $this->_processor->supportsPlanType("QPROC_ALTERPLAN") === true) {
-            if ($this->_processor->validatePlan($plan, $table, $errors) !== true) {
+            if ($this->_processor->validatePlan($plan, $table, $errors, $sources) !== true) {
                 return false;
             }
         }
@@ -109,9 +123,10 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
      * @param bool $plan flag for plan creation
      * @param string $table result table
      * @param array $options for further options that are handeled by the queue
-     * @return array $response 
+     * @param string $jobType job type of the new job
+     * @return array $response
      */
-    public function query($sql, $plan = false, $table, $options = array()) {
+    public function query($sql, $plan = false, $table, $sources, $options = array(), $jobType = 'web') {
         // init error array
         $errors = array();
 
@@ -120,14 +135,6 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             $tablename = false;
         } else {
             $tablename = $table;
-        }
-
-        // get group of the user
-        $usrGrp = Daiquiri_Auth::getInstance()->getCurrentRole();
-        if ($usrGrp !== null) {
-            $options['usrGrp'] = $usrGrp;
-        } else {
-            $options['usrGrp'] = "guest";
         }
 
         // if plan type direct, obtain query plan
@@ -157,17 +164,42 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             return array('status' => 'error', 'errors' => $errors);
         }
 
+        // get group of the user
+        $options['usrGrp'] = Daiquiri_Auth::getInstance()->getCurrentRole();
+
         // before submission, see if user has enough quota
-        if ($this->_checkQuota($this->_queue, $usrGrp)) {
+        if ($this->_checkQuota($this->_queue, $options['usrGrp'])) {
             $errors['quotaError'] = 'Your quota has been reached. Drop some tables to free space or contact the administrators';
             return array('status' => 'error', 'errors' => $errors);
         }
 
+        // get user database name
+        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $job['database'] = Daiquiri_Config::getInstance()->getUserDbName($username);
+        $job['host'] = Daiquiri_Config::getInstance()->getUserDbHost();
+
+        // get some more infomation about the job
+        $job['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
+        $job['ip'] = Daiquiri_Auth::getInstance()->getRemoteAddr();
+        $job['type_id'] = $this->_queue->getJobResource()->getTypeId($jobType);
+
+        // store the sources of the job
+        $tmp = array();
+        foreach($sources as $source) {
+            $tmp[] = $this->_queue->quoteIdentifier($source['database'],$source['table']);
+        }
+        $job['sources'] = implode(',',$tmp);
+
         // submit job
-        $statusId = $this->_queue->submitJob($job, $errors, $options);
+        $this->_queue->submitJob($job, $errors, $options);
         if (!empty($errors)) {
             return array('status' => 'error', 'errors' => $errors);
         }
+
+        // get username and status
+        $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
+        $job['status'] = $this->_queue->getStatus($job['status_id']);
+        $job['type'] = $jobType;
 
         // return with success
         return array(
@@ -179,7 +211,7 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     /**
      * Returns the query plan.
      * @param string $sql the sql string
-     * @return array $response 
+     * @return array $response
      */
     public function plan($sql, array &$errors) {
         // init error array
@@ -197,40 +229,18 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
      * @return bool
      */
     private function _checkQuota($resource, $usrGrp) {
-        $dbStatData = $resource->fetchDatabaseStats();
 
-        $usedSpace = (float) $dbStatData['db_size'];
+        // get current database stats and auota
+        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
+        $stats = $resource->fetchStats($userId);
+        $quota = Daiquiri_Config::getInstance()->getQueryQuota($usrGrp);
 
-        $quotaStr = Daiquiri_Config::getInstance()->query->quota->$usrGrp;
-
-        //if no quota given, let them fill the disks!
-        if (empty($quotaStr)) {
+        // if no quota given, let them fill the disks!
+        if (empty($quota)) {
             return false;
         }
 
-        //parse the quota to resolve KB, MB, GB, TB, PB, EB...
-        preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quotaStr, $parse);
-        $quota = (float) $parse[1];
-        $unit = $parse[2];
-
-        switch (strtoupper($unit)) {
-            case 'EB':
-                $quota *= 1024;
-            case 'PB':
-                $quota *= 1024;
-            case 'TB':
-                $quota *= 1024;
-            case 'GB':
-                $quota *= 1024;
-            case 'MB':
-                $quota *= 1024;
-            case 'KB':
-                $quota *= 1024;
-            default:
-                break;
-        }
-
-        if ($usedSpace > $quota) {
+        if ($stats['size'] > $quota) {
             return true;
         } else {
             return false;

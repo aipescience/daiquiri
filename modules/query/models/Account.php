@@ -39,119 +39,59 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $message = $row['value'];
         }
 
-        // get the sqloptions needed to show the list of jobs
         $userId = Daiquiri_Auth::getInstance()->getCurrentId();
 
-        // get rows and return
-        $rows = array();
+        // get groups
+        $groupsResource = new Query_Model_Resource_Groups();
+        $groups = $groupsResource->fetchRows(array(
+            'where' => array(
+                'user_id = ?' => $userId,
+            )
+        ));
+
+        // get rows
         try {
-            $dbRows = $this->getResource()->fetchRows(array(
+            $rows = $this->getResource()->fetchRows(array(
                 'where' => array(
                     'user_id = ?' => $userId,
-                    'status_id != ?' => $this->getResource()->getStatusId('removed'),
-                ),
-                'order' => array($this->getResource()->getTimeField() . ' DESC'),
-                'limit' => 1000
+                    'removed = ?' => 0
+                )
             ));
         } catch (Exception $e) {
-            $dbRows = array();
-        }
-
-        foreach ($dbRows as $dbRow) {
-            $row = array();
-            foreach (array('id', 'table', 'status') as $col) {
-                $row[$col] = $dbRow[$col];
-            }
-            $row['time'] = $dbRow[$this->getResource()->getTimeField()];
-            $rows[] = $row;
+            $rows = array();
         }
 
         // get number of currently active jobs
-        $resourceClass = get_class($this->getResource());
-        if ($resourceClass::$hasQueues) {
-            try {
-                $nactive = $this->getResource()->fetchNActive();
-            } catch (Exception $e) {
-                $nactive = false;
-            }
-        } else {
-            $nactive = false;
-        }
+        $nactive = $this->getResource()->fetchNActive();
 
         // check if guest or not
         $guest = (Daiquiri_Auth::getInstance()->getCurrentRole() === 'guest');
 
         // get the quota information
-        $usrGrp = Daiquiri_Auth::getInstance()->getCurrentRole();
-        if ($usrGrp !== null) {
-            $quota = array();
+        $role = Daiquiri_Auth::getInstance()->getCurrentRole();
 
-            // get database stats
-            try {
-                $stats = $this->getResource()->fetchDatabaseStats();
-            } catch (Exception $e) {
-                $stats = array();
-            }
+        // get the quota space
+        $stats =  $this->getResource()->fetchStats($userId);
+        $quota = array(
+            'used' => $stats['size'],
+            'max' => Daiquiri_Config::getInstance()->getQueryQuota($role),
+        );
 
-            // get the quota space
-            $quota['max'] = Daiquiri_Config::getInstance()->query->quota->$usrGrp;
-
-            if (!empty($stats)) {
-                // space in byte
-                $usedSpace = (float) $stats['db_size'];
-
-                // parse the quota to resolve KB, MB, GB, TB, PB, EB...
-                preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quota['max'], $parse);
-                $quotaSpace = (float) $parse[1];
-                $unit = $parse[2];
-
-                switch (strtoupper($unit)) {
-                    case 'EB':
-                        $quotaSpace *= 1024;
-                    case 'PB':
-                        $quotaSpace *= 1024;
-                    case 'TB':
-                        $quotaSpace *= 1024;
-                    case 'GB':
-                        $quotaSpace *= 1024;
-                    case 'MB':
-                        $quotaSpace *= 1024;
-                    case 'KB':
-                        $quotaSpace *= 1024;
-                    default:
-                        break;
-                }
-
-                if ($usedSpace > $quotaSpace) {
-                    $quota['exceeded'] = true;
-                } else {
-                    $quota['exceeded'] = false;
-                }
-
-                $unit = ' byte';
-                foreach (array('KB','MB','GB','TB','PB','EB') as $u) {
-                    if ($usedSpace > 1024) {
-                        $usedSpace /= 1024.0;
-                        $unit = $u;
-                    }
-                }
-
-                $quota['used'] = ((string) floor($usedSpace * 100) / 100 ) . ' ' . $unit;
-            } else {
-                $quota['used'] = '?';
-            }
+        if ($quota['used'] > $quota['max']) {
+            $quota['exceeded'] = true;
         } else {
-            $quota = false;
+            $quota['exceeded'] = false;
         }
 
         return array(
             'status' => 'ok',
+            'groups' => $groups,
             'jobs' => $rows,
             'database' => array(
                 'message' => $message,
                 'nactive' => $nactive,
                 'guest' => $guest,
-                'quota' => $quota,
+                'quota' => $quota
             )
         );
     }
@@ -176,11 +116,10 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
 
         // create return array
         $job = array(
-            'time' => $dbRow[$this->getResource()->getTimeField()],
             'additional' => array()
         );
 
-        foreach(array('id','database','table','status','error','username','timeQueue','timeQuery') as $key) {
+        foreach(array('id','database','table','status','error','time','timeQueue','timeQuery','nrows','size','complete','removed') as $key) {
             if (isset($dbRow[$key])) {
                 $job[$key] = $dbRow[$key];
             }
@@ -200,43 +139,43 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
             $job['plan'] = $plan;
         }
 
-        // get actial query if there is one
+        // get actual query if there is one
         if (isset($dbRow['actualQuery'])) {
             $job['actualQuery'] = str_replace("; ",";\n",$dbRow['actualQuery']);
             unset($dbRow['actualQuery']);
         }
 
-        // fetch table statistics
-        if ($job['status'] == 'success') {
-            $stat = $this->getResource()->fetchTableStats($job['database'],$job['table']);
-        } else {
-            $stat = array();
-        }
-
-        // ret row count
-        if (isset($stat['tbl_row'])) {
-            $job['nrows'] = $stat['tbl_row'];
-            unset($stat['tbl_row']);
-        }
-
         // create additional array
         $translations = $this->getResource()->getTranslations();
-        foreach (array_merge($dbRow, $stat) as $key => $value) {
-            $job['additional'][] = array(
-                'key' => $key,
-                'name' => $translations[$key],
-                'value' => $value
-            );
+        foreach ($dbRow as $key => $value) {
+            if (isset($translations[$key])) {
+                $job['additional'][] = array(
+                    'key' => $key,
+                    'name' => $translations[$key],
+                    'value' => $value
+                );
+            }
         }
 
         // add columns if the job was a success
         if ($job['status'] == 'success') {
             $descResource = new Data_Model_Resource_Description();
             $descResource->init($job['database']);
-            $tableMeta = $descResource->describeTable($job['table']);
+
+            try {
+                $tableMeta = $descResource->describeTable($job['table']);
+            } catch (Zend_Db_Statement_Exception $e) {
+                return array(
+                    'status' => 'error',
+                    'error' => 'The table could not be found on the server, please contact support.'
+                );
+            }
 
             $job['cols'] = $tableMeta['columns'];
         }
+
+        // add the username of the current user
+        $job['username'] = Daiquiri_Auth::getInstance()->getCurrentUsername();
 
         return array('job' => $job, 'status' => 'ok');
     }
@@ -361,6 +300,240 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         }
 
         return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
+     * Updates a query job.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function moveJob($id, array $formParams = array()) {
+        // set job resource
+        $this->setResource(Query_Model_Resource_AbstractQuery::factory());
+
+        // get job and check permissions
+        $row = $this->getResource()->getJobResource()->fetchRow($id);
+        if (empty($row) || $row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId() || !empty($row['removed'])) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+
+        // create the form object
+        $form = new Query_Form_MoveJob(array(
+            'groupId' => $row['group_id'],
+            'prevId' => $row['prev_id']
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                $errors = array();
+                $this->getResource()->getJobResource()->moveRow($id, $row['prev_id'], $row['next_id'], $values['prev_id'], $row['group_id'], $values['group_id'], $errors);
+
+                if (empty($errors)) {
+                    return array('status' => 'ok');
+                } else {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form, $errors);
+                }
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
+     * Creates a query job group.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function createGroup(array $formParams = array()) {
+        // set group resource
+        $this->setResource(new Query_Model_Resource_Groups());
+
+        // create the form object
+        $form = new Query_Form_Group(array(
+            'submit' => 'Update query job group'
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                // get the current user id
+                $values['user_id'] = Daiquiri_Auth::getInstance()->getCurrentId();
+
+                // store the values in the database
+                $id = $this->getResource()->insertRow($values);
+
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
+     * Updates a query job group.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function updateGroup($id, array $formParams = array()) {
+        // set group resource
+        $this->setResource(new Query_Model_Resource_Groups());
+
+        // get the entry from the database
+        $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+        if ($entry['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
+        }
+
+        // create the form object
+        $form = new Query_Form_Group(array(
+            'entry' => $entry,
+            'submit' => 'Update query job group'
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                $this->getResource()->updateRow($id, $values);
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
+     * Moves a query job group whithin the linked list.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function moveGroup($id, array $formParams = array()) {
+        // set group resource
+        $this->setResource(new Query_Model_Resource_Groups());
+
+        // get the entry from the database
+        $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+        if ($entry['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
+        }
+
+        // create the form object
+        $form = new Query_Form_MoveGroup(array(
+            'prevId' => $entry['prev_id']
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                $errors = array();
+                $this->getResource()->moveRow($id, $entry['prev_id'], $entry['next_id'], $values['prev_id'], $errors);
+
+                if (empty($errors)) {
+                    return array('status' => 'ok');
+                } else {
+                    return $this->getModelHelper('CRUD')->validationErrorResponse($form, $errors);
+                }
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
+     * Toggle the visibility of a query job group.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function toggleGroup($id, array $formParams = array()) {
+        // set group resource
+        $this->setResource(new Query_Model_Resource_Groups());
+
+        // get the entry from the database
+        $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+        if ($entry['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
+        }
+
+        // create the form object
+        $form = new Daiquiri_Form_Confirm(array(
+            'submit' => 'Toggle'
+        ));
+
+        // valiadate the form if POST
+        if (!empty($formParams)) {
+            if ($form->isValid($formParams)) {
+                // get the form values
+                $values = $form->getValues();
+
+                if ($entry['hidden'] === '0') {
+                    $this->getResource()->updateRow($id, array('hidden' => '1'));
+                } else {
+                    $this->getResource()->updateRow($id, array('hidden' => '0'));
+                }
+
+                return array('status' => 'ok');
+            } else {
+                return $this->getModelHelper('CRUD')->validationErrorResponse($form);
+            }
+        }
+
+        return array('form' => $form, 'status' => 'form');
+    }
+
+    /**
+     * Deletes a query job group.
+     * @param int $id id of the query job group
+     * @param array $formParams
+     * @return array $response
+     */
+    public function deleteGroup($id, array $formParams = array()) {
+        // set group resource
+        $this->setResource(new Query_Model_Resource_Groups());
+
+        // get the entry from the database
+        $entry = $this->getResource()->fetchRow($id);
+        if (empty($entry)) {
+            throw new Daiquiri_Exception_NotFound();
+        }
+        if ($entry['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+            throw new Daiquiri_Exception_Forbidden();
+        }
+
+        return $this->getModelHelper('CRUD')->delete($id, $formParams, 'Delete query job group');
     }
 
     /**

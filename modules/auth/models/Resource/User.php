@@ -61,8 +61,8 @@ class Auth_Model_Resource_User extends Daiquiri_Model_Resource_Table {
     public function countRows(array $sqloptions = array()) {
         $select = $this->select();
         $select->from('Auth_User', 'COUNT(*) as count');
-        $select->join('Auth_Roles', 'Auth_Roles.id = Auth_User.role_id', array('role'));
-        $select->join('Auth_Status', 'Auth_Status.id = Auth_User.status_id', array('status'));
+        $select->join('Auth_Roles', 'Auth_Roles.id = Auth_User.role_id', false);
+        $select->join('Auth_Status', 'Auth_Status.id = Auth_User.status_id', false);
 
         if ($sqloptions) {
             $select->setWhere($sqloptions);

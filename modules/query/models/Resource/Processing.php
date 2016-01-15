@@ -55,7 +55,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
      * Splits an SQL query into multiple lines. Returns an array with a
      * query in each line. This will also remove the ';' from each query
      * @param string $sql
-     * @return array multiline queries 
+     * @return array multiline queries
      */
     public function splitQueryIntoMultiline($sql, array &$errors) {
         $multilines = explode(";", str_replace("\n", " ", rtrim($sql, " ")));
@@ -484,7 +484,7 @@ class Query_Model_Resource_Processing extends Daiquiri_Model_Resource_Abstract {
         $errorString = str_replace("'localhost'", "'XXXXXXXXXXXX'", $errorString);
         $errorString = str_replace("'{$config['host']}'", "'XXXXXXXXXXXX'", $errorString);
         $errorString = str_replace("'{$config['username']}'", "'XXXXXXXXXXXX'", $errorString);
-        $errorString = preg_replace("\d+\.\d+\.\d+\.\d+", "'XXXXXXXXXXXX'", $errorString);
+        $errorString = preg_replace("'\d+\.\d+\.\d+\.\d+'", "'XXXXXXXXXXXX'", $errorString);
 
         if (!empty($errorString)) {
             $errors['validateError'] = $errorString;

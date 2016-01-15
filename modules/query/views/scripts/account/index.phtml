@@ -44,11 +44,69 @@
 
     <p class="<?php echo (($this->database['quota']['exceeded'] === true) ? 'text-error' : '') ?>">
         <?php if ($this->database['guest'] === true): ?>
-        The guest user is using <?php echo $this->escape($this->database['quota']['used']); ?> of its quota of <?php echo $this->escape($this->database['quota']['max']); ?>.
+        The guest user is using <?php echo $this->escape($this->database['quota']['used']); ?> bytes of its quota of <?php echo $this->escape($this->database['quota']['max']); ?> bytes.
         <?php else: ?>
-        You are using <?php echo $this->escape($this->database['quota']['used']); ?> of your quota of <?php echo $this->escape($this->database['quota']['max']); ?>.
+        You are using <?php echo $this->escape($this->database['quota']['used']); ?> bytes of your quota of <?php echo $this->escape($this->database['quota']['max']); ?> bytes.
         <?php endif; ?>
     </p>
+
+    <h4>Job groups</h4>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Prev</th>
+                <th>Next</th>
+                <th>Hidden</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($this->groups as $group): ?>
+            <tr>
+                <?php foreach (array('id','name','prev_id','next_id','hidden') as $key): ?>
+                <td>
+                    <?php echo $this->escape($group[$key]); ?>
+                </td>
+                <?php endforeach; ?>
+                <td>
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'Update',
+                        'href' => '/query/account/update-group/id/' . $group['id'],
+                        'append' => '&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'Move',
+                        'href' => '/query/account/move-group/id/' . $group['id'],
+                        'append' => '&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'Toggle',
+                        'href' => '/query/account/toggle-group/id/' . $group['id'],
+                        'append' => '&nbsp;'
+                    ));
+                    echo $this->internalLink(array(
+                        'text' => 'Delete',
+                        'href' => '/query/account/delete-group/id/' . $group['id']
+                    ));
+                    ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <div class="row">
+    <?php echo $this->internalLink(array(
+        'text' => 'Create new group',
+        'href' => '/query/account/create-group/',
+        'prepend' => '<p class="daiquiri-widget span3">',
+        'append' => '</p>'
+    ));?>
+    </div>
 
     <h4>Job list</h4>
 
@@ -59,21 +117,45 @@
                 <th>Table</th>
                 <th>Status</th>
                 <th>Timestamp</th>
+                <th>Group Id</th>
+                <th>Prev</th>
+                <th>Next</th>
+                <th>Options</th>
             </tr>
         </thead>
         <tbody>
         <?php foreach ($this->jobs as $job): ?>
             <tr>
-            <?php foreach ($job as $key => $value): ?>
-                <?php if ($key === 'id'): ?>
-                    <td><?php echo $this->internalLink(array(
+                <td>
+                    <?php echo $this->internalLink(array(
                         'href' => '/query/account/show-job/id/' . $job['id'],
                         'text' => $job['id']
-                    )); ?></td>
-                <?php else: ?>
-                    <td><?php echo $this->escape($value); ?></td>
-                <?php endif; ?>
-            <?php endforeach; ?>
+                    )); ?>
+                </td>
+                <?php foreach (array('table','status','time','group_id','prev_id','next_id') as $key): ?>
+                <td>
+                    <?php echo $this->escape($job[$key]); ?>
+                </td>
+                <?php endforeach; ?>
+                <td>
+                    <?php
+                    echo $this->internalLink(array(
+                        'text' => 'Rename',
+                        'href' => '/query/account/rename-job/id/' . $job['id'],
+                        'append' => '&nbsp;'));
+                    echo $this->internalLink(array(
+                        'text' => 'Move',
+                        'href' => '/query/account/move-job/id/' . $job['id'],
+                        'append' => '&nbsp;'));
+                    echo $this->internalLink(array(
+                        'text' => 'Remove',
+                        'href' => '/query/account/remove-job/id/' . $job['id'],
+                        'append' => '&nbsp;'));
+                    echo $this->internalLink(array(
+                        'text' => 'Kill',
+                        'href' => '/query/account/kill-job/id/' . $job['id']));
+                    ?>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>

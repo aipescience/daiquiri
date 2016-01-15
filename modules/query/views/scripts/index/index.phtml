@@ -24,10 +24,8 @@
 
 <div class="main" ng-app="query" ng-controller="QueryController"
     ng-init='options = <?php echo Zend_Json::encode($this->options); ?>'>
-    
-    <h2>Query interface</h2>
 
-    <div class="ng-hide" id="loadingIcon" data-loading> </div>
+    <h2>Query interface</h2>
 
     <div class="row">
 
@@ -52,14 +50,14 @@
                     <p ng-show="account.database.nactive > 1">
                         There are {{account.database.nactive}} jobs in the queue.
                     </p>
-                    <p ng-show="account.database.guest == true">
+                    <p ng-show="account.database.guest === true">
                         You are using the guest user. For a personal account, please sign up <a href="/auth/registration/register">here</a>.
                     </p>
                     <p ng-show="account.database.guest === true">
-                        The guest user is using {{account.database.quota.used}} of its quota of {{account.database.quota.max}}.
+                        The guest user is using {{account.database.quota.used | bytes}} of its quota of {{account.database.quota.max | bytes}}.
                     </p>
                     <p ng-show="account.database.guest === false">
-                        You are using {{account.database.quota.used}} of your quota of {{account.database.quota.max}}.
+                        You are using {{account.database.quota.used | bytes}} of your quota of {{account.database.quota.max | bytes}}.
                     </p>
                     <p ng-show="account.database.quota.exceeded" class="text-error">
                         Please remove some jobs to free space or contact the administrators.
@@ -82,23 +80,71 @@
 
             <!-- jobs -->
 
-            <ul id="jobs" class="daiquiri-widget nav nav-pills nav-stacked">
-                <li class="nav-header">Job list</li>
-                <li class="nav-item {{job.id == account.active.job ? 'active' : ''}}"
-                    ng-repeat="job in account.jobs  | orderBy:'-time'">
-                    <a href="" ng-click="activateJob(job.id)" >
-                        <i class="icon-ok pull-right" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
-                        <i class="icon-warning-sign pull-right" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
-                        <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
-                        <i class="icon-remove pull-right" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
-                        <i class="icon-trash pull-right" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
-                        <i class="icon-pause pull-right" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
-                        <i class="icon-ban-circle pull-right" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
-                        <div class="daiquiri-query-jobs-item">{{job.table}}</div>
-                    </a>
+            <ul id="jobs" class="daiquiri-widget nav nav-list nav-stacked" ng-controller="JobsController">
+                <li class="nav-header daiquiri-query-group-header">
+                    <div>Job list</div>
+                    <div class="daiquiri-query-group-dropzone" ng-show="drag.type === 'group' && jobslist.hasGroups" data-group-id=""></div>
+                    <div class="daiquiri-query-job-dropzone" ng-show="drag.type === 'job' && !jobslist.hasGroups" data-group-id=""></div>
+                </li>
+
+                <li class="nav-note" ng-show="jobslist.isEmpty"><p>No jobs found</p></li>
+
+                <li class="nav-item daiquiri-query-group" ng-repeat="group in jobslist.data"
+                    draggable="{{ (edit && group.id) ? 'true' : 'false'}}" data-group-id="{{group.id}}" data-group-name="{{group.name}}">
+                    <ul class="nav nav-list">
+                        <li class="nav-header daiquiri-query-group-header" ng-show="jobslist.hasGroups">
+                            <h6>
+                                <div class="daiquiri-query-groups-toggle" ng-click="toggleGroup(group.id)" ng-show="group.id != null">
+                                    <i class="fa fa-folder" rel="tooltip" ng-hide="group.hidden == 1"></i>
+                                    <i class="fa fa-folder-open" rel="tooltip" ng-show="group.hidden == 1"></i>
+                                </div>
+                                <div class="daiquiri-query-groups-options" ng-show="edit && group.id != null">
+                                    <i class="fa fa-pencil" ng-click="showDialog('rename-group', group)"></i>
+                                    <i class="fa fa-trash" ng-click="showDialog('remove-group', group)"></i>
+                                </div>
+                                <div class="daiquiri-query-groups-item" ng-class="{'edit': edit}">{{group.name}}</div>
+                            </h6>
+                            <div class="daiquiri-query-job-dropzone" ng-show="drag.type === 'job'" data-group-id="{{group.id}}"></div>
+                        </li>
+
+                        <li class="daiquiri-query-job nav-item {{job.id == account.active.job ? 'active' : ''}}"
+                            ng-repeat="job in group.jobs" ng-hide="group.hidden == 1" draggable="{{ edit ? 'true' : 'false'}}"
+                            data-job-id="{{job.id}}" data-job-name="{{job.database}}.{{job.table}}">
+
+                            <a href="" ng-click="activateJob(job.id, $event)" draggable="false">
+                                <div class="daiquiri-query-jobs-status pull-right" ng-hide="edit">
+                                    <i class="icon-ok" rel="tooltip" data-placement="right" data-original-title="Job is done" ng-show="job.status == 'success'"></i>
+                                    <i class="icon-warning-sign" rel="tooltip" data-placement="right" data-original-title="Job terminated with an error"  ng-show="job.status == 'error'"></i>
+                                    <i class="icon-play pull-right" rel="tooltip" data-placement="right" data-original-title="Job is running" ng-show="job.status == 'running'"></i>
+                                    <i class="icon-remove" rel="tooltip" data-placement="right" data-original-title="Job was killed" ng-show="job.status == 'killed'"></i>
+                                    <i class="icon-trash" rel="tooltip" data-placement="right" data-original-title="Job was deleted" ng-show="job.status == 'deleted'"></i>
+                                    <i class="icon-pause" rel="tooltip" data-placement="right" data-original-title="Job is queued" ng-show="job.status == 'queued'"></i>
+                                    <i class="icon-ban-circle" rel="tooltip" data-placement="right" data-original-title="Job timed out" ng-show="job.status == 'timeout'"></i>
+                                </div>
+                                <div class="daiquiri-query-jobs-options" ng-show="edit">
+                                    <i class="daiquiri-query-jobs-option fa fa-pencil" ng-click="showDialog('rename-job', job)"></i>
+                                    <i class="daiquiri-query-jobs-option fa fa-trash" ng-click="showDialog('remove-job', job)"></i>
+                                </div>
+
+                                <div class="daiquiri-query-jobs-item" ng-class="{'edit': edit}">{{job.table}}</div>
+                            </a>
+
+                            <div class="daiquiri-query-job-dropzone" ng-show="drag.type === 'job'" data-job-id="{{job.id}}"></div>
+                        </li>
+                        <div class="daiquiri-query-group-dropzone" ng-show="drag.type === 'group' && group.id" data-group-id="{{group.id}}"></div>
+                    </ul>
+                </li>
+
+                <li class="nav-note">
+                    <button class="linkbutton" ng-click="edit = true" ng-hide="edit">Edit jobs and groups</button>
+                    <button class="linkbutton" ng-click="showDialog('create-group')" ng-show="edit">Create new group</button>
+                    <button class="linkbutton" ng-click="edit = false" ng-show="edit">Stop editing</button>
                 </li>
             </ul>
 
+            <p class="text-error" ng-show="account.error">
+                {{account.error}}
+            </p>
         </div>
 
         <!-- main content  -->
@@ -251,28 +297,33 @@
                                             <dt>Number of rows</dt>
                                             <dd>{{account.job.nrows}}</dd>
                                         </div>
+
+                                        <div ng-show="account.job.size != null">
+                                            <dt>Size of the table</dt>
+                                            <dd>{{account.job.size | bytes}}</dd>
+                                        </div>
                                     </dl>
                                 </div>
                                 <div class="nav-item">
                                     <div ng-show="account.job.status == 'success'">
-                                        <button class="linkbutton" ng-click="showDialog('rename')">
+                                        <button class="linkbutton" ng-click="showDialog('rename-job')">
                                             Rename the job's result table
                                         </button>
                                     </div>
                                     <div ng-show="account.job.status == 'running' || account.job.status == 'pending'">
-                                        <button class="linkbutton" ng-click="showDialog('kill')">
+                                        <button class="linkbutton" ng-click="showDialog('kill-job')">
                                             Kill the job
                                         </button>
                                     </div>
                                     <div ng-show="account.job.status != 'running' && account.job.status != 'pending'">
-                                        <button class="linkbutton" ng-click="showDialog('remove')">
+                                        <button class="linkbutton" ng-click="showDialog('remove-job')">
                                             Remove the job
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="daiquiri-widget nav">
+                            <div class="daiquiri-widget nav" ng-show="account.job.additional.length">
                                 <div class="nav-header">Additional infomation</div>
                                 <div class="nav-item">
                                     <dl class="dl-horizontal">
@@ -599,11 +650,11 @@
 
     <!-- rename job dialog -->
 
-    <div daiquiri-modal transclude ng-show="dialog.enabled=='rename'">
-        <h2>Rename table</h2>
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='rename-job'">
+        <h2>Rename table `{{dialog.obj.table}}`</h2>
         <p class="text-error" ng-show="dialog.errors">{{dialog.errors.form}}</p>
-        <form name="rename">
-            <fieldset id="fieldset-tablerenamegroup" class="form-horizontal">
+        <form name="renameJobForm">
+            <fieldset class="form-horizontal">
                 <div class="control-group">
                     <label for="tablename" class="control-label required">New name of the table</label>
                     <div class="controls">
@@ -614,7 +665,7 @@
                     </div>
                 </div>
             </fieldset>
-            <fieldset id="fieldset-actiongroup" class="form-action">
+            <fieldset class="form-action">
                 <input type="submit" name="submit" value="Rename table" class="btn btn-primary" ng-click="renameJob()" />
                 <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
             </fieldset>
@@ -623,11 +674,11 @@
 
     <!-- kill job dialog -->
 
-    <div daiquiri-modal transclude ng-show="dialog.enabled=='kill'">
-        <h2>Kill job</h2>
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='kill-job'">
+        <h2>Kill job `{{dialog.obj.table}}`</h2>
         <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
-        <form name="kill" class="daiquiri-form-danger">
-            <fieldset id="fieldset-actiongroup" class="form-action">
+        <form name="killJobForm" class="daiquiri-form-danger">
+            <fieldset class="form-action">
                 <input type="submit" name="submit" value="Kill job" class="btn btn-danger" ng-click="killJob()" />
                 <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
             </fieldset>
@@ -636,11 +687,11 @@
 
     <!-- remove job dialog -->
 
-    <div daiquiri-modal transclude ng-show="dialog.enabled=='remove'">
-        <h2>Remove Job</h2>
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='remove-job'">
+        <h2>Remove job `{{dialog.obj.table}}`</h2>
         <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
-        <form name="kill" class="daiquiri-form-danger">
-            <fieldset id="fieldset-actiongroup" class="form-action">
+        <form name="removeJobForm" class="daiquiri-form-danger">
+            <fieldset class="form-action">
                 <input type="submit" name="submit" value="Remove job" class="btn btn-danger" ng-click="removeJob()" />
                 <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
             </fieldset>
@@ -653,10 +704,75 @@
         <h2>Query submitted</h2>
         <p>Your query has been submitted as job {{dialog.values.table}}.</p>
         <p>When the job is done you can obtain the results via the job browser on the left side.</p>
-        <form name="info" class="daiquiri-form">
-            <fieldset id="fieldset-passwordgroup" class="form-action">
+        <form name="infoForm" class="daiquiri-form">
+            <fieldset class="form-action">
                 <input type="submit" name="submit" value="Ok" class="btn btn-primary" ng-click="hideDialog()" />
             </fieldset>
         </form>
     </div>
+
+    <!-- create group modal -->
+
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='create-group'">
+        <h2>Create new group</h2>
+
+        <form name="createGroupForm" class="daiquiri-form">
+            <fieldset class="form-horizontal">
+                <div class="control-group">
+                    <label for="creategroupname" class="control-label required">Name of the group</label>
+                    <div class="controls">
+                        <input type="text" name="name" id="creategroupname" ng-model="dialog.values.name" />
+                        <ul class="unstyled text-error" ng-show="dialog.errors.name">
+                            <li ng-repeat="error in dialog.errors.name">{{error}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-action">
+                <input type="submit" name="submit" value="Create group" class="btn btn-primary" ng-click="createGroup()" />
+                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
+            </fieldset>
+        </form>
+    </div>
+
+    <!-- rename group modal -->
+
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='rename-group'">
+        <h2>Rename group '{{dialog.obj.name}}'</h2>
+
+        <form name="renameGroupForm" class="daiquiri-form">
+            <fieldset class="form-horizontal">
+                <div class="control-group">
+                    <label for="renamegroupname" class="control-label required">Name of the group</label>
+                    <div class="controls">
+                        <input type="text" name="name" id="renamegroupname" ng-model="dialog.values.name" />
+                        <ul class="unstyled text-error" ng-show="dialog.errors.name">
+                            <li ng-repeat="error in dialog.errors.name">{{error}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-action">
+                <input type="submit" name="submit" value="Rename group" class="btn btn-primary" ng-click="renameGroup()" />
+                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
+            </fieldset>
+        </form>
+    </div>
+
+    <!-- remove group modal -->
+
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='remove-group'">
+        <h2>Remove group '{{dialog.obj.name}}'</h2>
+
+        <p class="text-error" ng-show="dialog.errors.form">{{dialog.errors.form}}</p>
+        <form name="removeJobForm" class="daiquiri-form-danger">
+            <fieldset class="form-action">
+                <input type="submit" name="submit" value="Remove group" class="btn btn-danger" ng-click="removeGroup()" />
+                <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
+            </fieldset>
+        </form>
+    </div>
+
 </div>

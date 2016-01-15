@@ -52,7 +52,7 @@ angular.module('samp', [])
             if (icon.length != 0) {
                 iconUrl = icon.attr('href');
             } else {
-                console.log('Error: Favicon not found.');
+                iconUrl = '';
             }
         }
         if (iconUrl.toLowerCase().indexOf('http://') !== 0 && iconUrl.toLowerCase().indexOf('https://') !== 0) {

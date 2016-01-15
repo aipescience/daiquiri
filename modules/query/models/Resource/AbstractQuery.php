@@ -33,6 +33,12 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     public static $hasQueues = false;
 
     /**
+     * Instance of Query_Model_Resource_Jobs to be used with this ressource
+     * @var Query_Model_Resource_Jobs $_jobResource
+     */
+    private $_jobResource = null;
+
+    /**
      * Queue factory.
      * @return Query_Model_Resource_AbstractQuery $queue
      */
@@ -84,13 +90,6 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     abstract public function killJob($id);
 
     /**
-     * Returns true if given status is killable and false, if job cannot be killed
-     * @param string $status
-     * @return bool
-     */
-    abstract public function isStatusKillable($status);
-
-    /**
      * Returns the columns of the (joined) tables.
      * @return array $cols
      */
@@ -119,41 +118,40 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     abstract public function fetchRow($id);
 
     /**
-     * Returns statistical information about the database table if exists.
-     * @param string $database name of the database
-     * @param string $table name of the table
+     * Returns the number of rows and the size of a given user database.
+     * @param int $userId id of the user
      * @return array $stats
      */
-    abstract public function fetchTableStats($database,$table);
+    abstract public function fetchStats($userId);
 
     /**
-     * Returns statistical information about the complete database
-     * @return array $stats
+     * Fetches information about the queues or false if no queues are available.
+     * @return mixed $queues
      */
-    public function fetchDatabaseStats() {
-        // check if this table is locked and if yes, don't query information_schema. This will result in a
-        // "waiting for metadata lock" and makes daiquiri hang
-        $username = Daiquiri_Auth::getInstance()->getCurrentUsername();
-        $db = Daiquiri_Config::getInstance()->getUserDbName($username);
+    abstract public function fetchConfig();
 
-        // get list of locked tables
-        $lockedTables = $this->getAdapter()->query('SHOW OPEN TABLES IN `' . $db . '` WHERE In_use > 0')->fetchAll();
-        $where = "";
-        foreach ($lockedTables as $table) {
-            $where .= " AND table_name != '" . $table['Table'] . "'";
+    /**
+     * Returns the number of jobs in the queue or false if no queues are available.
+     * @return mixed $nactive
+     */
+    abstract public function fetchNActive();
+
+    /**
+     * Returns true if given status is killable.
+     * @param string $status
+     * @return bool $killable
+     */
+    abstract public function isStatusKillable($status);
+
+    /**
+     * Returns (and creates) and instance of Query_Model_Resource_Jobs
+     * @return Query_Model_Resource_Jobs $jobResource
+     */
+    public function getJobResource() {
+        if (empty($this->_jobResource)) {
+            $this->_jobResource = new Query_Model_Resource_Jobs;
         }
-
-        // obtain row count
-        // obtain table size in byte
-        // obtain index size in byte
-        // obtain free space (in table) in byte
-        $sql = "SELECT round( sum(data_length + index_length), 3 ) AS 'db_size', " .
-                "round( sum(index_length), 3) AS 'db_idx_size', " .
-                "round( sum(data_free), 3 ) AS 'db_free', sum(table_rows) AS 'db_row' " .
-                "FROM information_schema.tables WHERE table_schema = ?"
-                . $where;
-
-        return $this->getAdapter()->query($sql, array($db))->fetch();
+        return $this->_jobResource;
     }
 
     /**
@@ -180,15 +178,6 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     }
 
     /**
-     * Returns the field used best as a timestamp.
-     * returns string $timeField
-     */ 
-    public function getTimeField() {
-        $classname = get_class($this);
-        return $classname::$_timeField;
-    }
-
-    /**
      * Returns the status for a given status_id.
      * @param int $status_id
      * @return string $status
@@ -196,6 +185,15 @@ abstract class Query_Model_Resource_AbstractQuery extends Daiquiri_Model_Resourc
     public function getStatus($statusId) {
         $classname = get_class($this);
         return array_search($statusId, $classname::$_status);
+    }
+
+    /**
+     * Returns $hasQueues for this class.
+     * @return bool $hasQueues
+     */
+    public function hasQueues() {
+        $classname = get_class($this);
+        return $classname::$hasQueues;
     }
 
     /**

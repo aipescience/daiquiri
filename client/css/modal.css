@@ -79,6 +79,10 @@ button.daiquiri-modal-close:hover {
     padding-left: 15px;
     padding-right: 15px;
 }
+.daiquiri-modal-body ul.text-error {
+    padding-left: 0;
+    padding-right: 0;
+}
 .daiquiri-modal-body > form:last-child {
     margin-bottom: 0;
     padding-bottom: 0;

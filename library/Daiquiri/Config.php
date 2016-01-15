@@ -127,7 +127,7 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
 
     /**
      * Returns the site url
-     * @return string 
+     * @return string
      */
     public function getSiteUrl() {
         return $this->getHost() . Zend_Controller_Front::getInstance()->getBaseUrl();
@@ -146,11 +146,14 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         } else {
             $host = 'http://';
         }
-        $host .= $server["SERVER_NAME"];
+        if (isset($server['HTTP_X_FORWARDED_SERVER'])) {
+            $host .= $server['HTTP_X_FORWARDED_SERVER'];
+        } else {
+            $host .= $server["SERVER_NAME"];
+        }
         if ($server["SERVER_PORT"] != "80") {
             $host .= ':' . $server["SERVER_PORT"];
         }
-
         return $host;
     }
 
@@ -161,6 +164,48 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         $front = Zend_Controller_Front::getInstance();
         return $front->getBaseUrl();
     }
+
+    /** Returns query parameters correctly for repeated keys with missing [],
+     * multiple occurence of one key results in array of its values
+     * Example: /uws/query&PHASE=a&PHASE=b will give array('PHASE'=>array('a','b')),
+     * (Normally, PHP would overwrite values for repeated keys with the last value,
+     * and would require square brackets to indicate an array, e.g. PHASE[]=a&PHASE[]=b.)
+     * @return array
+     */
+    public function getMultiQuery() {
+        $front = Zend_Controller_Front::getInstance();
+        $requestUri = $front->getRequest()->getRequestUri();
+
+        $queryparams = array();
+
+        // strip path information, get query-part from Uri
+        if (false !== ($pos = strpos($requestUri, '?'))) {
+            $query = substr($requestUri, $pos + 1);
+
+            // parse values and add to array, if key is repeated
+            foreach (explode('&', $query) as $param) {
+                $keyvalue = explode('=', $param);
+                $key = urldecode($keyvalue[0]);
+
+                if (isset($keyvalue[1])) {
+                    $value = urldecode($keyvalue[1]);
+                } else {
+                    $value = "";
+                }
+
+                if (array_key_exists($key, $queryparams)) {
+                    if (!is_array($queryparams[$key])) {
+                        $queryparams[$key] = array($queryparams[$key]);
+                    }
+                    $queryparams[$key][] = $value;
+                } else {
+                    $queryparams[$key] = $value;
+                }
+            }
+        }
+        return $queryparams;
+    }
+
 
     /**
      * Returns the web (default) database adapter
@@ -180,6 +225,14 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         $postfix = $this->_config->query->userDb->postfix;
 
         return $prefix . $username . $postfix;
+    }
+
+    /**
+     * Returns the name of the host, where the user database are stored
+     * @return string $host
+     */
+    public function getUserDbHost() {
+        return $this->_application->resources->multidb->user->host;
     }
 
     /**
@@ -258,6 +311,39 @@ class Daiquiri_Config extends Daiquiri_Model_Singleton {
         }
 
         return $output;
+    }
+
+    /**
+     * Returns the quota of a given role in bytes;
+     * @param   $role  role
+     * @return  $quotaBytes
+     */
+    public function getQueryQuota($role) {
+        $quota = Daiquiri_Config::getInstance()->query->quota->$role;
+
+        // parse the quota to resolve KB, MB, GB, TB, PB, EB...
+        preg_match("/([0-9.]+)\s*([KMGTPEBkmgtpeb]*)/", $quota, $parse);
+        $quotaBytes = (float) $parse[1];
+        $unit = $parse[2];
+
+        switch (strtoupper($unit)) {
+            case 'EB':
+                $quotaBytes *= 1024;
+            case 'PB':
+                $quotaBytes *= 1024;
+            case 'TB':
+                $quotaBytes *= 1024;
+            case 'GB':
+                $quotaBytes *= 1024;
+            case 'MB':
+                $quotaBytes *= 1024;
+            case 'KB':
+                $quotaBytes *= 1024;
+            default:
+                break;
+        }
+
+        return (int) $quotaBytes;
     }
 
 }
