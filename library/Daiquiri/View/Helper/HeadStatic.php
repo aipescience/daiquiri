@@ -68,6 +68,8 @@ class Daiquiri_View_Helper_HeadStatic extends Zend_View_Helper_Abstract {
         'daiquiri_admin.js' => '/daiquiri/js/admin.js',
         'daiquiri_simbadresolver.js' => '/daiquiri/js/simbadresolver.js',
         'daiquiri_simbadresolver.css' => '/daiquiri/css/simbadresolver.css',
+        'daiquiri_columnsearch.js' => '/daiquiri/js/columnsearch.js',
+        'daiquiri_columnsearch.css' => '/daiquiri/css/columnsearch.css',
     );
 
     /**

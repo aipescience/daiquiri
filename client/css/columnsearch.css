@@ -1,0 +1,74 @@
+
+/* csearch resolver style */
+
+#csearch-form {
+    margin-bottom: 10px;
+}
+
+#csearch-resolver {
+    margin-bottom: 10px;
+}
+
+#csearch-input {
+    margin: 0;
+    width: 534px;
+}
+
+#csearch-results {
+    overflow: auto;
+    height: 107px;
+    width: 698px;
+}
+
+#csearch-results li a {
+    line-height: 14px;
+    height: 14px;
+}
+
+
+#csearch-results .tableName,
+#csearch-results .column,
+#csearch-results .unit,
+#csearch-results .ucd,
+#csearch-results .description {
+    float: left;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#csearch-results .tableName {
+    width: 15%;
+}
+
+#csearch-results .column {
+    width: 12%;
+}
+
+#csearch-results .unit {
+    width: 8%;
+}
+
+#csearch-results .ucd {
+    width: 20%;
+}
+
+#csearch-results .description {
+    width: 45%;
+}
+
+#csearch-results .head {
+    margin-left: 12px;
+    margin-right: 12px;
+    height: 24px;
+}
+#csearch-results .head div {
+    line-height: 14px;
+    height: 14px;
+    padding: 5px 0px;
+}
+
+
+#csearch-results .csearch-results-empty {
+    padding: 5px 12px;
+    font-size: small;
+}
