@@ -174,11 +174,11 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                         </li>
                         <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.browserItemDblClicked(item.database,item.table,item.column)">
                               <a href="">
-                                  <div class="tableName">{{item.table}}</div>
-                                  <div class="column">{{item.column}}</div>
-                                  <div class="ucd">{{item.ucd}} &nbsp;</div>
-                                  <div class="unit">{{item.unit}} &nbsp;</div>
-                                  <div class="description">{{item.description}} &nbsp;</div>
+                                  <div class="tableName" title="{{item.table}}">{{item.table}}</div>
+                                  <div class="column" title="{{item.column}}">{{item.column}}</div>
+                                  <div class="ucd" title="{{item.ucd}}">{{item.ucd}} &nbsp;</div>
+                                  <div class="unit" title="{{item.unit}}">{{item.unit}} &nbsp;</div>
+                                  <div class="description" title="{{item.description}}">{{item.description}} &nbsp;</div>
                               </a>
                         </li>
                         <li ng-show="result.data.length==0" class="csearch-results-empty">
