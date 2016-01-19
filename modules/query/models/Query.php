@@ -88,17 +88,19 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             return false;
         }
 
-        // check if the table exists in the jobs table
-        $rows = $this->_queue->fetchRows(array(
-            'where' => array(
-                '`user_id` = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
-                '`table` = ?' => $table,
-                '`removed` = 0'
-            )
-        ));
-        if (!empty($rows)) {
-            $errors['submitError'] = "You already have a job with the table name '{$table}'";
-            return false;
+        // if a table name was given, make sure that it does not already exist
+        if (!empty($table)) {
+            $rows = $this->_queue->fetchRows(array(
+                'where' => array(
+                    '`user_id` = ?' => Daiquiri_Auth::getInstance()->getCurrentId(),
+                    '`table` = ?' => $table,
+                    '`removed` = 0'
+                )
+            ));
+            if (!empty($rows)) {
+                $errors['submitError'] = "You already have a job with the table name '{$table}'";
+                return false;
+            }
         }
 
         // process sql string
