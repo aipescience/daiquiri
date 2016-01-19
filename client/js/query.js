@@ -95,7 +95,7 @@ app.factory('PollingService', ['$timeout','QueryService','DownloadService',funct
             DownloadService.downloadTable(QueryService.account.job.download.format);
         }
 
-        if (options.polling.enabled === true || options.polling.enabled === 1) {
+        if (options.polling.enabled == true) {
             $timeout(poll, options.polling.timeout);
         }
     }
