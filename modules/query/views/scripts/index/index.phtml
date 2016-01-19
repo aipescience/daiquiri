@@ -652,7 +652,6 @@
 
     <div daiquiri-modal transclude ng-show="dialog.enabled=='rename-job'">
         <h2>Rename table `{{dialog.obj.table}}`</h2>
-        <p class="text-error" ng-show="dialog.errors">{{dialog.errors.form}}</p>
         <form name="renameJobForm">
             <fieldset class="form-horizontal">
                 <div class="control-group">
@@ -666,6 +665,9 @@
                 </div>
             </fieldset>
             <fieldset class="form-action">
+                <p class="text-error pull-left" ng-show="dialog.errors">
+                    <span ng-repeat="error in dialog.errors.form">{{error}}</span>
+                </p>
                 <input type="submit" name="submit" value="Rename table" class="btn btn-primary" ng-click="renameJob()" />
                 <input type="submit" name="cancel" value="Cancel" class="btn" ng-click="hideDialog()" />
             </fieldset>

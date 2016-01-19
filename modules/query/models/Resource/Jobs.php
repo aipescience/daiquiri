@@ -451,4 +451,29 @@ class Query_Model_Resource_Jobs extends Daiquiri_Model_Resource_Table {
 
         return array('cols' => $cols, 'rows' => $rows);
     }
+
+    /**
+     * Checks if a non-removed job with the given tablename exists in the Jobs table.
+     * @param  int    $userId          id of the user
+     * @param  string $month           name of the table
+     * @return bool   $tablenameExists
+     */
+    public function checkIfTableExists($userId, $table) {
+        if (empty($table)) {
+            return false;
+        } else {
+            $rows = $this->fetchRows(array(
+                'where' => array(
+                    '`user_id` = ?' => $userId,
+                    '`table` = ?' => $table,
+                    '`removed` = 0'
+                )
+            ));
+            if (empty($rows)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
 }

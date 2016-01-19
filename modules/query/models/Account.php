@@ -190,9 +190,12 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
         // set job resource
         $this->setResource(Query_Model_Resource_AbstractQuery::factory());
 
+        // get user id
+        $userId = Daiquiri_Auth::getInstance()->getCurrentId();
+
         // get job and check permissions
         $row = $this->getResource()->fetchRow($id);
-        if (empty($row) || $row['user_id'] !== Daiquiri_Auth::getInstance()->getCurrentId()) {
+        if (empty($row) || $row['user_id'] !== $userId) {
             throw new Daiquiri_Exception_NotFound();
         }
 
@@ -211,11 +214,18 @@ class Query_Model_Account extends Daiquiri_Model_Abstract {
                 if ($row['table'] === $values['tablename']) {
                     return array('status' => 'ok');
                 } else {
+                    // make sure that it does not already exist
+                    if ($this->getResource()->getJobResource()->checkIfTableExists($userId, $values['tablename'])) {
+                        return $this->getModelHelper('CRUD')->validationErrorResponse($form, array(
+                            "You already have a job with the table name '{$values['tablename']}'"
+                        ));
+                    }
+
                     try {
                         $this->getResource()->renameJob($id, $values['tablename']);
                         return array('status' => 'ok');
                     } catch (Exception $e) {
-                        return $this->getModelHelper('CRUD')->validationErrorResponse($form,$e->getMessage());
+                        return $this->getModelHelper('CRUD')->validationErrorResponse($form, $e->getMessage());
                     }
                 }
             } else {
