@@ -95,7 +95,7 @@ app.factory('PollingService', ['$timeout','QueryService','DownloadService',funct
             DownloadService.downloadTable(QueryService.account.job.download.format);
         }
 
-        if (options.polling.enabled === true) {
+        if (options.polling.enabled === true || options.polling.enabled === 1) {
             $timeout(poll, options.polling.timeout);
         }
     }
@@ -288,7 +288,7 @@ app.factory('QueryService', ['$http','$timeout','$window','filterFilter','ModalS
                     }
 
                     // if a form was active, the image tab was active or the job was not a success, switch to job overview tab
-                    if (account.active.form != false || $('#images-tab-header').hasClass('active') || account.job.status != 'success') {
+                    if (account.active.form !== false || $('#images-tab-header').hasClass('active') || account.job.status !== 'success') {
                         $('#overview-tab-header a').tab('show');
                     }
 
