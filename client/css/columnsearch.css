@@ -1,23 +1,50 @@
 
 /* csearch resolver style */
 
-#csearch-form {
-    margin-bottom: 10px;
+#csearch-wrapper {
+  float:left;
+  width:100%;
+  margin-bottom:10px;
 }
 
-#csearch-resolver {
+#csearch-left {
+  float:left;
+  width: 66%;
+}
+
+#csearch-right {
+  float:left;
+  width: 34%;
+}
+
+#csearch-right div {
+  height:137px;
+  margin-bottom:0px;
+  overflow: auto;
+}
+#csearch-right div strong {
+  font-weight:bold;
+  display:block;
+  margin-bottom: 5px;
+}
+
+#csearch-right div i {
+  font-weight:bold;
+}
+
+#csearch-form {
     margin-bottom: 10px;
 }
 
 #csearch-input {
     margin: 0;
-    width: 534px;
+    width: 308px;
 }
 
 #csearch-results {
     overflow: auto;
     height: 107px;
-    width: 698px;
+    width: 450px;
 }
 
 #csearch-results li a {
@@ -26,34 +53,22 @@
 }
 
 
-#csearch-results .tableName,
-#csearch-results .column,
-#csearch-results .unit,
-#csearch-results .ucd,
-#csearch-results .description {
+#csearch-results .items div {
     float: left;
     overflow: hidden;
     white-space: nowrap;
 }
 
+#csearch-results .databaseName {
+    width: 30%;
+}
+
 #csearch-results .tableName {
-    width: 15%;
+    width: 30%;
 }
 
-#csearch-results .column {
-    width: 12%;
-}
-
-#csearch-results .unit {
-    width: 8%;
-}
-
-#csearch-results .ucd {
-    width: 20%;
-}
-
-#csearch-results .description {
-    width: 45%;
+#csearch-results .columnName {
+    width: 40%;
 }
 
 #csearch-results .head {
@@ -65,6 +80,7 @@
     line-height: 14px;
     height: 14px;
     padding: 5px 0px;
+    float:left;
 }
 
 

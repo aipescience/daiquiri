@@ -158,33 +158,39 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         if (Daiquiri_Config::getInstance()->query->csearch->enabled) {
             $html .= '
             <div ng-show="visible === \'columnSearch\'">
-                <div id="column-search" ng-controller="columnSearchForm">
-                    <div id="csearch-form">
-                        <input type="text" name="csearch-identifier" id="csearch-input" ng-model="query"
-                               ng-keydown="csearchInput($event);" />
-                        <input type="button" value="Search columns" class="btn pull-right" id="csearch-submit" ng-click="columnSearch()" />
+                <div id="csearch-wrapper" ng-controller="columnSearchForm">
+                    <div id="csearch-left">
+                        <div id="csearch-form">
+                            <input type="text" name="csearch-identifier" id="csearch-input" ng-model="query"
+                                   ng-keydown="csearchInput($event);" />
+                            <input type="button" value="Search columns" class="btn" id="csearch-submit" ng-click="columnSearch()" />
+                        </div>
+                        <ul id="csearch-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                            <li ng-show="result.data.length>0" class="head"> 
+                              <div class="databaseName">Database</div>
+                              <div class="tableName">Table</div>
+                              <div class="columnName">Column</div>
+                            </li>
+                            <li ng-repeat="item in result.data" class="items nav-item" 
+                                ng-mouseover="browserItemClicked(item)" >
+                                  <a href="">
+                                      <div class="databaseName" title="{{item.database}}"
+                                           ng-dblclick="browserItemDblClicked(item.database)">{{item.database}}</div>
+                                      <div class="tableName" title="{{item.table}}"
+                                           ng-dblclick="browserItemDblClicked(item.table)">{{item.table}}</div>
+                                      <div class="columnName" title="{{item.column}}"
+                                           ng-dblclick="browserItemDblClicked(item)">{{item.column}}</div>
+                                  </a>
+                            </li>
+                            <li ng-show="result.data.length==0" class="csearch-results-empty">
+                                No results for "{{result.query}}"
+                            </li>
+                        </ul>
                     </div>
-                    <ul id="csearch-results" class="daiquiri-widget nav nav-pills nav-stacked">
-                        <li ng-show="result.data.length>0" class="head"> 
-                          <div class="tableName">Table</div>
-                          <div class="column">Column</div>
-                          <div class="ucd">UCD</div>
-                          <div class="unit">Unit</div>
-                          <div class="description">Additional Information</div>
-                        </li>
-                        <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.browserItemDblClicked(item.database,item.table,item.column)">
-                              <a href="">
-                                  <div class="tableName" title="{{item.table}}">{{item.table}}</div>
-                                  <div class="column" title="{{item.column}}">{{item.column}}</div>
-                                  <div class="ucd" title="{{item.ucd}}">{{item.ucd}} &nbsp;</div>
-                                  <div class="unit" title="{{item.unit}}">{{item.unit}} &nbsp;</div>
-                                  <div class="description" title="{{item.description}}">{{item.description}} &nbsp;</div>
-                              </a>
-                        </li>
-                        <li ng-show="result.data.length==0" class="csearch-results-empty">
-                            No results for "{{result.query}}"
-                        </li>
-                    </ul>
+                    <div id="csearch-right">
+                        <div class="daiquiri-widget" id="csearch-tooltip">              
+                        </div>
+                    </div>
                 </div>
                 <div class="daiquiri-query-bar-hint">
                     A double click on an item will copy the corresponding coordinates into the query.
