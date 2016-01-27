@@ -133,3 +133,11 @@
 #wp-content .sidebar .sidebar-container {
     margin-bottom: 20px;
 }
+
+#wp-content .post-video {
+    float: left;
+}
+#wp-content .post-video video,
+#wp-content .post-video img {
+    width: 320px;
+}

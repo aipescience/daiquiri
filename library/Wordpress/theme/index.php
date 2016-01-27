@@ -35,6 +35,11 @@
 
                 <div class="post-date">by <?php the_author(); ?> on <?php the_date(); ?></div>
 
+                <div class="post-video">
+                   <?php daiquiri_the_video(320); ?>
+                   <?php daiquiri_the_image(320); ?>
+                </div>
+
                 <?php the_content(); ?>
 
                 <?php if (comments_open(get_the_ID())): ?>

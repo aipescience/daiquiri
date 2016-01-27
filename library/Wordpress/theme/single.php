@@ -25,6 +25,11 @@
     <div class="span9 main">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
         <div class="post">
+            <?php
+                daiquiri_the_video(700);
+                daiquiri_the_image(700);
+            ?>
+
             <h2>
                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
             </h2>
