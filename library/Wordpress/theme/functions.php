@@ -257,7 +257,7 @@ function daiquiri_save_video_meta_box($post_id, $post) {
     $current['video_ogg']    = get_post_meta($post_id,'video_ogg',true);
     $current['video_webm']    = get_post_meta($post_id,'video_webm',true);
 
-    foreach (array('video_poster','video_mp4','video_ogg','video_webm') as $key) {
+    foreach (array('video_poster','video_mp4','video_avi','video_ogg','video_webm') as $key) {
         if ($new[$key] && '' == $current[$key]) {
             /* If a new meta value was added and there was no previous value, add it. */
             add_post_meta($post_id, $key, $new[$key], true);
@@ -330,6 +330,7 @@ function daiquiri_the_video($width) {
     $post_id = get_the_ID();
     $poster = get_post_meta($post_id,'video_poster',true);
     $mp4    = get_post_meta($post_id,'video_mp4',true);
+    $avi    = get_post_meta($post_id,'video_avi',true);
     $ogg    = get_post_meta($post_id,'video_ogg',true);
     $webm   = get_post_meta($post_id,'video_webm',true);
 
