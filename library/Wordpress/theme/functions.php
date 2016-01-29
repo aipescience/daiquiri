@@ -201,7 +201,7 @@ function daiquiri_video_meta_box($object, $box) {
     $post_id = $object->ID;
     $poster = get_post_meta($post_id,'video_poster',true);
     $mp4    = get_post_meta($post_id,'video_mp4',true);
-    $mp4    = get_post_meta($post_id,'video_avi',true);
+    $avi    = get_post_meta($post_id,'video_avi',true);
     $ogg    = get_post_meta($post_id,'video_ogg',true);
     $webm   = get_post_meta($post_id,'video_webm',true);
 
