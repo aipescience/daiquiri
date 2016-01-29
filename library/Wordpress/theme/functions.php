@@ -213,6 +213,10 @@ function daiquiri_video_meta_box($object, $box) {
     echo '<input class="widefat" type="text" name="daiquiri-video-meta-box-mp4" id="daiquiri-video-meta-box-mp4" value="' . $mp4 . '"/>';
     echo '</p>';
     echo '<p>';
+    echo '<label for="daiquiri-video-meta-box-avi">' . _e("Video avi file",'example') . '</label>';
+    echo '<input class="widefat" type="text" name="daiquiri-video-meta-box-avi" id="daiquiri-video-meta-box-avi" value="' . $avi . '"/>';
+    echo '</p>';
+    echo '<p>';
     echo '<label for="daiquiri-video-meta-box-ogg">' . _e("Video ogg file",'example') . '</label>';
     echo '<input class="widefat" type="text" name="daiquiri-video-meta-box-ogg" id="daiquiri-video-meta-box-ogg" value="' . $ogg . '"/>';
     echo '</p>';
@@ -240,13 +244,15 @@ function daiquiri_save_video_meta_box($post_id, $post) {
     $new = array();
     $new['video_poster'] = (isset($_POST['daiquiri-video-meta-box-poster']) ? sanitize_text_field($_POST['daiquiri-video-meta-box-poster']) : '');
     $new['video_mp4']    = (isset($_POST['daiquiri-video-meta-box-mp4']) ? sanitize_text_field($_POST['daiquiri-video-meta-box-mp4']) : '');
+    $new['video_avi']    = (isset($_POST['daiquiri-video-meta-box-avi']) ? sanitize_text_field($_POST['daiquiri-video-meta-box-avi']) : '');
     $new['video_ogg']    = (isset($_POST['daiquiri-video-meta-box-ogg']) ? sanitize_text_field($_POST['daiquiri-video-meta-box-ogg']) : '');
-    $new['video_webm']    = (isset($_POST['daiquiri-video-meta-box-webm']) ? sanitize_text_field($_POST['daiquiri-video-meta-box-webm']) : '');
+    $new['video_webm']   = (isset($_POST['daiquiri-video-meta-box-webm']) ? sanitize_text_field($_POST['daiquiri-video-meta-box-webm']) : '');
 
     /* Get the current data */
     $current = array();
     $current['video_poster'] = get_post_meta($post_id,'video_poster',true);
     $current['video_mp4']    = get_post_meta($post_id,'video_mp4',true);
+    $current['video_avi']    = get_post_meta($post_id,'video_avi',true);
     $current['video_ogg']    = get_post_meta($post_id,'video_ogg',true);
     $current['video_webm']    = get_post_meta($post_id,'video_webm',true);
 
@@ -329,7 +335,9 @@ function daiquiri_the_video($width) {
     if (!empty($poster) || !empty($mp4) || ! empty($ogg)) {
         echo '<div style="width: ' . $width . 'px;">';
         echo '<video poster="' . $poster . '" controls="controls" style="width: 100%;">';
+
         if (!empty($mp4)) echo '<source src="' . $mp4 . '" type="video/mp4" />';
+        if (!empty($avi)) echo '<source src="' . $avi . '" type="video/avi" />';
         if (!empty($ogg)) echo '<source src="' . $ogg . '" type="video/ogg" />';
         if (!empty($webm)) echo '<source src="' . $webm . '" type="video/webm" />';
         echo 'Your browser does not support the video tag.</video></div>';
