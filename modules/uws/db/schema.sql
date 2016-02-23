@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS Uws_Jobs (
   `ownerId` VARCHAR(256),
   `phase` VARCHAR(64) NOT NULL,
   `quote` DATETIME,
+  `creationTime` DATETIME,
   `startTime` DATETIME,
   `endTime` DATETIME,
   `executionDuration` BIGINT,

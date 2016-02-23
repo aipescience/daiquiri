@@ -92,6 +92,7 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
         $jobUWS->ownerId = $row['ownerId'];
         $jobUWS->phase = $row['phase'];
         $jobUWS->quote = $row['quote'];
+        $jobUWS->creationTime = $row['creationTime'];
 
         if ($row['startTime'] !== "0000-00-00 00:00:00" && $row['startTime'] != NULL) {
             $datetime = new DateTime($row['startTime']);

@@ -32,12 +32,17 @@ class Uws_Model_Resource_Jobs extends Uws_Model_Resource_Abstract {
         $this->jobref = array();
     }
 
-    public function addJob($id, $href, array $phases) {
+    public function addJob($id, $href, array $phases, $creationTime, $runId, $ownerId) {
         $newJob = new Uws_Model_Resource_ShortJobDescriptionType("jobref");
 
         $newJob->id = $id;
         $newJob->reference->href = $href;
         $newJob->phase = $phases;
+
+        // optional new keywords for updated UWS 1.1 version
+        $newJob->creationTime = $creationTime;
+        $newJob->runId = $runId;
+        $newJob->ownerId = $ownerId;
 
         $this->jobref[] = $newJob;
     }

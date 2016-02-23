@@ -103,6 +103,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $wherestatus = NULL;
         } else {
             // statuslist is empty and no phase-filter was given
+            // => shall return everything except removed jobs (ARCHIVED phase)
             $wherestatus = array('status_id != ?' => $this->getResource()->getStatusId('removed'));
         }
 
@@ -155,7 +156,16 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             foreach ($rows as $job) {
                 $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['id']);
                 $status = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$job['status']]];
-                $joblist[] = array('id' => $job['table'], 'href' => $href, 'status' => $status, 'time' => $job['time']);
+                $jobId = $job['id'];
+
+                $joblist[] = array('id' => $jobId,
+                                   'href' => $href,
+                                   'status' => $status,
+                                   'time' => $job['time'],
+                                   'creationTime' => $job['time'],
+                                   'runId' => $job['table'],
+                                   'ownerId' => Daiquiri_Auth::getInstance()->getCurrentUsername()
+                                   );
             }
         }
 
@@ -169,15 +179,15 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             // add AFTER condition and/or ignore startTime=NULL in case of AFTER/LAST
             $whereafter = array();
             if (isset($after)) {
-                $whereafter = array("CONVERT_TZ(startTime, 'SYSTEM', '+0:00') > ?" => date('Y-m-d H:i:s', $after));
+                $whereafter = array("CONVERT_TZ(creationTime, 'SYSTEM', '+0:00') > ?" => date('Y-m-d H:i:s', $after));
             }
             else if (isset($last)) {
-                $whereafter = array('startTime IS NOT NULL');
+                $whereafter = array('creationTime IS NOT NULL'); // should never happen actually ...
             }
 
             $pendingRows = $resUWSJobs->fetchRows(array(
                 'where' => $whereafter,
-                'order' => array('startTime DESC'),
+                'order' => array('creationTime DESC'),
                 'order' => array('jobId DESC'), // add this here for useful ordering if startTime=NULL (PENDING jobs)
                 'limit' => $limit,
             )); // the check for the userId is inside UWSJobs
@@ -185,17 +195,26 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             foreach ($pendingRows as $job) {
                 $href = Daiquiri_Config::getInstance()->getSiteUrl() . "/uws/" . urlencode($params['moduleName']) . "/" . urlencode($job['jobId']);
                 $status = $job['phase'];
+                $jobId = $job['jobId'];
 
                 if ( empty($phase) || in_array($status, $phases) ) {
-                    $pendingJoblist[] = array('id' => $job['jobId'], 'href' => $href, 'status' => $status, 'time' => $job['startTime']);
+                    $pendingJoblist[] = array('id' => $jobId,
+                                              'href' => $href,
+                                              'status' => $status,
+                                              'time' => $job['startTime'],
+                                              'creationTime' => $job['creationTime'],
+                                              'runId' => $job['runId'],
+                                              'ownerId' => $job['ownerId']
+                                             );
                 }
             }
         }
 
         // reverse job sort order, since standard requires for LAST/AFTER keywords
         // *ascending* startTimes (but needed initial DESC order in queries for most recent limit)
-        $joblist = array_reverse($joblist);
-        $pendingJoblist = array_reverse($pendingJoblist);
+        // reverse ordering not needed anymore! Yeah! (Feb 2016)
+        //$joblist = array_reverse($joblist);
+        //$pendingJoblist = array_reverse($pendingJoblist);
 
         // merge both lists ...
         $joblist = array_merge($joblist, $pendingJoblist);
@@ -203,22 +222,22 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // and sort by startTime (< 10 ms for 10,000 jobs, so it's fast enough to do it always)
         $sortcolumn = array();
         foreach ($joblist as $job) {
-            $sortcolumn[] = $job['time'];
+            $sortcolumn[] = $job['creationTime'];
         }
-        array_multisort($sortcolumn, SORT_ASC, $joblist);
+        array_multisort($sortcolumn, SORT_DESC, $joblist);
 
         // apply final cut, if required
         if (array_key_exists('LAST', $params)) {
             // cut the list, only keep number of jobs required by LAST or given by limit
             if (!is_null($limit)) {
-                $joblist = array_slice($joblist, -$limit, $limit);
+                $joblist = array_slice($joblist, 0, $limit);
             }
         }
 
         // copy jobs into jobs-object
         $jobs = new Uws_Model_Resource_Jobs();
         foreach ($joblist as $job) {
-            $jobs->addJob($job['id'], $job['href'], array($job['status']));
+            $jobs->addJob($job['id'], $job['href'], array($job['status']), $job['creationTime'], $job['runId'], $job['ownerId']);
         }
 
         return $jobs;
@@ -245,9 +264,11 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         $jobUWS->jobId = $row['id'];
         $jobUWS->ownerId = Daiquiri_Auth::getInstance()->getCurrentUsername();
         $jobUWS->phase = Query_Model_Uws::$status[Query_Model_Uws::$statusQueue[$row['status']]];
+        $jobUWS->runId = $row['table']; // our interpretation of runId: use it as the job name = table name
 
         // convert timestamps to ISO 8601
         if (get_class($this->getResource()) == 'Query_Model_Resource_QQueueQuery') {
+
             if ($row['timeExecute'] !== "0000-00-00 00:00:00") {
                 $datetimeStart = new DateTime($row['timeExecute']);
                 $jobUWS->startTime = $datetimeStart->format('c');
@@ -262,6 +283,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $datetime = new DateTime($row['time']);
             $jobUWS->startTime = $datetime->format('c');
             $jobUWS->endTime = $datetime->format('c');
+            $jobUWS->creationTime = $datetime->format('c');
         }
 
         if ($this->getResource()->hasQueues()) {
@@ -432,8 +454,8 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // validate query
         // We will set a startTime here only if the validation results in an
         // error; otherwise the startTime will be set once execution of the
-        // job starts. This is the behaviour expected by a client as discussed
-        // on the IVOA mailing list.
+        // job starts. This is the expected behaviour as discussed
+        // on the IVOA mailing list (fall 2015).
         $job->resetErrors();
         $model = new Query_Model_Query();
         try {
