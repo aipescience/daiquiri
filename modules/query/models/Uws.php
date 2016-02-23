@@ -468,7 +468,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 $resource = new Uws_Model_Resource_UWSJobs();
                 $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
-                // job is in final state now, add startTime and endTime
+                // job is in final state now (ERROR), add startTime and endTime
                 $now = date('Y-m-d\TH:i:s');
                 $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
 
@@ -480,7 +480,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
-            // job is in final state now, add startTime and endTime
+            // job is in final state now (ERROR), add startTime and endTime
             $now = date('Y-m-d\TH:i:s');
             $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
 
@@ -488,10 +488,18 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         }
 
         // submit query
+
+        // first get the creationTime from UWSJobs (pending job list),
+        // because we want to store it in the main table
+        $resource = new Uws_Model_Resource_UWSJobs();
+        $jobUws = $resource->fetchRow($job->jobId);
+        $creationTime = $jobUws['creationTime'];
+
+
         if ($this->getResource()->hasQueues()) {
-            $response = $model->query($sql, false, $tablename, $sources, array("queue" => $queue, "jobId" => $job->jobId),'uws');
+            $response = $model->query($sql, false, $tablename, $sources, array("queue" => $queue, "jobId" => $job->jobId), $creationTime, 'uws');
         } else {
-            $response = $model->query($sql, false, $tablename, $sources, array("jobId" => $job->jobId),'uws');
+            $response = $model->query($sql, false, $tablename, $sources, array("jobId" => $job->jobId), $creationTime, 'uws');
         }
 
         if ($response['status'] !== 'ok') {
@@ -502,14 +510,14 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $resource = new Uws_Model_Resource_UWSJobs();
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
-            // job is in final state now, add startTime and endTime
+            // job is in final state now (ERROR), add startTime and endTime
             $now = date('Y-m-d\TH:i:s');
             $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
 
             return;
         }
 
-        // clean up stuff (basically just remove the job in the temorary UWS job store - if we are here
+        // clean up stuff (basically just remove the job in the temporary UWS job store - if we are here
         // everything has been handled by the queue)
         $resource = new Uws_Model_Resource_UWSJobs();
         $resource->deleteRow($job->jobId);
