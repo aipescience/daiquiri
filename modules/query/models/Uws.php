@@ -278,6 +278,12 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 $datetimeEnd = new DateTime($row['timeFinish']);
                 $jobUWS->endTime = $datetimeEnd->format('c');
             }
+
+            if ($row['time'] != "0000-00-00 00:00:00") {
+                $datetimeCreation = new DateTime($row['time']);
+                $jobUWS->creationTime = $datetimeCreation->format('c');
+            }
+
         } else {
             // for simple queue
             $datetime = new DateTime($row['time']);
