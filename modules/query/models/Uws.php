@@ -113,9 +113,9 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // check LAST keyword and set $limit accordingly
         if (array_key_exists('LAST', $params)) {
             $last = $params['LAST'];
-            // check if string contains only digits (positive integer!),
+            // check if string contains only digits (-> positive integers) and not 0
             // if so, convert to integer
-            if (isset($last) && ctype_digit($last)) {
+            if (isset($last) && ctype_digit($last) && $last > 0) {
                 $last = intval($last);
                 // set limit (maybe restrict to max. limit here?)
                 $limit = $last;
@@ -182,13 +182,13 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 $whereafter = array("CONVERT_TZ(creationTime, 'SYSTEM', '+0:00') > ?" => date('Y-m-d H:i:s', $after));
             }
             else if (isset($last)) {
-                $whereafter = array('creationTime IS NOT NULL'); // should never happen actually ...
+                $whereafter = array('creationTime IS NOT NULL'); // should never happen actually ... (maybe older jobs with no creation time yet ...)
             }
 
             $pendingRows = $resUWSJobs->fetchRows(array(
                 'where' => $whereafter,
                 'order' => array('creationTime DESC'),
-                'order' => array('jobId DESC'), // add this here for useful ordering if startTime=NULL (PENDING jobs)
+                'order' => array('jobId DESC'), // add this here for useful ordering if creationTime=NULL (PENDING jobs)
                 'limit' => $limit,
             )); // the check for the userId is inside UWSJobs
 
@@ -212,14 +212,12 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
 
         // reverse job sort order, since standard requires for LAST/AFTER keywords
         // *ascending* startTimes (but needed initial DESC order in queries for most recent limit)
-        // reverse ordering not needed anymore! Yeah! (Feb 2016)
-        //$joblist = array_reverse($joblist);
-        //$pendingJoblist = array_reverse($pendingJoblist);
+        // -- reverse ordering not needed anymore! Yeah! (Feb 2016)
 
         // merge both lists ...
         $joblist = array_merge($joblist, $pendingJoblist);
 
-        // and sort by startTime (< 10 ms for 10,000 jobs, so it's fast enough to do it always)
+        // and sort by creationTime (< 10 ms for 10,000 jobs, so it's fast enough to do it always)
         $sortcolumn = array();
         foreach ($joblist as $job) {
             $sortcolumn[] = $job['creationTime'];
