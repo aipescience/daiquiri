@@ -29,8 +29,7 @@ angular.module('simbadResolver',['browser'])
         console.log('Before: '+query)
 
         // Correct the query
-        query = query.replace("+","%2B");
-        query = query.replace(" ","+");
+        query = encodeURIComponent(query);
 
         console.log('After: '+query)
 
