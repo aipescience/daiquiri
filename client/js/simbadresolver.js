@@ -27,6 +27,7 @@ angular.module('simbadResolver',['browser'])
     function simbadSearch(query,callBack) {
 
         // Correct the query
+        query = query.replace("+","%2B");
         query = query.replace(" ","+");
 
         /*
