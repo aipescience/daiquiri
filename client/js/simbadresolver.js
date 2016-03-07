@@ -26,9 +26,13 @@ angular.module('simbadResolver',['browser'])
     // Search on Simbad and parse the data
     function simbadSearch(query,callBack) {
 
+        console.log('Before: '+query)
+
         // Correct the query
         query = query.replace("+","%2B");
         query = query.replace(" ","+");
+
+        console.log('After: '+query)
 
         /*
          * Simbad query URL
@@ -102,4 +106,15 @@ angular.module('simbadResolver',['browser'])
             alert('No coordinates available.');
         }
     };
+
+    $scope.inputPlateConeSearch = function(coord1,coord2) {
+        $('#plate_racent').val(coord1);
+        $('#plate_decent').val(coord2);
+    }
+
+    $scope.inputSourceConeSearch = function(coord1,coord2) {
+        $('#cone_ra').val(coord1);
+        $('#cone_dec').val(coord2);
+    }
+
 }]);
