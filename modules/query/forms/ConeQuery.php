@@ -68,9 +68,9 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
      */
     public function init() {
 
-        $html = '<div class="daiquiri-query-bar" style="width:145px;">
+        $html = '<div class="daiquiri-query-bar" style="width:150px;">
                    <ul class="nav-pills pull-left">
-                      <li><a ng-click="showSimbadSearch = !showSimbadSearch" href style="width:121px;">{{showSimbadSearch?"Hide Simbad search":"Show Simbad search"}}</a></li>
+                      <li><a ng-click="showSimbadSearch = !showSimbadSearch" href style="width:126px;text-align:center;">{{showSimbadSearch?"Hide Simbad search":"Show Simbad search"}}</a></li>
                    </ul>
                  </div>
                  <div ng-show="showSimbadSearch" ng-init="showSimbadSearch = false">
