@@ -174,8 +174,9 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'enabled' => true,
             ),
             'ipMask' => 1,
-            'simbad' => array(
+            'simbadSearch' => array(
                 'enabled' => true,
+                'url' => 'http://simbad.u-strasbg.fr'
             ),
             'download' => array(
                 'type' => 'direct', // or gearman

@@ -75,10 +75,10 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                         <a href="" ng-click="toogleFunctions()">Function browser</a>
                     </li>';
 
-        if (Daiquiri_Config::getInstance()->query->simbad->enabled) {
+        if (Daiquiri_Config::getInstance()->query->simbadSearch->enabled) {
             $html .= '
-                    <li ng-class="{\'active\': visible === \'simbad\'}">
-                        <a href="" ng-click="toogleSimbad()">Simbad object search</a>
+                    <li ng-class="{\'active\': visible === \'simbadSearch\'}">
+                        <a href="" ng-click="toogleSimbadSearch()">Simbad object search</a>
                     </li>';
         }
 
@@ -126,17 +126,17 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                 </div>
             </div>';
 
-        if (Daiquiri_Config::getInstance()->query->simbad->enabled) {
+        if (Daiquiri_Config::getInstance()->query->simbadSearch->enabled) {
             $html .= '
-            <div ng-show="visible === \'simbad\'">
-                <div id="simbad-resolver" ng-controller="simbadForm">
-                    <div id="simbad-form">
-                        <input type="text" name="simbad-identifier" id="simbad-input" ng-model="query"
+            <div ng-show="visible === \'simbadSearch\'">
+                <div id="simbad-search-resolver" ng-controller="SimbadSearchController">
+                    <div id="simbad-search-form">
+                        <input type="text" name="simbad-search-identifier" id="simbad-search-input" ng-model="query"
                                ng-keydown="simbadInput($event);" />
-                        <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-submit" ng-click="simbadSearch()" />
+                        <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-search-submit" ng-click="simbadSearch()" />
                     </div>
 
-                    <ul id="simbad-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                    <ul id="simbad-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
                         <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1,item.coord2)">
                               <a href="">
                                   <div class="object">{{item.object}}</div>
@@ -144,7 +144,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                                   <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
                               </a>
                         </li>
-                        <li ng-show="result.data.length==0" class="simbad-results-empty">
+                        <li ng-show="result.data.length==0" class="simbad-search-results-empty">
                             No results for "{{result.query}}"
                         </li>
                     </ul>

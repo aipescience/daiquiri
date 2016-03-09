@@ -52,6 +52,9 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
                 'title' => $form->title
             );
         }
+        if (!empty(Daiquiri_Config::getInstance()->query->simbadSearch)) {
+            $options['simbadSearchUrl'] = Daiquiri_Config::getInstance()->query->simbadSearch->url;
+        }
         $this->view->options = $options;
 
         // get options for the query plan
