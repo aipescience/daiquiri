@@ -1,82 +1,82 @@
 
-/* csearch resolver style */
+/* column-search resolver style */
 
-#csearch-wrapper {
+#column-search-wrapper {
   float:left;
   width:100%;
   margin-bottom:10px;
 }
 
-#csearch-left {
+#column-search-left {
   float:left;
   width: 66%;
 }
 
-#csearch-right {
+#column-search-right {
   float:left;
   width: 34%;
 }
 
-#csearch-right div {
+#column-search-right div {
   height:137px;
   margin-bottom:0px;
   overflow: auto;
 }
-#csearch-right div strong {
+#column-search-right div strong {
   font-weight:bold;
   display:block;
   margin-bottom: 5px;
 }
 
-#csearch-right div i {
+#column-search-right div i {
   font-weight:bold;
 }
 
-#csearch-form {
+#column-search-form {
     margin-bottom: 10px;
 }
 
-#csearch-input {
+#column-search-input {
     margin: 0;
     width: 308px;
 }
 
-#csearch-results {
+#column-search-results {
     overflow: auto;
     height: 107px;
     width: 450px;
 }
 
-#csearch-results li a {
+#column-search-results li a {
     line-height: 14px;
     height: 14px;
 }
 
 
-#csearch-results .items div {
+#column-search-results .items div {
     float: left;
     overflow: hidden;
     white-space: nowrap;
 }
 
-#csearch-results .databaseName {
+#column-search-results .databaseName {
     width: 30%;
 }
 
-#csearch-results .tableName {
+#column-search-results .tableName {
     width: 30%;
 }
 
-#csearch-results .columnName {
+#column-search-results .columnName {
     width: 40%;
 }
 
-#csearch-results .head {
+#column-search-results .head {
     margin-left: 12px;
     margin-right: 12px;
     height: 24px;
 }
-#csearch-results .head div {
+#column-search-results .head div {
     line-height: 14px;
     height: 14px;
     padding: 5px 0px;
@@ -84,7 +84,7 @@
 }
 
 
-#csearch-results .csearch-results-empty {
+#column-search-results .column-search-results-empty {
     padding: 5px 12px;
     font-size: small;
 }

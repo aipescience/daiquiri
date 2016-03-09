@@ -21,70 +21,53 @@
 // Search columns feature
 angular.module('columnSearch',['browser'])
 
-.factory('SearchService',['$http',function ($http) {
-    
-    /*
-    // Exstracts the information from the tooltip
-    function parseTooltip(tooltip) {
-      desc = tooltip.match(/\b([^\<]*)/i);
-      type = tooltip.match(/\<i\>Type:\<\/i\>([^\<]*)/i);
-      ucd = tooltip.match(/\<i\>UCD:\<\/i\>([^\<]*)/i);
-      unit = tooltip.match(/\<i\>Unit:\<\/i\>([^\<]*)/i);
-      return {
-        "desc": desc==null ? "" : desc[1],
-        "type": type==null ? "" : type[1],
-        "ucd": ucd==null ? "" : ucd[1],
-        "unit": unit==null ? "" : unit[1],
-      }
-    }
-    */
-    
+.factory('ColumnSearchService',['$http',function ($http) {
+
     // Returns a list of columns that match the searched query
     function searchInData(data,query,callBack) {
-      console.log(data)
-      // Escape all RegExp special characters and split the query
-      query = query.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
-      query = query.split(/\s+/ig);
 
-      searchResults = [];
-      i = 0;
+        // Escape all RegExp special characters and split the query
+        query = query.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+        query = query.split(/\s+/ig);
 
-      // Search in all available columns
-      for (d=0; d<data.databases.length; d++) {
-        for (t=0; t<data.databases[d].tables.length; t++) {
-          for (c=0; c<data.databases[d].tables[t].columns.length; c++) {
+        searchResults = [];
+        i = 0;
 
-            // Preparing a string to be searched in
-            var string = data.databases[d].tables[t].columns[c].tooltip;
-            string = string.replace( /(\<br \/\>|)\<i\>(Type|UCD|Unit):\<\/i\>/ig ,' '); // removing the titles
-            string = data.databases[d].name +  " " +
-                     data.databases[d].tables[t].name + " " + 
-                     data.databases[d].tables[t].columns[c].name + " " + string;
+        // Search in all available columns
+        for (d=0; d<data.databases.length; d++) {
+            for (t=0; t<data.databases[d].tables.length; t++) {
+                for (c=0; c<data.databases[d].tables[t].columns.length; c++) {
 
-            // Search each subquery in the string
-            var found = true;
-            for (q=0; q<query.length; q++) {
-              if (string.search(new RegExp(query[q],"i"))<0) {
-                found = false;
-              }
+                    // Preparing a string to be searched in
+                    var string = data.databases[d].tables[t].columns[c].tooltip;
+                    string = string.replace( /(\<br \/\>|)\<i\>(Type|UCD|Unit):\<\/i\>/ig ,' '); // removing the titles
+                    string = data.databases[d].name +  " " +
+                    data.databases[d].tables[t].name + " " +
+                    data.databases[d].tables[t].columns[c].name + " " + string;
+
+                    // Search each subquery in the string
+                    var found = true;
+                    for (q=0; q<query.length; q++) {
+                        if (string.search(new RegExp(query[q],"i"))<0) {
+                            found = false;
+                        }
+                    }
+
+                    // Append list if each subquery was found in the string
+                    if (found) {
+                        searchResults[i] = {
+                            database: data.databases[d].name,
+                            table: data.databases[d].tables[t].name,
+                            column: data.databases[d].tables[t].columns[c].name,
+                            tooltip: data.databases[d].tables[t].columns[c].tooltip
+                        };
+                        i++;
+                    }
+                }
             }
-
-            // Append list if each subquery was found in the string
-            if (found) {
-              searchResults[i] = {
-                database: data.databases[d].name,
-                table: data.databases[d].tables[t].name,
-                column: data.databases[d].tables[t].columns[c].name,
-                tooltip: data.databases[d].tables[t].columns[c].tooltip
-              }
-              i++;
-            }
-
-          }
         }
-      }
 
-      callBack(searchResults);
+        callBack(searchResults);
 
     }
 
@@ -93,16 +76,16 @@ angular.module('columnSearch',['browser'])
     };
 }])
 
-//Controller for a column search form
-.controller('columnSearchForm', ['$scope','SearchService',function ($scope,SearchService) {
+// Controller for a column search form
+.controller('ColumnSearchController', ['$scope','ColumnSearchService',function ($scope, ColumnSearchService) {
 
     $scope.query = ''; // contains a input field string
-    $scope.result = {cols:"",show:false}; // results of the search
-   
+    $scope.result = {cols:'', show:false}; // results of the search
+
     // Overide an enter/return stoke in the input field
-    $scope.simbadInput = function (event) {
+    $scope.columnInput = function (event) {
         if (event.keyCode === 13) {
-            $scope.simbadSearch();
+            $scope.columnSearch();
             event.preventDefault();
             event.stopPropagation();
         }
@@ -111,7 +94,7 @@ angular.module('columnSearch',['browser'])
     // Perform a column search and get the data
     $scope.columnSearch = function () {
         if ($scope.query !== "") {
-            SearchService.searchInData($scope.$parent.databases.data, $scope.query, function(data){
+            ColumnSearchService.searchInData($scope.$parent.databases.data, $scope.query, function(data){
                 $scope.result.data = data;
                 $scope.result.query = $scope.query;
                 $scope.result.show = true;
@@ -127,7 +110,7 @@ angular.module('columnSearch',['browser'])
 
     // Display datailed info about the column in the right panel
     $scope.browserItemClicked = function(item) {
-      $('#csearch-tooltip').html("<strong>"+item.column+"</strong> "+item.tooltip);
+      $('#column-search-tooltip').html("<strong>"+item.column+"</strong> "+item.tooltip);
     };
 
 }]);
