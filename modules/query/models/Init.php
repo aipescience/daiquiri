@@ -178,6 +178,9 @@ class Query_Model_Init extends Daiquiri_Model_Init {
                 'enabled' => true,
                 'url' => 'http://simbad.u-strasbg.fr'
             ),
+            'columnSearch' => array(
+                'enabled' => true
+            ),
             'download' => array(
                 'type' => 'direct', // or gearman
                 'dir' => "/srv/download",
