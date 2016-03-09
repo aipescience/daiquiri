@@ -82,6 +82,13 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                     </li>';
         }
 
+        if (Daiquiri_Config::getInstance()->query->columnSearch->enabled) {
+            $html .= '
+                    <li ng-class="{\'active\': visible === \'columnSearch\'}">
+                        <a href="" ng-click="toogleColumnSearch()">Column search</a>
+                    </li>';
+        }
+
         $html .= '
                 </ul>
                 <ul class="nav-pills pull-right">
@@ -148,8 +155,49 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             </div>';
         }
 
-        $html .= '
-        </div>';
+        if (Daiquiri_Config::getInstance()->query->columnSearch->enabled) {
+            $html .= '
+            <div ng-show="visible === \'columnSearch\'">
+                <div id="column-search-wrapper" ng-controller="ColumnSearchController">
+                    <div id="column-search-left">
+                        <div id="column-search-form">
+                            <input type="text" name="column-search-identifier" id="column-search-input" ng-model="query"
+                                   ng-keydown="columnInput($event);" />
+                            <input type="button" value="Search columns" class="btn" id="column-search-submit" ng-click="columnSearch()" />
+                        </div>
+                        <ul id="column-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                            <li ng-show="result.data.length>0" class="head">
+                                <div class="databaseName">Database</div>
+                                <div class="tableName">Table</div>
+                                <div class="columnName">Column</div>
+                            </li>
+                            <li ng-repeat="item in result.data" class="items nav-item" ng-mouseover="browserItemClicked(item)">
+                                <a href="">
+                                    <div class="databaseName" title="{{item.database}}"
+                                        ng-dblclick="browserItemDblClicked(item.database)">{{item.database}}</div>
+                                    <div class="tableName" title="{{item.table}}"
+                                        ng-dblclick="browserItemDblClicked(item.table)">{{item.table}}</div>
+                                    <div class="columnName" title="{{item.column}}"
+                                        ng-dblclick="browserItemDblClicked(item.column)">{{item.column}}</div>
+                                </a>
+                            </li>
+                            <li ng-show="result.data.length==0" class="column-search-results-empty">
+                                No results for "{{result.query}}"
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="column-search-right">
+                        <div class="daiquiri-widget" id="column-search-tooltip">
+                        </div>
+                    </div>
+                </div>
+                <div class="daiquiri-query-bar-hint">
+                    A double click on an item will copy the corresponding coordinates into the query.
+                </div>
+            </div>';
+        }
+
+        $html .= '</div>';
 
         $this->addNoteElement('sql_bar', $html);
 
