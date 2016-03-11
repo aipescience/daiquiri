@@ -26,8 +26,12 @@ angular.module('simbadResolver',['browser'])
     // Search on Simbad and parse the data
     function simbadSearch(query,callBack) {
 
+        console.log("Before: "+query);
         // Correct the query
-        query = encodeURIComponent(query);
+        //query = encodeURIComponent(query);
+        query = query.replace("+","%2B");
+        query = query.replace(" ","%20");
+        console.log("After: "+query);
 
         /*
          * Simbad query URL
