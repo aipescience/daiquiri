@@ -18,10 +18,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-angular.module('simbadResolver',['browser'])
+angular.module('simbadSearch',['browser'])
 
 // Factory for Simbad queries
-.factory('SimbadParser',['$http',function ($http) {
+.factory('SimbadSearchService',['$http',function ($http) {
+    // query options, will be set inside the template via ng-init
+    var options = {};
+
+    function init(opt) {
+        options = opt;
+    }
 
     // Search on Simbad and parse the data
     function simbadSearch(query,callBack) {
@@ -39,7 +45,7 @@ angular.module('simbadResolver',['browser'])
          * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-url
          * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-fscript#VotableFields
          */
-        var url = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident="+query+"&output.format=votable&output.params=main_id,coo(d),otype(V)";
+        var url = options.simbadSearchUrl + "/simbad/sim-id?Ident="+query+"&output.format=votable&output.params=main_id,coo(d),otype(V)";
 
         // get and parse the XML VOTable
         $http({
@@ -66,15 +72,16 @@ angular.module('simbadResolver',['browser'])
     }
 
     return {
+        init: init,
         simbadSearch: simbadSearch
     };
 }])
 
 //Controller for a Simbad search form
-.controller('simbadForm', ['$scope','SimbadParser',function ($scope,SimbadParser) {
+.controller('SimbadSearchController', ['$scope','SimbadSearchService',function ($scope, SimbadSearchService) {
 
     $scope.query = ''; // contains a input field string
-    $scope.result = {cols:"",show:false}; // contains results from simbad
+    $scope.result = {cols:"", show:false}; // contains results from simbad
 
     // Overide an enter/return stoke in the input field
     $scope.simbadInput = function (event) {
@@ -88,7 +95,7 @@ angular.module('simbadResolver',['browser'])
     // Perform a Simbad search and get the data
     $scope.simbadSearch = function () {
         if ($scope.query !== "") {
-            SimbadParser.simbadSearch($scope.query,function(data){
+            SimbadSearchService.simbadSearch($scope.query,function(data){
                 $scope.result.data = data;
                 $scope.result.query = $scope.query;
                 $scope.result.show = true;
@@ -109,11 +116,10 @@ angular.module('simbadResolver',['browser'])
     $scope.inputPlateConeSearch = function(coord1,coord2) {
         $('#plate_racent').val(coord1);
         $('#plate_decent').val(coord2);
-    }
+    };
 
     $scope.inputSourceConeSearch = function(coord1,coord2) {
         $('#cone_ra').val(coord1);
         $('#cone_dec').val(coord2);
-    }
-
+    };
 }]);

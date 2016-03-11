@@ -1,51 +1,51 @@
 
 /* Simbad resolver style */
 
-#simbad-form {
+#simbad-search-form {
     margin-bottom: 10px;
 }
 
-#simbad-resolver {
+#simbad-search-resolver {
     margin-bottom: 10px;
 }
 
-#simbad-input {
+#simbad-search-input {
     margin: 0;
     width: 534px;
 }
 
-#simbad-results {
+#simbad-search-results {
     overflow: auto;
     height: 107px;
 }
 
-#simbad-results li a {
+#simbad-search-results li a {
     line-height: 14px;
     height: 14px;
 }
 
 
-#simbad-results .object,
-#simbad-results .type,
-#simbad-results .coords {
+#simbad-search-results .object,
+#simbad-search-results .type,
+#simbad-search-results .coords {
     float: left;
     overflow: hidden;
     white-space: nowrap;
 }
 
-#simbad-results .object {
+#simbad-search-results .object {
     width: 40%;
 }
 
-#simbad-results .type {
+#simbad-search-results .type {
     width: 30%;
 }
 
-#simbad-results .coords {
+#simbad-search-results .coords {
     width: 30%;
 }
 
-#simbad-results .simbad-results-empty {
+#simbad-search-results .simbad-search-results-empty {
     padding: 5px 12px;
     font-size: small;
 }

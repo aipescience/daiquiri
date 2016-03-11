@@ -75,10 +75,17 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                         <a href="" ng-click="toogleFunctions()">Function browser</a>
                     </li>';
 
-        if (Daiquiri_Config::getInstance()->query->simbad->enabled) {
+        if (Daiquiri_Config::getInstance()->query->simbadSearch->enabled) {
             $html .= '
-                    <li ng-class="{\'active\': visible === \'simbad\'}">
-                        <a href="" ng-click="toogleSimbad()">Simbad object search</a>
+                    <li ng-class="{\'active\': visible === \'simbadSearch\'}">
+                        <a href="" ng-click="toogleSimbadSearch()">Simbad object search</a>
+                    </li>';
+        }
+
+        if (Daiquiri_Config::getInstance()->query->columnSearch->enabled) {
+            $html .= '
+                    <li ng-class="{\'active\': visible === \'columnSearch\'}">
+                        <a href="" ng-click="toogleColumnSearch()">Column search</a>
                     </li>';
         }
 
@@ -119,17 +126,17 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                 </div>
             </div>';
 
-        if (Daiquiri_Config::getInstance()->query->simbad->enabled) {
+        if (Daiquiri_Config::getInstance()->query->simbadSearch->enabled) {
             $html .= '
-            <div ng-show="visible === \'simbad\'">
-                <div id="simbad-resolver" ng-controller="simbadForm">
-                    <div id="simbad-form">
-                        <input type="text" name="simbad-identifier" id="simbad-input" ng-model="query"
+            <div ng-show="visible === \'simbadSearch\'">
+                <div id="simbad-search-resolver" ng-controller="SimbadSearchController">
+                    <div id="simbad-search-form">
+                        <input type="text" name="simbad-search-identifier" id="simbad-search-input" ng-model="query"
                                ng-keydown="simbadInput($event);" />
-                        <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-submit" ng-click="simbadSearch()" />
+                        <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-search-submit" ng-click="simbadSearch()" />
                     </div>
 
-                    <ul id="simbad-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                    <ul id="simbad-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
                         <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1,item.coord2)">
                               <a href="">
                                   <div class="object">{{item.object}}</div>
@@ -137,7 +144,7 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                                   <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
                               </a>
                         </li>
-                        <li ng-show="result.data.length==0" class="simbad-results-empty">
+                        <li ng-show="result.data.length==0" class="simbad-search-results-empty">
                             No results for "{{result.query}}"
                         </li>
                     </ul>
@@ -148,8 +155,49 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
             </div>';
         }
 
-        $html .= '
-        </div>';
+        if (Daiquiri_Config::getInstance()->query->columnSearch->enabled) {
+            $html .= '
+            <div ng-show="visible === \'columnSearch\'">
+                <div id="column-search-wrapper" ng-controller="ColumnSearchController">
+                    <div id="column-search-left">
+                        <div id="column-search-form">
+                            <input type="text" name="column-search-identifier" id="column-search-input" ng-model="query"
+                                   ng-keydown="columnInput($event);" />
+                            <input type="button" value="Search columns" class="btn" id="column-search-submit" ng-click="columnSearch()" />
+                        </div>
+                        <ul id="column-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                            <li ng-show="result.data.length>0" class="head">
+                                <div class="databaseName">Database</div>
+                                <div class="tableName">Table</div>
+                                <div class="columnName">Column</div>
+                            </li>
+                            <li ng-repeat="item in result.data" class="items nav-item" ng-mouseover="browserItemClicked(item)">
+                                <a href="">
+                                    <div class="databaseName" title="{{item.database}}"
+                                        ng-dblclick="browserItemDblClicked(item.database)">{{item.database}}</div>
+                                    <div class="tableName" title="{{item.table}}"
+                                        ng-dblclick="browserItemDblClicked(item.table)">{{item.table}}</div>
+                                    <div class="columnName" title="{{item.column}}"
+                                        ng-dblclick="browserItemDblClicked(item.column)">{{item.column}}</div>
+                                </a>
+                            </li>
+                            <li ng-show="result.data.length==0" class="column-search-results-empty">
+                                No results for "{{result.query}}"
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="column-search-right">
+                        <div class="daiquiri-widget" id="column-search-tooltip">
+                        </div>
+                    </div>
+                </div>
+                <div class="daiquiri-query-bar-hint">
+                    A double click on an item will copy the corresponding coordinates into the query.
+                </div>
+            </div>';
+        }
+
+        $html .= '</div>';
 
         $this->addNoteElement('sql_bar', $html);
 

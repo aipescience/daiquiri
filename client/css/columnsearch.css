@@ -1,0 +1,90 @@
+
+/* column-search resolver style */
+
+#column-search-wrapper {
+  float:left;
+  width:100%;
+  margin-bottom:10px;
+}
+
+#column-search-left {
+  float:left;
+  width: 66%;
+}
+
+#column-search-right {
+  float:left;
+  width: 34%;
+}
+
+#column-search-right div {
+  height:137px;
+  margin-bottom:0px;
+  overflow: auto;
+}
+#column-search-right div strong {
+  font-weight:bold;
+  display:block;
+  margin-bottom: 5px;
+}
+
+#column-search-right div i {
+  font-weight:bold;
+}
+
+#column-search-form {
+    margin-bottom: 10px;
+}
+
+#column-search-input {
+    margin: 0;
+    width: 308px;
+}
+
+#column-search-results {
+    overflow: auto;
+    height: 107px;
+    width: 450px;
+}
+
+#column-search-results li a {
+    line-height: 14px;
+    height: 14px;
+}
+
+
+#column-search-results .items div {
+    float: left;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#column-search-results .databaseName {
+    width: 30%;
+}
+
+#column-search-results .tableName {
+    width: 30%;
+}
+
+#column-search-results .columnName {
+    width: 40%;
+}
+
+#column-search-results .head {
+    margin-left: 12px;
+    margin-right: 12px;
+    height: 24px;
+}
+#column-search-results .head div {
+    line-height: 14px;
+    height: 14px;
+    padding: 5px 0px;
+    float:left;
+}
+
+
+#column-search-results .column-search-results-empty {
+    padding: 5px 12px;
+    font-size: small;
+}

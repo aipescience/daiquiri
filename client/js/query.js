@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies','simbadResolver']);
+var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies','simbadSearch','columnSearch']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -860,7 +860,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
 
 /* controllers */
 
-app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService','DownloadService',function($scope,$timeout,PollingService,QueryService,SubmitService,DownloadService) {
+app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService','DownloadService','SimbadSearchService',function($scope,$timeout,PollingService,QueryService,SubmitService,DownloadService,SimbadSearchService) {
 
     $scope.account = QueryService.account;
     $scope.dialog  = QueryService.dialog;
@@ -936,6 +936,7 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
         QueryService.init($scope.options);
         SubmitService.init($scope.options);
         DownloadService.init($scope.options);
+        SimbadSearchService.init($scope.options);
     });
 
 }]);
@@ -1074,11 +1075,18 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
             $scope.visible = 'functions';
         }
     };
-    $scope.toogleSimbad = function() {
-        if ($scope.visible === 'simbad') {
+    $scope.toogleSimbadSearch = function() {
+        if ($scope.visible === 'simbadSearch') {
             $scope.visible = false;
         } else {
-            $scope.visible = 'simbad';
+            $scope.visible = 'simbadSearch';
+        }
+    };
+    $scope.toogleColumnSearch = function() {
+        if ($scope.visible === 'columnSearch') {
+            $scope.visible = false;
+        } else {
+            $scope.visible = 'columnSearch';
         }
     };
     $scope.toogleExamples = function() {
