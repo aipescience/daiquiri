@@ -32,13 +32,10 @@ angular.module('simbadSearch',['browser'])
     // Search on Simbad and parse the data
     function simbadSearch(query,callBack) {
 
-        console.log("Before: "+query);
-        // Correct the query
-        //query = encodeURIComponent(query);
-        query = query.replace("+","%2B");
-        query = query.replace(" ","%20");
-        console.log("After: "+query);
-
+        query = encodeURIComponent(query);
+        //query = query.replace("+","%2B");
+        //query = query.replace(" ","%20");
+        
         /*
          * Simbad query URL
          * more information and settings at:
