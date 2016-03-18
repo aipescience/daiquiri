@@ -115,11 +115,15 @@ angular.module('simbadSearch',['browser'])
 
     $scope.inputPlateConeSearch = function(coord1,coord2) {
         $('#plate_racent').val(coord1);
+        $('#plate_racent').trigger('input');
         $('#plate_decent').val(coord2);
+        $('#plate_decent').trigger('input');    
     };
 
     $scope.inputSourceConeSearch = function(coord1,coord2) {
         $('#cone_ra').val(coord1);
-        $('#cone_dec').val(coord2);
+        $('#cone_ra').trigger('input');
+        $('#cone_dec').val(coord2)
+        $('#cone_dec').trigger('input');
     };
 }]);
