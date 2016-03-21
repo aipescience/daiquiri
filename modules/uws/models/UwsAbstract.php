@@ -569,7 +569,8 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         $jobUWS->quote = $this->getQuote();
 
         // set a creation time, for updated UWS 1.1 version
-        $now = date('Y-m-d\TH:i:s');
+        $now = date('Y-m-d H:i:s');
+        //$now = $now->format('c');
         $jobUWS->creationTime = $now;
 
         //no destruction time supported, so return hillariously high number
@@ -671,7 +672,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
             // job is put into final state; set endTime, if not existing yet
             if (!$job->endTime) {
-                $datetimeEnd = date('Y-m-d\TH:i:s');
+                $datetimeEnd = date('Y-m-d H:i:s');
                 $job->endTime = $datetimeEnd;
                 $resource->updateRow($job->jobId, array("endTime" => $job->endTime));
             }

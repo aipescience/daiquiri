@@ -434,7 +434,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
             // job is in final state now, add startTime and endTime
-            $now = date('Y-m-d\TH:i:s');
+            $now = date('Y-m-d H:i:s');
             $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
 
             return;
@@ -473,7 +473,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
                 $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
                 // job is in final state now (ERROR), add startTime and endTime
-                $now = date('Y-m-d\TH:i:s');
+                $now = date('Y-m-d H:i:s');
                 $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
 
                 return;
@@ -485,7 +485,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
             // job is in final state now (ERROR), add startTime and endTime
-            $now = date('Y-m-d\TH:i:s');
+            $now = date('Y-m-d H:i:s');
             $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
 
             return;
@@ -515,7 +515,7 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             $resource->updateRow($job->jobId, array("phase" => "ERROR", "errorSummary" => Zend_Json::encode($job->errorSummary)));
 
             // job is in final state now (ERROR), add startTime and endTime
-            $now = date('Y-m-d\TH:i:s');
+            $now = date('Y-m-d H:i:s');
             $resource->updateRow($job->jobId, array("startTime" => $now, "endTime" => $now));
 
             return;

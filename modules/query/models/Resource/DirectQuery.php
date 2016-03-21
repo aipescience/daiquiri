@@ -163,7 +163,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         }
         // check if time is 0, even if it was already set (because if creationTime was NULL, we do not want to use this)
         if ($job['time'] == false || $job['time'] == "0000-00-00 00:00:00" || $job['time'] == NULL) {
-            $job['time'] = date("Y-m-d\TH:i:s");
+            $job['time'] = date("Y-m-d H:i:s");
         }
 
         $job['complete'] = true;
