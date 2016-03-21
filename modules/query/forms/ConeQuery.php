@@ -67,6 +67,40 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
      * Initializes the form.
      */
     public function init() {
+
+        $html = '<div class="daiquiri-query-bar" style="width:150px;">
+            <ul class="nav-pills pull-left">
+                <li>
+                    <a ng-click="showSimbadSearch = !showSimbadSearch" href style="width:126px;text-align:center;">{{showSimbadSearch?"Hide Simbad search":"Show Simbad search"}}</a>
+                </li>
+            </ul>
+            </div>
+            <div ng-show="showSimbadSearch" ng-init="showSimbadSearch = false">
+                <div id="simbad-search-resolver" ng-controller="SimbadSearchController">
+                    <div id="simbad-search-form">
+                        <input type="text" name="simbad-search-identifier" id="simbad-search-input" ng-model="query" ng-keydown="simbadInput($event);" />
+                        <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-search-submit" ng-click="simbadSearch()" />
+                    </div>
+
+                    <ul id="simbad-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                        <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.inputSourceConeSearch(item.coord1,item.coord2)">
+                            <a href="">
+                                <div class="object">{{item.object}}</div>
+                                <div class="type">{{item.type}}</div>
+                                <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
+                            </a>
+                        </li>
+                        <li ng-show="result.data.length==0" class="simbad-search-results-empty">
+                            No results for "{{result.query}}"
+                        </li>
+                    </ul>
+                </div>
+                <div class="daiquiri-query-bar-hint">
+                    A double click on an item will copy the corresponding coordinates into the following form fields.
+                </div>
+            </div>';
+        $this->addNoteElement('cone_simbad', $html);
+
         // add form elements
         $this->addCsrfElement('cone_csrf');
         $this->addFloatElement('cone_ra', 'RA<sub>deg</sub>');
