@@ -639,7 +639,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         return $jobId;
     }
 
-    //optains a (pending) job in the UWS job list
+    //obtains a (pending) job from the UWS job list
     public function getPendingJob($id) {
         $resource = new Uws_Model_Resource_UWSJobs();
         $job = $resource->fetchObjectWithId($id);
