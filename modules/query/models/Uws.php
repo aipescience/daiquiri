@@ -232,10 +232,19 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
         }
 
-        // copy jobs into jobs-object
+        // copy jobs into jobs-object, convert time format
+        // (This would be a good opportunity to convert to UTC time zone as well,
+        //  but currently this is not required by the standard.)
         $jobs = new Uws_Model_Resource_Jobs();
         foreach ($joblist as $job) {
-            $jobs->addJob($job['id'], $job['href'], array($job['status']), $job['creationTime'], $job['runId'], $job['ownerId']);
+            $creationdatetime = new DateTime($job['creationTime']);
+            $creationdatetime = $creationdatetime->format('c');
+            $jobs->addJob($job['id'],
+                          $job['href'],
+                          array($job['status']),
+                          $creationdatetime,
+                          $job['runId'],
+                          $job['ownerId']);
         }
 
         return $jobs;
