@@ -1,3 +1,12 @@
+2016/03/22
+==========
+
+UWS update (branch uws11_update): new field 'creationTime' needed in Uws_Jobs table
+on the web server:
+
+ALTER TABLE `Uws_Jobs` ADD COLUMN `creationTime` VARCHAR(256) AFTER quote;
+
+
 2015/09/08
 ==========
 
