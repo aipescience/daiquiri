@@ -104,6 +104,11 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
             $jobUWS->endTime = $datetime->format('c');
         }
 
+        if ($row['creationTime'] !== "0000-00-00 00:00:00" && $row['creationTime'] != NULL) {
+            $datetime = new DateTime($row['creationTime']);
+            $jobUWS->creationTime = $datetime->format('c');
+        }
+
         $jobUWS->executionDuration = intval($row['executionDuration']);
 
         if ($row['destruction'] !== "0000-00-00 00:00:00" && $row['destruction'] != NULL) {
