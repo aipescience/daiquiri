@@ -217,7 +217,20 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
         // merge both lists ...
         $joblist = array_merge($joblist, $pendingJoblist);
 
-        // and sort by creationTime (< 10 ms for 10,000 jobs, so it's fast enough to do it always)
+        // ... convert time formats and update list ...
+        // (Before sorting, so that we have a consistent
+        // format, no matter what may have been different in the two lists.)
+        // (This would be a good opportunity to convert to UTC time zone as well,
+        //  but currently this is not required by the standard.)
+
+        foreach ($joblist as $key => $job) {
+            $creationdatetime = new DateTime($job['creationTime']);
+            $creationdatetime = $creationdatetime->format('c');
+            $joblist[$key]['creationTime'] = $creationdatetime;
+        }
+
+        // ... and sort by creationTime
+        // (< 10 ms for 10,000 jobs, so it's fast enough to do it always)
         $sortcolumn = array();
         foreach ($joblist as $job) {
             $sortcolumn[] = $job['creationTime'];
@@ -232,17 +245,13 @@ class Query_Model_Uws extends Uws_Model_UwsAbstract {
             }
         }
 
-        // copy jobs into jobs-object, convert time format
-        // (This would be a good opportunity to convert to UTC time zone as well,
-        //  but currently this is not required by the standard.)
+        // copy jobs into jobs-object
         $jobs = new Uws_Model_Resource_Jobs();
         foreach ($joblist as $job) {
-            $creationdatetime = new DateTime($job['creationTime']);
-            $creationdatetime = $creationdatetime->format('c');
-            $jobs->addJob($job['id'],
+           $jobs->addJob($job['id'],
                           $job['href'],
                           array($job['status']),
-                          $creationdatetime,
+                          $job['creationTime'],
                           $job['runId'],
                           $job['ownerId']);
         }
