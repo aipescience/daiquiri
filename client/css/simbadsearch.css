@@ -19,22 +19,29 @@
     height: 107px;
 }
 
-#simbad-search-results li a {
+#simbad-search-results li {
     line-height: 14px;
     height: 14px;
+    padding: 5px 12px;
+}
+
+#simbad-search-results li:hover {
+    background: #eeeeee;
+    cursor: pointer;
 }
 
 
 #simbad-search-results .object,
 #simbad-search-results .type,
-#simbad-search-results .coords {
+#simbad-search-results .coords,
+#simbad-search-results .ucac4 {
     float: left;
     overflow: hidden;
     white-space: nowrap;
 }
 
 #simbad-search-results .object {
-    width: 40%;
+    width: 30%;
 }
 
 #simbad-search-results .type {
@@ -43,6 +50,10 @@
 
 #simbad-search-results .coords {
     width: 30%;
+}
+
+#simbad-search-results .ucac4 {
+    width: 9%;
 }
 
 #simbad-search-results .simbad-search-results-empty {

@@ -129,28 +129,51 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
         if (Daiquiri_Config::getInstance()->query->simbadSearch->enabled) {
             $html .= '
             <div ng-show="visible === \'simbadSearch\'">
-                <div id="simbad-search-resolver" ng-controller="SimbadSearchController">
-                    <div id="simbad-search-form">
-                        <input type="text" name="simbad-search-identifier" id="simbad-search-input" ng-model="query"
-                               ng-keydown="simbadInput($event);" />
-                        <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-search-submit" ng-click="simbadSearch()" />
-                    </div>
+                <div ng-controller="SimbadSearchController">
+                    <div id="simbad-search-resolver">
+                        <div id="simbad-search-form">
+                            <input type="text" name="simbad-search-identifier" id="simbad-search-input" ng-model="query"
+                                   ng-keydown="simbadInput($event);" />
+                            <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-search-submit" ng-click="simbadSearch()" />
+                        </div>
 
-                    <ul id="simbad-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
-                        <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1,item.coord2)">
-                              <a href="">
+                        <ul id="simbad-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
+                            <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.browserItemDblClicked(\'coords\',item.coord1,item.coord2)">
                                   <div class="object">{{item.object}}</div>
                                   <div class="type">{{item.type}}</div>
                                   <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
-                              </a>
-                        </li>
-                        <li ng-show="result.data.length==0" class="simbad-search-results-empty">
-                            No results for "{{result.query}}"
-                        </li>
-                    </ul>
-                </div>
-                <div class="daiquiri-query-bar-hint">
-                    A double click on an item will copy the corresponding coordinates into the query.
+                                  <div class="ucac4" ng-show="item.coord1!=\'\'"><a href="" ng-click="vizierSearch(item.coord1,item.coord2)">Catalog IDs</a></div>
+                            </li>
+                            <li ng-show="result.data.length==0" class="simbad-search-results-empty">
+                                No results for "{{result.query}}"
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="daiquiri-query-bar-hint">
+                        A double click on an item will copy the corresponding coordinates into the query.
+                    </div>
+                    <div daiquiri-modal transclude>
+                      <div>
+                         <h2>Catalog search</h2>
+                         <p><strong>RA:</strong> {{vizierCenter.ra}}<br /> <strong>DEC:</strong> {{vizierCenter.dec}}</p>
+                         <p>A double click on an item will copy the identifier into the field.</p>
+                         <div ng-repeat="catalog in vizierResults" ng-show="catalog.data.length>0" style="padding:0px 15px 15px 15px;">
+                           <h3>{{catalog.name}}</h3>
+                           <table class="table table-hover table-condensed">
+                                <thead>
+                                    <tr><th width="150">ID</th><th width="100">RA</th><th width="100">DEC</th><th>Distance</th></tr>
+                                </thead>
+                                <tr ng-repeat="item in catalog.data" style="cursor:pointer" ng-dblclick="inputCatalogIdIntoQuery(item.id)">
+                                    <td>{{item.id}}</td>
+                                    <td>{{item.ra}}</td>
+                                    <td>{{item.dec}}</td>
+                                    <td>{{item.r}}</td>
+                                </tr>
+                           </table>
+                         </div>
+                      </div>
+                    </div>
+
                 </div>
             </div>';
         }

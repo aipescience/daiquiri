@@ -860,7 +860,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
 
 /* controllers */
 
-app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService','DownloadService','SimbadSearchService',function($scope,$timeout,PollingService,QueryService,SubmitService,DownloadService,SimbadSearchService) {
+app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService','DownloadService','SearchService',function($scope,$timeout,PollingService,QueryService,SubmitService,DownloadService,SearchService) {
 
     $scope.account = QueryService.account;
     $scope.dialog  = QueryService.dialog;
@@ -936,7 +936,7 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
         QueryService.init($scope.options);
         SubmitService.init($scope.options);
         DownloadService.init($scope.options);
-        SimbadSearchService.init($scope.options);
+        SearchService.init($scope.options);
     });
 
 }]);

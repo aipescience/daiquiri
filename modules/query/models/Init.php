@@ -176,7 +176,11 @@ class Query_Model_Init extends Daiquiri_Model_Init {
             'ipMask' => 1,
             'simbadSearch' => array(
                 'enabled' => true,
-                'url' => 'http://simbad.u-strasbg.fr'
+                'url' => 'http://simbad.u-strasbg.fr',
+                'vizier' => array(
+                    'catalogs' => array('I/322A','I/259'),
+                    'url' => 'http://vizier.u-strasbg.fr/',
+                ),
             ),
             'columnSearch' => array(
                 'enabled' => true

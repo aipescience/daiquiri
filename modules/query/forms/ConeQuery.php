@@ -84,11 +84,9 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
 
                     <ul id="simbad-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
                         <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.inputSourceConeSearch(item.coord1,item.coord2)">
-                            <a href="">
-                                <div class="object">{{item.object}}</div>
-                                <div class="type">{{item.type}}</div>
-                                <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
-                            </a>
+                            <div class="object">{{item.object}}</div>
+                            <div class="type">{{item.type}}</div>
+                            <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
                         </li>
                         <li ng-show="result.data.length==0" class="simbad-search-results-empty">
                             No results for "{{result.query}}"
