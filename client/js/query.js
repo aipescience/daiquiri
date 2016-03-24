@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies','simbadSearch','columnSearch']);
+var app = angular.module('query',['table','modal','browser','images','plot','codemirror','samp','ngCookies','cdsSearch','columnSearch']);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -711,7 +711,7 @@ app.factory('SubmitService', ['$http','$timeout','$window','QueryService','Codem
             // empty the query input textarea
             CodemirrorService.clear('sql_query');
         }
-
+       
         // insert the sting into the codemirror textarea
         CodemirrorService.insert('sql_query', value + ' ');
     }
@@ -728,7 +728,7 @@ app.factory('SubmitService', ['$http','$timeout','$window','QueryService','Codem
     };
 }]);
 
-app.factory('BarService', ['BrowserService',function(BrowserService) {
+app.factory('BarService', ['BrowserService', function(BrowserService) {
     BrowserService.browser.databases = {
         'url': '/query/account/databases/',
         'colnames': ['databases','tables','columns']
@@ -860,7 +860,7 @@ app.factory('DownloadService', ['$http','QueryService',function($http,QueryServi
 
 /* controllers */
 
-app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService','DownloadService','SearchService',function($scope,$timeout,PollingService,QueryService,SubmitService,DownloadService,SearchService) {
+app.controller('QueryController',['$scope','$timeout','PollingService','QueryService','SubmitService','DownloadService','CdsSearchService',function($scope,$timeout,PollingService,QueryService,SubmitService,DownloadService,CdsSearchService) {
 
     $scope.account = QueryService.account;
     $scope.dialog  = QueryService.dialog;
@@ -936,7 +936,7 @@ app.controller('QueryController',['$scope','$timeout','PollingService','QuerySer
         QueryService.init($scope.options);
         SubmitService.init($scope.options);
         DownloadService.init($scope.options);
-        SearchService.init($scope.options);
+        CdsSearchService.init($scope.options);
     });
 
 }]);
@@ -1045,13 +1045,13 @@ app.controller('SubmitController',['$scope','SubmitService',function($scope,Subm
     $scope.submitPlan = function(mail) {
         SubmitService.submitPlan(mail);
     };
-
+    
     $scope.$on('browserItemDblClicked', function(event,browsername,value) {
         SubmitService.insertIntoQuery(browsername,value);
     });
 }]);
 
-app.controller('BarController',['$scope','BarService',function($scope,BarService) {
+app.controller('BarController',['$scope','BarService','QueryService','ModalService','CdsSearchService',function($scope,BarService,QueryService,ModalService,CdsSearchService) {
 
     $scope.databases = BarService.databases;
     $scope.keywords = BarService.keywords;
@@ -1075,12 +1075,11 @@ app.controller('BarController',['$scope','BarService',function($scope,BarService
             $scope.visible = 'functions';
         }
     };
-    $scope.toogleSimbadSearch = function() {
-        if ($scope.visible === 'simbadSearch') {
-            $scope.visible = false;
-        } else {
-            $scope.visible = 'simbadSearch';
-        }
+    $scope.toogleCdsSearch = function() {
+        QueryService.dialog.enabled = 'cdsSearch';
+        QueryService.dialog.options = $scope.dialogOptions;
+        CdsSearchService.resetResults();
+        ModalService.open();
     };
     $scope.toogleColumnSearch = function() {
         if ($scope.visible === 'columnSearch') {

@@ -777,4 +777,86 @@
         </form>
     </div>
 
+    <!-- search service -->
+
+    <div daiquiri-modal transclude ng-show="dialog.enabled=='cdsSearch'">
+        <div ng-controller="CdsSearchController" id="cdsSearchWrapper">
+            <h2>CDS search</h2>
+            <div class="tabbable">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#simbadTab" data-toggle="tab">Simbad search</a></li>
+                    <li><a href="#vizierTab" data-toggle="tab" id="vizierTabButton">VizieR search</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="simbadTab">
+                        <form name="cdsSimbadSearchForm">
+                            <p>
+                                The following tool can be used to retrieve coordinates of astronomical objects from the Simbad database.<br />
+                                Input the name of an object and click on the search button.<br />
+                            </p>
+                            <div class="input-append">
+                                <input type="text" name="cdsSimbadSearchInput" ng-model="simbadQuery" placeholder="object name" ng-keydown="simbadInput($event);" />
+                                <input type="button" value="Search on Simbad" class="btn" ng-click="simbadSearch()" />
+                            </div>
+                        </form>
+                        <div id="cdsVizierSearchResults" ng-show="simbad.data.length>0">
+                            <table class="table table-condensed">
+                                <thead ng-show="simbad.data.length>0">
+                                    <tr>
+                                        <th>Object</th>
+                                        <th>Type</th>
+                                        <th>Coordinates</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tr ng-repeat="item in simbad.data">
+                                    <td>{{item.object}}</td>
+                                    <td>{{item.type}}</td>
+                                    <td ng-show="simbad.coordOutput"><a ng-click="pasteCoordinates(item.coord1,item.coord2)" title="Paste coordinates to the form field">{{item.coord1}} &nbsp; {{item.coord2}}</a></td>
+                                    <td ng-show="simbad.coordOutput===false">{{item.coord1}} &nbsp; {{item.coord2}}</td>
+                                    <td><a ng-click="showCatalogIds(item.coord1,item.coord2)" ng-show="item.coord1!=''" title="Search for coordinates in VizieR">Show catalog IDs</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div ng-show="simbad.data.length==0" class="alert alert-error">
+                            No results for "{{simbad.query}}"
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="vizierTab">
+                        <form name="cdsVizierSearchForm">
+                            <p>
+                                The following tool will search for astronomical objects within the radius of 2 arcmin around the given coordinates.<br />
+                                The search gives up to five closest object from the Tycho-2 and UCAC4 catalogs.<br />
+                                Input the object coordinates and click on the search button.<br />
+                            </p>
+                            <div class="input-append">
+                                <input type="text" name="cdsVizierSearchInput" ng-model="vizierQuery" placeholder="RA DEC" ng-keydown="vizierInput($event);" />
+                                <input type="button" value="Search on VizieR" class="btn" ng-click="vizierSearch()" />
+                            </div>
+                        </form>
+                        <div id="cdsVizierSearchResults" ng-show="vizier.data.show">
+                             <h3>{{catalog.name}}</h3>
+                             <table class="table table-condensed">
+                                  <thead>
+                                      <tr><th>ID</th><th>RA</th><th>DEC</th><th>Distance</th><th>Catalog</th></tr>
+                                  </thead>
+                                  <tr ng-repeat="item in vizier.data.results">
+                                      <td ng-show="vizier.idOutput"><a ng-click="pasteIDs(item.id)">{{item.id}}</a></td>
+                                      <td ng-show="vizier.idOutput===false">{{item.id}}</td>
+                                      <td>{{item.ra}}</td>
+                                      <td>{{item.dec}}</td>
+                                      <td>{{item.r}}</td>
+                                      <td>{{item.catalog}}</td>
+                                  </tr>
+                             </table>
+                        </div>
+                        <div ng-show="vizier.data.show==false" class="alert alert-error">
+                            No results for "{{vizier.query}}"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

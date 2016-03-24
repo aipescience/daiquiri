@@ -18,10 +18,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-angular.module('simbadSearch',['browser'])
+angular.module('cdsSearch',['browser','query'])
 
 // Factory for Simbad queries
-.factory('SearchService',['$http',function ($http) {
+.factory('CdsSearchService',['$http','QueryService',function ($http,QueryService) {
+
     // query options, will be set inside the template via ng-init
     var options = {};
 
@@ -29,11 +30,32 @@ angular.module('simbadSearch',['browser'])
         options = opt;
     }
 
-    // Search on Simbad and parse the data
-    function simbadSearch(query,callBack) {
+    // Search results
+    var simbadResults = {
+      query: '',
+      data: false,
+      coordOutput: true  // are coordinates clickable
+    };
+    var vizierResults = {
+      query: '',
+      data: false,
+      idOutput: true  // is ID clickable
+    };
 
-        query = encodeURIComponent(query);
+    function resetResults() { 
+        simbadResults.query = '';
+        simbadResults.data = false;
+        simbadResults.coordOutput = true;
+        vizierResults.query = '';
+        vizierResults.data = false;
+        vizierResults.idOutput = true;
+    }
+
+    // Search on Simbad and parse the data
+    function simbadSearch(query,callback) {
         
+        simbadResults.query = query;
+
         /*
          * Simbad query URL
          * more information and settings at:
@@ -42,7 +64,7 @@ angular.module('simbadSearch',['browser'])
          */
         var opts = {"output.format": "votable",
                     "output.params": "main_id,coo(d),otype(V)",
-                    "Ident": query}
+                    "Ident": simbadResults.query}
         
         // get and parse the XML VOTable
         $http({
@@ -52,25 +74,34 @@ angular.module('simbadSearch',['browser'])
             xmlDoc = $.parseXML(response.data);
             $xml = $(xmlDoc);
             rows = $xml.find('TABLEDATA TR');
-            data = [];
+            simbadResults.data = [];
             rows.each(function(i) {
                 cols = $(this).find('TD');
-                data[i] = {
+                simbadResults.data[i] = {
                     object: cols.eq(0).text(),
                     type: cols.eq(6).text(),
                     coord1: cols.eq(1).text(),
                     coord2: cols.eq(2).text(),
                 };
-            });
-            callBack(data);
+            }); 
+
+            if (QueryService.dialog.options!==undefined) {
+                if (QueryService.dialog.options.coordOutput==false) {
+                    simbadResults.coordOutput = false;
+                }  
+            }
+
+            callback();
         }, function errorCallback(response) {
             console.log('Error: results were not resolved from simbad');
         });
+
     }
 
     // Search on VizieR and parse the data
-    function vizierSearch(coord1,coord2,callBack) {
+    function vizierSearch(coords,callback) {
 
+        vizierResults.query = coords;
         var catalogs = options.vizierSearchCatalogs
 
         /*
@@ -82,13 +113,12 @@ angular.module('simbadSearch',['browser'])
          * Use the VizieR catalog identifiers (i.e. I/322A, J/MNRAS/416/2265,...) from the CDS Catalogue list.
          */
         var opts = {"-source":catalogs.join(" "),
-                "-c": coord1+" "+coord2,
+                "-c": vizierResults.query,
                 "-c.r":2,
                 "-out":"_RA _DEC _r *meta.id.part;meta.main *meta.id;meta.main",
                 "-sort":"_r",
                 "-out.max":5}
        
-
         // get and parse the XML VOTable
         $http({
            method: 'GET',
@@ -97,29 +127,36 @@ angular.module('simbadSearch',['browser'])
             xmlDoc = $.parseXML(response.data);
             $xml = $(xmlDoc);
 
-            var data = {}
+            vizierResults.data = {'results':{},'show':false};
             for (c in catalogs) {
                 var $cxml = $xml.find("RESOURCE[name='"+catalogs[c]+"']")
-                data[c] = {"name": $cxml.find("DESCRIPTION:first").text(),
-                           "id": catalogs[c],
-                           "data": []}
-                $cxml.find("TABLEDATA TR").each(function(i) {
+                
+                $cxml.find("TABLEDATA TR").each(function() {
                   cols = $(this).find('TD');
                   if (catalogs[c]=='I/259') { // exception for Tycho 2 catalog
                       id = cols.eq(3).text()+"-"+cols.eq(4).text()+"-"+cols.eq(5).text()
                   } else {
                       id = cols.eq(3).text()
                   }
-                  data[c]['data'][i] = {
+                  r = cols.eq(2).text()
+                  vizierResults.data['results'][r+'_'+c] = {
                       id: id,
                       ra: cols.eq(0).text(),
                       dec: cols.eq(1).text(),
                       r: cols.eq(2).text(),
+                      catalog: $cxml.find("DESCRIPTION:first").text()
                   };
+                  vizierResults.data['show'] = true;
                 });
             }
+            
+            if (QueryService.dialog.options!==undefined) {
+                if (QueryService.dialog.options.idOutput==false) {
+                    vizierResults.idOutput = false;
+                }  
+            }
 
-            callBack(data);
+            callback();
         }, function errorCallback(response) {
             console.log('Error: results were not resolved from VizieR');
         });
@@ -129,18 +166,48 @@ angular.module('simbadSearch',['browser'])
     return {
         init: init,
         simbadSearch: simbadSearch,
-        vizierSearch: vizierSearch
+        simbadResults: simbadResults,
+        vizierSearch: vizierSearch,
+        vizierResults: vizierResults,
+        resetResults: resetResults,
     };
 }])
 
 //Controller for a Simbad search form
-.controller('SimbadSearchController', ['$scope','SearchService','ModalService',function ($scope, SearchService,ModalService) {
+.controller('CdsSearchController', ['$scope','$rootScope','CdsSearchService','ModalService','QueryService',function ($scope, $rootScope, CdsSearchService,ModalService,QueryService) {
+    
+    $scope.simbadQuery = '';
+    $scope.simbad = CdsSearchService.simbadResults;
 
-    $scope.query = ''; // contains a input field string
-    $scope.result = {cols:"", show:false}; // contains results from simbad
+    $scope.vizierQuery = '';
+    $scope.vizier = CdsSearchService.vizierResults;
 
-    $scope.vizierResults = {};
-    $scope.vizierCenter = {'ra':0,'dec':0};
+    // Perform a Simbad search and get the data
+    $scope.simbadSearch = function () {
+        if ($scope.simbadQuery !== "") {
+            CdsSearchService.simbadSearch($scope.simbadQuery,function(){       
+            });
+        }
+    };
+
+    // Perform a Simbad search and get the data
+    $scope.vizierSearch = function (callBack) {
+        if ($scope.vizierQuery !== "") {
+            CdsSearchService.vizierSearch($scope.vizierQuery,function(){
+                if (typeof callBack === "function") {
+                    callBack();
+                }
+            });
+        }
+    };
+
+    // Search IDs in VizieR catalogues
+    $scope.showCatalogIds = function(coord1,coord2) {
+        $scope.vizierQuery = coord1+' '+coord2;
+        $scope.vizierSearch(function(){
+            $('#vizierTabButton').tab('show');
+        });
+    }
 
     // Overide an enter/return stoke in the input field
     $scope.simbadInput = function (event) {
@@ -151,65 +218,36 @@ angular.module('simbadSearch',['browser'])
         }
     };
 
-    // Perform a Simbad search and get the data
-    $scope.simbadSearch = function () {
-        if ($scope.query !== "") {
-            SearchService.simbadSearch($scope.query,function(data){
-                $scope.result.data = data;
-                $scope.result.query = $scope.query;
-                $scope.result.show = true;
-            });
+    // Overide an enter/return stoke in the input field
+    $scope.vizierInput = function (event) {
+        if (event.keyCode === 13) {
+            $scope.vizierSearch();
+            event.preventDefault();
+            event.stopPropagation();
         }
     };
 
-    // Insert coordinates into the query text field
-    // event is handled in 'query.js' file
-    $scope.browserItemDblClicked = function(browsername,coord1,coord2) {
-        if (coord1 !== "") {
-            $scope.$emit('browserItemDblClicked',browsername,coord1+' '+coord2);
+    // Paste coordinates
+    $scope.pasteCoordinates = function(coord1,coord2) {
+        if (QueryService.dialog.options==undefined) {
+            $rootScope.$broadcast('browserItemDblClicked','cdssearch',coord1+' '+coord2);
         } else {
-            alert('No coordinates available.');
+            $('#'+QueryService.dialog.options.coordOutput[0]).val(coord1)
+            $('#'+QueryService.dialog.options.coordOutput[0]).trigger('input'); 
+            $('#'+QueryService.dialog.options.coordOutput[1]).val(coord2)
+            $('#'+QueryService.dialog.options.coordOutput[1]).trigger('input'); 
         }
-    };
-
-    $scope.inputPlateConeSearch = function(coord1,coord2) {
-        $('#plate_racent').val(coord1);
-        $('#plate_racent').trigger('input');
-        $('#plate_decent').val(coord2);
-        $('#plate_decent').trigger('input');    
-    };
-
-    $scope.inputSourceConeSearch = function(coord1,coord2) {
-        $('#cone_ra').val(coord1);
-        $('#cone_ra').trigger('input');
-        $('#cone_dec').val(coord2)
-        $('#cone_dec').trigger('input');
-    };
-
-    // Search for the Catalog ID using the VizieR
-    $scope.vizierSearch = function (coord1,coord2) {
-        if (coord1 !== "") {
-            SearchService.vizierSearch(coord1,coord2,function(data){
-                $scope.vizierResults = data;
-                $scope.vizierCenter = {'ra':coord1,'dec':coord2}
-                ModalService.open();
-            });
-        } else {
-            alert('No coordinates available.');
-        }
-    }
-
-    // Insert ID into the query text field
-    // event is handled in 'query.js' file
-    $scope.inputCatalogIdIntoQuery = function (id) {
-        $scope.$emit('browserItemDblClicked','coords',id);
         ModalService.close();
     }
 
-    // Insert ID into the "light curve" text field
-    $scope.inputCatalogIdIntoSlc = function (id) {
-        $('#scl_id').val(id)
-        $('#scl_id').trigger('input');
+    // Paste IDs
+    $scope.pasteIDs = function(id) {
+        if (QueryService.dialog.options==undefined) {
+            $rootScope.$broadcast('browserItemDblClicked','cdssearch',id);
+        } else {
+            $('#'+QueryService.dialog.options.idOutput).val(id)
+            $('#'+QueryService.dialog.options.idOutput).trigger('input'); 
+        }
         ModalService.close();
     }
 

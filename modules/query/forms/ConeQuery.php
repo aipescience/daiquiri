@@ -68,35 +68,14 @@ class Query_Form_ConeQuery extends Query_Form_AbstractFormQuery {
      */
     public function init() {
 
-        $html = '<div class="daiquiri-query-bar" style="width:150px;">
-            <ul class="nav-pills pull-left">
-                <li>
-                    <a ng-click="showSimbadSearch = !showSimbadSearch" href style="width:126px;text-align:center;">{{showSimbadSearch?"Hide Simbad search":"Show Simbad search"}}</a>
-                </li>
-            </ul>
-            </div>
-            <div ng-show="showSimbadSearch" ng-init="showSimbadSearch = false">
-                <div id="simbad-search-resolver" ng-controller="SimbadSearchController">
-                    <div id="simbad-search-form">
-                        <input type="text" name="simbad-search-identifier" id="simbad-search-input" ng-model="query" ng-keydown="simbadInput($event);" />
-                        <input type="button" value="Search on Simbad" class="btn pull-right" id="simbad-search-submit" ng-click="simbadSearch()" />
-                    </div>
-
-                    <ul id="simbad-search-results" class="daiquiri-widget nav nav-pills nav-stacked">
-                        <li ng-repeat="item in result.data" class="nav-item" ng-dblclick="$parent.inputSourceConeSearch(item.coord1,item.coord2)">
-                            <div class="object">{{item.object}}</div>
-                            <div class="type">{{item.type}}</div>
-                            <div class="coords">{{item.coord1}} &nbsp; {{item.coord2}}</div>
-                        </li>
-                        <li ng-show="result.data.length==0" class="simbad-search-results-empty">
-                            No results for "{{result.query}}"
-                        </li>
-                    </ul>
-                </div>
-                <div class="daiquiri-query-bar-hint">
-                    A double click on an item will copy the corresponding coordinates into the following form fields.
-                </div>
-            </div>';
+        // CDS Search tool
+        $options_json = Zend_Json::encode(array(
+          'idOutput'=>false,
+          'coordOutput'=>array('cone_ra','cone_dec')
+        ));
+        $html = '<div ng-controller="BarController" ng-init=\'dialogOptions = '.$options_json.'\' class="cds-search-button">
+                    <a ng-click="toogleCdsSearch()">Get coordinates from Simbad search</a>
+                 </div>';
         $this->addNoteElement('cone_simbad', $html);
 
         // add form elements

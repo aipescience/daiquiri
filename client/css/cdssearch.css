@@ -1,0 +1,19 @@
+#cdsSearchWrapper {
+  padding: 15px;
+}
+
+#cdsSearchWrapper a {
+  cursor: pointer;
+}
+
+.cds-search-button {
+  height: 30px;
+}
+.cds-search-button a {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 2px 12px;
+  float: left;
+  display: block;
+  cursor:pointer;
+}
