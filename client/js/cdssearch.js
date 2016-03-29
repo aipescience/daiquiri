@@ -42,7 +42,7 @@ angular.module('cdsSearch',['browser','query'])
       idOutput: true  // is ID clickable
     };
 
-    function resetResults() { 
+    function resetResults() {
         simbadResults.query = '';
         simbadResults.data = false;
         simbadResults.coordOutput = true;
@@ -53,7 +53,7 @@ angular.module('cdsSearch',['browser','query'])
 
     // Search on Simbad and parse the data
     function simbadSearch(query,callback) {
-        
+
         simbadResults.query = query;
 
         /*
@@ -62,10 +62,12 @@ angular.module('cdsSearch',['browser','query'])
          * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-url
          * http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-fscript#VotableFields
          */
-        var opts = {"output.format": "votable",
-                    "output.params": "main_id,coo(d),otype(V)",
-                    "Ident": simbadResults.query}
-        
+        var opts = {
+            "output.format": "votable",
+            "output.params": "main_id,coo(d),otype(V)",
+            "Ident": simbadResults.query
+        };
+
         // get and parse the XML VOTable
         $http({
            method: 'GET',
@@ -83,12 +85,12 @@ angular.module('cdsSearch',['browser','query'])
                     coord1: cols.eq(1).text(),
                     coord2: cols.eq(2).text(),
                 };
-            }); 
+            });
 
             if (QueryService.dialog.options!==undefined) {
-                if (QueryService.dialog.options.coordOutput==false) {
+                if (QueryService.dialog.options.coordOutput === false) {
                     simbadResults.coordOutput = false;
-                }  
+                }
             }
 
             callback();
@@ -102,7 +104,7 @@ angular.module('cdsSearch',['browser','query'])
     function vizierSearch(coords,callback) {
 
         vizierResults.query = coords;
-        var catalogs = options.vizierSearchCatalogs
+        var catalogs = options.vizierSearchCatalogs;
 
         /*
          * VizieR query URL
@@ -112,13 +114,15 @@ angular.module('cdsSearch',['browser','query'])
          * More catalogs can be set in Daiquiri "Admin>Configuration" by editing of "query.simbadSearch.vizier.catalogs.X"
          * Use the VizieR catalog identifiers (i.e. I/322A, J/MNRAS/416/2265,...) from the CDS Catalogue list.
          */
-        var opts = {"-source":catalogs.join(" "),
+        var opts = {
+                "-source": catalogs.join(" "),
                 "-c": vizierResults.query,
-                "-c.r":2,
-                "-out":"_RA _DEC _r *meta.id.part;meta.main *meta.id;meta.main",
-                "-sort":"_r",
-                "-out.max":5}
-       
+                "-c.r": 2,
+                "-out": "_RA _DEC _r *meta.id.part;meta.main *meta.id;meta.main",
+                "-sort": "_r",
+                "-out.max": 5
+            };
+
         // get and parse the XML VOTable
         $http({
            method: 'GET',
@@ -128,17 +132,17 @@ angular.module('cdsSearch',['browser','query'])
             $xml = $(xmlDoc);
 
             vizierResults.data = {'results':{},'show':false};
-            for (c in catalogs) {
-                var $cxml = $xml.find("RESOURCE[name='"+catalogs[c]+"']")
-                
+            for (var c in catalogs) {
+                var $cxml = $xml.find("RESOURCE[name='"+catalogs[c]+"']");
+
                 $cxml.find("TABLEDATA TR").each(function() {
                   cols = $(this).find('TD');
                   if (catalogs[c]=='I/259') { // exception for Tycho 2 catalog
-                      id = cols.eq(3).text()+"-"+cols.eq(4).text()+"-"+cols.eq(5).text()
+                      id = cols.eq(3).text()+"-"+cols.eq(4).text()+"-"+cols.eq(5).text();
                   } else {
-                      id = cols.eq(3).text()
+                      id = cols.eq(3).text();
                   }
-                  r = cols.eq(2).text()
+                  r = cols.eq(2).text();
                   vizierResults.data['results'][r+'_'+c] = {
                       id: id,
                       ra: cols.eq(0).text(),
@@ -149,11 +153,11 @@ angular.module('cdsSearch',['browser','query'])
                   vizierResults.data['show'] = true;
                 });
             }
-            
+
             if (QueryService.dialog.options!==undefined) {
-                if (QueryService.dialog.options.idOutput==false) {
+                if (QueryService.dialog.options.idOutput === false) {
                     vizierResults.idOutput = false;
-                }  
+                }
             }
 
             callback();
@@ -175,7 +179,7 @@ angular.module('cdsSearch',['browser','query'])
 
 //Controller for a Simbad search form
 .controller('CdsSearchController', ['$scope','$rootScope','CdsSearchService','ModalService','QueryService',function ($scope, $rootScope, CdsSearchService,ModalService,QueryService) {
-    
+
     $scope.simbadQuery = '';
     $scope.simbad = CdsSearchService.simbadResults;
 
@@ -185,7 +189,7 @@ angular.module('cdsSearch',['browser','query'])
     // Perform a Simbad search and get the data
     $scope.simbadSearch = function () {
         if ($scope.simbadQuery !== "") {
-            CdsSearchService.simbadSearch($scope.simbadQuery,function(){       
+            CdsSearchService.simbadSearch($scope.simbadQuery,function(){
             });
         }
     };
@@ -207,7 +211,7 @@ angular.module('cdsSearch',['browser','query'])
         $scope.vizierSearch(function(){
             $('#vizierTabButton').tab('show');
         });
-    }
+    };
 
     // Overide an enter/return stoke in the input field
     $scope.simbadInput = function (event) {
@@ -229,26 +233,26 @@ angular.module('cdsSearch',['browser','query'])
 
     // Paste coordinates
     $scope.pasteCoordinates = function(coord1,coord2) {
-        if (QueryService.dialog.options==undefined) {
+        if (angular.isUndefinec(QueryService.dialog.options)) {
             $rootScope.$broadcast('browserItemDblClicked','cdssearch',coord1+' '+coord2);
         } else {
-            $('#'+QueryService.dialog.options.coordOutput[0]).val(coord1)
-            $('#'+QueryService.dialog.options.coordOutput[0]).trigger('input'); 
-            $('#'+QueryService.dialog.options.coordOutput[1]).val(coord2)
-            $('#'+QueryService.dialog.options.coordOutput[1]).trigger('input'); 
+            $('#'+QueryService.dialog.options.coordOutput[0]).val(coord1);
+            $('#'+QueryService.dialog.options.coordOutput[0]).trigger('input');
+            $('#'+QueryService.dialog.options.coordOutput[1]).val(coord2);
+            $('#'+QueryService.dialog.options.coordOutput[1]).trigger('input');
         }
         ModalService.close();
-    }
+    };
 
     // Paste IDs
     $scope.pasteIDs = function(id) {
-        if (QueryService.dialog.options==undefined) {
+        if (angular.isUndefinec(QueryService.dialog.options)) {
             $rootScope.$broadcast('browserItemDblClicked','cdssearch',id);
         } else {
-            $('#'+QueryService.dialog.options.idOutput).val(id)
-            $('#'+QueryService.dialog.options.idOutput).trigger('input'); 
+            $('#'+QueryService.dialog.options.idOutput).val(id);
+            $('#'+QueryService.dialog.options.idOutput).trigger('input');
         }
         ModalService.close();
-    }
+    };
 
 }]);
