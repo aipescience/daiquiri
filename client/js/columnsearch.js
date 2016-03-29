@@ -40,28 +40,30 @@ angular.module('columnSearch',['browser'])
 
                     // Preparing a string to be searched in
                     var string = data.databases[d].tables[t].columns[c].tooltip;
-                    string = string.replace( /(\<br \/\>|)\<i\>(Type|UCD|Unit):\<\/i\>/ig ,' '); // removing the titles
-                    string = data.databases[d].name +  " " +
-                    data.databases[d].tables[t].name + " " +
-                    data.databases[d].tables[t].columns[c].name + " " + string;
+                    if (angular.isDefined(string)) {
+                        string = string.replace(/(\<br \/\>|)\<i\>(Type|UCD|Unit):\<\/i\>/ig ,' '); // removing the titles
+                        string = data.databases[d].name +  " " +
+                            data.databases[d].tables[t].name + " " +
+                            data.databases[d].tables[t].columns[c].name + " " + string;
 
-                    // Search each subquery in the string
-                    var found = true;
-                    for (q=0; q<query.length; q++) {
-                        if (string.search(new RegExp(query[q],"i"))<0) {
-                            found = false;
+                        // Search each subquery in the string
+                        var found = true;
+                        for (q=0; q<query.length; q++) {
+                            if (string.search(new RegExp(query[q],"i"))<0) {
+                                found = false;
+                            }
                         }
-                    }
 
-                    // Append list if each subquery was found in the string
-                    if (found) {
-                        searchResults[i] = {
-                            database: data.databases[d].name,
-                            table: data.databases[d].tables[t].name,
-                            column: data.databases[d].tables[t].columns[c].name,
-                            tooltip: data.databases[d].tables[t].columns[c].tooltip
-                        };
-                        i++;
+                        // Append list if each subquery was found in the string
+                        if (found) {
+                            searchResults[i] = {
+                                database: data.databases[d].name,
+                                table: data.databases[d].tables[t].name,
+                                column: data.databases[d].tables[t].columns[c].name,
+                                tooltip: data.databases[d].tables[t].columns[c].tooltip
+                            };
+                            i++;
+                        }
                     }
                 }
             }
