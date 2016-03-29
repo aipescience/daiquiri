@@ -87,7 +87,7 @@ angular.module('cdsSearch',['browser','query'])
                 };
             });
 
-            if (QueryService.dialog.options!==undefined) {
+            if (angular.isDefined(QueryService.dialog.options)) {
                 if (QueryService.dialog.options.coordOutput === false) {
                     simbadResults.coordOutput = false;
                 }
@@ -154,7 +154,7 @@ angular.module('cdsSearch',['browser','query'])
                 });
             }
 
-            if (QueryService.dialog.options!==undefined) {
+            if (angular.isDefined(QueryService.dialog.options)) {
                 if (QueryService.dialog.options.idOutput === false) {
                     vizierResults.idOutput = false;
                 }
@@ -233,7 +233,7 @@ angular.module('cdsSearch',['browser','query'])
 
     // Paste coordinates
     $scope.pasteCoordinates = function(coord1,coord2) {
-        if (angular.isUndefinec(QueryService.dialog.options)) {
+        if (angular.isUndefined(QueryService.dialog.options)) {
             $rootScope.$broadcast('browserItemDblClicked','cdssearch',coord1+' '+coord2);
         } else {
             $('#'+QueryService.dialog.options.coordOutput[0]).val(coord1);
@@ -246,7 +246,7 @@ angular.module('cdsSearch',['browser','query'])
 
     // Paste IDs
     $scope.pasteIDs = function(id) {
-        if (angular.isUndefinec(QueryService.dialog.options)) {
+        if (angular.isUndefined(QueryService.dialog.options)) {
             $rootScope.$broadcast('browserItemDblClicked','cdssearch',id);
         } else {
             $('#'+QueryService.dialog.options.idOutput).val(id);
