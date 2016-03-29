@@ -75,14 +75,16 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                         <a href="" ng-click="toogleFunctions()">Function browser</a>
                     </li>';
 
-        if (Daiquiri_Config::getInstance()->query->simbadSearch->enabled) {
+        if (Daiquiri_Config::getInstance()->query->simbadSearch
+            && Daiquiri_Config::getInstance()->query->simbadSearch->enabled) {
             $html .= '
                     <li ng-class="{\'active\': visible === \'simbadSearch\'}">
                         <a href="" ng-click="toogleCdsSearch()">CDS search</a>
                     </li>';
         }
 
-        if (Daiquiri_Config::getInstance()->query->columnSearch->enabled) {
+        if (Daiquiri_Config::getInstance()->query->columnSearch
+            && Daiquiri_Config::getInstance()->query->columnSearch->enabled) {
             $html .= '
                     <li ng-class="{\'active\': visible === \'columnSearch\'}">
                         <a href="" ng-click="toogleColumnSearch()">Column search</a>
@@ -126,7 +128,8 @@ class Query_Form_SqlQuery extends Query_Form_AbstractFormQuery {
                 </div>
             </div>';
 
-        if (Daiquiri_Config::getInstance()->query->columnSearch->enabled) {
+        if (Daiquiri_Config::getInstance()->query->columnSearch
+            && Daiquiri_Config::getInstance()->query->columnSearch->enabled) {
             $html .= '
             <div ng-show="visible === \'columnSearch\'">
                 <div id="column-search-wrapper" ng-controller="ColumnSearchController">

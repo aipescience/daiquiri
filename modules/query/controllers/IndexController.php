@@ -55,7 +55,9 @@ class Query_IndexController extends Daiquiri_Controller_Abstract {
         if (!empty(Daiquiri_Config::getInstance()->query->simbadSearch)) {
             $options['simbadSearchUrl'] = Daiquiri_Config::getInstance()->query->simbadSearch->url;
             $options['vizierSearchUrl'] = Daiquiri_Config::getInstance()->query->simbadSearch->vizier->url;
-            $options['vizierSearchCatalogs'] = Daiquiri_Config::getInstance()->query->simbadSearch->vizier->catalogs->toArray();
+            if (!empty(Daiquiri_Config::getInstance()->query->simbadSearch->vizier->catalogs)) {
+                $options['vizierSearchCatalogs'] = Daiquiri_Config::getInstance()->query->simbadSearch->vizier->catalogs->toArray();
+            }
         }
         $this->view->options = $options;
 
