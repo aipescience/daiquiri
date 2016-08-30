@@ -395,7 +395,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
     public function put($requestParams, $putParams, $rawBody) {
         // if there is a tablename set, then check its validity
-        if (isset($postParams['table'])) {
+        if (isset($putParams['table'])) {
             $this->tablenameIsValid($postParams['table']);
         }
 
