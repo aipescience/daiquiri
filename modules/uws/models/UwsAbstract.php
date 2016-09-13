@@ -234,6 +234,11 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
     }
 
     public function post($requestParams, $postParams) {
+        // if there is a tablename set, then check its validity
+        if (isset($postParams['table'])) {
+            $this->tablenameIsValid($postParams['table']);
+        }
+
         // get the wildcard parameters
         $wildParams = array();
         foreach ($requestParams as $key => $value) {
@@ -389,6 +394,11 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
     }
 
     public function put($requestParams, $putParams, $rawBody) {
+        // if there is a tablename set, then check its validity
+        if (isset($putParams['table'])) {
+            $this->tablenameIsValid($postParams['table']);
+        }
+
         // get the wildcard parameters
         $wildParams = array();
         foreach ($requestParams as $key => $value) {
@@ -670,6 +680,22 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         } else {
             $this->abortJobImpl($job);
         }
+    }
+
+    public function tablenameIsValid($value) {
+        $isValid = true;
+
+        if (preg_match("/[^A-Za-z0-9\,\_\:\]\[\<\>\+\-]/", $value)) {
+            $isValid = false;
+            throw new Daiquiri_Exception_BadRequest("Table name not valid. Only digits, letters and [ ] < > + - _ , : are allowed.");
+        }
+
+        if (strlen($value) > 128) {
+            $isValid = false;
+            throw new Daiquiri_Exception_BadRequest("Table name not valid. At most 128 characters are allowed.");
+        }
+
+        return $isValid;
     }
 
 }

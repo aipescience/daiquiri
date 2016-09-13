@@ -49,9 +49,7 @@ angular.module('codemirror', [])
         insert: function (key, string) {
             if (angular.isDefined(elements[key])) {
                 var pos = elements[key].getCursor();
-                pos['ch'] += string.length;
                 elements[key].replaceSelection(string);
-                elements[key].setCursor(pos);
                 elements[key].focus();
             }
         },
