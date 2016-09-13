@@ -52,7 +52,7 @@
 
     padding-top: 5px;
     padding-bottom: 5px;
-    padding-right: 24px;
+    padding-right: 32px;
 
     overflow-x: hidden;
     text-overflow: ellipsis;
@@ -61,7 +61,7 @@
 }
 .daiquiri-browser .daiquiri-browser-body li a i {
     position: absolute;
-    right: 12px;
+    right: 18px;
     opacity: 0.3;
 }
 .daiquiri-browser .nav-pills > .selected > a,
