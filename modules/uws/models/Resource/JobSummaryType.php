@@ -36,6 +36,7 @@ class Uws_Model_Resource_JobSummaryType extends Uws_Model_Resource_Abstract {
         $this->ownerId = false;
         $this->phase = "PENDING";
         $this->quote = false;
+        $this->creationTime = false;
         $this->startTime = false;
         $this->endTime = false;
         $this->executionDuration = 0;
@@ -99,10 +100,11 @@ class Uws_Model_Resource_JobSummaryType extends Uws_Model_Resource_Abstract {
         $job->appendChild($version);
 
         $this->_writeXMLElement($xmlDoc, $job, "jobId");
-        $this->_writeXMLElement($xmlDoc, $job, "runId", true);
+        $this->_writeXMLElement($xmlDoc, $job, "runId"); //, true, do not add "true: in order to set the element even if null
         $this->_writeXMLElement($xmlDoc, $job, "ownerId");
         $this->_writeXMLElement($xmlDoc, $job, "phase");
         $this->_writeXMLElement($xmlDoc, $job, "quote");
+        $this->_writeXMLElement($xmlDoc, $job, "creationTime");
         $this->_writeXMLElement($xmlDoc, $job, "startTime");
         $this->_writeXMLElement($xmlDoc, $job, "endTime");
         $this->_writeXMLElement($xmlDoc, $job, "executionDuration");

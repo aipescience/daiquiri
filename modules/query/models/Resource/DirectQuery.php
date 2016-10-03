@@ -71,7 +71,7 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
 
         // get jobId from the options, or not
         if (!empty($options) && array_key_exists('jobId', $options)) {
-            $job['id'] = "{$options['jobId']}";
+            $job['id'] = "{$options['jobId']}"; // will be overwritten later on by "true" jobId => remove?
         }
 
         // create the actual sql statement
@@ -156,10 +156,19 @@ class Query_Model_Resource_DirectQuery extends Query_Model_Resource_AbstractQuer
         }
 
         // set other fields in job object
-        $job['time'] = date("Y-m-d\TH:i:s");
+
+        // if no time is set yet (or it is Null/0's), then create it now, otherwise keep the stored (creation) time
+        if (!empty($options) && array_key_exists('creationTime', $options)) {
+            $job['time'] = $options['creationTime'];
+        }
+        // check if time is 0, even if it was already set (because if creationTime was NULL, we do not want to use this)
+        if ($job['time'] == false || $job['time'] == "0000-00-00 00:00:00" || $job['time'] == NULL) {
+            $job['time'] = date("Y-m-d H:i:s");
+        }
+
         $job['complete'] = true;
 
-        // insert job into jobs table
+        // insert job into jobs table // is this the one on the server??
         $job['id'] = $this->getJobResource()->insertRow($job);
     }
 

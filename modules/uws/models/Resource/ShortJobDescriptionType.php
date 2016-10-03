@@ -31,6 +31,10 @@ class Uws_Model_Resource_ShortJobDescriptionType extends Uws_Model_Resource_Abst
 
         $this->name = $name;
         $this->id = false;
+        $this->jobId = false;
+        $this->runId = false;
+        $this->ownerId = false;
+        $this->creationTime = false;
         $this->reference = new Uws_Model_Resource_ReferenceAttrGrp();
         $this->phase = array();
     }
@@ -38,9 +42,26 @@ class Uws_Model_Resource_ShortJobDescriptionType extends Uws_Model_Resource_Abst
     public function toXML(&$xmlDoc, &$node = false) {
         $job = $xmlDoc->createElementNS($this->nsUws, "uws:{$this->name}");
 
+        // note: this id must be the jobId for the job (not job name or resultTable name),
+        // This must be the same id as used in the href-element
         $id = $xmlDoc->createAttribute("id");
         $id->value = htmlspecialchars($this->id, ENT_QUOTES);
         $job->appendChild($id);
+
+        // add optional attributes allowed by UWS 1.1 update:
+        // use our job-name or table-name for runId
+        $runId = $xmlDoc->createAttribute("runId");
+        $runId->value = htmlspecialchars($this->runId, ENT_QUOTES);
+        $job->appendChild($runId);
+
+        $ownerId = $xmlDoc->createAttribute("ownerId");
+        $ownerId->value = htmlspecialchars($this->ownerId, ENT_QUOTES);
+        $job->appendChild($ownerId);
+
+        $creationTime = $xmlDoc->createAttribute("creationTime");
+        $creationTime->value = htmlspecialchars($this->creationTime, ENT_QUOTES);
+        $job->appendChild($creationTime);
+
         $this->reference->toXML($xmlDoc, $job);
 
         foreach ($this->phase as $phase) {

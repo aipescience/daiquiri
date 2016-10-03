@@ -578,6 +578,11 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
         $jobUWS->quote = $this->getQuote();
 
+        // set a creation time, for updated UWS 1.1 version
+        $now = date('Y-m-d H:i:s');
+        //$now = $now->format('c');
+        $jobUWS->creationTime = $now;
+
         //no destruction time supported, so return hillariously high number
         $datetime = new DateTime('31 Dec 2999');
         $jobUWS->destruction = $datetime->format('c');
@@ -597,9 +602,13 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
             $jobUWS->executionDuration = NULL;
         }
 
+        // Do not support a custom runId set by client, because we want to use
+        // the table-name for this
         if (isset($postParams['runid'])) {
-            $jobUWS->runId = $postParams['runid'];
             unset($postParams['runid']);
+        }
+        if (isset($postParams['table'])) {
+            $jobUWS->runId = $postParams['table'];
         } else {
             $jobUWS->runId = NULL;
         }
@@ -616,6 +625,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         $job['ownerId'] = $jobUWS->ownerId;
         $job['phase'] = $jobUWS->phase;
         $job['quote'] = $jobUWS->quote;
+        $job['creationTime'] = $jobUWS->creationTime;
         $job['startTime'] = $jobUWS->startTime;
         $job['endTime'] = $jobUWS->endTime;
         $job['executionDuration'] = $jobUWS->executionDuration;
@@ -639,7 +649,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
         return $jobId;
     }
 
-    //optains a (pending) job in the UWS job list
+    //obtains a (pending) job from the UWS job list
     public function getPendingJob($id) {
         $resource = new Uws_Model_Resource_UWSJobs();
         $job = $resource->fetchObjectWithId($id);
@@ -672,7 +682,7 @@ abstract class Uws_Model_UwsAbstract extends Daiquiri_Model_Abstract {
 
             // job is put into final state; set endTime, if not existing yet
             if (!$job->endTime) {
-                $datetimeEnd = date('Y-m-d\TH:i:s');
+                $datetimeEnd = date('Y-m-d H:i:s');
                 $job->endTime = $datetimeEnd;
                 $resource->updateRow($job->jobId, array("endTime" => $job->endTime));
             }

@@ -111,15 +111,16 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
     }
 
     /**
-     * Querys the database with a plain text query.
+     * Queries the database with a plain text query.
      * @param string $sql the sql string
      * @param bool $plan flag for plan creation
      * @param string $table result table
      * @param array $options for further options that are handeled by the queue
+     * @param string $creationTime time of creation for uws-jobs (from pending phase) (for new UWS 1.1)
      * @param string $jobType job type of the new job
      * @return array $response
      */
-    public function query($sql, $plan = false, $table, $sources, $options = array(), $jobType = 'web') {
+    public function query($sql, $plan = false, $table, $sources, $options = array(), $creationTime = NULL, $jobType = 'web') {
         // init error array
         $errors = array();
 
@@ -182,6 +183,9 @@ class Query_Model_Query extends Daiquiri_Model_Abstract {
             $tmp[] = $this->_queue->quoteIdentifier($source['database'],$source['table']);
         }
         $job['sources'] = implode(',',$tmp);
+
+        // also provide the creationTime as option to submitJob
+        $options['creationTime'] = $creationTime;
 
         // submit job
         $this->_queue->submitJob($job, $errors, $options);

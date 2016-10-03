@@ -92,6 +92,7 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
         $jobUWS->ownerId = $row['ownerId'];
         $jobUWS->phase = $row['phase'];
         $jobUWS->quote = $row['quote'];
+        $jobUWS->creationTime = $row['creationTime'];
 
         if ($row['startTime'] !== "0000-00-00 00:00:00" && $row['startTime'] != NULL) {
             $datetime = new DateTime($row['startTime']);
@@ -101,6 +102,11 @@ class Uws_Model_Resource_UWSJobs extends Daiquiri_Model_Resource_Table {
         if ($row['endTime'] !== "0000-00-00 00:00:00" && $row['endTime'] != NULL) {
             $datetime = new DateTime($row['endTime']);
             $jobUWS->endTime = $datetime->format('c');
+        }
+
+        if ($row['creationTime'] !== "0000-00-00 00:00:00" && $row['creationTime'] != NULL) {
+            $datetime = new DateTime($row['creationTime']);
+            $jobUWS->creationTime = $datetime->format('c');
         }
 
         $jobUWS->executionDuration = intval($row['executionDuration']);

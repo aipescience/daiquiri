@@ -153,10 +153,19 @@ class Query_Model_Resource_QQueueQuery extends Query_Model_Resource_AbstractQuer
             return Query_Model_Resource_QQueueQuery::$_status['error'];
         }
 
-        // fetch the new jobs row for the timestamp and the status
+        // fetch the new jobs row for the status
         $row = $this->fetchRow($job['id']);
-        $job['time'] = $row['timeSubmit'];
         $job['status_id'] = $row['status_id'];
+
+        // if no time is set yet, then create it now, otherwise keep the stored (creation) time
+        // set the job's 'time' to the creationTime provided in $options;
+        // if no creationTime given (or Null/000), use "timeSubmit" from the server instead
+        if (!empty($options) && array_key_exists('creationTime', $options)) {
+            $job['time'] = $options['creationTime'];
+        }
+        if ($job['time'] == false || $job['time'] == "0000-00-00 00:00:00" || $job['time'] == NULL) {
+            $job['time'] = $row['timeSubmit'];
+        }
 
         // insert job into jobs table
         $this->getJobResource()->insertRow($job);
