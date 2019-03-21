@@ -87,7 +87,7 @@ function identifier_func($atts) {
     ), $atts ) );
 
     // more identifier systems to be implemented
-    if ($doi) $html = "<p>Please cite this data set using the unique digital object identifier <a href=\"http://dx.doi.org/{$doi}\">doi:{$doi}</a>.";
+    if ($doi) $html = "<p>Please cite this data set using the unique digital object identifier <a href=\"https://doi.org/{$doi}\">doi:{$doi}</a>.";
 
     return $html;
 }
